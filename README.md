@@ -8,9 +8,10 @@ Each skill is a self-contained set of instructions, policy knowledge, and code e
 
 | Name | Description |
 |------|-------------|
-| [wikimedia-api-access](.claude/wikimedia-api-access/SKILL.md) | Access Wikimedia APIs (REST, Action, SPARQL) with correct User-Agent headers, rate limiting, and 429/403 error handling |
-| [wikimedia-pageviews](.claude/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties or the REST API |
-| [wikipedia-en-biography-writing](.claude/wikipedia-en-biography-writing/SKILL.md) | Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and BLP policies |
+| [wikimedia-api-access](.claude/skills/wikimedia-api-access/SKILL.md) | Access Wikimedia APIs (REST, Action, SPARQL) with correct User-Agent headers, rate limiting, and 429/403 error handling |
+| [wikimedia-database](.claude/skills/wikimedia-database/SKILL.md) | Execute SQL queries against Wikimedia production replicas via an SSH tunnel to Toolforge |
+| [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties or the REST API |
+| [wikipedia-en-biography-writing](.claude/skills/wikipedia-en-biography-writing/SKILL.md) | Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and BLP policies |
 
 ## Usage
 
@@ -24,14 +25,14 @@ cp -r Wikipedia-AI-Skills/.claude /path/to/your/project/
 ### Install a single skill
 
 ```bash
-cp -r Wikipedia-AI-Skills/.claude/wikimedia-pageviews /path/to/your/project/.claude/
+cp -r Wikipedia-AI-Skills/.claude/skills/wikimedia-pageviews /path/to/your/project/.claude/skills/
 ```
 
 Once installed, your AI coding agent will discover the skill automatically through the `skill` tool. You can also open any `SKILL.md` file and paste its contents directly into an agent's instructions.
 
 ## Skill format
 
-Every skill lives in `.claude/<name>/SKILL.md` with this structure:
+Every skill lives in `.claude/skills/<name>/SKILL.md` with this structure:
 
 ```yaml
 ---
