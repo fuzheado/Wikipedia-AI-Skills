@@ -1,0 +1,148 @@
+---
+name: wikipedia-en-biography-writing
+description: Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and biographies of living persons (BLP) policies
+license: MIT
+compatibility: opencode
+---
+
+## SOP: Notability Assessment
+
+Before drafting, evaluate whether the subject meets English Wikipedia's notability criteria. If notability is unclear, flag it for the user rather than proceeding.
+
+### General Notability (WP:GNG)
+The subject must have received **significant coverage** in **multiple reliable sources** that are **independent** of the subject. Depth of coverage matters — brief mentions or directory listings do not count.
+
+### Subject-Specific Guidelines
+- **WP:ANYBIO** — Received a major award, or been inducted into a notable hall of fame.
+- **WP:NACADEMIC** — Professor with major academic awards, highly cited research, a named chair, or editorial role at a top journal.
+- **WP:NARTIST** — Work exhibited at major museums, significant critical attention, or representation in notable galleries.
+- **WP:NCREATIVE** — Subject's creative work has been the subject of multiple independent reviews or major awards.
+
+### When Notability Is Unclear
+State: "This subject may not meet Wikipedia's notability guidelines. The provided sources should be checked for significant, independent coverage." Proceed only if the user confirms and supplies sufficient sources.
+
+## SOP: Article Structure
+
+Use this standard biography structure. Do not deviate from the section ordering.
+
+```wikitext
+{{Infobox person
+| name          = 
+| image         = 
+| caption       = 
+| birth_date    = 
+| birth_place   = 
+| death_date    = 
+| death_place   = 
+| nationality   = 
+| occupation    = 
+| known_for     = 
+| alma_mater    = 
+| awards        = 
+}}
+```
+
+### Lead (unnamed, first paragraph)
+- 2-4 paragraphs summarizing the subject's most important facts
+- First sentence: **"[Name] (born [date]) is a [nationality] [occupation] known for [key achievement]."**
+- Establish notability immediately
+- No citations needed for facts restated from the body (WP:LEADCITE)
+
+### Body Sections
+```wikitext
+== Early life and education ==
+Early years, family background, schooling.
+
+== Career ==
+Professional trajectory, major achievements. For academics: research, publications, teaching. For artists: exhibitions, works, critical reception.
+
+== Personal life ==
+Only include if well-sourced and relevant. For living subjects, keep minimal — spouse, children, notable residences. Exclude private details (address, phone).
+
+== Awards and honors ==
+List with inline citations. Use a bullet list or prose depending on quantity.
+
+== Selected works ==
+For authors, filmmakers, or artists. Use a numbered list or a table.
+
+== References ==
+{{reflist}}
+```
+
+## SOP: Citations
+
+### Citation Templates
+Always use inline `<ref>` tags with the appropriate citation template:
+
+```wikitext
+<ref>{{cite web |url= |title= |last= |first= |date= |website= |access-date=}}</ref>
+
+<ref>{{cite news |url= |title= |last= |first= |date= |work= |publisher= |access-date=}}</ref>
+
+<ref>{{cite book |title= |last= |first= |date= |publisher= |isbn= |pages=}}</ref>
+
+<ref>{{cite journal |title= |last= |first= |date= |journal= |volume= |issue= |pages= |doi=}}</ref>
+```
+
+### Per-Section Rules
+- **Lead** — No citations needed (facts are cited in the body)
+- **Body** — Every substantive claim needs at least one inline citation directly after the sentence
+- **Controversial claims** — Require multiple strong, independent, reliable sources
+- **Direct quotes** — Must have an inline citation with page number
+- **Statistics** — Must be cited to the specific source containing those numbers
+
+### Source Hierarchy
+1. **Preferred:** Academic journals, major news outlets, government publications, peer-reviewed books
+2. **Acceptable with caution:** Primary sources (for straightforward facts only), reputable magazines, documentaries
+3. **Do not use:** Self-published sources (blogs, social media, personal websites), Wikipedia mirrors, paid or sponsored content
+4. **Never use for BLP:** Tabloids, anonymous sources, rumor sites, user-generated content
+
+## SOP: Policy Guardrails
+
+### BLP (Biographies of Living Persons)
+1. **Remove unsourced or poorly sourced contentious material immediately.** Do not leave it in the draft even temporarily.
+2. **Never include** private information (home address, phone number, email, exact birth date without a source) for a living person.
+3. **Give due weight** — do not overemphasize minor controversies, lawsuits, or personal matters.
+4. **Use neutral language** — avoid loaded terms ("controversial," "alleged," "scandal," "rocky").
+5. **Attribute negative claims** explicitly: "According to a 2020 investigation by The Guardian, ..."
+6. **Harm principle** — If publishing a fact could cause harm and it is not essential to the biography, omit it.
+
+### NPOV (Neutral Point of View)
+1. **Avoid promotional language:** "renowned," "leading," "pioneering," "legendary," "world-class," "visionary."
+2. **Present claims as claims,** not facts: "Smith argues that ..." not "Smith proved that ..."
+3. **Attribute opinions:** "According to X, ..." or "X has described the work as ..."
+4. **Give proportional weight** — major views get more space, fringe views get minimal or no space.
+5. **Do not take sides** in disputes. Describe both sides' positions fairly.
+
+### NOR (No Original Research)
+1. **No synthesis** — Do not connect information across sources to imply a conclusion that neither source states.
+2. **No analysis** — Every fact in the article must be traceable to a published reliable source.
+3. **No interpretation** — Let the sources speak. Do not add your own reading of events.
+
+### Verifiability
+1. Use only published, reliable sources with editorial oversight.
+2. For academic subjects, prefer peer-reviewed journals and university presses.
+3. For current events, prefer major news outlets with fact-checking.
+4. Primary sources (interviews, official documents) are acceptable for straightforward factual claims but not for interpretive analysis.
+
+## SOP: Anti-Hallucination Rules
+
+These are **strict** constraints — violating any of them produces a dangerously bad draft.
+
+1. **Never fabricate a citation.** Every `<ref>` must point to a source the user provided or one you independently verified. If you lack a source, write `{{citation needed}}` and flag it.
+2. **Never guess a URL.** Do not invent a URL for a citation. If the user provides URLs, use them. If not, provide the citation metadata without a link.
+3. **Never assume a source supports a claim.** Read the source in the user's context. If you are unsure what a source says, ask the user.
+4. **Never include dates, statistics, or quotes without a source.** These are the most commonly hallucinated content.
+5. **When in doubt, omit.** If you cannot verify a detail, leave it out rather than inventing it.
+6. **Flag gaps** with `{{citation needed}}`, `{{clarify}}`, or `{{when}}` instead of silently omitting needed citations.
+7. **Review before output.** Before returning a draft, check every `<ref>` against the user's provided sources.
+
+## Workflow: Drafting a Biography
+
+1. **Gather** — Ask the user for: subject name, a short description to avoid disambiguation, and a list of reliable sources (URLs or full bibliographic detail).
+2. **Assess** — Evaluate notability against WP:GNG or subject-specific guidelines. Flag issues before drafting.
+3. **Outline** — Draft section headers based on what the user's sources cover. Skip sections with no source support.
+4. **Write body first** — Build each section with inline citations before writing the lead. This ensures the lead is grounded in sourced content.
+5. **Write lead** — Summarize the body's key points in 2-4 paragraphs. Do not introduce facts not in the body.
+6. **Add infobox** — Use `{{Infobox person}}` with only fields supported by sources.
+7. **Review** — Check against BLP, NPOV, NOR, and every anti-hallucination rule. Flag any concerns to the user.

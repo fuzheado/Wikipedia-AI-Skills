@@ -1,0 +1,53 @@
+# Wikipedia AI Skills
+
+A curated collection of reusable skill files for AI coding agents — [OpenCode](https://opencode.ai), [Claude Code](https://docs.anthropic.com/en/docs/claude-code), and any agent that supports the `.claude/<name>/SKILL.md` convention — to help with Wikipedia and Wikimedia-related tasks.
+
+Each skill is a self-contained set of instructions, policy knowledge, and code examples that an agent loads on demand via the `skill` tool. This means agents get expert-level guidance without bloating their system prompt.
+
+## Skills
+
+| Name | Description |
+|------|-------------|
+| [wikimedia-api-access](.claude/wikimedia-api-access/SKILL.md) | Access Wikimedia APIs (REST, Action, SPARQL) with correct User-Agent headers, rate limiting, and 429/403 error handling |
+| [wikimedia-pageviews](.claude/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties or the REST API |
+| [wikipedia-en-biography-writing](.claude/wikipedia-en-biography-writing/SKILL.md) | Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and BLP policies |
+
+## Usage
+
+### Install all skills into your project
+
+```bash
+git clone https://github.com/fuzheado/Wikipedia-AI-Skills.git
+cp -r Wikipedia-AI-Skills/.claude /path/to/your/project/
+```
+
+### Install a single skill
+
+```bash
+cp -r Wikipedia-AI-Skills/.claude/wikimedia-pageviews /path/to/your/project/.claude/
+```
+
+Once installed, your AI coding agent will discover the skill automatically through the `skill` tool. You can also open any `SKILL.md` file and paste its contents directly into an agent's instructions.
+
+## Skill format
+
+Every skill lives in `.claude/<name>/SKILL.md` with this structure:
+
+```yaml
+---
+name: skill-name
+description: Short description for agent discovery
+license: MIT
+compatibility: opencode
+---
+## SOP: ...
+...agent-facing instructions...
+```
+
+## Contributing
+
+Open an issue or submit a pull request. When adding a new skill, follow the format above and ensure every fact, policy reference, or code example is accurate.
+
+## License
+
+MIT
