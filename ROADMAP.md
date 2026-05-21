@@ -6,9 +6,11 @@
 
 - **wikimedia-api-access** — Complete. Covers Wikimedia API entry points (REST, Action, SPARQL), User-Agent policy compliance with `ContentGapResearch` as the project identifier, rate limiting with Retry-After backoff, connection reuse via `requests.Session()`, 403/429 error handling, and browser-based `Api-User-Agent` workaround. Links to the official Wikimedia Foundation User-Agent Policy.
 
-- **wikimedia-database** — Complete. Covers SSH tunnel setup and connection management (plain `ssh` and `autossh`), Python implementation with `pymysql`, and data handling guardrails (read-only, namespace filtering, binary decoding, safety limits, database naming conventions).
+- **wikimedia-database** — Complete. Covers SSH tunnel setup and connection management (plain `ssh` and `autossh`), Python implementation with `pymysql`, configurable local port via `TOOLFORGE_DB_PORT` (default 3307), and data handling guardrails (read-only, namespace filtering, binary decoding, safety limits, database naming conventions).
 
 - **wikimedia-pageviews** — Complete. Covers two data retrieval paths: cached SQL property (`page_props.pp_propname = 'pageview_daily_average'` with `CAST AS UNSIGNED`) for sorting/filtering large result sets, and the Analytics QuickMetrics REST API for precise historical data. Includes the "no table" guardrail (pageviews table does not exist in SQL replicas).
+
+- **wikimedia-toolforge** — Complete. Covers Toolforge account setup, tool creation, file deployment (rsync, git), web services management (Kubernetes-backed, all runtimes), Kubernetes jobs for batch tasks, cron jobs, environment variables and secrets, logs and debugging. Includes nine guardrails covering common pitfalls (become, SSH keys, NFS, resource limits, etc.) and full example workflows.
 
 - **wikipedia-en-biography-writing** — Complete. Covers notability assessment (WP:GNG, WP:ANYBIO, WP:NACADEMIC, WP:NARTIST, WP:NCREATIVE), biography article structure with wiki markup templates (Infobox person, citation templates, section ordering), citation requirements per section, source hierarchy, policy guardrails for BLP/NPOV/NOR/Verifiability, and seven strict anti-hallucination rules.
 
@@ -19,6 +21,8 @@
 - MIT license
 - README with install instructions
 - GitHub repository initialized at `fuzheado/Wikipedia-AI-Skills`
+- `.claude.json` project configuration for agent discovery
+- `CONTRIBUTING.md` with skill authoring guidelines, accuracy checklist, and PR process
 
 ## What's outstanding
 
@@ -47,8 +51,9 @@
 ### Process
 
 - Add skill tests: for each skill, define a set of prompts to validate that agents follow the SOP correctly
-- Write CONTRIBUTING.md with skill authoring guidelines
+- Write CONTRIBUTING.md with skill authoring guidelines ✅
 - Set up a GitHub issue template for skill suggestions
+- Add `.claude.json` project configuration for agent discovery ✅
 
 ## Key decisions
 

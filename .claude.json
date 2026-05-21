@@ -1,0 +1,8 @@
+{
+  "project": "wikipedia-ai-skills",
+  "description": "A curated collection of reusable skill files for AI coding agents to help with Wikipedia and Wikimedia-related tasks",
+  "skills": {
+    "search_paths": [".claude/skills"],
+    "auto_load": []
+  }
+}

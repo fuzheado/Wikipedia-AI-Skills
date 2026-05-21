@@ -13,6 +13,7 @@ Enables the agent to execute dynamic SQL queries against Wikimedia production re
 * `TOOLFORGE_USER`: The shell/LDAP username for SSH (e.g., `janesmith`).
 * `TOOLFORGE_SQL_USER`: The replica database username (e.g., `u1234`).
 * `TOOLFORGE_SQL_PASSWORD`: The replica database password.
+* `TOOLFORGE_DB_PORT`: The local port for the SSH tunnel (default: `3307`). Set if you need a different port to avoid conflicts with a local MySQL/MariaDB instance.
 
 * **SSH Config:** The user must have their SSH keys added to the `ssh-agent` to allow non-interactive connections.
 
@@ -22,14 +23,14 @@ Enables the agent to execute dynamic SQL queries against Wikimedia production re
 
 Before executing any SQL, the agent must ensure the tunnel is active.
 
-* **Check:** Attempt a connection to `127.0.0.1:3306`.
+* **Check:** Attempt a connection to `127.0.0.1:${TOOLFORGE_DB_PORT:-3307}`.
 * **Auto-Establish:** If the port is closed, the agent should attempt to spawn a background SSH process:
-`ssh -L 3306:enwiki.analytics.db.svc.wikimedia.cloud:3306 ${TOOLFORGE_USER}@login.toolforge.org -N`
+`ssh -L ${TOOLFORGE_DB_PORT:-3307}:enwiki.analytics.db.svc.wikimedia.cloud:3306 ${TOOLFORGE_USER}@login.toolforge.org -N`
 * **Persistence (Recommended):** For long-running data generation, use `autossh` instead of plain
   `ssh`. Autossh monitors the connection and re-establishes it if the tunnel drops, which happens
   frequently during multi-hour sessions. Install with `brew install autossh` (macOS) or
   `apt install autossh` (Linux), then use:
-  `autossh -M 0 -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" -L 3306:enwiki.analytics.db.svc.wikimedia.cloud:3306 ${TOOLFORGE_USER}@login.toolforge.org -N -v`
+  `autossh -M 0 -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" -L ${TOOLFORGE_DB_PORT:-3307}:enwiki.analytics.db.svc.wikimedia.cloud:3306 ${TOOLFORGE_USER}@login.toolforge.org -N -v`
 * **Escalation:** If the tunnel fails to open, provide the user with the command above to run manually.
 
 ### **2. Implementation Pattern (Python)**
@@ -47,7 +48,7 @@ load_dotenv()
 
 def get_db_connection(db_name='enwiki_p'):
     host = '127.0.0.1'
-    port = 3306
+    port = int(os.getenv('TOOLFORGE_DB_PORT', '3307'))
     
     # Check if tunnel is open
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
