@@ -13,6 +13,7 @@
 - **wikimedia-toolforge** — Complete. Covers Toolforge account setup, tool creation, file deployment (rsync, git), web services management (Kubernetes-backed, all runtimes), Kubernetes jobs for batch tasks, cron jobs, environment variables and secrets, logs and debugging. Includes nine guardrails covering common pitfalls (become, SSH keys, NFS, resource limits, etc.) and full example workflows.
 
 - **wikipedia-en-biography-writing** — Complete. Covers notability assessment (WP:GNG, WP:ANYBIO, WP:NACADEMIC, WP:NARTIST, WP:NCREATIVE), biography article structure with wiki markup templates (Infobox person, citation templates, section ordering), citation requirements per section, source hierarchy, policy guardrails for BLP/NPOV/NOR/Verifiability, and seven strict anti-hallucination rules.
+- **wikimedia-cdn-assets** — Complete. Guides agents on loading JavaScript, CSS, and fonts from Wikimedia's privacy-preserving cdnjs.toolforge.org CDN to ensure user privacy and policy compliance.
 
 ### Project infrastructure
 
@@ -50,7 +51,10 @@
 
 ### Process
 
-- Add skill tests: for each skill, define a set of prompts to validate that agents follow the SOP correctly
+- Add skill tests: For each skill, define prompts and validation criteria to ensure agents correctly follow SOPs and adhere to policies.
+    - **Testing Facility:** Utilize a Python-based testing framework (e.g., `pytest`) within a dedicated `tests/` directory. Tests will parse `SKILL.md` files, validate YAML frontmatter, extract SOP instructions, and simulate agent interactions to verify adherence to policies and guardrails.
+    - **Test Definition:** Tests will cover core functionalities, critical guardrails, content accuracy (e.g., policy references, code examples), and edge cases identified within the skill's SOP.
+    - **Coverage Goal:** Aim for a minimum of 3-5 distinct tests per skill, ensuring comprehensive coverage of critical functions and safety constraints. Test suites should be expanded iteratively.
 - Write CONTRIBUTING.md with skill authoring guidelines ✅
 - Set up a GitHub issue template for skill suggestions
 - Add `.claude.json` project configuration for agent discovery ✅
