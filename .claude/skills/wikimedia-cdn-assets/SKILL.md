@@ -1,13 +1,13 @@
 ---
 name: wikimedia-cdn-assets
-description: Guides agents on loading JavaScript, CSS, and fonts from Wikimedia's privacy-preserving cdnjs.toolforge.org CDN to ensure user privacy and policy compliance.
+description: Guides agents on loading JavaScript, CSS, and fonts from Wikimedia's privacy-preserving cdnjs mirror to ensure user privacy and policy compliance.
 license: MIT
 compatibility: all
 ---
 
 ## SOP: Load Web Assets from Wikimedia's CDN
 
-This skill provides guidelines for agents to load common web assets (JavaScript libraries, CSS stylesheets, fonts) from Wikimedia's internal CDN service, `cdnjs.toolforge.org`. This practice is crucial for maintaining user privacy and adhering to Wikimedia's policies by avoiding external, third-party CDNs that may track users.
+This skill provides guidelines for agents to load common web assets (JavaScript libraries, CSS stylesheets, fonts) from Wikimedia's internal cdnjs mirror. This practice is crucial for maintaining user privacy and adhering to Wikimedia's policies by avoiding external, third-party CDNs that may track users.
 
 ### 1. Rationale: Privacy and Policy Compliance
 
@@ -15,68 +15,72 @@ This skill provides guidelines for agents to load common web assets (JavaScript 
 *   **Toolforge Web Hosting Policy:** The `Help:Toolforge/Web` page on wikitech.wikimedia.org mandates the use of internal Wikimedia CDN services for hosted web applications. This ensures that asset delivery aligns with Wikimedia's privacy commitments.
 *   **Performance & Reliability:** While external CDNs can be fast, using the internal one keeps traffic within Wikimedia's infrastructure, potentially reducing latency for users accessing Wikimedia projects and ensuring a consistent experience.
 
-**Key Principle:** Always prioritize `cdnjs.toolforge.org` for loading common web assets when building tools hosted on Toolforge or interacting with Wikimedia services.
+**Key Principle:** Always prioritize the Toolforge cdnjs mirror for loading common web assets when building tools hosted on Toolforge or interacting with Wikimedia services.
 
-### 2. How to Find and Load Assets
+### 2. CDN Mirror URLs
 
-The primary source for these assets is:
-`https://cdnjs.toolforge.org/`
+There are two possible hostnames for the CDN mirror, both using the same path structure:
 
-This service mirrors many popular libraries and frameworks available on the public cdnjs.com but serves them from Wikimedia's domain.
+| Hostname | Works | Notes |
+|----------|-------|-------|
+| `tools-static.wmflabs.org/cdnjs/ajax/libs` | Yes | The only confirmed working endpoint |
+| `cdn.toolforge.org/ajax/libs` | Partial | May not have all libraries cached |
+| `cdnjs.toolforge.org` | No | Returns 404 for all libraries |
+
+**Only `tools-static.wmflabs.org/cdnjs/ajax/libs/...` has been confirmed to work.** The other hostnames (`cdnjs.toolforge.org`, `cdn.toolforge.org`) do not serve actual content — use `tools-static.wmflabs.org/cdnjs/` instead.
 
 **General URL Structure:**
-The URLs typically follow this pattern:
 
-`https://cdnjs.toolforge.org/<library-name>/<version>/<file-type>/<file-name>`
+```
+https://tools-static.wmflabs.org/cdnjs/ajax/libs/<library>/<version>/<file>
+```
 
 **Examples:**
 
-#### a. Loading JavaScript Libraries
-
-To include a JavaScript library (e.g., jQuery, Bootstrap JS), use an HTML `<script>` tag.
-
-**Example: Loading jQuery 3.6.0**
-
 ```html
-<script src="https://cdnjs.toolforge.org/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<link rel="stylesheet" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
 ```
 
-**Example: Loading Bootstrap 5.3.0 JavaScript**
+### 3. How to Find the Correct Library and Version
 
-```html
-<script src="https://cdnjs.toolforge.org/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+The browseable index at `https://cdnjs.toolforge.org/` lists all available libraries but is very large (5MB+). Instead, use the cdnjs API to search for libraries and find the latest version:
+
+**API Endpoint:**
+```
+https://api.cdnjs.com/libraries?search=<query>&fields=version,latest
 ```
 
-#### b. Loading CSS Stylesheets
-
-To include a CSS stylesheet (e.g., Bootstrap CSS, custom stylesheets), use an HTML `<link>` tag in the `<head>` section of your HTML document.
-
-**Example: Loading Bootstrap 5.3.0 CSS**
-
-```html
-<link rel="stylesheet" href="https://cdnjs.toolforge.org/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+**Example — find d3 version:**
+```
+https://api.cdnjs.com/libraries?search=d3&fields=version,latest
 ```
 
-#### c. Loading Fonts
-
-If a specific font is required and available on `cdnjs.toolforge.org`, it can be loaded via CSS.
-
-**Example: Loading Google Fonts (via cdnjs.toolforge.org)**
-If a font like "Open Sans" is available, you might load it via a CSS import or a `<link>` tag pointing to a Google Fonts stylesheet hosted on the Toolforge CDN.
-*First, check `https://cdnjs.toolforge.org/` for font packages or CSS files that import fonts.*
-
-```html
-<!-- Assuming a font CSS is available -->
-<link rel="stylesheet" href="https://cdnjs.toolforge.org/google-fonts/opensans/3.0.0/css/opensans.css">
+Response:
+```json
+{
+  "name": "d3",
+  "latest": "https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js",
+  "version": "7.9.0"
+}
 ```
-*(Note: Verify the exact path and version for specific fonts on `cdnjs.toolforge.org`)*
 
-### 3. Guardrails and Best Practices
+From the response, construct the Toolforge mirror URL by replacing `cdnjs.cloudflare.com/ajax/libs` with `tools-static.wmflabs.org/cdnjs/ajax/libs`:
+```
+https://tools-static.wmflabs.org/cdnjs/ajax/libs/d3/7.9.0/d3.min.js
+```
 
-*   **DO NOT** use external, non-Wikimedia CDNs (e.g., `cdnjs.com`, `unpkg.com`, `jsdelivr.net`, `fonts.googleapis.com`, `fonts.gstatic.com`) for assets served to users of your Toolforge application.
-*   **ALWAYS** specify an exact version number for the asset (e.g., `3.6.0` for jQuery). Avoid using `latest` or version-agnostic URLs, as this can lead to unexpected changes and breakages when libraries update.
-*   **VERIFY** asset availability on `https://cdnjs.toolforge.org/` before incorporating it into your project.
-*   **IF** an asset is *absolutely essential* and not found on `cdnjs.toolforge.org`, consider bundling it locally within your tool's deployment. However, this should be a last resort and carefully considered for licensing and maintenance.
+**Example — search for a specific library:**
+```
+https://api.cdnjs.com/libraries?search=bootstrap&fields=version,latest
+```
+
+### 4. Guardrails and Best Practices
+
+*   **DO NOT** use external, non-Wikimedia CDNs (e.g., `cdnjs.cloudflare.com`, `cdnjs.com`, `unpkg.com`, `jsdelivr.net`, `fonts.googleapis.com`, `fonts.gstatic.com`) for assets served to users of your Toolforge application.
+*   **ALWAYS** specify an exact version number for the asset (e.g., `7.9.0` for d3). Avoid using `latest` or version-agnostic URLs, as this can lead to unexpected changes and breakages when libraries update.
+*   **VERIFY** asset availability on the Toolforge mirror before incorporating it into a project. Use `webfetch` to check the URL returns a 200 status.
+*   **IF** an asset is *absolutely essential* and not found on the Toolforge mirror, consider loading it from the official CDN (`d3js.org` for d3, `code.jquery.com` for jQuery, etc.) as a last resort. Better a minor privacy concern than a broken tool.
 *   **CONSULT** `https://wikitech.wikimedia.org/wiki/Help:Toolforge/Web` for the most up-to-date policies and recommendations regarding web asset management on Toolforge.
-
-By adhering to these guidelines, agents can ensure their applications are privacy-conscious and compliant with Wikimedia's hosting policies.
+*   **TO FIND** available libraries, the list at `https://cdnjs.toolforge.org/` is comprehensive but very large — prefer the API search (`api.cdnjs.com`) for targeted lookups.
