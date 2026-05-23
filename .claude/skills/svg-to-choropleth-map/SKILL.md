@@ -1,6 +1,6 @@
 ---
 name: svg-to-choropleth-map
-description: Convert an SVG choropleth map file into Wikipedia's {{Choropleth map}} template wikitext, with entity extraction, color mapping, caption inference, and multi-language template lookup via Wikidata
+description: Convert an SVG choropleth map file into Wikipedia's {{Choropleth map}} template wikitext, with entity extraction, color mapping, {{Legend}} color key generation, caption inference, and multi-language template lookup via Wikidata
 license: MIT
 compatibility: opencode
 ---
@@ -54,7 +54,7 @@ Use the most semantic alias for the entities parameter: `countries`, `states`, `
 | `height` | `200` | Pixels |
 | `align` | `right` | `left`, `center`, `right` |
 | `frameless` | — | Set to any value to remove border |
-| `legends` | — | Set to `yes` for automatic legend |
+| `legends` | — | Set to `yes` for automatic gradient legend (numeric/percentage maps) |
 | `caption` | — | End with `:` when labeling a numeric/percentage legend scale |
 | `min-opacity` | `0` | 0–1; keeps low-value regions visible |
 | `logarithmic-scale` | — | Set to `yes` for wide-range datasets |
@@ -143,11 +143,44 @@ Synthesize a caption: lead with the title, append year and source if present, ke
 1. Group regions sharing a value on one line, separated by `;`
 2. Sort lines highest → lowest (numeric/percentage maps)
 3. Match `width`/`height` to the SVG aspect ratio (default: 400×225 world, 400×260 US, 400×300 single-country)
-4. Omit parameters not needed: omit `color` when every entity has an explicit hex value; omit `legends` for single-color maps; omit `caption` if none found
+4. Omit parameters not needed: omit `color` when every entity has an explicit hex value; omit `legends` for categorical hex-color maps; omit `caption` if none found
 
-Output inside a fenced code block for copy-paste.
+Output inside a single fenced code block: the `{{Choropleth map}}` template followed by `{{Legend}}` entries.
 
-After the block, note: map type detected, region count, value format used, and any IDs that could not be resolved.
+### `{{Legend}}` color key
+
+After the closing `}}` of the choropleth template, add one `{{Legend}}` line per distinct color to label what each color means:
+
+```
+{{legend|#color|Label text}}
+```
+
+- **Order:** highest/best tier first, lowest/worst last
+- **`outline` parameter:** required for light colors (pale yellows, pastels, near-white) so the swatch is visible — use `outline=silver` or `outline=#A2A9B1`
+- **Label text:** use tier names found in Step 3 (SVG text elements or Commons file page); if none found, ask the user
+- **Single-color maps:** omit `{{Legend}}` entries entirely
+- **Numeric/percentage maps:** use `legends = yes` in the template instead of `{{Legend}}` entries
+
+**Example output (categorical):**
+```
+{{Choropleth map
+| countries =
+#31a354: CL; MA; IN; EE; NO; GB; PH; NL; PT; FI; DE; LU; MT
+#fee391: EG; LT; CH; ES; GR; LV; ID; CO; FR; IT; HR; MX; AT; NZ; SK
+#fe9929: CY; BG; IE; BR; BE; VN; SI; TH; RO; ZA; CZ; BY; TR; DZ; AR
+#d7301f: JP; CN; US; HU; PL; AU; MY; TW; CA; RU; KR; KZ; SA; IR
+| view = World
+| width = 500
+| height = 280
+| caption = Countries by Climate Change Performance Index ranking (2023)
+}}
+{{legend|#31a354|High}}
+{{legend|#fee391|Medium|outline=silver}}
+{{legend|#fe9929|Low}}
+{{legend|#d7301f|Very Low}}
+```
+
+After the block, note: map type detected, region count, value format used, legend labels source, and any IDs that could not be resolved.
 
 ---
 
