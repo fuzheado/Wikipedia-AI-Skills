@@ -34,7 +34,17 @@ Once installed, your AI coding agent will discover the skill automatically throu
 
 ## Skill format
 
-Every skill lives in `.claude/skills/<name>/SKILL.md` with this structure:
+Every skill lives in `.claude/skills/<name>/` with this enhanced structure:
+
+```
+my-skill/
+├── SKILL.md              # Agent-facing instructions with SOPs
+├── scripts/              # Executable helpers (bash, python, etc.)
+├── references/           # Deep reference docs loaded on-demand
+└── assets/               # Templates, config files, sample data
+```
+
+The `SKILL.md` file includes YAML frontmatter for agent discovery:
 
 ```yaml
 ---
@@ -64,10 +74,7 @@ This repository is undergoing an enhancement pass to add executable tooling
 ✅ `wikimedia-toolforge` — Enhanced with scripts, references, assets
 ✅ `wikimedia-cdn-assets` — Enhanced with scripts, references, assets
 
-All 6 skills completed. See the [Enhancement Handbook](ENHANCEMENT-HANDBOOK.md) for details.
-
-See the [Enhancement Handbook](ENHANCEMENT-HANDBOOK.md) for the full plan,
-pattern, and instructions for continuing this work.
+All 6 skills completed. See the [Enhancement Handbook](ENHANCEMENT-HANDBOOK.md) for the full reference and enhancement pattern.
 
 ## License
 
