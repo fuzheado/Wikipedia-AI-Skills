@@ -61,20 +61,6 @@ compatibility: opencode
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on adding new skills, improving existing ones, and the pull request process. All skills must follow the YAML frontmatter format and pass the content accuracy checklist.
 
-## Enhancement Status
-
-This repository is undergoing an enhancement pass to add executable tooling
-(scripts, reference docs, and templates) to each skill beyond just
-`SKILL.md` instructions.
-
-✅ `wikimedia-api-access` — Enhanced with scripts, references, assets
-✅ `wikimedia-database` — Enhanced with scripts, references, assets
-✅ `wikimedia-pageviews` — Enhanced with scripts, references, assets
-✅ `wikipedia-en-biography-writing` — Enhanced with scripts, references, assets
-✅ `wikimedia-toolforge` — Enhanced with scripts, references, assets
-✅ `wikimedia-cdn-assets` — Enhanced with scripts, references, assets
-
-All 6 skills completed. See the [Enhancement Handbook](ENHANCEMENT-HANDBOOK.md) for the full reference and enhancement pattern.
 
 ## License
 
