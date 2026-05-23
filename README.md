@@ -51,7 +51,7 @@ Then add the skills path to `~/.pi/agent/settings.json`:
 }
 ```
 
-After restarting pi, all six skills will be available on-demand.
+After restarting pi, all the skills will be available on-demand.
 
 ## Skill format
 
