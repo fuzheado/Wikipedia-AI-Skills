@@ -4,7 +4,11 @@
 
 ### Published skills
 
-- **wikimedia-api-access** — Complete. Covers Wikimedia API entry points (REST, Action, SPARQL), User-Agent policy compliance with `ContentGapResearch` as the project identifier, rate limiting with Retry-After backoff, connection reuse via `requests.Session()`, 403/429 error handling, and browser-based `Api-User-Agent` workaround. Links to the official Wikimedia Foundation User-Agent Policy.
+- **wikimedia-api-access** — Complete. Covers Wikimedia API entry points (REST, Action, SPARQL), User-Agent policy compliance with `ContentGapResearch` as the project identifier, rate limiting with Retry-After backoff, connection reuse via `requests.Session()`, 403/429 error handling, and browser-based `Api-User-Agent` workaround. Links to the official Wikimedia Foundation User-Agent Policy. Updated to clarify that the Action API and REST API work across all Wikimedia projects (Commons, Wikidata, Wiktionary, etc.) — just swap the domain.
+
+- **wikimedia-commons** — Complete. Covers the two Commons search interfaces (MediaSearch for visual browsing vs. Special:Search/CirrusSearch for advanced queries), structured data search via `haswbstatement:`, programmatic access via the Action/REST APIs, Commons namespaces (File, Gallery, Category, Creator, etc.), categories vs. galleries, licensing guidance (CC0/CC BY/CC BY-SA vs. non-compliant NC/ND licenses), the "three pillars" of free licensing, the fair-use prohibition, uploaded file formats (allowed and disallowed, including MP4 patent issues), bulk upload tools (Pattypan, flickr2commons, url2commons, video2commons, Commonist), the Volunteer Response Team (VRT) permissions verification process, and a search demo script with `--ns` namespace override support.
+
+- **wikidata** — Complete. Covers Wikidata's role as the inter-language linking backbone for Wikipedia, the Q-number (items) and P-number (properties) system, Wikibase as a MediaWiki extension with its own Action API modules (`wbgetentities`, `wbsearchentities`, `wbgetclaims`, etc.), the SPARQL query service at query.wikidata.org (web interface and programmatic access), the fundamental properties P31 (instance of) and P279 (subclass of) with hierarchical query patterns, the community-driven (non-rigid) taxonomy model, a comparison of SPARQL vs. `haswbstatement:`, and workflow guidance for choosing the right access method.
 
 - **wikimedia-database** — Complete. Covers SSH tunnel setup and connection management (plain `ssh` and `autossh`), Python implementation with `pymysql`, configurable local port via `TOOLFORGE_DB_PORT` (default 3307), and data handling guardrails (read-only, namespace filtering, binary decoding, safety limits, database naming conventions).
 
@@ -39,10 +43,6 @@
 
 - **Citation health checker** — SOPs for checking whether citations actually support the claims they are attached to, identifying dead links, missing metadata, and inappropriate sources.
 
-- **Wikimedia Commons** — Upload workflow, licensing guidance, category navigation, and image description templates.
-
-- **Wikidata** — Entity creation, property selection, query patterns via SPARQL, and reconciliation workflows.
-
 ### Improvements to existing skills
 
 - Add more domain-specific infobox templates to the biography skill (e.g., `Infobox scientist`, `Infobox writer`, `Infobox artist`, `Infobox athlete`)
@@ -60,12 +60,6 @@
 - Add `.claude.json` project configuration for agent discovery ✅
 
 ## Key decisions
-
-### `.claude/skills/<name>/SKILL.md` over flat `.md` files
-
-**Decision:** Each skill lives in `.claude/skills/<name>/SKILL.md` rather than as a flat Markdown file at the project root or directly in `.claude/<name>/`.
-
-**Why:** This is the standard convention documented by opencode, which searches `.claude/skills/*/SKILL.md`. Agents discover skills automatically via the `skill` tool, which reads `name` and `description` from YAML frontmatter and presents them as available tools. Flat files require manual copy-paste into system prompts. The `skills/` subdirectory keeps the `.claude/` namespace clean and is compatible with both opencode and Claude Code discovery mechanisms. The directory-per-skill layout also allows for future expansion (supporting scripts, test data, or sub-documents per skill).
 
 ### YAML frontmatter requirement
 

@@ -8,7 +8,9 @@ Each skill is a self-contained set of instructions, policy knowledge, and code e
 
 | Name | Description |
 |------|-------------|
+| [wikidata](.claude/skills/wikidata/SKILL.md) | Understand and query Wikidata — the free, collaborative, multilingual knowledge graph that underpins Wikipedia's inter-language links, Commons structured data, and semantic facts across all Wikimedia projects. Covers SPARQL, the Wikibase REST/Action APIs, RDF data dumps, and semantic web concepts |
 | [wikimedia-api-access](.claude/skills/wikimedia-api-access/SKILL.md) | Access Wikimedia APIs (REST, Action, SPARQL) with correct User-Agent headers, rate limiting, and 429/403 error handling |
+| [wikimedia-commons](.claude/skills/wikimedia-commons/SKILL.md) | Search and understand Wikimedia Commons — the free media repository of images, video, sound, 3D files, PDFs, and other media used across Wikipedia and its sister projects |
 | [wikimedia-database](.claude/skills/wikimedia-database/SKILL.md) | Execute SQL queries against Wikimedia production replicas via an SSH tunnel to Toolforge |
 | [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties or the REST API |
 | [wikipedia-en-biography-writing](.claude/skills/wikipedia-en-biography-writing/SKILL.md) | Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and BLP policies |
@@ -27,7 +29,7 @@ cp -r Wikipedia-AI-Skills/.claude /path/to/your/project/
 ### Install a single skill
 
 ```bash
-cp -r Wikipedia-AI-Skills/.claude/skills/wikimedia-pageviews /path/to/your/project/.claude/skills/
+cp -r Wikipedia-AI-Skills/.claude/skills/wikimedia-commons /path/to/your/project/.claude/skills/
 ```
 
 Once installed, your AI coding agent will discover the skill automatically through the `skill` tool. You can also open any `SKILL.md` file and paste its contents directly into an agent's instructions.

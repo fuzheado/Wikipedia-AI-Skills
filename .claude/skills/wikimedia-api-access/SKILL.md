@@ -58,6 +58,14 @@ response = requests.get('https://en.wikipedia.org/w/api.php', headers=headers)
 | Wikidata Query (SPARQL) | `https://query.wikidata.org/sparql` | Structured data queries |
 | Toolforge | `https://tools.wmflabs.org/` | Community tool hosting |
 
+> 💡 **These APIs are project-agnostic.** The Action API and REST API shown above with `en.wikipedia.org` are MediaWiki APIs that work on **any** Wikimedia project — just swap the domain. For example:
+> - **Commons:** `https://commons.wikimedia.org/w/api.php` — search media files, fetch EXIF metadata, inspect categories
+> - **Wikidata:** `https://www.wikidata.org/w/api.php` — query entities, manage labels and descriptions, fetch claims
+> - **Wiktionary:** `https://en.wiktionary.org/w/api.php` — dictionary data, word definitions, etymology
+> - **Meta-Wiki:** `https://meta.wikimedia.org/w/api.php` — global user info, cross-wiki settings, Wikimedia Foundation policies
+>
+> The query parameters and response structures are the same; only the domain and the wiki's content differ.
+
 ## **General Implementation Pattern**
 
 ```python
