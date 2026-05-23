@@ -10,7 +10,7 @@
 
 ## What This Is
 
-This repo has **6 skills** in `.claude/skills/<name>/SKILL.md`. Initially, each
+This repo has **8 skills** in `.claude/skills/<name>/SKILL.md`. Initially, each
 was just a single `SKILL.md` file with instructions. The goal is to **enhance
 each skill** with the full agent-skills structure:
 
@@ -108,7 +108,7 @@ Run every script. Import/test every template. Verify SKILL.md renders correctly.
 
 ---
 
-## ✅ Completed: All 6 Skills
+## ✅ Completed: All 8 Skills
 
 ### 1. `wikimedia-database`
 | File | Type | Purpose |
@@ -160,6 +160,21 @@ Run every script. Import/test every template. Verify SKILL.md renders correctly.
 | `references/cdn-mirror-guide.md` | 📚 Reference | Complete CDN mirror usage guide with troubleshooting |
 | `assets/load-template.html` | 🧩 Template | HTML page loading jQuery, Bootstrap, and Font Awesome from CDN |
 | `assets/load-template.js` | 🧩 Template | Dynamic JavaScript asset loader for programmatic use |
+
+### 6. `wikimedia-commons`
+| File | Type | Purpose |
+|---|---|---|
+| `scripts/commons-search.sh` | 🎬 Script | Search Commons via CirrusSearch or MediaSearch backend, with `--ns` namespace override |
+| `references/commons-api.md` | 📚 Reference | Commons Action API and REST API endpoints, license detection patterns |
+| `assets/commons-file-inspector.py` | 🐍 Template | Inspect a Commons file's license, author, categories, usage across wikis, and EXIF data |
+
+### 7. `wikidata`
+| File | Type | Purpose |
+|---|---|---|
+| `scripts/wikidata-lookup.sh` | 🎬 Script | Look up a Wikidata item or property by Q/P ID — returns label, description, and basic statements |
+| `scripts/sparql-query.sh` | 🎬 Script | Run a SPARQL query against the Wikidata Query Service and display results |
+| `references/wikidata-api.md` | 📚 Reference | Wikibase Action API modules, SPARQL query patterns, common Q/P ID reference card |
+| `assets/wikidata-entity-fetcher.py` | 🐍 Template | Fetch and display Wikidata item data — labels, descriptions, claims with qualifiers, sitelinks |
 
 ---
 
