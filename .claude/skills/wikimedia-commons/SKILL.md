@@ -69,6 +69,8 @@ Commons files carry structured data statements (Wikibase annotations) that descr
 
 **Syntax:** `haswbstatement:<property>=<value>`
 
+> 💡 **Works in both search interfaces.** While this section appears under Special:Search (CirrusSearch), `haswbstatement:` also works in the MediaSearch search box — just enter it directly. The key difference is that CirrusSearch supports advanced combinations with `intitle:`, `incategory:`, and other prefixes, while MediaSearch treats it as a plain search term alongside its semantic matching.
+
 where  `<property>` is a Wikidata property ID (e.g., `P180` for "depicts", `P170` for "creator", `P571` for "inception") and `<value>` is a Wikidata item ID (e.g., `Q5` for "human", `Q30` for "United States").
 
 **Examples:**
@@ -98,7 +100,7 @@ where  `<property>` is a Wikidata property ID (e.g., `P180` for "depicts", `P170
 | Layout | Visual grid | Text results list |
 | Best for | Browsing, finding reusable media | Precise queries, category navigation, advanced filters |
 | Advanced syntax | Limited | Full CirrusSearch (intitle, incategory, filetype, haswbstatement, etc.) |
-| Structured data search | Not supported | `haswbstatement:P180=Q5` — query Wikibase statements directly |
+| Structured data search | Supported via `haswbstatement:` in search box (though without dedicated UI facets) | `haswbstatement:P180=Q5` — query Wikibase statements directly |
 | License filters | Built-in UI | Via search syntax or advanced parameters |
 
 ### **3. Programmatic APIs (Action API & REST API)**
