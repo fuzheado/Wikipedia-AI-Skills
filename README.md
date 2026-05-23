@@ -32,6 +32,27 @@ cp -r Wikipedia-AI-Skills/.claude/skills/wikimedia-pageviews /path/to/your/proje
 
 Once installed, your AI coding agent will discover the skill automatically through the `skill` tool. You can also open any `SKILL.md` file and paste its contents directly into an agent's instructions.
 
+### Pi agent setup
+
+[Pi](https://github.com/earendil-works/pi-coding-agent) discovers skills from anywhere on the filesystem via `settings.json`. To use these skills in pi:
+
+```bash
+mkdir -p ~/.pi/repos
+git clone https://github.com/fuzheado/Wikipedia-AI-Skills.git ~/.pi/repos/Wikipedia-AI-Skills
+```
+
+Then add the skills path to `~/.pi/agent/settings.json`:
+
+```json
+{
+  "skills": [
+    "~/.pi/repos/Wikipedia-AI-Skills/.claude/skills"
+  ]
+}
+```
+
+After restarting pi, all six skills will be available on-demand.
+
 ## Skill format
 
 Every skill lives in `.claude/skills/<name>/` with this enhanced structure:
