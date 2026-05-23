@@ -33,22 +33,22 @@ echo ""
 
 # Web service status
 echo -e "${CYAN}📡 Web Service Status${NC}"
-ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; webservice --backend=kubernetes python3.11 status 2>&1" || \
-ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; webservice --backend=kubernetes node status 2>&1" || \
-ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; webservice --backend=kubernetes php8.2 status 2>&1" || \
-ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; webservice --backend=kubernetes static status 2>&1" || \
+ssh "$HOST" "become ${TOOL_NAME} webservice --backend=kubernetes python3.11 status 2>&1" || \
+ssh "$HOST" "become ${TOOL_NAME} webservice --backend=kubernetes node status 2>&1" || \
+ssh "$HOST" "become ${TOOL_NAME} webservice --backend=kubernetes php8.2 status 2>&1" || \
+ssh "$HOST" "become ${TOOL_NAME} webservice --backend=kubernetes static status 2>&1" || \
 echo -e "   ${YELLOW}Could not determine web service status (no standard backend?)${NC}"
 echo ""
 
 # Kubernetes jobs
 echo -e "${CYAN}⏳ Kubernetes Jobs${NC}"
-ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; toolforge jobs list 2>&1" || \
+ssh "$HOST" "become ${TOOL_NAME} toolforge jobs list 2>&1" || \
 echo -e "   ${YELLOW}No jobs found or could not list jobs${NC}"
 echo ""
 
 # Disk usage
 echo -e "${CYAN}💾 Disk Usage${NC}"
-ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; du -sh /data/project/${TOOL_NAME}/ 2>&1" || \
+ssh "$HOST" "become ${TOOL_NAME} du -sh /data/project/${TOOL_NAME}/ 2>&1" || \
 echo -e "   ${YELLOW}Could not get disk usage${NC}"
 echo ""
 

@@ -30,13 +30,19 @@ if [ -z "$TOOL_NAME" ] || [ -z "$ACTION" ]; then
     exit 1
 fi
 
-HOST="${TOOLFORGE_USER:-your-username}@login.toolforge.org"
+if [ -z "${TOOLFORGE_USER:-}" ]; then
+    echo -e "${RED}❌ TOOLFORGE_USER is not set${NC}"
+    echo "   Set it: export TOOLFORGE_USER='your-toolforge-username'"
+    exit 1
+fi
+
+HOST="${TOOLFORGE_USER}@login.toolforge.org"
 
 case "$ACTION" in
     list)
         echo -e "${CYAN}📋 Cron jobs for ${TOOL_NAME}${NC}"
         echo ""
-        ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; crontab -l 2>&1" || \
+        ssh "$HOST" "become ${TOOL_NAME} crontab -l 2>&1" || \
             echo -e "   ${YELLOW}No cron jobs found${NC}"
         ;;
 
@@ -57,7 +63,7 @@ case "$ACTION" in
         echo ""
 
         # Escape for SSH
-        ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; (crontab -l 2>/dev/null; echo '${SCHEDULE} ${CMD}') | crontab - 2>&1"
+        ssh "$HOST" "become ${TOOL_NAME} sh -c 'crontab -l 2>/dev/null; echo \"${SCHEDULE} ${CMD}\"' | crontab - 2>&1"
         echo -e "${GREEN}✅ Cron job added${NC}"
         ;;
 
@@ -71,7 +77,7 @@ case "$ACTION" in
         fi
 
         echo -e "${YELLOW}🗑️  Removing cron jobs matching '${PATTERN}' from ${TOOL_NAME}${NC}"
-        ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; crontab -l 2>/dev/null | grep -v '${PATTERN}' | crontab - 2>&1"
+        ssh "$HOST" "become ${TOOL_NAME} sh -c 'crontab -l 2>/dev/null | grep -v \"${PATTERN}\" | crontab -' 2>&1"
         echo -e "${GREEN}✅ Removed matching cron jobs${NC}"
         ;;
 
@@ -80,7 +86,7 @@ case "$ACTION" in
         echo -ne "${YELLOW}Are you sure? (y/n):${NC} "
         read -r CONFIRM
         if [ "$CONFIRM" = "y" ] || [ "$CONFIRM" = "Y" ]; then
-            ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; crontab -r 2>&1"
+            ssh "$HOST" "become ${TOOL_NAME} crontab -r 2>&1"
             echo -e "${GREEN}✅ All cron jobs cleared${NC}"
         else
             echo -e "${YELLOW}Cancelled${NC}"

@@ -33,10 +33,9 @@ if [ ! -d "$LOCAL_DIR" ]; then
 fi
 
 if [ -z "${TOOLFORGE_USER:-}" ]; then
-    echo -e "${YELLOW}⚠️  TOOLFORGE_USER not set. Using 'your-username'.${NC}"
+    echo -e "${RED}❌ TOOLFORGE_USER is not set${NC}"
     echo "   Set it: export TOOLFORGE_USER='your-toolforge-username'"
-    echo ""
-    TOOLFORGE_USER="your-username"
+    exit 1
 fi
 
 echo -e "${CYAN}📦 Deploying to Toolforge${NC}"
@@ -55,13 +54,17 @@ rsync -avz --dry-run --exclude '.*' \
     exit 1
 }
 
-echo ""
-echo -ne "${YELLOW}Proceed with deployment? (y/n):${NC} "
-read -r CONFIRM
-
-if [ "$CONFIRM" != "y" ] && [ "$CONFIRM" != "Y" ]; then
-    echo -e "${YELLOW}Deployment cancelled.${NC}"
-    exit 0
+# Skip confirmation prompt in non-interactive contexts (e.g., pi)
+if [ -t 0 ]; then
+    echo ""
+    echo -ne "${YELLOW}Proceed with deployment? (y/n):${NC} "
+    read -r CONFIRM
+    if [ "$CONFIRM" != "y" ] && [ "$CONFIRM" != "Y" ]; then
+        echo -e "${YELLOW}Deployment cancelled.${NC}"
+        exit 0
+    fi
+else
+    echo -e "${YELLOW}Non-interactive — proceeding automatically.${NC}"
 fi
 
 # Actual deployment
@@ -78,7 +81,7 @@ echo -e "${GREEN}✅ Deployment complete${NC}"
 echo ""
 echo -e "${YELLOW}🔧 Setting executable permissions${NC}"
 ssh "${TOOLFORGE_USER}@login.toolforge.org" \
-    "find ${REMOTE_DIR} -type f \( -name '*.sh' -o -name '*.py' \) -exec chmod +x {} +" 2>/dev/null || true
+    "become ${TOOL_NAME} find ${REMOTE_DIR} -type f \( -name '*.sh' -o -name '*.py' \) -exec chmod +x {} +" 2>/dev/null || true
 
 echo -e "${GREEN}✅ Permissions set${NC}"
 echo ""

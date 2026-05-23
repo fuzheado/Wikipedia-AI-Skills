@@ -32,7 +32,13 @@ if [ -z "$TOOL_NAME" ] || [ -z "$ACTION" ]; then
     exit 1
 fi
 
-HOST="${TOOLFORGE_USER:-your-username}@login.toolforge.org"
+if [ -z "${TOOLFORGE_USER:-}" ]; then
+    echo -e "${RED}❌ TOOLFORGE_USER is not set${NC}"
+    echo "   Set it: export TOOLFORGE_USER='your-toolforge-username'"
+    exit 1
+fi
+
+HOST="${TOOLFORGE_USER}@login.toolforge.org"
 
 case "$ACTION" in
     run)
@@ -49,12 +55,12 @@ case "$ACTION" in
         echo -e "   Command: ${COMMAND}"
         echo ""
 
-        ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; toolforge jobs run ${JOB_NAME} --command '${COMMAND}' --image python3.11 --wait 2>&1"
+        ssh "$HOST" "become ${TOOL_NAME} toolforge jobs run ${JOB_NAME} --command '${COMMAND}' --image python3.11 --wait 2>&1"
         ;;
 
     list)
         echo -e "${CYAN}📋 Jobs for ${TOOL_NAME}${NC}"
-        ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; toolforge jobs list 2>&1"
+        ssh "$HOST" "become ${TOOL_NAME} toolforge jobs list 2>&1"
         ;;
 
     logs)
@@ -66,7 +72,7 @@ case "$ACTION" in
         fi
 
         echo -e "${CYAN}📜 Logs for job '${JOB_NAME}' on ${TOOL_NAME}${NC}"
-        ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; toolforge jobs logs ${JOB_NAME} 2>&1"
+        ssh "$HOST" "become ${TOOL_NAME} toolforge jobs logs ${JOB_NAME} 2>&1"
         ;;
 
     delete)
@@ -78,7 +84,7 @@ case "$ACTION" in
         fi
 
         echo -e "${YELLOW}🗑️  Deleting job '${JOB_NAME}' on ${TOOL_NAME}${NC}"
-        ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; toolforge jobs delete ${JOB_NAME} 2>&1"
+        ssh "$HOST" "become ${TOOL_NAME} toolforge jobs delete ${JOB_NAME} 2>&1"
         ;;
 
     status)
@@ -86,10 +92,10 @@ case "$ACTION" in
         if [ -z "$JOB_NAME" ]; then
             # Overall status
             echo -e "${CYAN}📊 Job status for ${TOOL_NAME}${NC}"
-            ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; toolforge jobs list 2>&1"
+            ssh "$HOST" "become ${TOOL_NAME} toolforge jobs list 2>&1"
         else
             echo -e "${CYAN}📊 Status of job '${JOB_NAME}' on ${TOOL_NAME}${NC}"
-            ssh "$HOST" "become ${TOOL_NAME} 2>/dev/null; toolforge jobs list 2>&1 | grep ${JOB_NAME} || echo 'Job not found'"
+            ssh "$HOST" "become ${TOOL_NAME} toolforge jobs list 2>&1 | grep ${JOB_NAME} || echo 'Job not found'"
         fi
         ;;
 
