@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Toolforge App</title>
+
+    <!--
+        Load assets from Wikimedia's privacy-preserving CDN mirror.
+        This keeps user data within Wikimedia infrastructure.
+    -->
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        body { padding: 20px; }
+        .container { max-width: 960px; margin: 0 auto; }
+        footer { margin-top: 40px; color: #666; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="mb-4">
+            <h1><i class="fas fa-globe"></i> My Tool</h1>
+            <p class="lead">A Toolforge web application using Wikimedia's CDN</p>
+        </header>
+
+        <main>
+            <div id="app">
+                <p>Loading...</p>
+            </div>
+        </main>
+
+        <footer>
+            <p>
+                Running on <a href="https://toolforge.org/">Toolforge</a>.
+                Assets loaded from
+                <a href="https://wikitech.wikimedia.org/wiki/Help:Toolforge/Web">Wikimedia's CDN</a>
+                for privacy.
+            </p>
+        </footer>
+    </div>
+
+    <!-- jQuery (needed for Bootstrap) -->
+    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js"></script>
+
+    <!-- Your app logic -->
+    <script>
+        $(function() {
+            $("#app").html(`
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    All assets loaded from Wikimedia's CDN mirror.
+                </div>
+                <p>
+                    Libraries loaded:
+                    <span class="badge bg-primary">jQuery 3.6.0</span>
+                    <span class="badge bg-primary">Bootstrap 5.3.0</span>
+                    <span class="badge bg-primary">Font Awesome 6.5.1</span>
+                </p>
+            `);
+        });
+    </script>
+</body>
+</html>

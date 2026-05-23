@@ -84,3 +84,76 @@ https://api.cdnjs.com/libraries?search=bootstrap&fields=version,latest
 *   **IF** an asset is *absolutely essential* and not found on the Toolforge mirror, consider loading it from the official CDN (`d3js.org` for d3, `code.jquery.com` for jQuery, etc.) as a last resort. Better a minor privacy concern than a broken tool.
 *   **CONSULT** `https://wikitech.wikimedia.org/wiki/Help:Toolforge/Web` for the most up-to-date policies and recommendations regarding web asset management on Toolforge.
 *   **TO FIND** available libraries, the list at `https://cdnjs.toolforge.org/` is comprehensive but very large — prefer the API search (`api.cdnjs.com`) for targeted lookups.
+
+---
+
+## Tooling
+
+This skill includes helper scripts, reference docs, and templates:
+
+### 🔧 CDN Asset Checker (`scripts/check-cdn.sh`)
+
+Verify that a library is available on the Wikimedia CDN mirror.
+
+```bash
+# Check by full URL
+./scripts/check-cdn.sh "https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.6.0/jquery.min.js"
+
+# Search by library name (auto-detects latest version)
+./scripts/check-cdn.sh d3
+
+# Specify version and file explicitly
+./scripts/check-cdn.sh twitter-bootstrap 5.3.0 css/bootstrap.min.css
+```
+
+Returns green (200), redirect warning, or red (404).
+
+### 🔧 Library Search (`scripts/list-available.sh`)
+
+Search for libraries available on the cdnjs mirror.
+
+```bash
+./scripts/list-available.sh chart 5
+./scripts/list-available.sh jquery 3
+```
+
+Outputs library name, version, and CDN path in a formatted table.
+
+### 📚 CDN Mirror Guide (`references/cdn-mirror-guide.md`)
+
+Complete reference for the Wikimedia CDN mirror:
+- Base URL and URL construction
+- Verified working libraries with tested URLs
+- Complete HTML examples for common libraries
+- Guardrails table (do/don't)
+- Troubleshooting guide for 404s and common issues
+
+### 🧩 HTML Load Template (`assets/load-template.html`)
+
+Ready-to-use HTML page that loads jQuery, Bootstrap, and Font Awesome
+from the Wikimedia CDN mirror. Copy and customize for your Toolforge tool.
+
+### 🧩 JavaScript Loader (`assets/load-template.js`)
+
+Dynamic asset loader for programmatic use:
+
+```javascript
+// Load common libraries
+loadCommonAssets().then(() => {
+    // jQuery, Bootstrap, Font Awesome are ready
+    $(document).ready(function() {
+        console.log('All assets loaded from Wikimedia CDN');
+    });
+});
+
+// Load specific libraries
+loadCDNAssets({
+    scripts: [['d3', '7.9.0', 'd3.min.js']],
+    styles: [['twitter-bootstrap', '5.3.0', 'css/bootstrap.min.css']],
+});
+
+// Load a single script
+loadCDNScript('jquery', '3.6.0', 'jquery.min.js')
+    .then(() => console.log('jQuery loaded'))
+    .catch(err => console.error('Failed:', err));
+```

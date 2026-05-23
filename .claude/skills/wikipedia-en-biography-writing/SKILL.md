@@ -5,6 +5,7 @@ license: MIT
 compatibility: opencode
 ---
 
+
 ## SOP: Notability Assessment
 
 Before drafting, evaluate whether the subject meets English Wikipedia's notability criteria. If notability is unclear, flag it for the user rather than proceeding.
@@ -144,5 +145,79 @@ These are **strict** constraints — violating any of them produces a dangerousl
 3. **Outline** — Draft section headers based on what the user's sources cover. Skip sections with no source support.
 4. **Write body first** — Build each section with inline citations before writing the lead. This ensures the lead is grounded in sourced content.
 5. **Write lead** — Summarize the body's key points in 2-4 paragraphs. Do not introduce facts not in the body.
-6. **Add infobox** — Use `{{Infobox person}}` with only fields supported by sources.
+6. **Add infobox** — Use the appropriate infobox template with only fields supported by sources. Most infoboxes should use a small fraction of available fields. When in doubt about a field's accuracy, appropriateness, or formatting, leave it out.
 7. **Review** — Check against BLP, NPOV, NOR, and every anti-hallucination rule. Flag any concerns to the user.
+
+---
+
+## Tooling
+
+This skill includes helper scripts, reference docs, and templates:
+
+### 🔧 Notability Checker (`scripts/check-notability.sh`)
+
+Walks through Wikipedia's notability criteria and produces a structured assessment.
+
+```bash
+# Interactive mode — guides through each criterion
+./scripts/check-notability.sh "Albert Einstein"
+
+# Print the guide without interactive prompts
+./scripts/check-notability.sh --guide
+```
+
+### 🔧 Citation Validator (`scripts/citation-check.sh`)
+
+Checks a draft file for citation issues.
+
+```bash
+./scripts/citation-check.sh my_draft.md
+```
+
+Reports:
+- Total citation count and missing reference list
+- Templates missing URLs or access-dates
+- Empty template fields
+- Hallucination risk flags ({{citation needed}}, {{clarify}}, etc.)
+- Section-level citation gaps
+
+### 📚 Policy Reference (`references/policies.md`)
+
+Full policy excerpts for BLP, NPOV, NOR, and Verifiability, with checklists
+and source reliability guide. Read when you need to verify policy compliance.
+
+### 📚 Notability Guide (`references/notability-guide.md`)
+
+Deep reference on all notability guidelines (GNG, ANYBIO, NACADEMIC, NARTIST,
+NCREATIVE, NSPORT) with examples, a flowchart, and common pitfalls.
+
+### 🧩 Biography Template (`assets/biography-template.md`)
+
+Complete article skeleton with:
+- Standard section ordering
+- Infobox template
+- Lead structure guide
+- Section-by-section guidance
+- Pre-submission checklist
+
+### 🧩 Citation Templates (`assets/citation-template.md`)
+
+Ready-to-use templates for all citation types (web, news, book, journal)
+with required/recommended fields and anti-hallucination rules.
+
+### 🧩 Infobox Templates (`assets/infobox-templates/`)
+
+> ⚠️ **Less is more.** The infobox templates list dozens of possible fields, but most articles
+> should use only a handful — the ones the editor is confident in and that convey essential
+> information. **It is better to leave a field out than to include one you are unsure about.**
+
+Subject-specific infobox variants:
+
+| Template | For |
+|---|---|
+| `person.md` | **Generic/default** — use when no subject-specific infobox fits |
+| `scientist.md` | Academics, researchers, scientists |
+| `writer.md` | Authors, journalists, poets |
+| `artist.md` | Visual artists, sculptors, photographers |
+| `athlete.md` | Athletes, coaches, sports figures |
+| `officeholder.md` | Politicians, government officials, diplomats, judges |

@@ -88,6 +88,7 @@ def query_wiki(sql, db='enwiki_p'):
 * **Safety Limits:** Every exploratory query **must** include a `LIMIT` (suggested default: 10-50).
 * **Database Naming:** Project names must end in `_p` (e.g., `wikidatawiki_p`, `commonswiki_p`).
 
+
 ## **Example Use Cases**
 
 * **Prompt:** "What are the 5 oldest pages in the 'Draft' namespace?"
@@ -97,7 +98,60 @@ def query_wiki(sql, db='enwiki_p'):
 * **Prompt:** "Count revisions by 'ExampleUser' on enwiki."
 * **Action:** Execute `SELECT COUNT(*) FROM revision_userindex JOIN actor ON rev_actor = actor_id WHERE actor_name = 'ExampleUser';`
 
-
-
 ---
 
+## **Tooling**
+
+This skill includes helper scripts, reference docs, and templates:
+
+### 🔧 Tunnel Management (`scripts/setup-tunnel.sh`)
+
+Establishes an SSH tunnel to Toolforge. Auto-detects if tunnel is already
+active, prefers `autossh` for auto-reconnecting, and verifies the connection.
+
+```bash
+./scripts/setup-tunnel.sh [db_host] [local_port]
+```
+
+**Requires:** `TOOLFORGE_USER` environment variable and SSH key loaded in agent.
+
+### 🔧 Query Runner (`scripts/query.sh`)
+
+Run a SQL query against a replica and see results in the terminal.
+
+```bash
+./scripts/query.sh "SELECT page_title, page_len FROM page LIMIT 10" [database]
+```
+
+Includes safety guardrails: only SELECT allowed, missing env vars detected.
+
+### 🔧 Tunnel Closer (`scripts/close-tunnel.sh`)
+
+Cleanly tear down the SSH tunnel.
+
+```bash
+./scripts/close-tunnel.sh [local_port]
+```
+
+### 📚 Schema Reference (`references/schema-replicas.md`)
+
+Full reference of Wikimedia replica database tables (page, revision, actor,
+page_props, categorylinks, pagelinks) with column descriptions and common
+queries.
+
+### 📚 Connection Guide (`references/connection-guide.md`)
+
+Step-by-step guide for setting up Toolforge access, getting credentials,
+and troubleshooting common issues.
+
+### 🧩 Environment Template (`assets/.env.example`)
+
+```bash
+cp assets/.env.example .env
+# Edit .env with your credentials
+```
+
+### 🧩 Sample SQL Queries (`assets/sample-queries.sql`)
+
+50+ pre-built SQL queries organized by category (page info, stats, categories,
+pageviews, Wikidata, revisions, links, cross-refs, user activity).

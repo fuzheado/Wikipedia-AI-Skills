@@ -51,9 +51,10 @@ response = requests.get('https://en.wikipedia.org/w/api.php', headers=headers)
 | API | Base URL | Common Use |
 |-----|----------|------------|
 | Action API | `https://en.wikipedia.org/w/api.php` | Search, page content, edits, categories |
-| REST API | `https://api.wikimedia.org/wiki/REST_API` | Modern Wikimedia API (all projects) |
-| RESTBase | `https://en.wikipedia.org/api/rest_v1/` | Page summaries, mobile content, transforms |
+| REST API | `https://en.wikipedia.org/api/rest_v1/` | Page summaries, mobile content, transforms |
 | Pageviews | `https://wikimedia.org/api/rest_v1/metrics/pageviews/` | Traffic statistics |
+| Commons Analytics | `https://wikimedia.org/api/rest_v1/metrics/commons-analytics/` | GLAM category/file usage stats (monthly, pre-compiled) |
+| Lift Wing ML | `https://api.wikimedia.org/service/lw/inference/v1/models/` | ML predictions (revert risk, article quality, topics) |
 | Wikidata Query (SPARQL) | `https://query.wikidata.org/sparql` | Structured data queries |
 | Toolforge | `https://tools.wmflabs.org/` | Community tool hosting |
 
@@ -115,3 +116,89 @@ fetch('https://en.wikipedia.org/w/api.php?action=query&format=json', {
 - **SPARQL query:** "Query Wikidata for all museums in Paris with their coordinates."
 - **Batch lookup:** "For each page in this list of 50 titles, fetch the page ID and word count from the API."
 - **Troubleshoot 403:** "Check the User-Agent header and confirm it follows the Wikimedia format."
+
+---
+
+## **Tooling**
+
+This skill includes helper scripts, reference docs, and templates:
+
+### 🔧 Connectivity Test (`scripts/test-api.sh`)
+
+Tests 14 endpoints across 6 API families with your User-Agent and reports which ones work.
+
+```bash
+# Test with the default User-Agent
+./scripts/test-api.sh
+
+# Test with YOUR User-Agent
+./scripts/test-api.sh "MyBot/1.0 (https://example.com; me@example.com) MyProject"
+```
+
+Tests 14 endpoints across 6 API families:
+- 📡 Core APIs (Action API: siteinfo, search, page content) — 3 tests
+- 🌐 REST APIs (page summary, mobile-html) — 3 tests
+- 🔗 SPARQL / Wikidata — 2 tests
+- 📊 Pageviews API — 1 test
+- 🖼️  Commons Analytics API — 3 tests (category metrics, top wikis, top edited)
+- 🧠 Lift Wing ML API — 2 tests (POST-based, revert risk + article quality)
+
+**Note on Commons Analytics:** Data is only available for categories on the
+[allow list](https://gitlab.wikimedia.org/repos/data-engineering/airflow-dags/-/blob/main/main/dags/commons/commons_category_allow_list.tsv)
+and their subcategories. The `category-metrics-snapshot` and `top-wikis-per-category`
+tests use `Smithsonian_American_Art_Museum` (an allow-listed category) and should
+return data. See `references/endpoints.md` for details on the allow list.
+
+### 📚 API Endpoint Reference (`references/endpoints.md`)
+
+Full catalog of Wikimedia endpoints organized by API family:
+- Action API parameters and pagination pattern
+- REST API and RESTBase endpoints
+- Pageviews API parameters and date formats
+- SPARQL query patterns
+- Quick selection guide (task → best endpoint)
+
+Read it when you need to find the right endpoint:
+
+```bash
+# Load by asking the agent, or reference directly
+cat references/endpoints.md
+```
+
+### 🐍 Python Client Template (`assets/user-agent-template.py`)
+
+A ready-to-use Python client with:
+- Proper User-Agent configuration
+- `requests.Session` with connection reuse
+- Rate limiting (configurable delay between requests)
+- Automatic retry with exponential backoff on 429/timeouts
+- Helpful error messages for 403 (bad UA) and 404
+- Convenience methods for all major API types
+- Works as a standalone demo script
+
+```bash
+# Copy and customize
+cp assets/user-agent-template.py my_bot.py
+# Edit my_bot.py with your User-Agent, then run
+python3 my_bot.py
+```
+
+Supports:
+```python
+from user_agent_template import WikimediaClient
+
+with WikimediaClient("MyBot/1.0 (user@example.com) MyProject") as client:
+    # Action API
+    results = client.search("Albert Einstein", limit=5)
+    extract = client.get_page_extract("Python (programming language)")
+    
+    # REST API
+    summary = client.page_summary("Albert Einstein")
+    
+    # SPARQL
+    entities = client.sparql_query("SELECT ?item WHERE { ... }")
+    entity = client.get_entity("Q937")
+    
+    # Pageviews
+    top = client.top_pageviews("en.wikipedia")
+```
