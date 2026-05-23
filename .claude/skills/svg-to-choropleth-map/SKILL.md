@@ -145,7 +145,7 @@ Synthesize a caption: lead with the title, append year and source if present, ke
 3. Match `width`/`height` to the SVG aspect ratio (default: 400×225 world, 400×260 US, 400×300 single-country)
 4. Omit parameters not needed: omit `color` when every entity has an explicit hex value; omit `legends` for categorical hex-color maps; omit `caption` if none found
 
-Output inside a single fenced code block: the `{{Choropleth map}}` template followed by `{{Legend}}` entries.
+Output inside a single fenced code block, with `{{Legend}}` entries embedded inside the `caption` parameter value.
 
 ### `{{Legend}}` color key
 
@@ -161,6 +161,8 @@ After the closing `}}` of the choropleth template, add one `{{Legend}}` line per
 - **Single-color maps:** omit `{{Legend}}` entries entirely
 - **Numeric/percentage maps:** use `legends = yes` in the template instead of `{{Legend}}` entries
 
+Embed `{{Legend}}` entries inside the `caption` parameter — on new lines after the caption text, before the template's closing `}}`. This is the same pattern used in Wikipedia image captions:
+
 **Example output (categorical):**
 ```
 {{Choropleth map
@@ -173,11 +175,11 @@ After the closing `}}` of the choropleth template, add one `{{Legend}}` line per
 | width = 500
 | height = 280
 | caption = Countries by Climate Change Performance Index ranking (2023)
-}}
 {{legend|#31a354|High}}
 {{legend|#fee391|Medium|outline=silver}}
 {{legend|#fe9929|Low}}
 {{legend|#d7301f|Very Low}}
+}}
 ```
 
 After the block, note: map type detected, region count, value format used, legend labels source, and any IDs that could not be resolved.
