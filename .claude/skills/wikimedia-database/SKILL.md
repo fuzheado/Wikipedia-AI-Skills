@@ -88,6 +88,24 @@ def query_wiki(sql, db='enwiki_p'):
 * **Safety Limits:** Every exploratory query **must** include a `LIMIT` (suggested default: 10-50).
 * **Database Naming:** Project names must end in `_p` (e.g., `wikidatawiki_p`, `commonswiki_p`).
 
+### **MySQL 9+ compatibility**
+
+If you get `ERROR 2059: Authentication plugin 'mysql_native_password' cannot be loaded`
+when using the `mysql` CLI, this is because **MySQL 9.x removed the
+`mysql_native_password` plugin entirely** from the client — both as a loadable
+`.so` and as a compiled-in implementation. Neither `--default-auth` nor any
+other flag can work around this.
+
+**The fix is to use `pymysql`** (pure Python). It implements the MySQL protocol
+natively and handles `mysql_native_password` authentication without any
+external plugins:
+
+```bash
+pip install pymysql python-dotenv
+```
+
+The `query.sh` script will automatically use `pymysql` if available, falling
+back to the `mysql` CLI only if Python dependencies are missing.
 
 ## **Example Use Cases**
 
