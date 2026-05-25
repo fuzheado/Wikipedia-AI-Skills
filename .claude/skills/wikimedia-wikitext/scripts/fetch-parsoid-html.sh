@@ -32,9 +32,8 @@ fi
 # Use default User-Agent if none set
 UA="${WIKI_UA:-WikitextSkill/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills)}"
 
-# URL-encode the page title for the API path
-# curl does this automatically with --data-urlencode, but for URL path we use a simple approach
-ENCODED_PAGE=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${PAGE}'))" 2>/dev/null || echo "${PAGE// /_}")
+# MediaWiki REST API expects underscores for spaces in the URL path
+ENCODED_PAGE="${PAGE// /_}"
 
 URL="https://en.wikipedia.org/w/rest.php/v1/page/${ENCODED_PAGE}/html"
 
