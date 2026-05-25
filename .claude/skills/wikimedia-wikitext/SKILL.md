@@ -7,7 +7,7 @@ compatibility: opencode
 
 ## SOP: The Two Strategies
 
-There are **two fundamentally different approaches** to reading wiki content. Choose based on whether you need to **write back** wikitext changes.
+There are **two fundamentally different approaches** to reading and extracting data from MediaWiki wikitext. Choose based on whether you need to **write back** wikitext changes.
 
 | Strategy | When to use | Tool |
 |----------|-------------|------|
