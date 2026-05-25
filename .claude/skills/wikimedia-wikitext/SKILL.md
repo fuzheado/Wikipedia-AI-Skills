@@ -201,13 +201,32 @@ Wikitext may contain non-ASCII characters, HTML entities (`&amp;`, `&lt;`), and 
 
 This skill includes helper scripts, reference docs, and templates:
 
-### 🔧 Parser Health Check (`scripts/test-mwparser.sh`)
+### 🔧 Wikitext Inspector (`scripts/test-mwparser.sh`)
 
-Verifies `mwparserfromhell` is installed and runs a smoke test with sample wikitext.
+Inspect any wikitext file and get a structured overview of what's in it — templates,
+wikilinks, tags, headings, sections, and potential issues. Also doubles as an
+installation smoke test when called with no arguments.
 
 ```bash
+# Smoke test (no args) — verify installation
 ./scripts/test-mwparser.sh
+
+# Inspect a wikitext file
+./scripts/test-mwparser.sh page.wikitext
+
+# Pipe mode — inspect wikitext from stdin
+curl -s "https://en.wikipedia.org/w/index.php?title=Python_(programming_language)&action=raw" \
+  | ./test-mwparser.sh -
+
+# Usage: ./test-mwparser.sh [file.wikitext | -]
+#   (no args)  — run installation smoke test
+#   file.wikitext — parse file and report structure
+#   -          — read wikitext from stdin (pipe mode)
 ```
+
+Reports: total AST nodes, templates with parameter previews, wikilinks with display
+text, tags, headings (section outline), plain text length, and potential issues
+(e.g., empty file, very large pages).
 
 ### 🔧 Parsoid HTML Fetcher (`scripts/fetch-parsoid-html.sh`)
 
