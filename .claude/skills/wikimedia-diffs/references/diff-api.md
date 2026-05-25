@@ -4,6 +4,24 @@ Two APIs can return diffs between Wikipedia revisions: the **Action API** (HTML 
 
 ---
 
+## Browser Diff URL
+
+To share or view a diff in a web browser (no API needed):
+
+```
+https://{project}/w/index.php?title={page_title}&diff={new_revision_id}&oldid={old_revision_id}
+```
+
+Example:
+
+```
+https://en.wikipedia.org/w/index.php?title=Talk:Geothermal_energy&diff=1352498037&oldid=1323528943
+```
+
+This is the format Wikipedia itself uses when linking to diffs from history pages and watchlists. It renders the full side-by-side or inline diff view with the familiar Wikimedia interface.
+
+---
+
 ## Action API: `action=compare`
 
 ### Endpoint

@@ -13,6 +13,23 @@ Wikipedia records every edit as a **revision** with a unique ID. A **diff** show
 |----------|-------------|----------|
 | **Action API** | You need raw wikitext diff (markup changes) or diff metadata | `action=compare` |
 | **REST API** | You need rendered HTML comparison (visual diff) | `/compare` |
+| **Browser URL** | You want to view or share a diff in a web browser | `index.php?diff=...&oldid=...` |
+
+### Sharing a Diff Link
+
+To share a link to a diff between two specific revisions:
+
+```
+https://en.wikipedia.org/w/index.php?title=PAGE_TITLE&diff=NEW_REV_ID&oldid=OLD_REV_ID
+```
+
+For example:
+
+```
+https://en.wikipedia.org/w/index.php?title=Talk:Geothermal_energy&diff=1352498037&oldid=1323528943
+```
+
+This works for any Wikimedia project — just change the hostname and provide the page title and two revision IDs. No API key or User-Agent is needed since this is a standard web URL.
 
 ---
 
