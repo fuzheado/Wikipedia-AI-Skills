@@ -1,6 +1,6 @@
 ---
 name: wikimedia-wikitext
-description: Parse, extract, and manipulate MediaWiki wikitext (wiki markup) using proper AST-based tooling instead of fragile regex patterns
+description: Parse, extract, and manipulate Wikipedia and MediaWiki wikitext (wiki markup, templates, infoboxes, citations, links) using proper AST-based tooling instead of fragile regex patterns
 license: MIT
 compatibility: opencode
 ---
