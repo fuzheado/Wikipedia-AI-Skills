@@ -1,6 +1,6 @@
 ---
 name: wikimedia-cdn-assets
-description: Guides agents on loading JavaScript, CSS, and fonts from Wikimedia's privacy-preserving cdnjs mirror to ensure user privacy and policy compliance.
+description: Load JavaScript, CSS, and fonts for Toolforge tools from Wikimedia's privacy-preserving cdnjs mirror, ensuring user privacy and policy compliance
 license: MIT
 compatibility: all
 ---

@@ -1,6 +1,6 @@
 ---
 name: wikimedia-database
-description: Execute SQL queries against Wikimedia production replicas via an SSH tunnel to Toolforge, with connection management and data handling guardrails
+description: Execute SQL queries against Wikipedia database replicas (enwiki, wikidata, commonswiki) via an SSH tunnel to Toolforge, with connection management and data handling guardrails
 license: MIT
 compatibility: opencode
 ---

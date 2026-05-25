@@ -1,6 +1,6 @@
 ---
 name: wikimedia-commons
-description: Search and understand Wikimedia Commons — the free media repository of images, video, sound, 3D files, PDFs, and other media used across Wikipedia and its sister projects
+description: Search, upload, and understand Wikimedia Commons — the free media repository of images, video, sound, 3D files, PDFs, and other media used across Wikipedia and its sister projects. Browse categories, find reusable media, and retrieve file metadata
 license: MIT
 compatibility: opencode
 ---

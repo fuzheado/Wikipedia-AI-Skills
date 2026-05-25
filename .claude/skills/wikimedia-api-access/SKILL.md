@@ -1,6 +1,6 @@
 ---
 name: wikimedia-api-access
-description: Access Wikimedia APIs (REST, Action API, SPARQL) with correct User-Agent headers, rate limiting, and 429/403 error handling
+description: Access Wikipedia and Wikimedia APIs (REST, Action API, SPARQL) with correct User-Agent headers, rate limiting, and 429/403 error handling
 license: MIT
 compatibility: opencode
 ---
