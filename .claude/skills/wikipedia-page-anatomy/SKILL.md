@@ -337,6 +337,9 @@ Python library used by the shell scripts. Provides `fetch_wikitext()` and `extra
 Fetch a Wikipedia article and report on all its structural components: infobox type and parameters, visible and hidden categories, templates by category (infobox, navbox, maintenance), protection level, redirect/disambiguation status, WikiProject banners from the talk page, reference/citation count, and section outline.
 
 ```bash
+pip install requests   # required for this tool
 python3 assets/page-audit.py "Albert Einstein"
 python3 assets/page-audit.py "Python (programming language)" --project fr.wikipedia --json
 ```
+
+> **Note:** The shell scripts (`extract-infobox.sh`, `page-summary.sh`) and `wikitext_utils.py` use only Python standard library — no pip install needed. The `page-audit.py` requires `requests`.

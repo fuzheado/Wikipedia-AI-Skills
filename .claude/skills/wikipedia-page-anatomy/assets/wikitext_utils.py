@@ -1,29 +1,31 @@
 #!/usr/bin/env python3
 """
-Infobox extractor — fetch a Wikipedia article's raw wikitext and extract
-the first infobox template with its parameters.
+Wikitext utilities — fetch Wikipedia wikitext and extract infobox data.
+Uses only Python standard library (urllib) so no pip install needed.
 
 Usage:
     python3 wikitext_utils.py infobox "Albert Einstein"
     python3 wikitext_utils.py infobox "Python (programming language)" --project fr.wikipedia
+    python3 wikitext_utils.py infobox "Berlin" --json
 """
 
 import sys
 import re
-import requests
+import json
+import urllib.request
+import urllib.parse
 import argparse
 
 USER_AGENT = "PageAnatomy/1.0 (https://en.wikipedia.org; demo@example.com) WikiSkills"
 
 
 def fetch_wikitext(title, project="en.wikipedia.org"):
-    """Fetch raw wikitext for a page."""
+    """Fetch raw wikitext for a page using stdlib urllib."""
     url = f"https://{project}/w/index.php"
-    params = {"title": title, "action": "raw"}
-    headers = {"User-Agent": USER_AGENT}
-    resp = requests.get(url, params=params, headers=headers, timeout=15)
-    resp.raise_for_status()
-    return resp.text
+    params = urllib.parse.urlencode({"title": title, "action": "raw"})
+    req = urllib.request.Request(f"{url}?{params}", headers={"User-Agent": USER_AGENT})
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        return resp.read().decode("utf-8")
 
 
 def extract_infobox(wikitext):
@@ -80,7 +82,6 @@ def main():
         sys.exit(0)
 
     if args.json:
-        import json
         print(json.dumps({
             "type": infobox_type,
             "params": [{"name": n, "value": v} for n, v in params]
