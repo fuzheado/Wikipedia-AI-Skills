@@ -303,9 +303,40 @@ action=query&titles=Title&format=json
 
 ---
 
-## Tooling (to be built)
+## Tooling
 
-- `scripts/extract-infobox.sh` — Extract infobox field names and values from a Wikipedia article
-- `scripts/page-summary.sh` — Show a compact summary (infobox type, categories, protection level, template count, redirect status)
-- `references/template-reference.md` — Quick reference for common infobox and citation template parameters
-- `assets/page-audit.py` — Python tool that fetches a page and reports on all structural components
+### 🔧 Infobox Extractor (`scripts/extract-infobox.sh`)
+
+Extract infobox field names and values from any Wikipedia article. Handles nested templates and multi-line parameters via brace-depth tracking.
+
+```bash
+./scripts/extract-infobox.sh "Albert Einstein"
+./scripts/extract-infobox.sh "Python (programming language)" --project fr.wikipedia
+./scripts/extract-infobox.sh "Berlin" --json
+```
+
+### 🔧 Page Summary (`scripts/page-summary.sh`)
+
+Fetches a compact structural overview of any article — infobox type, protection level, redirect/disambiguation status, visible and hidden categories, template count, and WikiProject assessment banners from the talk page.
+
+```bash
+./scripts/page-summary.sh "Albert Einstein"
+./scripts/page-summary.sh "Python (programming language)" --json
+```
+
+### 📚 Template Reference (`references/template-reference.md`)
+
+Quick reference for common infobox templates (person, scientist, settlement, film, company, etc.), citation templates (`cite web`, `cite book`, `cite journal`), and maintenance templates (`{{cn}}`, `{{POV}}`, `{{stub}}`, etc.).
+
+### 🐍 Wikitext Utilities (`assets/wikitext_utils.py`)
+
+Python library used by the shell scripts. Provides `fetch_wikitext()` and `extract_infobox()` functions with proper brace-depth tracking.
+
+### 🐍 Page Auditor (`assets/page-audit.py`)
+
+Fetch a Wikipedia article and report on all its structural components: infobox type and parameters, visible and hidden categories, templates by category (infobox, navbox, maintenance), protection level, redirect/disambiguation status, WikiProject banners from the talk page, reference/citation count, and section outline.
+
+```bash
+python3 assets/page-audit.py "Albert Einstein"
+python3 assets/page-audit.py "Python (programming language)" --project fr.wikipedia --json
+```
