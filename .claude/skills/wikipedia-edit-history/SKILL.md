@@ -37,6 +37,69 @@ action=query&prop=revisions&titles=Albert_Einstein&rvstart=2026-01-01T00:00:00Z&
 
 ---
 
+## SOP: Batching and Pagination for Efficiency
+
+The Action API supports fetching **up to 500 revisions in a single call** (`rvlimit=500`). For bots with the `apihighlimits` right, this goes up to **5,000**. Use this to minimize round trips.
+
+### Batch Size Guidelines
+
+| Target | `rvlimit` Value | Round Trips for 1000 Revisions |
+|--------|----------------|-------------------------------|
+| Quick check (default) | 10 | 100 |
+| Typical analysis | 50 | 20 |
+| Full audit | 500 | 2 |
+
+**Always use the largest batch size you need** — the API does not charge extra for more results in a single call. The cost is in the number of HTTP requests, not the number of revisions returned.
+
+### Pagination Pattern
+
+To fetch all revisions for a page, loop on the `continue` key:
+
+```python
+params = {
+    "action": "query",
+    "prop": "revisions",
+    "titles": "Albert Einstein",
+    "rvlimit": 500,         ← max per call
+    "rvprop": "ids|timestamp|user|size",  ← only what you need
+    "format": "json",
+}
+while True:
+    data = api_request(params)
+    # ... process revisions ...
+    if "continue" not in data:
+        break
+    params.update(data["continue"])
+```
+
+### Selective `rvprop` Reduces Response Size
+
+Request only the properties you actually need. The most expensive property is `content` (full wikitext) — it multiplies the response size by 10–100x:
+
+| If you need... | Request... | Size vs. full |
+|----------------|------------|---------------|
+| Just revision IDs and timestamps | `rvprop=ids|timestamp` | ~5% |
+| Who changed what and when | `rvprop=ids|timestamp|user|size|comment` | ~15% |
+| Tags and minor flag | `rvprop=ids|flags|tags` | ~5% |
+| Full page content | `rvprop=content` | 100% (largest) |
+
+> 💡 **Fetch content for a single revision** using `action=query&revids=REVID&prop=revisions&rvprop=content` rather than including `content` in a batch revision list. This way you only download the wikitext for the revisions you actually need to read.
+
+### User Contributions Batching
+
+Similarly, `list=usercontribs` supports `uclimit=500` (or 5,000 for bots):
+
+```
+action=query&list=usercontribs&ucuser=Jimbo+Wales&uclimit=500&ucprop=ids|title|timestamp|comment|size|sizediff
+```
+
+### Compare Multiple Revisions Efficiently
+
+- Use `action=compare` to get diff metadata (`diffsize`, `fromsize`, `tosize`) for a pair of revisions in one call
+- To compare many pairs, **batch them sequentially** with a small delay (see `wikimedia-api-access` for rate limiting) rather than comparing each revision individually via the browser
+
+---
+
 ## SOP: Reading Revision Records
 
 Each revision, when requested with `rvprop=ids|timestamp|user|userid|size|comment|tags|flags`, returns:
