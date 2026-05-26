@@ -175,9 +175,35 @@ The `{{Archives}}` template displays an archive box in the talk page header with
 
 ---
 
-## Tooling (to be built)
+## Tooling
 
-- `scripts/get-assessment.sh` — Fetch WikiProject assessment class and importance for a given article from its talk page
-- `scripts/list-archives.sh` — List all archived discussion subpages for a given talk page
-- `references/assessment-ratings.md` — Reference guide for FA/GA/B/C/Start/Stub criteria
-- `assets/talk-archive-search.py` — Python tool that searches across a talk page and all its archives
+### 🔧 Get Assessment (`scripts/get-assessment.sh`)
+
+Fetch WikiProject assessment class and importance for a given article by parsing its talk page banners.
+
+```bash
+./scripts/get-assessment.sh "Albert Einstein"
+./scripts/get-assessment.sh "Python (programming language)" --json
+```
+
+### 🔧 List Archives (`scripts/list-archives.sh`)
+
+List all archived discussion subpages for a talk page via the prefixsearch API.
+
+```bash
+./scripts/list-archives.sh "Albert Einstein"
+./scripts/list-archives.sh "Talk:Albert Einstein" --json
+```
+
+### 📚 Assessment Ratings Reference (`references/assessment-ratings.md`)
+
+Reference guide for FA/GA/B/C/Start/Stub quality ratings and Top/High/Mid/Low importance ratings, with descriptions, typical article characteristics, and assessment distribution statistics.
+
+### 🐍 Talk Archive Search (`assets/talk-archive-search.py`)
+
+Search across a talk page and all its archives for a keyword or phrase. Uses only Python standard library.
+
+```bash
+python3 assets/talk-archive-search.py "Albert Einstein" "Nobel"
+python3 assets/talk-archive-search.py "Talk:Albert Einstein" "birth date" --json
+```
