@@ -280,10 +280,45 @@ Returns `blockid`, `blockedby`, `blockreason`, `blockexpiry` if the user is curr
 
 ---
 
-## Tooling (to be built)
+## Tooling
 
-- `scripts/recent-edits.sh` — Show recent edits to a page with diff size, user, and summary
-- `scripts/compare-revisions.sh` — Compare two revisions and show a summary of changes (byte delta, user, key changes)
-- `scripts/user-contribs.sh` — Fetch recent contributions for a user with page titles and edit summaries
-- `references/diff-patterns.md` — Common diff patterns and what they mean (content addition, blanking, revert, copyedit)
-- `assets/history-audit.py` — Python tool that fetches page history, computes per-revision diffs, and flags suspicious edits
+### 🔧 Recent Edits (`scripts/recent-edits.sh`)
+
+Show recent edits to a Wikipedia page with revision ID, byte change, user, edit summary, and tags.
+
+```bash
+./scripts/recent-edits.sh "Albert Einstein"
+./scripts/recent-edits.sh "Python (programming language)" --limit 20
+./scripts/recent-edits.sh "Berlin" --json
+```
+
+### 🔧 Compare Revisions (`scripts/compare-revisions.sh`)
+
+Compare two revisions and show a summary: byte change (churn and net), users, timestamps, and edit summaries. Can auto-detect the latest two revisions for a page.
+
+```bash
+./scripts/compare-revisions.sh --page "Albert Einstein"
+./scripts/compare-revisions.sh 123456789 123456790 --json
+```
+
+### 🔧 User Contributions (`scripts/user-contribs.sh`)
+
+Fetch recent contributions for a user with page titles, edit summaries, byte changes, and tags.
+
+```bash
+./scripts/user-contribs.sh "Jimbo Wales"
+./scripts/user-contribs.sh "ClueBot NG" --limit 20 --json
+```
+
+### 📚 Diff Patterns Reference (`references/diff-patterns.md`)
+
+Reference guide for interpreting diffs by byte change (small/medium/large/very large), visual signature (addition, removal, revert, blanking), edit summary keywords, and automated edit detection signals.
+
+### 🐍 History Auditor (`assets/history-audit.py`)
+
+Fetch page history, compute per-revision byte deltas, and flag suspicious edits: page blanking, large additions from anonymous users, missing edit summaries on large changes, revert patterns, and potential edit warring. Uses only Python standard library.
+
+```bash
+python3 assets/history-audit.py "Albert Einstein" --limit 100
+python3 assets/history-audit.py "Berlin" --json
+```
