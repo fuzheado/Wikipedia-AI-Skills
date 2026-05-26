@@ -25,10 +25,14 @@ These skills are designed to **help you research, understand, and prepare conten
 | Skill | What it helps with |
 |-------|-------------------|
 | [wikipedia-en-biography-writing](.claude/skills/wikipedia-en-biography-writing/SKILL.md) | Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and biographies of living persons (BLP) policies |
+| [wikipedia-page-anatomy](.claude/skills/wikipedia-page-anatomy/SKILL.md) | Navigate and understand the structure of a Wikipedia article — infoboxes, categories, references, templates, navboxes, redirects, disambiguation, and protection levels |
+| [wikipedia-talk-page](.claude/skills/wikipedia-talk-page/SKILL.md) | Navigate and participate in Wikipedia talk pages — discussion conventions, signing, WikiProject banners, assessment ratings, and archiving |
+| [wikipedia-edit-history](.claude/skills/wikipedia-edit-history/SKILL.md) | Read and analyze Wikipedia's page revision history — diffs, edit summaries, user contributions, byte changes, and vandalism detection |
 | [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties or the REST API |
 | [wikimedia-wikitext](.claude/skills/wikimedia-wikitext/SKILL.md) | Parse, extract, and manipulate Wikipedia and MediaWiki wikitext (templates, infoboxes, citations, links) using proper AST-based tooling or the Parsoid HTML REST API |
 | [wikimedia-diffs](.claude/skills/wikimedia-diffs/SKILL.md) | Fetch, compare, and interpret diffs between Wikipedia page revisions — byte changes, HTML diff tables, and edit statistics |
 | [wikimedia-commons](.claude/skills/wikimedia-commons/SKILL.md) | Search, upload, and understand Wikimedia Commons — the free media repository of images, video, sound, 3D files, PDFs, and other media used across Wikipedia and its sister projects. Browse categories, find reusable media, and retrieve file metadata |
+| [wikimedia-page-assessment](.claude/skills/wikimedia-page-assessment/SKILL.md) | Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners on any Wikimedia wiki with the PageAssessments extension |
 | [wikidata](.claude/skills/wikidata/SKILL.md) | Understand and query Wikidata — the free, collaborative, multilingual knowledge graph that underpins Wikipedia's inter-language links, Commons structured data, and semantic facts across all Wikimedia projects. Covers SPARQL, the Wikibase REST/Action APIs, RDF data dumps, and semantic web concepts |
 
 ### 🛠️ For tool developers
@@ -47,9 +51,14 @@ These skills are designed to **help you research, understand, and prepare conten
 | If you want to... | Use this skill |
 |---|---|
 | Draft a well-structured Wikipedia biography with proper citations and section ordering | `wikipedia-en-biography-writing` (see ⚠️ warning above) |
+| Understand the structure of a Wikipedia article (infobox, categories, templates, navboxes) | `wikipedia-page-anatomy` |
+| Participate in talk page discussions, sign comments, and find WikiProject assessments | `wikipedia-talk-page` |
+| Analyze page revision history, diffs, user contributions, and detect vandalism | `wikipedia-edit-history` |
 | Check how popular an article is and see its traffic trends | `wikimedia-pageviews` |
 | Extract infobox data, citations, or internal links from an article's wikitext | `wikimedia-wikitext` |
+| Compare two revisions and understand what changed | `wikimedia-diffs` |
 | Find reusable images on Commons for a Wikipedia article | `wikimedia-commons` |
+| Find article quality ratings (FA/GA/B/C/Start/Stub) and WikiProject assessments | `wikimedia-page-assessment` |
 | Query Wikidata for structured facts (e.g., "all museums in Paris with coordinates") | `wikidata` |
 | Build a bot or script that fetches data from Wikipedia | `wikimedia-api-access` |
 | Run SQL queries on the Wikipedia database to analyze page data at scale | `wikimedia-database` |

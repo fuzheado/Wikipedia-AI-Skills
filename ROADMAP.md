@@ -21,6 +21,12 @@
 - **wikipedia-en-biography-writing** — Complete. Covers notability assessment (WP:GNG, WP:ANYBIO, WP:NACADEMIC, WP:NARTIST, WP:NCREATIVE), biography article structure with wiki markup templates (Infobox person, citation templates, section ordering), citation requirements per section, source hierarchy, policy guardrails for BLP/NPOV/NOR/Verifiability, and seven strict anti-hallucination rules.
 - **wikimedia-cdn-assets** — Complete. Guides agents on loading JavaScript, CSS, and fonts from Wikimedia's privacy-preserving cdnjs.toolforge.org CDN to ensure user privacy and policy compliance.
 
+- **wikipedia-page-anatomy** — Complete. Covers the full structure of a Wikipedia article: lead section conventions, infobox types (template-based and module-backed), category hierarchy with sort keys and hidden categories, citation templates and identifiers (DOI, PMID, ISBN), transcluded templates and maintenance tags, navigation boxes vs. categories vs. infoboxes, redirect and disambiguation detection, protection levels and page existence checks, and an API methods reference table.
+
+- **wikipedia-talk-page** — Complete. Covers the Talk namespace naming conventions, threaded discussion format and indentation rules, signing with ~~~~ and unsigned comment detection, WikiProject banners with assessment quality (FA/GA/B/C/Start/Stub) and importance ratings (Top/High/Mid/Low), automated and manual archiving with MiszaBot configuration, pings and section editing, talk page etiquette (AGF, NPA, striking vs. deleting), and article talk vs. user talk distinctions. Cross-references wikimedia-page-assessment for bulk database queries.
+
+- **wikipedia-edit-history** — Complete. Covers accessing page history via URL and API with pagination, revision record structure (revid, parentid, user, size, tags), diff basics (deferring to wikimedia-diffs for deep mechanics), edit summary conventions and bot identification, minor vs. major edit flags, user attribution and contributions API, byte size analysis with vandalism red flags, undo vs. rollback permissions and the 3RR, revision tags and their meanings (mobile, visual editor, possible vandalism), vandalism detection signals and block status checks, and an API methods reference table.
+
 ### Project infrastructure
 
 - `.claude/skills/<name>/SKILL.md` directory structure with YAML frontmatter (name, description, license, compatibility)
