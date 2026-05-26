@@ -111,7 +111,7 @@ fetch('https://en.wikipedia.org/w/api.php?action=query&format=json', {
 
 1. **Connection reuse** — Always use a `requests.Session()` (or equivalent) to reuse connections. Do not create a new connection per request.
 2. **Retry-After** — On 429, respect the `Retry-After` header value. Never retry immediately.
-3. **Pacing** — For batch operations, add a small delay (at least 0.5s) between requests. For the Action API, respect the `maxlag` parameter.
+3. **Pacing & Batching** — For batch operations, add a small delay (at least 0.5s) between requests. For the Action API, respect the `maxlag` parameter. **Always use the largest batch size the API supports** (e.g., `rvlimit=500`, `uclimit=500`) rather than fetching items one at a time. See the **SOP: Batching and Pagination for Efficiency** in the [`wikipedia-edit-history`](../wikipedia-edit-history/SKILL.md) skill for detailed patterns.
 4. **403 handling** — A 403 almost always means a bad/missing UA. Check the UA string before debugging anything else.
 5. **User-Agent per project** — Parameterize the contact info so users can swap in their own details. Never hardcode someone else's email.
 6. **SPARQL queries** — For Wikidata Query Service, always set the UA and use `&format=json`. Consider using `SPARQLWrapper` with the `agent` parameter.

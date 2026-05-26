@@ -31,17 +31,24 @@ The original workhorse API. Parameter-driven, supports read, write, and search o
 
 ### Parameters Reference
 
-| Parameter | Purpose |
-|---|---|
-| `format=json` | **Always** specify JSON output (also: `xml`, `php`, `jsonfm`) |
-| `formatversion=2` | Modern format — numeric IDs as integers, cleaner structure |
-| `origin=*` | CORS header — required for browser-based requests from other origins |
-| `maxlag=<seconds>` | Respect server load (use `maxlag=5` for bulk operations) |
-| `continue` | Required for paginated results — always check for `continue` in the response |
-| `srlimit` | Search result limit (max 50 per request) |
-| `cmlimit` | Category member limit (max 500 per request) |
-| `exlimit` | Extract limit (max 20 per request) |
-| `prop=extracts|pageimages` | Combine for page previews with thumbnails |
+| Parameter | Purpose | Max Per Call |
+|---|---|:---:|
+| `format=json` | **Always** specify JSON output (also: `xml`, `php`, `jsonfm`) | — |
+| `formatversion=2` | Modern format — numeric IDs as integers, cleaner structure | — |
+| `origin=*` | CORS header — required for browser-based requests from other origins | — |
+| `maxlag=<seconds>` | Respect server load (use `maxlag=5` for bulk operations) | — |
+| `continue` | Required for paginated results — always check for `continue` in the response | — |
+| `srlimit` | Search result limit | 50 |
+| `cmlimit` | Category member limit | 500 |
+| `rvlimit` | Revision history limit (5,000 for bots with `apihighlimits`) | 500 |
+| `uclimit` | User contributions limit (5,000 for bots) | 500 |
+| `exlimit` | Extract limit | 20 |
+| `tllimit` | Transcluded templates limit | 500 |
+| `cllimit` | Category list limit (categories on a page) | 500 |
+| `bllimit` | Backlinks limit | 500 |
+| `prop=extracts|pageimages` | Combine for page previews with thumbnails | — |
+
+> 💡 **Batch efficiently:** Most `*limit` parameters accept up to **500** per call (or 5,000 for bots). Fetching 1,000 revisions with `rvlimit=500` takes 2 HTTP requests instead of 1,000 individual calls. For a full discussion of batching strategies, see the **SOP: Batching and Pagination for Efficiency** section in the [`wikipedia-edit-history`](../wikipedia-edit-history/SKILL.md) skill.
 
 ### Pagination Pattern
 
