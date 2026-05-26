@@ -5,6 +5,8 @@ license: MIT
 compatibility: opencode
 ---
 
+> ⚠️ **User-Agent required:** The history examples below use the Action API. All requests must include a descriptive `User-Agent` header or they will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
+
 ## SOP: Accessing Page History
 
 Every Wikipedia page has a complete edit history. Access it via:

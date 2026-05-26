@@ -5,6 +5,8 @@ license: MIT
 compatibility: opencode
 ---
 
+> ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
+
 Wikimedia Commons (https://commons.wikimedia.org) is a **free media repository** — a central library of freely licensed images, audio, video, 3D models, PDF documents, and other media files. Media uploaded to Commons is available for use across all Wikimedia projects (Wikipedia, Wiktionary, Wikisource, etc.) and by the general public. As of 2026, Commons hosts over 100 million file uploads.
 
 ## **What Commons Is — and Isn't**

@@ -5,6 +5,8 @@ license: MIT
 compatibility: opencode
 ---
 
+> ⚠️ **User-Agent required:** The API examples below use the Action API. All requests must include a descriptive `User-Agent` header or they will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
+
 ## SOP: Understanding the Talk Namespace
 
 Every Wikipedia page has an associated **talk page** where editors discuss improvements. The naming pattern is: prepend `Talk:` for mainspace, or replace the namespace prefix with `X talk:` for others.

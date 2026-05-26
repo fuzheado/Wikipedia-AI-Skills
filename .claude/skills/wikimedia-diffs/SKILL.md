@@ -5,6 +5,8 @@ license: MIT
 compatibility: opencode
 ---
 
+> ⚠️ **User-Agent required:** The diff examples below use the Action API and REST API. All requests must include a descriptive `User-Agent` header or they will be blocked. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
+
 ## SOP: Understanding Wikipedia Diffs
 
 Wikipedia records every edit as a **revision** with a unique ID. A **diff** shows what changed between two revisions. There are two ways to get diffs:

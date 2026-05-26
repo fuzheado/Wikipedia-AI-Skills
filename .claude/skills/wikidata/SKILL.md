@@ -5,6 +5,8 @@ license: MIT
 compatibility: opencode
 ---
 
+> ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns. Before writing any code, load that skill for the required User-Agent boilerplate.
+
 Wikidata (https://www.wikidata.org) is a **free, collaborative, multilingual knowledge graph** that serves as the central structured data repository for the Wikimedia ecosystem. It is operated by the Wikimedia Foundation and is openly editable by anyone.
 
 ## **What Wikidata Is**

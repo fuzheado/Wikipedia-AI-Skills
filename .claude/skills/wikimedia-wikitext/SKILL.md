@@ -5,6 +5,8 @@ license: MIT
 compatibility: opencode
 ---
 
+> ⚠️ **User-Agent required:** The API examples below use the Action API and REST API. All requests must include a descriptive `User-Agent` header or they will be blocked. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
+
 ## SOP: The Two Strategies
 
 There are **two fundamentally different approaches** to reading and extracting data from MediaWiki wikitext. Choose based on whether you need to **write back** wikitext changes.
