@@ -169,6 +169,163 @@ Indicates that a class is a **subset** of another, more general class. This crea
 
 ---
 
+## **SOP: Batch Entity Classification from Wikipedia Titles**
+
+A common cross-API workflow is: take a list of Wikipedia titles (e.g., from the Pageviews API), resolve each to its Wikidata ID, then classify the type of entity (person, place, film, etc.) using P31 (instance of). This requires chaining the Action API and the Wikibase `wbgetentities` module efficiently.
+
+⚠️ **User-Agent required:** All HTTP requests below need a descriptive `User-Agent` header. Load the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the required boilerplate, rate limiting, and retry patterns.
+
+### Step 1: Resolve Wikipedia Titles to Wikidata IDs
+
+Use the Action API's `prop=pageprops` with `ppprop=wikibase_item` to batch-resolve up to 50 titles per call:
+
+```python
+params = {
+    'action': 'query',
+    'titles': '|'.join(titles),       # accepts underscores or spaces
+    'prop': 'pageprops',
+    'ppprop': 'wikibase_item',
+}
+```
+
+⚠️ **Critical: Title normalization.** The Action API returns titles **with spaces** (e.g., `Donald Trump`), not underscores. When using titles from the Pageviews API (which uses underscores like `Donald_Trump`) as dictionary keys, normalize: `t.replace('_', ' ')`. See the **[Title Format Guide](../wikimedia-api-access/references/endpoints.md#11-title-format-guide-cross-api-gotcha)** in the API access reference for a full cross-API table.
+
+```python
+def resolve_wikidata_ids(session, titles):
+    """Batch-resolve Wikipedia titles to Wikidata Q IDs."""
+    results = []
+    for i in range(0, len(titles), 50):
+        batch = titles[i:i+50]
+        params = {
+            'action': 'query',
+            'titles': '|'.join(batch),
+            'prop': 'pageprops',
+            'ppprop': 'wikibase_item',
+            'format': 'json',
+        }
+        data = session.get('https://en.wikipedia.org/w/api.php', params=params).json()
+
+        # Build lookup dict — keys are space-normalized (Action API output format)
+        id_by_title = {}
+        for pid, info in data['query']['pages'].items():
+            if 'missing' not in info and 'pageprops' in info:
+                wid = info['pageprops'].get('wikibase_item')
+                if wid:
+                    id_by_title[info['title']] = wid
+
+        for title in batch:
+            wid = id_by_title.get(title.replace('_', ' '))  # normalize!
+            if wid:
+                results.append((title, wid))
+
+        time.sleep(0.5)  # rate limiting
+    return results
+```
+
+### Step 2: Batch-Check Entity Type via wbgetentities
+
+Once you have Wikidata IDs, use the Wikibase `wbgetentities` module to fetch P31 (instance of) claims for up to 50 IDs per call:
+
+```python
+params = {
+    'action': 'wbgetentities',
+    'ids': '|'.join(entity_ids),       # up to 50 IDs per call
+    'props': 'claims',
+    'format': 'json',
+}
+```
+
+⚠️ Do **not** use `Special:EntityData/{id}.json` for batch lookups — that endpoint only accepts a single ID at a time.
+
+### Step 3: Check P31 (instance of) Values
+
+Each entity's P31 claims contain the Q ID of the class it belongs to. Common entity types:
+
+| Q ID | Label | Use Case |
+|------|-------|----------|
+| Q5 | human | Biographies (people) |
+| Q11424 | film | Movie articles |
+| Q515 | city | Place/city articles |
+| Q4022 | river | Geographic features |
+| Q12136 | mountain | Geographic features |
+| Q16521 | taxon | Species articles |
+| Q7889 | video game | Game articles |
+| Q571 | book | Book articles |
+| Q101352 | family name | Surname articles |
+| Q4830453 | business | Company articles |
+| Q43229 | organization | Organization articles |
+| Q3918 | university | Educational institution articles |
+
+```python
+def is_human(entity):
+    """Check if a Wikidata entity is instance of human (Q5)."""
+    p31 = entity.get('claims', {}).get('P31', [])
+    for c in p31:
+        ds = c.get('mainsnak', {}).get('datavalue', {})
+        if ds.get('value', {}).get('id') == 'Q5':
+            return True
+    return False
+
+
+def classify_entities(session, entries):
+    """Batch-classify Wikipedia titles by entity type.
+    
+    entries: list of (title, wikidata_id) tuples
+    returns: dict mapping title -> set of class Q IDs
+    """
+    classification = {}
+    for i in range(0, len(entries), 50):
+        batch = entries[i:i+50]
+        ids = [e[1] for e in batch]
+        params = {
+            'action': 'wbgetentities',
+            'ids': '|'.join(ids),
+            'props': 'claims',
+            'format': 'json',
+        }
+        data = session.get('https://www.wikidata.org/w/api.php', params=params).json()
+
+        for title, eid in batch:
+            entity = data.get('entities', {}).get(eid, {})
+            p31 = entity.get('claims', {}).get('P31', [])
+            classes = set()
+            for c in p31:
+                ds = c.get('mainsnak', {}).get('datavalue', {})
+                qid = ds.get('value', {}).get('id')
+                if qid:
+                    classes.add(qid)
+            classification[title] = classes
+
+        time.sleep(0.5)
+    return classification
+```
+
+### Handling Subclass Hierarchies
+
+Some entities are instances of subclasses rather than directly of a common type (e.g., `instance of actor` instead of `instance of human`). For thorough checks, traverse `P279` (subclass of) in SPARQL to find all ancestor classes:
+
+```sparql
+# Check if Q33999 (actor) is a subclass of Q5 (human) transitively
+SELECT ?item ?itemLabel WHERE {
+  wd:Q33999 wdt:P279* wd:Q5.  # Follow subclass chain up to Q5
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+```
+
+For programmatic use, precompute a transitive closure for commonly-needed ancestors and cache the results.
+
+### Typical Pipeline Pattern
+
+The full cross-API pipeline:
+
+```
+Get list of titles → Batch-resolve Wikidata IDs → Batch-check P31 → Filter by type → Enrich
+```
+
+Each batch step uses the largest limit the API supports (50 for `prop=pageprops`, 50 for `wbgetentities`). Maintain a 0.3–0.5s delay between batches and respect `Retry-After` on 429 responses. See the **[cross-API pipeline example](../wikimedia-api-access/assets/cross_api_pipeline.py)** for a complete, runnable implementation.
+
+---
+
 ## **Workflow Guidance**
 
 ### **When to use each access method**

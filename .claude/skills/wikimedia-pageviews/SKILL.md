@@ -54,6 +54,53 @@ def get_historical_views(article_title, start_date, end_date, project='en.wikipe
 
 ```
 
+### **Scenario C: Getting the Most Popular Pages (REST API Top Endpoint)
+
+If the task requires finding the most-viewed pages across a project (e.g.,
+"Top 100 most read articles on English Wikipedia"), use the Top Pages REST
+endpoint. This is much faster than querying per-article for thousands of pages.
+
+* **Endpoint:** `https://wikimedia.org/api/rest_v1/metrics/pageviews/top/{project}/all-access/{date}`
+* **Date Format:** `YYYY/MM/DD` with slashes (⚠️ different from the per-article
+  endpoint which uses compact `YYYYMMDD`)
+* **Data Lag:** ~48 hours (use a date at least 2 days ago)
+* **Title Format:** Returns titles **with underscores** (e.g., `Donald_Trump`)
+
+```python
+import requests
+from datetime import datetime, timedelta
+
+headers = {'User-Agent': 'MyBot/1.0 (me@example.com) ContentGapResearch'}
+end = datetime.utcnow() - timedelta(days=3)
+date_str = end.strftime('%Y/%m/%d')  # Slashes: 2026/05/25
+
+url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{date_str}"
+resp = requests.get(url, headers=headers)
+data = resp.json()
+for article in data['items'][0]['articles'][:10]:
+    print(f"{article['rank']}. {article['article']} — {article['views']} views")
+```
+
+**Cross-API chaining:** The Top Pages endpoint is often the first step in a
+pipeline that classifies popular articles by entity type. When chaining its
+output with the Action API (e.g., to resolve Wikidata IDs), **normalize titles
+from underscores to spaces** before looking up in Action API response
+dictionaries:
+
+```python
+top_title = "Donald_Trump"  # from Pageviews Top
+wikidata_id = action_api_dict.get(top_title.replace('_', ' '))  # ✅
+# wikidata_id = action_api_dict.get(top_title)  # ❌ returns None
+```
+
+See the **Batch Entity Classification** SOP in the
+[`wikidata`](../wikidata/SKILL.md#sop-batch-entity-classification-from-wikipedia-titles)
+skill for the full pipeline, and the **Title Format Guide** in the
+[`wikimedia-api-access`](../wikimedia-api-access/references/endpoints.md#11-title-format-guide-cross-api-gotcha)
+endpoint reference for the complete cross-API table.
+
+---
+
 ## **Constraint & Guardrails**
 
 1. **The "No Table" Rule:** The agent must **never** attempt to query a table named `pageviews`, `traffic`, or `hits` in the SQL replicas. They do not exist.

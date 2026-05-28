@@ -435,6 +435,40 @@ Wikipedia lives on many subdomains, but the API patterns are the same:
 
 ---
 
+## 11. Title Format Guide (Cross-API Gotcha)
+
+A critical gotcha when chaining multiple Wikimedia APIs: they return titles in
+different formats. Failing to normalize causes silent data loss (dictionary
+lookups return None, batches appear empty, etc.).
+
+| API / Endpoint | Input Format | Output Format | Example Output |
+|---|---|---|---|
+| Pageviews Top | N/A | **Underscores** | `Donald_Trump` |
+| Pageviews Per-Article | **Underscores** | **Underscores** | `Donald_Trump` |
+| Action API `prop=pageprops` | Both accepted | **Spaces** | `Donald Trump` |
+| Action API `action=parse` | Both accepted | Mixed | `Donald Trump` |
+| REST API `/page/summary/{title}` | Spaces recommended | Spaces | `Donald Trump` |
+| SQL (`page_props`, `page` table) | N/A | **Underscores** | `Donald_Trump` |
+
+**Rule of thumb:** When building a dictionary whose keys are titles from the
+Pageviews API or SQL (both underscore-delimited), normalize to spaces before
+looking up in Action API response dicts.
+
+```python
+# ❌ Wrong — Pageviews title "Donald_Trump" won't match Action API key "Donald Trump"
+wid = action_api_dict.get(pageview_title)
+
+# ✅ Correct — normalize to spaces first
+wid = action_api_dict.get(pageview_title.replace('_', ' '))
+```
+
+This is especially important in the batch entity classification pipeline
+(Pageviews → Action API → Wikidata), where every title goes through this
+transformation and a one-line mismatch can cause 90% of data to silently
+disappear.
+
+---
+
 ## Quick Selection Guide
 
 | Task | Best Endpoint |

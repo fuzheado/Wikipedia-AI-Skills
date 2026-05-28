@@ -116,6 +116,32 @@ fetch('https://en.wikipedia.org/w/api.php?action=query&format=json', {
 5. **User-Agent per project** — Parameterize the contact info so users can swap in their own details. Never hardcode someone else's email.
 6. **SPARQL queries** — For Wikidata Query Service, always set the UA and use `&format=json`. Consider using `SPARQLWrapper` with the `agent` parameter.
 
+### 429 Retry-After Handling
+
+When a 429 (Too Many Requests) response is received, Wikimedia includes a
+`Retry-After` header specifying the number of seconds to wait. **Do not retry
+immediately with a fixed backoff** (e.g., always waiting exactly 5 seconds)
+— this is counterproductive and may lead to a temporary ban. Always use the
+server-supplied value:
+
+```python
+if resp.status_code == 429:
+    retry_after = int(resp.headers.get('Retry-After', 10))
+    time.sleep(retry_after)
+    continue  # retry the request in a loop
+```
+
+### Common Causes of 429 Responses
+
+- **Too many requests in a short window** even with a proper User-Agent.
+  Stay under ~2 requests/second for batch operations, and add deliberate
+  delays (0.3–0.5s) between requests.
+- **Too many titles in a single `titles` parameter.** Keep batches under 50
+  titles per call for `prop=pageprops` and 50 IDs per call for `wbgetentities`.
+- **Fetching very large pages via `action=parse` without a section limit.**
+  Add `rvsection=0` or `section=0` if you only need the lead section, or
+  use `exintro` with `prop=extracts` for a concise summary.
+
 ## **Example Use Cases**
 
 - **Fetch article content:** "Get the wikitext for 'Python (programming language)' using the Action API."
