@@ -60,10 +60,12 @@ These skills are designed to **help you research, understand, and prepare conten
 | Find reusable images on Commons for a Wikipedia article | `wikimedia-commons` |
 | Find article quality ratings (FA/GA/B/C/Start/Stub) and WikiProject assessments | `wikimedia-page-assessment` |
 | Query Wikidata for structured facts (e.g., "all museums in Paris with coordinates") | `wikidata` |
+| Classify Wikipedia articles by entity type (person, place, film, organization) | `wikidata` (batch entity classification SOP) |
 | Build a bot or script that fetches data from Wikipedia | `wikimedia-api-access` |
 | Run SQL queries on the Wikipedia database to analyze page data at scale | `wikimedia-database` |
 | Deploy a web tool to Toolforge and manage its services | `wikimedia-toolforge` |
 | Load jQuery, Bootstrap, or fonts in a Toolforge tool without breaking privacy policy | `wikimedia-cdn-assets` |
+| Chain multiple APIs (Pageviews → Wikidata → content analysis) with correct title normalization | `wikimedia-api-access` (cross-API pipeline script) |
 
 ---
 
@@ -104,6 +106,25 @@ Then add the skills path to `~/.pi/agent/settings.json`:
 ```
 
 After restarting pi, all the skills will be available on-demand.
+
+---
+
+## Testing
+
+New contributions should include tests. The project uses `pytest` with a test suite in
+`tests/` covering:
+
+- **YAML frontmatter validation** — every SKILL.md must have valid `name`, `description`,
+  `license`, and `compatibility` fields
+- **Content accuracy** — key SOP claims, code examples, and guardrails are verified
+  against the actual markdown
+- **Code execution** — runnable Python assets (like the cross-API pipeline script) have
+  mock-based unit tests
+
+```bash
+pip install pytest pyyaml requests
+python -m pytest tests/
+```
 
 ---
 

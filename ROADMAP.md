@@ -4,7 +4,7 @@
 
 ### Published skills
 
-- **wikimedia-api-access** — Complete. Covers Wikimedia API entry points (REST, Action, SPARQL), User-Agent policy compliance with `ContentGapResearch` as the project identifier, rate limiting with Retry-After backoff, connection reuse via `requests.Session()`, 403/429 error handling, and browser-based `Api-User-Agent` workaround. Links to the official Wikimedia Foundation User-Agent Policy. Updated to clarify that the Action API and REST API work across all Wikimedia projects (Commons, Wikidata, Wiktionary, etc.) — just swap the domain.
+- **wikimedia-api-access** — Complete. Covers Wikimedia API entry points (REST, Action, SPARQL), User-Agent policy compliance with `ContentGapResearch` as the project identifier, rate limiting with Retry-After backoff, connection reuse via `requests.Session()`, 403/429 error handling, and browser-based `Api-User-Agent` workaround. Links to the official Wikimedia Foundation User-Agent Policy. Updated to clarify that the Action API and REST API work across all Wikimedia projects (Commons, Wikidata, Wiktionary, etc.) — just swap the domain. **New:** Expanded 429 Retry-After section with common causes and anti-pattern warnings. **New:** Title Format Guide (section 11 in `references/endpoints.md`) documenting underscore-vs-space title format differences across 6 APIs, with correct/wrong code comparison. **New:** `assets/cross_api_pipeline.py` — runnable 4-step pipeline script (Pageviews → Wikidata → entity classification → content analysis).
 
 - **wikimedia-commons** — Complete. Covers the two Commons search interfaces (MediaSearch for visual browsing vs. Special:Search/CirrusSearch for advanced queries), structured data search via `haswbstatement:`, programmatic access via the Action/REST APIs, Commons namespaces (File, Gallery, Category, Creator, etc.), categories vs. galleries, licensing guidance (CC0/CC BY/CC BY-SA vs. non-compliant NC/ND licenses), the "three pillars" of free licensing, the fair-use prohibition, uploaded file formats (allowed and disallowed, including MP4 patent issues), bulk upload tools (Pattypan, flickr2commons, url2commons, video2commons, Commonist), the Volunteer Response Team (VRT) permissions verification process, and a search demo script with `--ns` namespace override support.
 
@@ -12,7 +12,7 @@
 
 - **wikimedia-database** — Complete. Covers SSH tunnel setup and connection management (plain `ssh` and `autossh`), Python implementation with `pymysql`, configurable local port via `TOOLFORGE_DB_PORT` (default 3307), and data handling guardrails (read-only, namespace filtering, binary decoding, safety limits, database naming conventions).
 
-- **wikimedia-pageviews** — Complete. Covers two data retrieval paths: cached SQL property (`page_props.pp_propname = 'pageview_daily_average'` with `CAST AS UNSIGNED`) for sorting/filtering large result sets, and the Analytics QuickMetrics REST API for precise historical data. Includes the "no table" guardrail (pageviews table does not exist in SQL replicas).
+- **wikimedia-pageviews** — Complete. Covers three data retrieval paths: cached SQL property (`page_props.pp_propname = 'pageview_daily_average'` with `CAST AS UNSIGNED`) for sorting/filtering large result sets, the Analytics QuickMetrics REST API for precise historical data, and the Top Pages REST endpoint (Scenario C) for finding the most-viewed pages across a project. Includes the "no table" guardrail (pageviews table does not exist in SQL replicas), date format warnings (slash vs compact), and cross-API chaining guidance with title normalization.
 
 - **wikimedia-page-assessment** — Complete. Covers querying Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners stored in `page_assessments` and `page_assessments_projects` tables. Includes deployment scope documentation (which wikis have the extension), full schema reference with real production replica columns (note: `pa_assessed_timestamp` does not exist — use `pa_page_revision` + `revision` table join), CLI scripts for project assessment queries and quality gap detection, Python/pymysql integration for MySQL 9.x compatibility, and 20+ sample SQL queries organized by category.
 
@@ -40,6 +40,9 @@
 - GitHub repository initialized at `fuzheado/Wikipedia-AI-Skills`
 - `.claude.json` project configuration for agent discovery
 - `CONTRIBUTING.md` with skill authoring guidelines, accuracy checklist, and PR process
+- Test suite with 104 tests across 3 modules: YAML frontmatter validation for all 14 skills,
+  mock-based unit tests for the cross-API pipeline script, and content-accuracy checks for key SOPs
+- `.gitignore` updated to exclude `.pytest_cache/`
 
 ## What's outstanding
 
@@ -61,15 +64,24 @@
 - Add `Api-User-Agent` header guidance to the API access skill for browser-based tools
 - Consider adding citation template generators for common scenarios (book with ISBN lookup, news article with URL extraction)
 
+### Completed improvements
+
+- **Title Format Guide** (section 11 of `wikimedia-api-access/references/endpoints.md`) — cross-API table documenting underscore-vs-space title formats across 6 endpoints, with correct/wrong code comparison. Fixes the single most costly bug when chaining Pageviews, Action API, and SQL results.
+- **Expanded 429 Retry-After handling** in `wikimedia-api-access/SKILL.md` — dedicated subsection explaining the importance of server-supplied Retry-After values, an anti-pattern warning against fixed backoff, and three common causes of 429 responses.
+- **Batch entity classification SOP** in `wikidata/SKILL.md` — resolves the gap between the SPARQL-focused Wikidata skill and the need for a concrete multi-API pipeline workflow. Covers batch Wikidata ID resolution, P31 type checking with 11 common Q IDs, and subclass hierarchy traversal.
+- **Cross-API pipeline script** (`wikimedia-api-access/assets/cross_api_pipeline.py`) — a runnable 4-step demo showing Pageviews → Wikidata ID resolution → P31 entity classification → content analysis, with proper batch processing, rate limiting, and title normalization.
+- **Scenario C (Top Pages)** in `wikimedia-pageviews/SKILL.md` — adds the Top Pages REST endpoint as a third data retrieval path alongside the existing SQL and per-article API scenarios. Includes date format warnings and cross-API chaining guidance.
+
 ### Process
 
-- Add skill tests: For each skill, define prompts and validation criteria to ensure agents correctly follow SOPs and adhere to policies.
-    - **Testing Facility:** Utilize a Python-based testing framework (e.g., `pytest`) within a dedicated `tests/` directory. Tests will parse `SKILL.md` files, validate YAML frontmatter, extract SOP instructions, and simulate agent interactions to verify adherence to policies and guardrails.
-    - **Test Definition:** Tests will cover core functionalities, critical guardrails, content accuracy (e.g., policy references, code examples), and edge cases identified within the skill's SOP.
-    - **Coverage Goal:** Aim for a minimum of 3-5 distinct tests per skill, ensuring comprehensive coverage of critical functions and safety constraints. Test suites should be expanded iteratively.
 - Write CONTRIBUTING.md with skill authoring guidelines ✅
 - Set up a GitHub issue template for skill suggestions
 - Add `.claude.json` project configuration for agent discovery ✅
+- **Add skill tests** ✅ — `pytest`-based test suite in `tests/` with 104 tests:
+    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 14 skills (5 checks each: exists, required fields, description length, MIT license, directory match)
+    - `test_cross_api_pipeline.py`: Mock-based unit tests for the pipeline script (title normalization, batch splitting, P31 classification, citation counting, namespace filtering)
+    - `test_markdown_sops.py`: Content-accuracy checks for new/modified SOPs (batch entity classification, Scenario C, Title Format Guide, 429 Retry-After)
+    - Coverage meets the 3-5 test minimum per affected skill; the full suite serves as a foundation to expand iteratively.
 
 ## Key decisions
 
