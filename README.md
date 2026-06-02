@@ -43,7 +43,11 @@ These skills are designed to **help you research, understand, and prepare conten
 | [wikimedia-api-access](.claude/skills/wikimedia-api-access/SKILL.md) | Access Wikipedia and Wikimedia APIs (REST, Action, SPARQL) with correct User-Agent headers, rate limiting, and 429/403 error handling |
 | [wikimedia-database](.claude/skills/wikimedia-database/SKILL.md) | Execute SQL queries against Wikipedia database replicas (enwiki, wikidata, commonswiki) via an SSH tunnel to Toolforge |
 | [wikimedia-toolforge](.claude/skills/wikimedia-toolforge/SKILL.md) | Manage Toolforge accounts, web services, Kubernetes pods, cron jobs, and file deployment for Wikimedia tools |
+
+| [wikimedia-cdn-assets](.claude/skills/wikimedia-cdn-assets/SKILL.md) | Guides agents on loading JavaScript, CSS, and fonts from Wikimedia's privacy-preserving cdnjs.toolforge.org CDN to ensure user privacy and policy compliance. |
+| [svg-to-choropleth-map](.claude/skills/svg-to-choropleth-map/SKILL.md) | Convert an SVG choropleth map into Wikipedia's `{{Choropleth map}}` template wikitext, with entity extraction, color mapping, `{{Legend}}` color key generation, caption inference, and multi-language template lookup via Wikidata |
 | [wikimedia-cdn-assets](.claude/skills/wikimedia-cdn-assets/SKILL.md) | Load JavaScript, CSS, and fonts for Toolforge tools from Wikimedia's privacy-preserving cdnjs mirror, ensuring user privacy and policy compliance |
+
 
 ---
 
