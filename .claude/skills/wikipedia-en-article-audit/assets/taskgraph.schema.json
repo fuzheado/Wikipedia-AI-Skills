@@ -1,0 +1,468 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/your-org/wikipedia-agent-taskgraph/schema/v1",
+  "title": "Wikipedia Article Improvement Task Graph",
+  "description": "Schema for a DAG of tasks to improve a Wikipedia article. Designed for agent-to-agent handoff.",
+  "type": "object",
+  "required": ["version", "project", "tasks"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version for compat checking",
+      "pattern": "^\\d+\\.\\d+$"
+    },
+    "project": {
+      "type": "string",
+      "description": "Short project slug, used for directory names and logging"
+    },
+    "article_title": {
+      "type": "string",
+      "description": "The canonical Wikipedia title (with spaces, not underscores)"
+    },
+    "article_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Permalink to the article being worked on"
+    },
+    "talk_page_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Permalink to the talk page (for assessment updates)"
+    },
+    "execution": {
+      "type": "object",
+      "description": "Global execution policy for the taskgraph runner",
+      "properties": {
+        "max_concurrency": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "description": "Maximum number of tasks to run in parallel (respects DAG dependencies)"
+        },
+        "fail_fast": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, abort all pending tasks on any task failure. If false, continue executing independent tasks."
+        },
+        "revert_on_failure": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, revert all edits made by the current and any completed tasks on failure"
+        },
+        "require_verification": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, every task's verify steps must pass before downstream tasks begin"
+        },
+        "max_retries_per_task": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 2
+        },
+        "status_report_path": {
+          "type": "string",
+          "description": "File path where the executor should write a run-status log"
+        }
+      },
+      "additionalProperties": false
+    },
+    "tasks": {
+      "type": "array",
+      "description": "The list of tasks. Each task has a unique id. Dependencies are expressed via depends_on.",
+      "items": {
+        "$ref": "#/$defs/task"
+      },
+      "uniqueItems": true
+    },
+    "$schema": {
+      "type": "string",
+      "description": "Self-reference to the schema file for tooling support"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "task": {
+      "type": "object",
+      "description": "A single unit of work. May depend on other tasks.",
+      "required": ["id", "category", "actions"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique task identifier. Used in depends_on references.",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "summary": {
+          "type": "string",
+          "description": "One-line human-readable summary of what this task does"
+        },
+        "depends_on": {
+          "type": "array",
+          "description": "Task IDs that must complete successfully before this task runs",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "factual_correction",
+            "npov_rewrite",
+            "structural",
+            "infobox",
+            "citation",
+            "grammar",
+            "verification",
+            "maintenance"
+          ],
+          "description": "Category for grouping and prioritization"
+        },
+        "criticality": {
+          "type": "string",
+          "enum": ["p0", "p1", "p2"],
+          "default": "p1",
+          "description": "p0 = must fix before article is acceptable; p1 = should fix; p2 = nice to have"
+        },
+        "tools": {
+          "type": "array",
+          "description": "Capabilities the agent needs to execute this task",
+          "items": {
+            "type": "string",
+            "enum": [
+              "wikipedia_api",
+              "http_get",
+              "web_browser",
+              "shell",
+              "wikidata_api",
+              "database_query",
+              "file_read"
+            ]
+          },
+          "default": ["wikipedia_api"]
+        },
+        "inputs": {
+          "type": "array",
+          "description": "External resources the task needs (URLs, file paths, etc.)",
+          "items": {
+            "$ref": "#/$defs/input"
+          },
+          "default": []
+        },
+        "actions": {
+          "type": "array",
+          "description": "Sequential steps to execute for this task. Must have at least one.",
+          "items": {
+            "$ref": "#/$defs/action"
+          },
+          "minItems": 1
+        },
+        "verify": {
+          "type": "array",
+          "description": "Post-condition checks that must all pass for the task to be considered complete",
+          "items": {
+            "$ref": "#/$defs/verify_step"
+          },
+          "default": []
+        },
+        "on_failure": {
+          "$ref": "#/$defs/failure_policy",
+          "default": {
+            "action": "revert_and_report",
+            "report_to": "failures.jsonl"
+          }
+        },
+        "notes": {
+          "type": "string",
+          "description": "Free-text notes, caveats, or edge cases the agent should know"
+        }
+      },
+      "additionalProperties": false
+    },
+    "input": {
+      "type": "object",
+      "description": "An external resource the task needs",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "web_archive",
+            "web_page",
+            "file",
+            "wikipedia_article",
+            "wikipedia_revision",
+            "wikidata_entity"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to fetch"
+        },
+        "path": {
+          "type": "string",
+          "description": "Local file path (relative to project root)"
+        },
+        "description": {
+          "type": "string",
+          "description": "What to look for in this input"
+        }
+      },
+      "oneOf": [
+        { "required": ["url"] },
+        { "required": ["path"] }
+      ],
+      "additionalProperties": false
+    },
+    "action": {
+      "oneOf": [
+        { "$ref": "#/$defs/action_edit_wikitext" },
+        { "$ref": "#/$defs/action_insert_after" },
+        { "$ref": "#/$defs/action_replace_text" },
+        { "$ref": "#/$defs/action_edit_talk_page" },
+        { "$ref": "#/$defs/action_fetch_source" },
+        { "$ref": "#/$defs/action_run_shell" },
+        { "$ref": "#/$defs/action_write_file" }
+      ]
+    },
+    "action_edit_wikitext": {
+      "type": "object",
+      "description": "Edit a Wikipedia page's wikitext by replacing an exact string",
+      "required": ["type", "page", "oldText", "newText"],
+      "properties": {
+        "type": { "type": "string", "const": "edit_wikitext" },
+        "page": { "type": "string", "description": "Page title to edit" },
+        "oldText": { "type": "string", "description": "Exact wikitext to find and replace" },
+        "newText": { "type": "string", "description": "Replacement wikitext" },
+        "summary": { "type": "string", "description": "Edit summary for the revision" },
+        "citation": {
+          "type": "object",
+          "description": "If provided, insert this citation in the new text",
+          "properties": {
+            "template": { "type": "string" },
+            "params": {
+              "type": "object",
+              "description": "Template parameters as key-value pairs"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "action_insert_after": {
+      "type": "object",
+      "description": "Insert wikitext after a specific string or template",
+      "required": ["type", "page", "after", "wikitext"],
+      "properties": {
+        "type": { "type": "string", "const": "insert_after" },
+        "page": { "type": "string", "description": "Page title to edit" },
+        "after": { "type": "string", "description": "String or template name to insert after" },
+        "after_type": {
+          "type": "string",
+          "enum": ["string", "template", "section"]
+        },
+        "wikitext": { "type": "string", "description": "Wikitext to insert" },
+        "wikitext_file": {
+          "type": "string",
+          "description": "Path to a file containing the wikitext (alternative to inline wikitext)"
+        },
+        "summary": { "type": "string", "description": "Edit summary" }
+      },
+      "oneOf": [
+        { "required": ["wikitext"] },
+        { "required": ["wikitext_file"] }
+      ],
+      "additionalProperties": false
+    },
+    "action_replace_text": {
+      "type": "object",
+      "description": "Replace text in a page using regex or literal search",
+      "required": ["type", "page", "pattern", "replacement"],
+      "properties": {
+        "type": { "type": "string", "const": "replace_text" },
+        "page": { "type": "string" },
+        "pattern": { "type": "string", "description": "Regex or literal pattern to match" },
+        "replacement": { "type": "string", "description": "Replacement string" },
+        "is_regex": { "type": "boolean", "default": false },
+        "flags": { "type": "string", "description": "Regex flags (e.g. 'g', 'gi')", "default": "" },
+        "summary": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "action_edit_talk_page": {
+      "type": "object",
+      "description": "Edit a talk page (for updating WikiProject assessments)",
+      "required": ["type", "page", "oldText", "newText"],
+      "properties": {
+        "type": { "type": "string", "const": "edit_talk_page" },
+        "page": { "type": "string", "description": "Talk page title" },
+        "oldText": { "type": "string" },
+        "newText": { "type": "string" },
+        "summary": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "action_fetch_source": {
+      "type": "object",
+      "description": "Fetch and store an external source for verification",
+      "required": ["type", "url", "store_as"],
+      "properties": {
+        "type": { "type": "string", "const": "fetch_source" },
+        "url": { "type": "string", "format": "uri" },
+        "store_as": { "type": "string", "description": "File path to save the fetched content" },
+        "method": { "type": "string", "enum": ["http_get", "http_get_with_headers", "web_archive"], "default": "http_get" }
+      },
+      "additionalProperties": false
+    },
+    "action_run_shell": {
+      "type": "object",
+      "description": "Execute a shell command (for local verification scripts, etc.)",
+      "required": ["type", "command"],
+      "properties": {
+        "type": { "type": "string", "const": "run_shell" },
+        "command": { "type": "string" },
+        "timeout_seconds": { "type": "integer", "minimum": 1, "default": 30 },
+        "expected_exit_code": { "type": "integer", "default": 0 }
+      },
+      "additionalProperties": false
+    },
+    "action_write_file": {
+      "type": "object",
+      "description": "Write content to a local file (for producing output artifacts)",
+      "required": ["type", "path", "content"],
+      "properties": {
+        "type": { "type": "string", "const": "write_file" },
+        "path": { "type": "string" },
+        "content": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "verify_step": {
+      "oneOf": [
+        { "$ref": "#/$defs/verify_page_contains" },
+        { "$ref": "#/$defs/verify_page_not_contains" },
+        { "$ref": "#/$defs/verify_infobox_exists" },
+        { "$ref": "#/$defs/verify_section_exists" },
+        { "$ref": "#/$defs/verify_assessment_equals" },
+        { "$ref": "#/$defs/verify_revision_comment" },
+        { "$ref": "#/$defs/verify_file_exists" },
+        { "$ref": "#/$defs/verify_shell" }
+      ]
+    },
+    "verify_page_contains": {
+      "type": "object",
+      "required": ["type", "page", "text"],
+      "properties": {
+        "type": { "type": "string", "const": "page_contains" },
+        "page": { "type": "string" },
+        "text": { "type": "string", "description": "Text the page must contain" },
+        "in_wikitext": { "type": "boolean", "default": true, "description": "If true, check raw wikitext. If false, check rendered text." }
+      },
+      "additionalProperties": false
+    },
+    "verify_page_not_contains": {
+      "type": "object",
+      "required": ["type", "page", "text"],
+      "properties": {
+        "type": { "type": "string", "const": "page_not_contains" },
+        "page": { "type": "string" },
+        "text": { "type": "string", "description": "Text the page must NOT contain" },
+        "in_wikitext": { "type": "boolean", "default": true }
+      },
+      "additionalProperties": false
+    },
+    "verify_infobox_exists": {
+      "type": "object",
+      "required": ["type", "page"],
+      "properties": {
+        "type": { "type": "string", "const": "infobox_exists" },
+        "page": { "type": "string" },
+        "expected_template": { "type": "string", "description": "e.g. 'Infobox person'" },
+        "expected_fields": {
+          "type": "array",
+          "description": "Field names that must be present in the infobox",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "verify_section_exists": {
+      "type": "object",
+      "required": ["type", "page", "heading"],
+      "properties": {
+        "type": { "type": "string", "const": "section_exists" },
+        "page": { "type": "string" },
+        "heading": { "type": "string", "description": "Section heading text (without ==)" }
+      },
+      "additionalProperties": false
+    },
+    "verify_assessment_equals": {
+      "type": "object",
+      "required": ["type", "page", "expected_class"],
+      "properties": {
+        "type": { "type": "string", "const": "assessment_equals" },
+        "page": { "type": "string", "description": "Talk page of the article" },
+        "expected_class": {
+          "type": "string",
+          "enum": ["Stub", "Start", "C", "B", "GA", "FA", "List", "FL"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "verify_revision_comment": {
+      "type": "object",
+      "required": ["type", "page"],
+      "properties": {
+        "type": { "type": "string", "const": "revision_has_comment" },
+        "page": { "type": "string" },
+        "comment_contains": { "type": "string", "description": "The edit summary must contain this string" }
+      },
+      "additionalProperties": false
+    },
+    "verify_file_exists": {
+      "type": "object",
+      "required": ["type", "path"],
+      "properties": {
+        "type": { "type": "string", "const": "file_exists" },
+        "path": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "verify_shell": {
+      "type": "object",
+      "required": ["type", "command"],
+      "properties": {
+        "type": { "type": "string", "const": "shell_check" },
+        "command": { "type": "string", "description": "Shell command that exits 0 on success, non-zero on failure" },
+        "timeout_seconds": { "type": "integer", "default": 15 }
+      },
+      "additionalProperties": false
+    },
+    "failure_policy": {
+      "type": "object",
+      "required": ["action"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "revert_and_report",
+            "skip_and_report",
+            "retry_and_report"
+          ],
+          "description": "revert_and_report = undo the edit and log failure; skip_and_report = mark as failed but move on; retry_and_report = retry up to max_retries then report"
+        },
+        "report_to": {
+          "type": "string",
+          "description": "File path to append failure details (JSONL format)"
+        },
+        "max_retries": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 2,
+          "description": "Only applies if action is retry_and_report"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
