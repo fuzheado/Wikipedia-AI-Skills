@@ -24,6 +24,7 @@ These skills are designed to **help you research, understand, and prepare conten
 
 | Skill | What it helps with |
 |-------|-------------------|
+| [wikipedia-en-article-audit](.claude/skills/wikipedia-en-article-audit/SKILL.md) | Audit a Wikipedia article for structural issues, factual errors, and NPOV violations, then produce a machine-readable task graph (DAG) that another agent can execute to fix all identified problems |
 | [wikipedia-en-biography-writing](.claude/skills/wikipedia-en-biography-writing/SKILL.md) | Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and biographies of living persons (BLP) policies |
 | [wikipedia-page-anatomy](.claude/skills/wikipedia-page-anatomy/SKILL.md) | Navigate and understand the structure of a Wikipedia article — infoboxes, categories, references, templates, navboxes, redirects, disambiguation, and protection levels |
 | [wikipedia-talk-page](.claude/skills/wikipedia-talk-page/SKILL.md) | Navigate and participate in Wikipedia talk pages — discussion conventions, signing, WikiProject banners, assessment ratings, and archiving |
@@ -50,6 +51,7 @@ These skills are designed to **help you research, understand, and prepare conten
 
 | If you want to... | Use this skill |
 |---|---|
+| Audit an article for factual errors, NPOV violations, and structural problems | `wikipedia-en-article-audit` (read-only — never edits live articles) |
 | Draft a well-structured Wikipedia biography with proper citations and section ordering | `wikipedia-en-biography-writing` (see ⚠️ warning above) |
 | Understand the structure of a Wikipedia article (infobox, categories, templates, navboxes) | `wikipedia-page-anatomy` |
 | Participate in talk page discussions, sign comments, and find WikiProject assessments | `wikipedia-talk-page` |
