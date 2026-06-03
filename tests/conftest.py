@@ -14,6 +14,7 @@ sys.path.insert(0, str(SKILLS_DIR / 'wikimedia-api-access' / 'assets'))
 # All skill directories
 SKILL_NAMES = [
     'wikidata',
+    'wikidata-vector-search',
     'wikimedia-api-access',
     'wikimedia-cdn-assets',
     'wikimedia-commons',

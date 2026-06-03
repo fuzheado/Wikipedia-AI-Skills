@@ -10,6 +10,8 @@
 
 - **wikidata** — Complete. Covers Wikidata's role as the inter-language linking backbone for Wikipedia, the Q-number (items) and P-number (properties) system, Wikibase as a MediaWiki extension with its own Action API modules (`wbgetentities`, `wbsearchentities`, `wbgetclaims`, etc.), the SPARQL query service at query.wikidata.org (web interface and programmatic access), the fundamental properties P31 (instance of) and P279 (subclass of) with hierarchical query patterns, the community-driven (non-rigid) taxonomy model, a comparison of SPARQL vs. `haswbstatement:`, and workflow guidance for choosing the right access method.
 
+- **wikidata-vector-search** — Complete. Covers the Wikidata Vector Database API at wd-vectordb.wmcloud.org — a semantic/vector search engine over all Wikidata items and properties. Three endpoints: item search, property search, and similarity scoring. Hybrid vector+keyword retrieval with Reciprocal Rank Fusion (RRF), multilingual support (100+ languages, 4 with dedicated vectors), and optional reranker. Includes a CLI query script (wd-vector-search.sh) that resolves QIDs to labels and descriptions and filters to Wikipedia articles by default. Documents the alpha limitations (non-functional instanceof filter, concept-first ranking, no labels in response).
+
 - **wikimedia-database** — Complete. Covers SSH tunnel setup and connection management (plain `ssh` and `autossh`), Python implementation with `pymysql`, configurable local port via `TOOLFORGE_DB_PORT` (default 3307), and data handling guardrails (read-only, namespace filtering, binary decoding, safety limits, database naming conventions).
 
 - **wikimedia-pageviews** — Complete. Covers three data retrieval paths: cached SQL property (`page_props.pp_propname = 'pageview_daily_average'` with `CAST AS UNSIGNED`) for sorting/filtering large result sets, the Analytics QuickMetrics REST API for precise historical data, and the Top Pages REST endpoint (Scenario C) for finding the most-viewed pages across a project. Includes the "no table" guardrail (pageviews table does not exist in SQL replicas), date format warnings (slash vs compact), and cross-API chaining guidance with title normalization.
@@ -40,7 +42,7 @@
 - GitHub repository initialized at `fuzheado/Wikipedia-AI-Skills`
 - `.claude.json` project configuration for agent discovery
 - `CONTRIBUTING.md` with skill authoring guidelines, accuracy checklist, and PR process
-- Test suite with 104 tests across 3 modules: YAML frontmatter validation for all 14 skills,
+- Test suite with 104 tests across 3 modules: YAML frontmatter validation for all 15 skills,
   mock-based unit tests for the cross-API pipeline script, and content-accuracy checks for key SOPs
 - `.gitignore` updated to exclude `.pytest_cache/`
 
@@ -78,7 +80,7 @@
 - Set up a GitHub issue template for skill suggestions
 - Add `.claude.json` project configuration for agent discovery ✅
 - **Add skill tests** ✅ — `pytest`-based test suite in `tests/` with 104 tests:
-    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 14 skills (5 checks each: exists, required fields, description length, MIT license, directory match)
+    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 15 skills (5 checks each: exists, required fields, description length, MIT license, directory match)
     - `test_cross_api_pipeline.py`: Mock-based unit tests for the pipeline script (title normalization, batch splitting, P31 classification, citation counting, namespace filtering)
     - `test_markdown_sops.py`: Content-accuracy checks for new/modified SOPs (batch entity classification, Scenario C, Title Format Guide, 429 Retry-After)
     - Coverage meets the 3-5 test minimum per affected skill; the full suite serves as a foundation to expand iteratively.

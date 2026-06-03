@@ -35,6 +35,8 @@ These skills are designed to **help you research, understand, and prepare conten
 | [wikimedia-commons](.claude/skills/wikimedia-commons/SKILL.md) | Search, upload, and understand Wikimedia Commons — the free media repository of images, video, sound, 3D files, PDFs, and other media used across Wikipedia and its sister projects. Browse categories, find reusable media, and retrieve file metadata |
 | [wikimedia-page-assessment](.claude/skills/wikimedia-page-assessment/SKILL.md) | Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners on any Wikimedia wiki with the PageAssessments extension |
 | [wikidata](.claude/skills/wikidata/SKILL.md) | Understand and query Wikidata — the free, collaborative, multilingual knowledge graph that underpins Wikipedia's inter-language links, Commons structured data, and semantic facts across all Wikimedia projects. Covers SPARQL, the Wikibase REST/Action APIs, RDF data dumps, and semantic web concepts |
+| [wikidata-vector-search](.claude/skills/wikidata-vector-search/SKILL.md) | Query Wikidata by meaning, concept, or natural-language description using the Wikidata Vector Database's semantic embeddings — fuzzy semantic search, “find like this”, cross-lingual retrieval, and similarity scoring when you don’t know the exact QID or label |
+
 
 ### 🛠️ For tool developers
 
@@ -63,6 +65,9 @@ These skills are designed to **help you research, understand, and prepare conten
 | Find article quality ratings (FA/GA/B/C/Start/Stub) and WikiProject assessments | `wikimedia-page-assessment` |
 | Query Wikidata for structured facts (e.g., "all museums in Paris with coordinates") | `wikidata` |
 | Classify Wikipedia articles by entity type (person, place, film, organization) | `wikidata` (batch entity classification SOP) |
+| Search Wikidata by meaning, description, or concept when you don’t know the exact label | `wikidata-vector-search` |
+| Find Wikidata items semantically similar to a free-text query, across 100+ languages | `wikidata-vector-search` |
+| Disambiguate which QID a piece of text refers to by comparing similarity scores | `wikidata-vector-search` |
 | Build a bot or script that fetches data from Wikipedia | `wikimedia-api-access` |
 | Run SQL queries on the Wikipedia database to analyze page data at scale | `wikimedia-database` |
 | Deploy a web tool to Toolforge and manage its services | `wikimedia-toolforge` |
