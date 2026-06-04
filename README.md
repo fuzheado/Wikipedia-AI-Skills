@@ -47,6 +47,7 @@ These skills are designed to **help you research, understand, and prepare conten
 | [wikimedia-toolforge](.claude/skills/wikimedia-toolforge/SKILL.md) | Manage Toolforge accounts, web services, Kubernetes pods, cron jobs, and file deployment for Wikimedia tools |
 | [wikimedia-cdn-assets](.claude/skills/wikimedia-cdn-assets/SKILL.md) | Load JavaScript, CSS, and fonts for Toolforge tools from Wikimedia's privacy-preserving cdnjs mirror, ensuring user privacy and policy compliance |
 | [pywikibot](.claude/skills/pywikibot/SKILL.md) | Use Pywikibot — the Python library and CLI tool suite for automating work on MediaWiki sites. Covers installation, the core object model (Site, Page, Category, User, ItemPage), page generators, the bot framework, built-in scripts (archivebot, replace, harvest_template, claimit, and 50+ more), Wikidata/Wikibase integration, Commons file operations, and Toolforge/PAWS deployment |
+| [wikimedia-eventstreams](.claude/skills/wikimedia-eventstreams/SKILL.md) | Consume real-time streams of Wikimedia events (edits, page creations, deletions, moves, log entries) via Server-Sent Events (SSE). Covers all available streams, event schemas, client libraries (Python/JS/curl), client-side filtering, historical replay, canary event handling, and building live dashboards, patrol monitors, and cross-wiki trackers |
 
 ---
 
@@ -79,6 +80,11 @@ These skills are designed to **help you research, understand, and prepare conten
 | Harvest infobox data from Wikipedia into Wikidata statements | `pywikibot` (harvest_template script) |
 | Fix redirected categories across an entire wiki | `pywikibot` (category_redirect script) |
 | Transfer images from a local wiki to Wikimedia Commons with full attribution history | `pywikibot` (image_transfer script) |
+| Watch Wikipedia edits happen in real time as a live feed | `wikimedia-eventstreams` |
+| Build a live dashboard showing edits per minute or active editors | `wikimedia-eventstreams` |
+| Monitor cross-wiki activity by the same user across multiple projects simultaneously | `wikimedia-eventstreams` |
+| Detect vandalism or automated imports on Wikidata in real time | `wikimedia-eventstreams` |
+| Replay past events from a stream (up to 31 days of history) | `wikimedia-eventstreams` (historical replay) |
 
 ---
 

@@ -35,6 +35,8 @@
 
 - **pywikibot** — Complete. Covers the Pywikibot Python library (v11.3.0) for automating work on MediaWiki sites. Includes installation (pip vs. repository mode), `user-config.py` setup, the core object model (Site, Page, Category, User, FilePage, Link, ItemPage, PropertyPage, Claim, LexemePage), the 40+ page generator system with composable CLI flags, the bot class hierarchy (BaseBot → ExistingPageBot → CurrentPageBot → ConfigParserBot) for writing custom bots, a catalog of 50+ built-in scripts across 7 categories (general, categories, templates, images, wikibase, admin, non-edit), full Wikidata/Wikibase integration with `harvest_template`, `claimit`, and `illustrate_wikidata` scripts, Commons file operations (download, upload, image_transfer), Toolforge/PAWS deployment guidance, a One-of-a-Kind Capabilities section highlighting 8 superpowers that no other API approach can easily replicate, and a decision table for when NOT to use Pywikibot. Ships with `assets/pywikibot-quickref.py` (280 lines of copy-paste ready code snippets), `references/api-mapping.md` (full MediaWiki Action API → Pywikibot method cross-reference), and `scripts/test-pywikibot.sh` (installation validation script).
 
+- **wikimedia-eventstreams** — Complete. Covers the EventStreams HTTP service (SSE-based real-time event streaming). Includes the complete stream catalog (18 streams: recentchange, revision-create, page-create, page-delete, page-move, page-links-change, revision-tags-change, ML prediction streams, Wikidata RDF mutation streams, and more), event schema reference for all recentchange fields with wiki/type/namespace/user/bot metadata, client libraries (Python `requests-sse`, Pywikibot `comms.eventstreams.EventStreams`, Node.js `wikimedia-streams`, browser `EventSource`, `curl` + `jq`), client-side filtering patterns (by wiki, type, namespace, user, bot flag, title pattern), mandatory canary event handling (`meta.domain === 'canary'`), connection lifecycle management with auto-reconnect using `Last-Event-ID`, historical replay via `?since=`, 15-minute timeout handling, and real-world tool patterns (live edit counter, cross-wiki monitor, Wikidata batch edit detector, patrol monitor). Ships with `assets/eventstreams-consumer.py` (207 lines, reusable Python consumer with CLI args, filters, and auto-reconnect), `references/stream-schemas.md` (compact field reference for all stream schemas), and `scripts/test-eventstreams.sh` (connectivity verification script).
+
 ### Project infrastructure
 
 - `.claude/skills/<name>/SKILL.md` directory structure with YAML frontmatter (name, description, license, compatibility)
@@ -44,7 +46,7 @@
 - GitHub repository initialized at `fuzheado/Wikipedia-AI-Skills`
 - `.claude.json` project configuration for agent discovery
 - `CONTRIBUTING.md` with skill authoring guidelines, accuracy checklist, and PR process
-- Test suite with 104 tests across 3 modules: YAML frontmatter validation for all 16 skills,
+- Test suite with 104 tests across 3 modules: YAML frontmatter validation for all 17 skills,
   mock-based unit tests for the cross-API pipeline script, and content-accuracy checks for key SOPs
 - `.gitignore` updated to exclude `.pytest_cache/`
 
@@ -57,6 +59,16 @@
 - **Copyediting for encyclopedic tone** — SOPs for auditing existing articles for NPOV violations, promotional language, weasel words, tone drift, and structural issues. Could include a checklist-style workflow.
 
 - **Pywikibot advanced workflows** — Deeper SOPs for chaining multiple Pywikibot scripts in CI/CD pipelines, integrating with Toolforge Kubernetes jobs, scheduling recurring bot tasks via cron, and monitoring bot health. The current skill covers the fundamentals; this would add deployment and operations guidance.
+
+- **ORES / Lift Wing (ML services)** — SOPs for using Wikimedia's ML-as-a-service APIs (edit quality prediction, article quality scoring, topic classification, revert-risk scoring). Covers the ORES API (`api.wmflabs.org/ores/v3/scores/`) and the newer Lift Wing replacement, available models (`damaging`, `goodfaith`, `articlequality`, `itemquality`, `reverted`, `topic`), threshold tuning, and integration patterns for patrol tools, quality dashboards, and vandalism detection. Complements the article-audit and page-assessment skills by adding ML-powered scores.
+
+- **Wikipedia XML/SQL dump processing** — SOPs for working with Wikimedia's monthly data dumps from `dumps.wikimedia.org`. Covers dump types (`pages-articles`, `pages-meta-current`, `stub-meta-history`, SQL dumps), streaming XML parsing with `mwxml`/`mwdump` (memory-safe iteration over gigabytes), Pywikibot's `xmlreader` module and `-xml:` generator filter, filtering by namespace or date range, and use cases like "extract all infobox data from the entire English Wikipedia without hitting the API". Complements the database-replicas skill (live SQL) by covering offline bulk analysis.
+
+- **Wikipedia bot policy, flagging & etiquette** — Governance skill covering what's ALLOWED when running bots on Wikimedia wikis. Covers the Bot Approvals Group (BAG) process, bot flag requirements (which differ between enwiki, Commons, and Wikidata), `put_throttle` ethics, Commons bot policy (no automated uploads without approval), Wikidata's permissive but property-restricted rules, communicating with other editors, and the higher standard bots are held to for edit-warring and 3RR. Complements the Pywikibot technical skill with the policy layer.
+
+- **Wikimedia REST API v1 — deep reference** — Comprehensive endpoint reference for the modern REST API. Covers `/page/{title}/html`, `/page/{title}/wikitext`, `/page/{title}/summary`, `/page/{title}/links`, `/page/{title}/related`, `/revision/{id}/diff`, `/revision/{id}/content`, `/search/title`, `/search/page`, `/transform/wikitext/to/html`, `/transform/html/to/wikitext`, `/feed/featured`, `/feed/onthisday`. Includes a decision table for choosing REST vs. Action API vs. EventStreams vs. SPARQL for a given task. Complements the api-access skill (which focuses on authentication and patterns) with an endpoint-by-endpoint reference.
+
+- **PAWS (Jupyter notebooks for Wikimedia)** — SOPs for using PAWS (`paws.wmflabs.org`), the hosted Jupyter notebook environment with Pywikibot pre-installed. Covers launching sessions, Pywikibot + pandas + matplotlib workflows, authentication flow, exporting notebooks as scripts, and when to use PAWS vs. Toolforge vs. local development. Complements the Toolforge skill with the exploration/prototyping tier.
 
 - **Domain-specific article templates** — Structure templates for common article types: companies, educational institutions, films, albums, software, scientific concepts. Each has distinct section conventions and notability guidelines.
 
@@ -84,7 +96,7 @@
 - Set up a GitHub issue template for skill suggestions
 - Add `.claude.json` project configuration for agent discovery ✅
 - **Add skill tests** ✅ — `pytest`-based test suite in `tests/` with 104 tests:
-    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 16 skills (5 checks each: exists, required fields, description length, MIT license, directory match)
+    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 17 skills (5 checks each: exists, required fields, description length, MIT license, directory match)
     - `test_cross_api_pipeline.py`: Mock-based unit tests for the pipeline script (title normalization, batch splitting, P31 classification, citation counting, namespace filtering)
     - `test_markdown_sops.py`: Content-accuracy checks for new/modified SOPs (batch entity classification, Scenario C, Title Format Guide, 429 Retry-After)
     - Coverage meets the 3-5 test minimum per affected skill; the full suite serves as a foundation to expand iteratively.
