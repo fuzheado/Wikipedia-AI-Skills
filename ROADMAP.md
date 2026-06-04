@@ -33,6 +33,8 @@
 
 - **wikipedia-edit-history** — Complete. Covers accessing page history via URL and API with pagination, revision record structure (revid, parentid, user, size, tags), diff basics (deferring to wikimedia-diffs for deep mechanics), edit summary conventions and bot identification, minor vs. major edit flags, user attribution and contributions API, byte size analysis with vandalism red flags, undo vs. rollback permissions and the 3RR, revision tags and their meanings (mobile, visual editor, possible vandalism), vandalism detection signals and block status checks, and an API methods reference table.
 
+- **pywikibot** — Complete. Covers the Pywikibot Python library (v11.3.0) for automating work on MediaWiki sites. Includes installation (pip vs. repository mode), `user-config.py` setup, the core object model (Site, Page, Category, User, FilePage, Link, ItemPage, PropertyPage, Claim, LexemePage), the 40+ page generator system with composable CLI flags, the bot class hierarchy (BaseBot → ExistingPageBot → CurrentPageBot → ConfigParserBot) for writing custom bots, a catalog of 50+ built-in scripts across 7 categories (general, categories, templates, images, wikibase, admin, non-edit), full Wikidata/Wikibase integration with `harvest_template`, `claimit`, and `illustrate_wikidata` scripts, Commons file operations (download, upload, image_transfer), Toolforge/PAWS deployment guidance, a One-of-a-Kind Capabilities section highlighting 8 superpowers that no other API approach can easily replicate, and a decision table for when NOT to use Pywikibot. Ships with `assets/pywikibot-quickref.py` (280 lines of copy-paste ready code snippets), `references/api-mapping.md` (full MediaWiki Action API → Pywikibot method cross-reference), and `scripts/test-pywikibot.sh` (installation validation script).
+
 ### Project infrastructure
 
 - `.claude/skills/<name>/SKILL.md` directory structure with YAML frontmatter (name, description, license, compatibility)
@@ -42,7 +44,7 @@
 - GitHub repository initialized at `fuzheado/Wikipedia-AI-Skills`
 - `.claude.json` project configuration for agent discovery
 - `CONTRIBUTING.md` with skill authoring guidelines, accuracy checklist, and PR process
-- Test suite with 104 tests across 3 modules: YAML frontmatter validation for all 15 skills,
+- Test suite with 104 tests across 3 modules: YAML frontmatter validation for all 16 skills,
   mock-based unit tests for the cross-API pipeline script, and content-accuracy checks for key SOPs
 - `.gitignore` updated to exclude `.pytest_cache/`
 
@@ -53,6 +55,8 @@
 - **General-topic article drafting** — SOPs for writing non-biography Wikipedia articles (events, organizations, concepts, places). Different structure templates, different notability criteria, different citation patterns. Prior art exists in the original project roadmap.
 
 - **Copyediting for encyclopedic tone** — SOPs for auditing existing articles for NPOV violations, promotional language, weasel words, tone drift, and structural issues. Could include a checklist-style workflow.
+
+- **Pywikibot advanced workflows** — Deeper SOPs for chaining multiple Pywikibot scripts in CI/CD pipelines, integrating with Toolforge Kubernetes jobs, scheduling recurring bot tasks via cron, and monitoring bot health. The current skill covers the fundamentals; this would add deployment and operations guidance.
 
 - **Domain-specific article templates** — Structure templates for common article types: companies, educational institutions, films, albums, software, scientific concepts. Each has distinct section conventions and notability guidelines.
 
@@ -80,7 +84,7 @@
 - Set up a GitHub issue template for skill suggestions
 - Add `.claude.json` project configuration for agent discovery ✅
 - **Add skill tests** ✅ — `pytest`-based test suite in `tests/` with 104 tests:
-    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 15 skills (5 checks each: exists, required fields, description length, MIT license, directory match)
+    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 16 skills (5 checks each: exists, required fields, description length, MIT license, directory match)
     - `test_cross_api_pipeline.py`: Mock-based unit tests for the pipeline script (title normalization, batch splitting, P31 classification, citation counting, namespace filtering)
     - `test_markdown_sops.py`: Content-accuracy checks for new/modified SOPs (batch entity classification, Scenario C, Title Format Guide, 429 Retry-After)
     - Coverage meets the 3-5 test minimum per affected skill; the full suite serves as a foundation to expand iteratively.

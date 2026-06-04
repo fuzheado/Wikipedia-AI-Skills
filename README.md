@@ -46,6 +46,7 @@ These skills are designed to **help you research, understand, and prepare conten
 | [wikimedia-database](.claude/skills/wikimedia-database/SKILL.md) | Execute SQL queries against Wikipedia database replicas (enwiki, wikidata, commonswiki) via an SSH tunnel to Toolforge |
 | [wikimedia-toolforge](.claude/skills/wikimedia-toolforge/SKILL.md) | Manage Toolforge accounts, web services, Kubernetes pods, cron jobs, and file deployment for Wikimedia tools |
 | [wikimedia-cdn-assets](.claude/skills/wikimedia-cdn-assets/SKILL.md) | Load JavaScript, CSS, and fonts for Toolforge tools from Wikimedia's privacy-preserving cdnjs mirror, ensuring user privacy and policy compliance |
+| [pywikibot](.claude/skills/pywikibot/SKILL.md) | Use Pywikibot — the Python library and CLI tool suite for automating work on MediaWiki sites. Covers installation, the core object model (Site, Page, Category, User, ItemPage), page generators, the bot framework, built-in scripts (archivebot, replace, harvest_template, claimit, and 50+ more), Wikidata/Wikibase integration, Commons file operations, and Toolforge/PAWS deployment |
 
 ---
 
@@ -73,6 +74,11 @@ These skills are designed to **help you research, understand, and prepare conten
 | Deploy a web tool to Toolforge and manage its services | `wikimedia-toolforge` |
 | Load jQuery, Bootstrap, or fonts in a Toolforge tool without breaking privacy policy | `wikimedia-cdn-assets` |
 | Chain multiple APIs (Pageviews → Wikidata → content analysis) with correct title normalization | `wikimedia-api-access` (cross-API pipeline script) |
+| Run bulk bot operations (edit 10K pages, scrape templates into Wikidata, archive talk pages, move categories) | `pywikibot` |
+| Write a custom Wikipedia bot in a few lines of Python | `pywikibot` |
+| Harvest infobox data from Wikipedia into Wikidata statements | `pywikibot` (harvest_template script) |
+| Fix redirected categories across an entire wiki | `pywikibot` (category_redirect script) |
+| Transfer images from a local wiki to Wikimedia Commons with full attribution history | `pywikibot` (image_transfer script) |
 
 ---
 
@@ -125,8 +131,8 @@ New contributions should include tests. The project uses `pytest` with a test su
   `license`, and `compatibility` fields
 - **Content accuracy** — key SOP claims, code examples, and guardrails are verified
   against the actual markdown
-- **Code execution** — runnable Python assets (like the cross-API pipeline script) have
-  mock-based unit tests
+- **Code execution** — runnable Python assets (like the cross-API pipeline script and the
+  Pywikibot quick reference) have mock-based unit tests
 
 ```bash
 pip install pytest pyyaml requests
