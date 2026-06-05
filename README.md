@@ -22,21 +22,27 @@ These skills are designed to **help you research, understand, and prepare conten
 
 ### 📝 For editors and contributors
 
+Skills are arranged from **foundational** (understanding how Wikipedia works) to **specialized** (analyzing and creating content).
+
 | Skill | What it helps with |
 |-------|-------------------|
-| [wikipedia-en-article-audit](.claude/skills/wikipedia-en-article-audit/SKILL.md) | Audit a Wikipedia article for structural issues, factual errors, and NPOV violations, then produce a machine-readable task graph (DAG) that another agent can execute to fix all identified problems |
-| [wikipedia-en-biography-writing](.claude/skills/wikipedia-en-biography-writing/SKILL.md) | Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and biographies of living persons (BLP) policies |
-| [wikipedia-page-anatomy](.claude/skills/wikipedia-page-anatomy/SKILL.md) | Navigate and understand the structure of a Wikipedia article - infoboxes, categories, references, templates, navboxes, redirects, disambiguation, and protection levels |
-| [wikipedia-talk-page](.claude/skills/wikipedia-talk-page/SKILL.md) | Navigate and participate in Wikipedia talk pages - discussion conventions, signing, WikiProject banners, assessment ratings, and archiving |
-| [wikipedia-edit-history](.claude/skills/wikipedia-edit-history/SKILL.md) | Read and analyze Wikipedia's page revision history - diffs, edit summaries, user contributions, byte changes, and vandalism detection |
-| [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties or the REST API |
+| | **▸ Understanding Wikipedia** |
+| [wikipedia-page-anatomy](.claude/skills/wikipedia-page-anatomy/SKILL.md) | Navigate and understand the structure of a Wikipedia article — infoboxes, categories, references, templates, navboxes, redirects, disambiguation, and protection levels |
+| [wikipedia-edit-history](.claude/skills/wikipedia-edit-history/SKILL.md) | Read and analyze Wikipedia's page revision history — diffs, edit summaries, user contributions, byte changes, and vandalism detection |
+| [wikimedia-diffs](.claude/skills/wikimedia-diffs/SKILL.md) | Fetch, compare, and interpret diffs between Wikipedia page revisions — byte changes, HTML diff tables, and edit statistics |
+| [wikipedia-talk-page](.claude/skills/wikipedia-talk-page/SKILL.md) | Navigate and participate in Wikipedia talk pages — discussion conventions, signing, WikiProject banners, assessment ratings, and archiving |
+| | **▸ Working with Content** |
 | [wikimedia-wikitext](.claude/skills/wikimedia-wikitext/SKILL.md) | Parse, extract, and manipulate Wikipedia and MediaWiki wikitext (templates, infoboxes, citations, links) using proper AST-based tooling or the Parsoid HTML REST API |
-| [wikimedia-diffs](.claude/skills/wikimedia-diffs/SKILL.md) | Fetch, compare, and interpret diffs between Wikipedia page revisions - byte changes, HTML diff tables, and edit statistics |
-| [wikimedia-commons](.claude/skills/wikimedia-commons/SKILL.md) | Search, upload, and understand Wikimedia Commons - the free media repository of images, video, sound, 3D files, PDFs, and other media used across Wikipedia and its sister projects. Browse categories, find reusable media, and retrieve file metadata |
-| [wikimedia-page-assessment](.claude/skills/wikimedia-page-assessment/SKILL.md) | Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners on any Wikimedia wiki with the PageAssessments extension |
-| [wikidata](.claude/skills/wikidata/SKILL.md) | Understand and query Wikidata - the free, collaborative, multilingual knowledge graph that underpins Wikipedia's inter-language links, Commons structured data, and semantic facts across all Wikimedia projects. Covers SPARQL, the Wikibase REST/Action APIs, RDF data dumps, and semantic web concepts |
+| [wikidata](.claude/skills/wikidata/SKILL.md) | Understand and query Wikidata — the free, collaborative, multilingual knowledge graph that underpins Wikipedia's inter-language links, Commons structured data, and semantic facts across all Wikimedia projects. Covers SPARQL, the Wikibase REST/Action APIs, RDF data dumps, and semantic web concepts |
 | [wikidata-vector-search](.claude/skills/wikidata-vector-search/SKILL.md) | Query Wikidata by meaning, concept, or natural-language description using the Wikidata Vector Database's semantic embeddings — fuzzy semantic search, "find like this", cross-lingual retrieval, and similarity scoring when you don't know the exact QID or label |
+| [wikimedia-commons](.claude/skills/wikimedia-commons/SKILL.md) | Search, upload, and understand Wikimedia Commons — the free media repository of images, video, sound, 3D files, PDFs, and other media used across Wikipedia and its sister projects. Browse categories, find reusable media, and retrieve file metadata |
+| | **▸ Analyzing Articles** |
+| [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties or the REST API |
+| [wikimedia-page-assessment](.claude/skills/wikimedia-page-assessment/SKILL.md) | Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners on any Wikimedia wiki with the PageAssessments extension |
 | [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) | Score article quality, revert risk, edit quality (goodfaith/damaging), readability, topic classification, reference quality, language identification, content translation recommendations, article descriptions, and article country using Wikimedia ML inference APIs (Lift Wing and legacy ORES) |
+| | **▸ Writing & Improving** |
+| [wikipedia-en-biography-writing](.claude/skills/wikipedia-en-biography-writing/SKILL.md) | Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and biographies of living persons (BLP) policies |
+| [wikipedia-en-article-audit](.claude/skills/wikipedia-en-article-audit/SKILL.md) | Audit a Wikipedia article for structural issues, factual errors, and NPOV violations, then produce a machine-readable task graph (DAG) that another agent can execute to fix all identified problems |
 
 
 ### 🛠️ For tool developers
@@ -57,26 +63,37 @@ These skills are designed to **help you research, understand, and prepare conten
 
 | If you want to... | Use this skill |
 |---|---|
-| Audit an article for factual errors, NPOV violations, and structural problems | `wikipedia-en-article-audit` (read-only - never edits live articles) |
-| Draft a well-structured Wikipedia biography with proper citations and section ordering | `wikipedia-en-biography-writing` (see ⚠️ warning above) |
+| | **▸ Understanding Wikipedia** |
 | Understand the structure of a Wikipedia article (infobox, categories, templates, navboxes) | `wikipedia-page-anatomy` |
-| Participate in talk page discussions, sign comments, and find WikiProject assessments | `wikipedia-talk-page` |
 | Analyze page revision history, diffs, user contributions, and detect vandalism | `wikipedia-edit-history` |
-| Check how popular an article is and see its traffic trends | `wikimedia-pageviews` |
-| Extract infobox data, citations, or internal links from an article's wikitext | `wikimedia-wikitext` |
 | Compare two revisions and understand what changed | `wikimedia-diffs` |
-| Find reusable images on Commons for a Wikipedia article | `wikimedia-commons` |
-| Find article quality ratings (FA/GA/B/C/Start/Stub) and WikiProject assessments | `wikimedia-page-assessment` |
+| Participate in talk page discussions, sign comments, and find WikiProject assessments | `wikipedia-talk-page` |
+| | **▸ Working with Content** |
+| Extract infobox data, citations, or internal links from an article's wikitext | `wikimedia-wikitext` |
 | Query Wikidata for structured facts (e.g., "all museums in Paris with coordinates") | `wikidata` |
 | Classify Wikipedia articles by entity type (person, place, film, organization) | `wikidata` (batch entity classification SOP) |
 | Search Wikidata by meaning, description, or concept when you don't know the exact label | `wikidata-vector-search` |
 | Find Wikidata items semantically similar to a free-text query, across 100+ languages | `wikidata-vector-search` |
 | Disambiguate which QID a piece of text refers to by comparing similarity scores | `wikidata-vector-search` |
+| Find reusable images on Commons for a Wikipedia article | `wikimedia-commons` |
+| | **▸ Analyzing Articles** |
+| Check how popular an article is and see its traffic trends | `wikimedia-pageviews` |
+| Find article quality ratings (FA/GA/B/C/Start/Stub) and WikiProject assessments | `wikimedia-page-assessment` |
+| Score the latest edit to a page and get a patrol verdict (revert risk + goodfaith + damaging) | `python3 .claude/skills/wikimedia-ml-services/assets/patrol_simulator.py Albert_Einstein` |
+| Get a full article quality report (quality + readability + topics + reference risk) | `python3 .claude/skills/wikimedia-ml-services/assets/article_quality_report.py Albert_Einstein en` |
+| Score a single revision against multiple models in parallel with caching | `python3 .claude/skills/wikimedia-ml-services/assets/liftwing_multi_model.py enwiki 123456789 --all` |
+| Batch score hundreds of revision IDs from a file | `cat revids.txt \| bash .claude/skills/wikimedia-ml-services/scripts/batch-score.sh enwiki revertrisk-multilingual --output csv` |
+| Interactively explore all ML models with a guided menu — no arguments to memorize | `bash .claude/skills/wikimedia-ml-services/scripts/playground.sh` |
+| Type any text and detect what language it's written in, with confidence scores | `python3 .claude/skills/wikimedia-ml-services/assets/language_explorer.py` |
+| | **▸ Writing & Improving** |
+| Draft a well-structured Wikipedia biography with proper citations and section ordering | `wikipedia-en-biography-writing` (see ⚠️ warning above) |
+| Audit an article for factual errors, NPOV violations, and structural problems | `wikipedia-en-article-audit` (read-only — never edits live articles) |
+| | **▸ Building Tools** |
 | Build a bot or script that fetches data from Wikipedia | `wikimedia-api-access` |
+| Chain multiple APIs (Pageviews → Wikidata → content analysis) with correct title normalization | `wikimedia-api-access` (cross-API pipeline script) |
 | Run SQL queries on the Wikipedia database to analyze page data at scale | `wikimedia-database` |
 | Deploy a web tool to Toolforge and manage its services | `wikimedia-toolforge` |
 | Load jQuery, Bootstrap, or fonts in a Toolforge tool without breaking privacy policy | `wikimedia-cdn-assets` |
-| Chain multiple APIs (Pageviews → Wikidata → content analysis) with correct title normalization | `wikimedia-api-access` (cross-API pipeline script) |
 | Run bulk bot operations (edit 10K pages, scrape templates into Wikidata, archive talk pages, move categories) | `pywikibot` |
 | Write a custom Wikipedia bot in a few lines of Python | `pywikibot` |
 | Harvest infobox data from Wikipedia into Wikidata statements | `pywikibot` (harvest_template script) |
@@ -87,12 +104,6 @@ These skills are designed to **help you research, understand, and prepare conten
 | Monitor cross-wiki activity by the same user across multiple projects simultaneously | `wikimedia-eventstreams` |
 | Detect vandalism or automated imports on Wikidata in real time | `wikimedia-eventstreams` |
 | Replay past events from a stream (up to 31 days of history) | `wikimedia-eventstreams` (historical replay) |
-| Interactively explore all ML models with a guided menu — no arguments to memorize | `bash .claude/skills/wikimedia-ml-services/scripts/playground.sh` |
-| Score the latest edit to a page and get a patrol verdict (revert risk + goodfaith + damaging) | `python3 .claude/skills/wikimedia-ml-services/assets/patrol_simulator.py Albert_Einstein` |
-| Type any text and detect what language it's written in, with confidence scores | `python3 .claude/skills/wikimedia-ml-services/assets/language_explorer.py` |
-| Get a full article quality report (quality + readability + topics + reference risk) | `python3 .claude/skills/wikimedia-ml-services/assets/article_quality_report.py Albert_Einstein en` |
-| Score a single revision against multiple models in parallel with caching | `python3 .claude/skills/wikimedia-ml-services/assets/liftwing_multi_model.py enwiki 123456789 --all` |
-| Batch score hundreds of revision IDs from a file | `cat revids.txt \| bash .claude/skills/wikimedia-ml-services/scripts/batch-score.sh enwiki revertrisk-multilingual --output csv` |
 
 ---
 
