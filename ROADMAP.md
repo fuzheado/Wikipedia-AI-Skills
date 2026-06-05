@@ -12,6 +12,8 @@
 
 - **wikidata-vector-search** — Complete. Covers the Wikidata Vector Database API at wd-vectordb.wmcloud.org — a semantic/vector search engine over all Wikidata items and properties. Three endpoints: item search, property search, and similarity scoring. Hybrid vector+keyword retrieval with Reciprocal Rank Fusion (RRF), multilingual support (100+ languages, 4 with dedicated vectors), and optional reranker. Includes a CLI query script (wd-vector-search.sh) that resolves QIDs to labels and descriptions and filters to Wikipedia articles by default. Documents the alpha limitations (non-functional instanceof filter, concept-first ranking, no labels in response).
 
+- **wikipedia-citations** — Complete. Covers Wikipedia citation templates (CS1/CS2) with full parameter reference for 20+ template types, the Wayback Machine API for checking and saving archives, dead link detection workflows, bare URL expansion, citation linting and validation, and 30+ maintenance templates. Ships with 4 CLI scripts (expand-bare-url, archive-check, check-dead-links, citation-inspector), 4 Python assets (wayback_inspector, dead_link_scanner, citation_linter, citation_generator), and 2 reference docs (CS1 parameters, maintenance templates).
+
 - **wikimedia-database** — Complete. Covers SSH tunnel setup and connection management (plain `ssh` and `autossh`), Python implementation with `pymysql`, configurable local port via `TOOLFORGE_DB_PORT` (default 3307), and data handling guardrails (read-only, namespace filtering, binary decoding, safety limits, database naming conventions).
 
 - **wikimedia-pageviews** — Complete. Covers three data retrieval paths: cached SQL property (`page_props.pp_propname = 'pageview_daily_average'` with `CAST AS UNSIGNED`) for sorting/filtering large result sets, the Analytics QuickMetrics REST API for precise historical data, and the Top Pages REST endpoint (Scenario C) for finding the most-viewed pages across a project. Includes the "no table" guardrail (pageviews table does not exist in SQL replicas), date format warnings (slash vs compact), and cross-API chaining guidance with title normalization.
@@ -56,6 +58,8 @@
 ## What's outstanding
 
 ### Planned skills
+
+- **Categories** — How Wikipedia categories work, their hierarchy, subcategories, finding/adding them, and the category system. Currently covered shallowly in `wikipedia-page-anatomy` (1 section) and `pywikibot` (Category object model). A dedicated skill would add CategoryTree API, diffusion conventions, and categorization guidelines.
 
 - **General-topic article drafting** — SOPs for writing non-biography Wikipedia articles (events, organizations, concepts, places). Different structure templates, different notability criteria, different citation patterns. Prior art exists in the original project roadmap.
 

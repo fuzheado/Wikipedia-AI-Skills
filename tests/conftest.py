@@ -16,6 +16,7 @@ SKILL_NAMES = [
     'pywikibot',
     'wikidata',
     'wikidata-vector-search',
+    'wikipedia-citations',
     'wikimedia-api-access',
     'wikimedia-cdn-assets',
     'wikimedia-commons',

@@ -35,6 +35,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [wikimedia-wikitext](.claude/skills/wikimedia-wikitext/SKILL.md) | Parse, extract, and manipulate Wikipedia and MediaWiki wikitext (templates, infoboxes, citations, links) using proper AST-based tooling or the Parsoid HTML REST API |
 | [wikidata](.claude/skills/wikidata/SKILL.md) | Understand and query Wikidata — the free, collaborative, multilingual knowledge graph that underpins Wikipedia's inter-language links, Commons structured data, and semantic facts across all Wikimedia projects. Covers SPARQL, the Wikibase REST/Action APIs, RDF data dumps, and semantic web concepts |
 | [wikidata-vector-search](.claude/skills/wikidata-vector-search/SKILL.md) | Query Wikidata by meaning, concept, or natural-language description using the Wikidata Vector Database's semantic embeddings — fuzzy semantic search, "find like this", cross-lingual retrieval, and similarity scoring when you don't know the exact QID or label |
+| [wikipedia-citations](.claude/skills/wikipedia-citations/SKILL.md) | Master Wikipedia citations — CS1/CS2 templates, Wayback Machine archiving, dead link detection, bare URL expansion, citation validation, and maintenance templates |
 | [wikimedia-commons](.claude/skills/wikimedia-commons/SKILL.md) | Search, upload, and understand Wikimedia Commons — the free media repository of images, video, sound, 3D files, PDFs, and other media used across Wikipedia and its sister projects. Browse categories, find reusable media, and retrieve file metadata |
 | | **▸ Analyzing Articles** |
 | [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties or the REST API |
@@ -56,6 +57,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [pywikibot](.claude/skills/pywikibot/SKILL.md) | Use Pywikibot - the Python library and CLI tool suite for automating work on MediaWiki sites. Covers installation, the core object model (Site, Page, Category, User, ItemPage), page generators, the bot framework, built-in scripts (archivebot, replace, harvest_template, claimit, and 50+ more), Wikidata/Wikibase integration, Commons file operations, and Toolforge/PAWS deployment |
 | [wikimedia-eventstreams](.claude/skills/wikimedia-eventstreams/SKILL.md) | Consume real-time streams of Wikimedia events (edits, page creations, deletions, moves, log entries) via Server-Sent Events (SSE). Covers all available streams, event schemas, client libraries (Python/JS/curl), client-side filtering, historical replay, canary event handling, and building live dashboards, patrol monitors, and cross-wiki trackers |
 | [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) | Score revisions and articles using Lift Wing ML models — revert risk, article quality, topic classification, readability, reference quality, language identification, and more. Includes ORES migration guidance |
+| [wikipedia-citations](.claude/skills/wikipedia-citations/SKILL.md) | Master Wikipedia citations — CS1/CS2 templates, Wayback Machine archiving, dead link detection, bare URL expansion, citation validation, and maintenance templates |
 
 ---
 
@@ -75,6 +77,12 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | Search Wikidata by meaning, description, or concept when you don't know the exact label | `wikidata-vector-search` |
 | Find Wikidata items semantically similar to a free-text query, across 100+ languages | `wikidata-vector-search` |
 | Disambiguate which QID a piece of text refers to by comparing similarity scores | `wikidata-vector-search` |
+| Generate proper citation templates (cite web, cite news, cite book, cite journal) | `python3 .claude/skills/wikipedia-citations/assets/citation_generator.py` |
+| Check a Wikipedia page for dead links and suggest Wayback Machine replacements | `python3 .claude/skills/wikipedia-citations/assets/dead_link_scanner.py Albert_Einstein` |
+| Lint all citations on a page for missing required parameters and issues | `python3 .claude/skills/wikipedia-citations/assets/citation_linter.py Albert_Einstein` |
+| Check if a URL is archived on the Wayback Machine | `bash .claude/skills/wikipedia-citations/scripts/archive-check.sh https://example.com` |
+| Inspect a summary of all citations on a Wikipedia page | `bash .claude/skills/wikipedia-citations/scripts/citation-inspector.sh Albert_Einstein` |
+| Expand a bare URL into a {{cite web}} template | `bash .claude/skills/wikipedia-citations/scripts/expand-bare-url.sh https://example.com` |
 | Find reusable images on Commons for a Wikipedia article | `wikimedia-commons` |
 | | **▸ Analyzing Articles** |
 | Check how popular an article is and see its traffic trends | `wikimedia-pageviews` |
