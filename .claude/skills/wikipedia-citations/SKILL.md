@@ -674,3 +674,4 @@ URL in a browser before relying on it.
 |----------|----------|
 | [`references/cs1-parameters.md`](./references/cs1-parameters.md) | Complete parameter reference for all CS1/CS2 templates |
 | [`references/maintenance-templates.md`](./references/maintenance-templates.md) | Full catalog of citation-related maintenance templates with usage guidance |
+| [`references/tools-decision-guide.md`](./references/tools-decision-guide.md) | When to use each tool — flowchart, pipelines, strengths/weaknesses of all 10+ methods |
