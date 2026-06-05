@@ -102,12 +102,13 @@
 - Write CONTRIBUTING.md with skill authoring guidelines ✅
 - Set up a GitHub issue template for skill suggestions
 - Add `.claude.json` project configuration for agent discovery ✅
-- **Add skill tests** ✅ — `pytest`-based test suite in `tests/` with 104 tests:
-    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 19 skills (5 checks each: exists, required fields, description length, MIT license, directory match; duplicate entries removed)
+- **Add skill tests** ✅ — `pytest`-based test suite in `tests/` with 197 tests:
+    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 20 skills (5 checks each: exists, required fields, description length, MIT license, directory match; duplicate entries removed)
     - `test_cross_api_pipeline.py`: Mock-based unit tests for the pipeline script (title normalization, batch splitting, P31 classification, citation counting, namespace filtering)
     - `test_markdown_sops.py`: Content-accuracy checks for new/modified SOPs (batch entity classification, Scenario C, Title Format Guide, 429 Retry-After)
     - `test_liftwing_multi_model.py`: Mock-based tests for the Lift Wing multi-model scorer (cache, extractors, formatting, error handling)
     - `test_article_quality_report.py`: Mock-based tests for the article quality report generator (all 4 model extractors, format functions, chaining)
+    - `test_citations.py`: Mock-based tests for citation tools (wayback inspector, dead link scanner, citation linter, citation generator — 25 tests)
     - Coverage meets the 3-5 test minimum per affected skill; the full suite serves as a foundation to expand iteratively.
 
 ## Key decisions
