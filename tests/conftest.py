@@ -11,10 +11,8 @@ SKILLS_DIR = REPO_ROOT / '.claude' / 'skills'
 # Add assets directory to path so we can import the pipeline script
 sys.path.insert(0, str(SKILLS_DIR / 'wikimedia-api-access' / 'assets'))
 
-# All skill directories
+# All skill directories (alphabetical order, no duplicates)
 SKILL_NAMES = [
-    'wikidata',
-    'wikidata-vector-search',
     'pywikibot',
     'wikidata',
     'wikidata-vector-search',
