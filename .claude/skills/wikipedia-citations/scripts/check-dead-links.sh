@@ -6,28 +6,32 @@
 #   ./check-dead-links.sh "Albert Einstein"  (spaces auto-converted)
 #   ./check-dead-links.sh Albert_Einstein --lang fr
 #   ./check-dead-links.sh Albert_Einstein --verbose
+#   ./check-dead-links.sh Albert_Einstein --parallel 10
 
 set -euo pipefail
 
 if [[ $# -eq 0 ]]; then
     echo "🔍 check-dead-links.sh — Extract URLs from a Wikipedia page and check each for dead links"
     echo ""
-    echo "Usage: $0 <page_title> [--lang LANG] [--verbose]"
+    echo "Usage: $0 <page_title> [--lang LANG] [--verbose] [--parallel N]"
     echo ""
     echo "Examples:"
     echo "  $0 Albert_Einstein"
     echo "  $0 'Albert Einstein' --lang fr"
+    echo "  $0 Albert_Einstein --parallel 20"
     exit 1
 fi
 
 PAGE=""
 LANG="en"
 VERBOSE=false
+PARALLEL=5
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --lang) LANG="$2"; shift 2 ;;
         --verbose) VERBOSE=true; shift ;;
+        --parallel) PARALLEL="$2"; shift 2 ;;
         -*) echo "Unknown option: $1"; exit 1 ;;
         *)
             if [[ -z "$PAGE" ]]; then
@@ -45,6 +49,7 @@ DOMAIN="${LANG}.wikipedia.org"
 UA="DeadLinkCheck/1.0 (user@example.com) ContentGapResearch"
 
 echo "🔍 Scanning citations on: $PAGE ($LANG)"
+echo "   Parallel checks: $PARALLEL"
 echo
 
 WIKITEXT=$(curl -s "https://${DOMAIN}/w/api.php?action=parse&page=${PAGE}&prop=wikitext&format=json" \
@@ -59,7 +64,7 @@ if [[ -z "$WIKITEXT" ]]; then
     exit 1
 fi
 
-# Extract all URLs, write to temp file to avoid subshell bug
+# Extract all URLs
 TMPFILE=$(mktemp)
 echo "$WIKITEXT" | python3 -c "
 import sys, re
@@ -85,60 +90,126 @@ if [[ "$COUNT" -eq 0 ]]; then
     exit 0
 fi
 
-# Use a temp file for results to avoid subshell pipe bug
-RESULTSFILE=$(mktemp)
-echo "0 0 0 0 0" > "$RESULTSFILE"  # live dead redirects archived errors
+# ── Parallel URL checking with xargs ────────────────────────────────────────
+# Each URL check is a simple function that prints a line of results.
+# xargs -P handles concurrency, and we collect output.
 
-CHECKED=0
+WORKDIR=$(mktemp -d)
+
+# Create a file with one line per URL check command
+# Each job writes its result to workdir/result-{idx}.txt
+CHECK_CMD_FILE="$WORKDIR/commands.txt"
+> "$CHECK_CMD_FILE"
+
+idx=0
 while IFS= read -r url; do
     [[ -z "$url" ]] && continue
-    CHECKED=$((CHECKED + 1))
+    idx=$((idx + 1))
+    echo "$idx|$url" >> "$CHECK_CMD_FILE"
+done < "$TMPFILE"
 
-    # Truncate URL for display
-    DISPLAY_URL="${url:0:90}"
-    echo "[$CHECKED/$COUNT] $DISPLAY_URL"
+# The parallel worker: reads from stdin, processes one URL
+worker() {
+    local line="$1"
+    local idx="${line%%|*}"
+    local url="${line#*|}"
+    local result_file="$WORKDIR/result-$idx.txt"
 
     HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
       -H "User-Agent: $UA" "$url" 2>/dev/null || echo "000")
 
-    read -r LIVE DEAD REDIRECTS ARCHIVED ERRORS < "$RESULTSFILE"
-
-    if [[ "$HTTP_CODE" == "000" ]]; then
-        echo "  ⚠  Connection error"
-        ERRORS=$((ERRORS + 1))
-    elif [[ "$HTTP_CODE" == "200" || "$HTTP_CODE" == "304" ]]; then
-        echo "  ✅ $HTTP_CODE"
-        LIVE=$((LIVE + 1))
-    elif [[ "$HTTP_CODE" == "301" || "$HTTP_CODE" == "302" || "$HTTP_CODE" == "303" || "$HTTP_CODE" == "307" || "$HTTP_CODE" == "308" ]]; then
-        echo "  🔀 $HTTP_CODE (redirect)"
-        REDIRECTS=$((REDIRECTS + 1))
-    else
-        echo "  ❌ $HTTP_CODE (dead)"
-        DEAD=$((DEAD + 1))
-
-        ARCHIVE_CHECK=$(curl -s "https://archive.org/wayback/available?url=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$url'))")" \
-          -H "User-Agent: $UA" 2>/dev/null | python3 -c "
+    {
+        echo "url=$url"
+        echo "http_code=$HTTP_CODE"
+        if [[ "$HTTP_CODE" == "000" ]]; then
+            echo "status=error"
+        elif [[ "$HTTP_CODE" == "200" || "$HTTP_CODE" == "304" ]]; then
+            echo "status=live"
+        elif [[ "$HTTP_CODE" -ge 301 && "$HTTP_CODE" -le 308 ]]; then
+            echo "status=redirect"
+        else
+            echo "status=dead"
+            ARCHIVE_URL=$(curl -s "https://archive.org/wayback/available?url=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$url'))")" \
+              -H "User-Agent: $UA" 2>/dev/null | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 snap = d.get('archived_snapshots', {}).get('closest', {})
 if snap:
-    print(f\"Archive: {snap.get('url', '')}\")
+    print(snap.get('url', ''))
 else:
-    print('No archive')
+    print('')
 ")
-        echo "  📦 $ARCHIVE_CHECK"
-        if [[ "$ARCHIVE_CHECK" != "No archive" ]]; then
-            ARCHIVED=$((ARCHIVED + 1))
+            echo "archive_url=$ARCHIVE_URL"
         fi
+    } > "$result_file"
+}
+export -f worker
+export UA WORKDIR
+
+# Run workers in parallel using xargs
+echo "   Launching $PARALLEL parallel workers..."
+cat "$CHECK_CMD_FILE" | xargs -P "$PARALLEL" -I {} bash -c 'worker "$@"' _ {} 2>/dev/null
+
+# ── Collect and display results ────────────────────────────────────────────
+LIVE=0
+DEAD=0
+REDIRECTS=0
+ARCHIVED=0
+ERRORS=0
+
+echo ""
+for idx in $(seq 1 "$COUNT"); do
+    result_file="$WORKDIR/result-$idx.txt"
+    URL=$(sed -n "${idx}p" "$TMPFILE")
+    DISPLAY_URL="${URL:0:90}"
+
+    if [[ ! -f "$result_file" ]]; then
+        echo "  [$idx/$COUNT] $DISPLAY_URL"
+        echo "    ⚠  No result"
+        ERRORS=$((ERRORS + 1))
+        continue
     fi
 
-    echo "$LIVE $DEAD $REDIRECTS $ARCHIVED $ERRORS" > "$RESULTSFILE"
-done < "$TMPFILE"
+    STATUS=""
+    HTTP_CODE=""
+    ARCHIVE_URL=""
+    while IFS='=' read -r key value; do
+        case "$key" in
+            status) STATUS="$value" ;;
+            http_code) HTTP_CODE="$value" ;;
+            archive_url) ARCHIVE_URL="$value" ;;
+        esac
+    done < "$result_file"
 
-read -r LIVE DEAD REDIRECTS ARCHIVED ERRORS < "$RESULTSFILE"
-rm -f "$TMPFILE" "$RESULTSFILE"
+    case "$STATUS" in
+        live)
+            echo "  [$idx/$COUNT] $DISPLAY_URL"
+            echo "    ✅ $HTTP_CODE"
+            LIVE=$((LIVE + 1)) ;;
+        redirect)
+            echo "  [$idx/$COUNT] $DISPLAY_URL"
+            echo "    🔀 $HTTP_CODE (redirect)"
+            REDIRECTS=$((REDIRECTS + 1)) ;;
+        dead)
+            echo "  [$idx/$COUNT] $DISPLAY_URL"
+            echo "    ❌ $HTTP_CODE (dead)"
+            DEAD=$((DEAD + 1))
+            if [[ -n "$ARCHIVE_URL" ]]; then
+                echo "    📦 Archived at: $ARCHIVE_URL"
+                ARCHIVED=$((ARCHIVED + 1))
+            else
+                echo "    📦 No archive found"
+            fi ;;
+        error)
+            echo "  [$idx/$COUNT] $DISPLAY_URL"
+            echo "    ⚠  Connection error"
+            ERRORS=$((ERRORS + 1)) ;;
+    esac
+done
 
-echo
+rm -rf "$WORKDIR" "$TMPFILE"
+
+echo ""
 echo "═══════════════════════════════════════"
 echo "  Results for $PAGE"
 echo "  Total URLs checked: $COUNT"
