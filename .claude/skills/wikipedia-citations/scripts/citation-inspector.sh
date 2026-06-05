@@ -9,6 +9,18 @@
 
 set -euo pipefail
 
+if [[ $# -eq 0 ]]; then
+    echo "📋 citation-inspector.sh — Show a summary of all citations on a Wikipedia page"
+    echo ""
+    echo "Usage: $0 <page_title> [--lang LANG] [--json]"
+    echo ""
+    echo "Examples:"
+    echo "  $0 Albert_Einstein"
+    echo "  $0 'Albert Einstein' --lang fr"
+    echo "  $0 Albert_Einstein --json"
+    exit 1
+fi
+
 LANG="en"
 JSON=false
 PAGE=""

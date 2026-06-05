@@ -9,16 +9,34 @@
 
 set -euo pipefail
 
-PAGE="${1:?"Usage: $0 <page_title> [--lang LANG] [--verbose]"}"
+if [[ $# -eq 0 ]]; then
+    echo "🔍 check-dead-links.sh — Extract URLs from a Wikipedia page and check each for dead links"
+    echo ""
+    echo "Usage: $0 <page_title> [--lang LANG] [--verbose]"
+    echo ""
+    echo "Examples:"
+    echo "  $0 Albert_Einstein"
+    echo "  $0 'Albert Einstein' --lang fr"
+    exit 1
+fi
+
+PAGE=""
 LANG="en"
 VERBOSE=false
 
-shift
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --lang) LANG="$2"; shift 2 ;;
         --verbose) VERBOSE=true; shift ;;
-        *) echo "Unknown option: $1"; exit 1 ;;
+        -*) echo "Unknown option: $1"; exit 1 ;;
+        *)
+            if [[ -z "$PAGE" ]]; then
+                PAGE="$1"
+            else
+                echo "Unexpected argument: $1"
+                exit 1
+            fi
+            shift ;;
     esac
 done
 

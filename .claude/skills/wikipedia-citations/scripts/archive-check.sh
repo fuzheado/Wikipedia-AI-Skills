@@ -7,7 +7,18 @@
 
 set -euo pipefail
 
-URL="${1:?"Usage: $0 <url>"}"
+if [[ $# -eq 0 ]]; then
+    echo "🔍 archive-check.sh — Check if a URL is archived on the Wayback Machine"
+    echo ""
+    echo "Usage: $0 <url>"
+    echo ""
+    echo "Examples:"
+    echo "  $0 https://example.com/article"
+    echo "  $0 'https://en.wikipedia.org/wiki/Main_Page'"
+    exit 1
+fi
+
+URL="${1:?}"
 USER_AGENT="ArchiveCheck/1.0 (user@example.com) ContentGapResearch"
 
 echo "🔍 Checking: $URL"

@@ -9,7 +9,19 @@
 
 set -euo pipefail
 
-URL="${1:?"Usage: $0 <url> [title] [website]"}"
+if [[ $# -eq 0 ]]; then
+    echo "🔗 expand-bare-url.sh — Expand a bare URL into a {{cite web}} template"
+    echo ""
+    echo "Usage: $0 <url> [title] [website]"
+    echo ""
+    echo "Examples:"
+    echo "  $0 https://example.com/article"
+    echo "  $0 'https://en.wikipedia.org/wiki/Main_Page'"
+    echo "  $0 'https://example.com/article' 'My Title' 'My Site'"
+    exit 1
+fi
+
+URL="${1:?}"
 
 USER_AGENT="ExpandBareURL/1.0 (user@example.com) ContentGapResearch"
 

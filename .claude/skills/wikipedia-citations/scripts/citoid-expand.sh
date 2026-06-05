@@ -9,7 +9,19 @@
 
 set -euo pipefail
 
-INPUT="${1:?"Usage: $0 <url|doi|isbn|pmid> [--raw]"}"
+if [[ $# -eq 0 ]]; then
+    echo "🧠 citoid-expand.sh — Auto-generate a full citation template from a URL, DOI, ISBN, or PMID"
+    echo ""
+    echo "Usage: $0 <url|doi|isbn|pmid> [--raw]"
+    echo ""
+    echo "Examples:"
+    echo "  $0 https://example.com/article"
+    echo "  $0 10.7554/eLife.32259"
+    echo "  $0 978-0-262-52316-5"
+    exit 1
+fi
+
+INPUT="${1:?}"
 RAW=false
 if [[ "${2:-}" == "--raw" ]]; then
     RAW=true
