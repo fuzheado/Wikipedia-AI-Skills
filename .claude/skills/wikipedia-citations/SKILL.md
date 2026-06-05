@@ -388,6 +388,162 @@ def extract_citations(page_title: str, lang: str = "en") -> list[dict]:
 
 ---
 
+## SOP: Citoid Auto-Citation (REST API)
+
+The [Citoid](https://www.mediawiki.org/wiki/Citoid) service, deployed on all WMF wikis,
+automatically fetches citation metadata from a URL, DOI, ISBN, PMID, PMCID, or QID.
+It powers VisualEditor's auto-cite feature and is accessible via the REST API.
+
+### API Endpoint
+
+```
+GET https://en.wikipedia.org/api/rest_v1/data/citation/mediawiki/{url|doi|isbn|pmid}
+GET https://en.wikipedia.org/api/rest_v1/data/citation/zotero/{url|doi|isbn|pmid}
+```
+
+- `/mediawiki` format returns data structured for wiki citation templates
+- `/zotero` format returns raw Zotero JSON (more structured, better for automation)
+
+### Fetch Citation Metadata from a URL
+
+```python
+import requests
+
+headers = {"User-Agent": "MyBot/1.0 (user@example.com) ContentGapResearch"}
+url = "https://en.wikipedia.org/api/rest_v1/data/citation/mediawiki/https://example.com/article"
+
+resp = requests.get(url, headers=headers)
+citations = resp.json()  # Returns array of citation objects
+
+if citations:
+    c = citations[0]  # Best match
+    print(f"Type: {c.get('itemType')}")       # webpage, journalArticle, book, etc.
+    print(f"Title: {c.get('title')}")
+    print(f"Authors: {c.get('author', [])}")   # List of [last, first] pairs
+    print(f"Date: {c.get('date')}")
+    print(f"Publisher: {c.get('publisher')}")
+    print(f"URL: {c.get('url')}")
+```
+
+### Fetch from a DOI
+
+```python
+resp = requests.get(
+    "https://en.wikipedia.org/api/rest_v1/data/citation/mediawiki/10.7554/eLife.32259",
+    headers=headers,
+)
+citations = resp.json()
+c = citations[0]
+# Returns: itemType=journalArticle, title, volume, publicationTitle,
+#          date, author, DOI, ISSN, url, accessDate
+```
+
+### Converting Citoid Data to a Citation Template
+
+```python
+def citoid_to_template(citation: dict) -> str:
+    """Convert a Citoid citation object to a CS1 template string."""
+    item_type = citation.get("itemType", "webpage")
+    url = citation.get("url", "")
+    title = citation.get("title", "")
+    date = citation.get("date", "")
+    access_date = citation.get("accessDate", "")
+
+    # Map Citoid item types to CS1 templates
+    type_map = {
+        "journalArticle": "cite journal",
+        "book": "cite book",
+        "bookSection": "cite book",
+        "newspaperArticle": "cite news",
+        "magazineArticle": "cite magazine",
+        "webpage": "cite web",
+        "report": "cite report",
+        "thesis": "cite thesis",
+        "conferencePaper": "cite conference",
+        "patent": "cite patent",
+        "film": "cite AV media",
+        "podcast": "cite podcast",
+        "interview": "cite interview",
+        "map": "cite map",
+    }
+    template = type_map.get(item_type, "cite web")
+
+    parts = [f"{{{{{template}}}"]
+
+    if url:
+        parts.append(f" |url={url}")
+    if title:
+        parts.append(f" |title={title}")
+    if date:
+        parts.append(f" |date={date}")
+    if access_date:
+        parts.append(f" |access-date={access_date}")
+
+    # Authors
+    authors = citation.get("author", [])
+    for i, (last, first) in enumerate(authors, 1):
+        if i == 1:
+            parts.append(f" |last={last} |first={first}")
+        else:
+            parts.append(f" |last{i}={last} |first{i}={first}")
+
+    # Type-specific fields
+    if template == "cite journal":
+        journal = citation.get("publicationTitle") or citation.get("journalTitle", "")
+        if journal:
+            parts.append(f" |journal={journal}")
+        volume = citation.get("volume", "")
+        if volume:
+            parts.append(f" |volume={volume}")
+        issue = citation.get("issue", "")
+        if issue:
+            parts.append(f" |issue={issue}")
+        pages = citation.get("pages", "")
+        if pages:
+            parts.append(f" |pages={pages}")
+        doi = citation.get("DOI", "")
+        if doi:
+            parts.append(f" |doi={doi}")
+
+    if template == "cite news":
+        newspaper = citation.get("publicationTitle", "")
+        if newspaper:
+            parts.append(f" |newspaper={newspaper}")
+
+    if template == "cite book":
+        publisher = citation.get("publisher", "")
+        if publisher:
+            parts.append(f" |publisher={publisher}")
+        isbn = citation.get("ISBN", [""])[0]
+        if isbn:
+            parts.append(f" |isbn={isbn}")
+
+    # Publisher field (for cite web when available)
+    publisher = citation.get("publisher", "")
+    if publisher and template == "cite web":
+        parts.append(f" |publisher={publisher}")
+    elif publisher and template not in ("cite book", "cite news"):
+        parts.append(f" |publisher={publisher}")
+
+    parts.append("}}")
+    return "\n".join(parts)
+
+
+# Usage:
+citation = citoid_to_template(c)
+print(citation)
+```
+
+### CLI with Citoid
+
+```bash
+# Fetch citation metadata for a URL and output as wiki template
+curl -s 'https://en.wikipedia.org/api/rest_v1/data/citation/mediawiki/https://example.com' \
+  -H 'User-Agent: MyBot/1.0 ContentGapResearch'
+```
+
+---
+
 ## SOP: Generating Citation Templates Programmatically
 
 When you have source metadata (from a DOI API, ISBN lookup, or user input),
@@ -498,6 +654,7 @@ URL in a browser before relying on it.
 |--------|---------|---------------|
 | [`scripts/expand-bare-url.sh`](./scripts/expand-bare-url.sh) | Expand a bare URL into a cite web template | `./expand-bare-url.sh https://example.com/article` |
 | [`scripts/archive-check.sh`](./scripts/archive-check.sh) | Check if a URL is archived on the Wayback Machine | `./archive-check.sh https://example.com/article` |
+| [`scripts/citoid-expand.sh`](./scripts/citoid-expand.sh) | Auto-generate a full citation template from URL/DOI/ISBN using Citoid | `./citoid-expand.sh 10.7554/eLife.32259` |
 | [`scripts/check-dead-links.sh`](./scripts/check-dead-links.sh) | Extract URLs from a Wikipedia page and check each one | `./check-dead-links.sh Albert_Einstein` |
 | [`scripts/citation-inspector.sh`](./scripts/citation-inspector.sh) | Show a summary of all citations on a page | `./citation-inspector.sh Albert_Einstein` |
 
@@ -506,6 +663,7 @@ URL in a browser before relying on it.
 | Script | Purpose | Usage Example |
 |--------|---------|---------------|
 | [`assets/wayback_inspector.py`](./assets/wayback_inspector.py) | Check Wayback Machine for URL archives, save new ones | `python3 wayback_inspector.py https://example.com` |
+| [`assets/citoid_fetcher.py`](./assets/citoid_fetcher.py) | Auto-generate citations from URL/DOI/ISBN/PMID via the Citoid API | `python3 citoid_fetcher.py 10.7554/eLife.32259` |
 | [`assets/dead_link_scanner.py`](./assets/dead_link_scanner.py) | Scan a Wikipedia page for dead links and suggest archives | `python3 dead_link_scanner.py Albert_Einstein` |
 | [`assets/citation_linter.py`](./assets/citation_linter.py) | Parse and validate all citation templates in a page | `python3 citation_linter.py Albert_Einstein` |
 | [`assets/citation_generator.py`](./assets/citation_generator.py) | Interactive CLI to generate citation templates | `python3 citation_generator.py` |

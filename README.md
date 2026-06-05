@@ -77,7 +77,9 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | Search Wikidata by meaning, description, or concept when you don't know the exact label | `wikidata-vector-search` |
 | Find Wikidata items semantically similar to a free-text query, across 100+ languages | `wikidata-vector-search` |
 | Disambiguate which QID a piece of text refers to by comparing similarity scores | `wikidata-vector-search` |
-| Generate proper citation templates (cite web, cite news, cite book, cite journal) | `python3 .claude/skills/wikipedia-citations/assets/citation_generator.py` |
+| Auto-generate a full citation template from any URL, DOI, or ISBN | `python3 .claude/skills/wikipedia-citations/assets/citoid_fetcher.py https://example.com` |
+| Auto-generate a citation from a DOI | `python3 .claude/skills/wikipedia-citations/assets/citoid_fetcher.py 10.7554/eLife.32259` |
+| Generate proper citation templates manually (cite web, cite news, cite book, cite journal) | `python3 .claude/skills/wikipedia-citations/assets/citation_generator.py` |
 | Check a Wikipedia page for dead links and suggest Wayback Machine replacements | `python3 .claude/skills/wikipedia-citations/assets/dead_link_scanner.py Albert_Einstein` |
 | Lint all citations on a page for missing required parameters and issues | `python3 .claude/skills/wikipedia-citations/assets/citation_linter.py Albert_Einstein` |
 | Check if a URL is archived on the Wayback Machine | `bash .claude/skills/wikipedia-citations/scripts/archive-check.sh https://example.com` |
