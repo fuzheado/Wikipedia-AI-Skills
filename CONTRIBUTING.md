@@ -123,6 +123,69 @@ Each skill should cover one well-defined task. If a skill covers two unrelated c
 - File: `.claude/skills/<skill-name>/SKILL.md`
 - The directory name and the `name` field in frontmatter must match.
 
+### 8. Research APIs Thoroughly — Don't Stop at the TOC
+
+Wikimedia API documentation is extensive and often spread across multiple pages.
+The following failure mode has happened in production: an agent reads a
+summary/table-of-contents page, assumes it is the full documentation, and writes
+incorrect code based on missing or inferred details. To avoid this:
+
+1. **The TOC page is never the full documentation.** Wikitech, the API Portal,
+   and MediaWiki docs use a hub-and-spoke model: one index page links to many
+   individual endpoint pages. Always follow the links to individual pages.
+
+2. **Verify model and endpoint names against the actual reference.**
+   Don't invent names by combining words from a description. For example, the
+   Lift Wing API lists "Get language agnostic articlequality prediction" — the
+   model name is `articlequality`, not `articlequality-language-agnostic`.
+   The only way to know this is to read the individual page.
+
+3. **Don't assume consistent naming conventions.** One model may use `rev_id`,
+   another `page_title`, another `title`, another `text`. Each defines its own
+   parameter schema. Check per-model docs.
+
+4. **Don't assume URL patterns are uniform.** Not every service under
+   `api.wikimedia.org/service/lw/` follows the same URL scheme. Some use POST,
+   some GET. Some use path parameters, some query strings. Verify each URL from
+   its own documentation.
+
+5. **A 404 is not proof a resource doesn't exist.** When you get a 404, first
+   check for:
+   - A different URL path prefix (e.g., `/recommendation/` vs `/inference/`)
+   - A different model name (e.g., `articlequality` vs `articlequality-language-agnostic`)
+   - A different HTTP method (GET vs POST)
+   - A different parameter style (query params vs JSON body)
+
+6. **Test every model/endpoint against the live API before finalizing code.**
+   Documentation can be stale or aspirational. A 30-second curl call can surface
+   response format differences, missing models, or parameter name mismatches
+   that would otherwise end up in a skill.
+
+    ```bash
+    # Workflow: systematically verify all endpoints from a TOC page
+    # 1. Fetch the TOC
+    curl -sL 'https://api.wikimedia.org/wiki/Lift_Wing_API/Reference' \
+      | grep -oP 'href="[^"]*"' | grep -i 'Get_' > endpoint_pages.txt
+
+    # 2. For each endpoint page, extract the URL, parameters, and method
+    for page in $(cat endpoint_pages.txt); do
+        curl -sL "https://api.wikimedia.org$page" \
+          | python3 -c "import sys,re; print(re.sub(r'<[^>]+>',' ',sys.stdin.read()))" \
+          | grep -A5 'POST\|GET\|Parameters\|Responses'
+    done
+
+    # 3. Test each model with a known-good revision ID
+    curl -s -X POST 'https://api.wikimedia.org/service/lw/inference/v1/models/MODEL:predict' \
+      -H 'Content-Type: application/json' \
+      -H 'User-Agent: SkillValidator/1.0 (contact) ContentGapResearch' \
+      -d '{"rev_id": 123456789, "lang": "en"}'
+    ```
+
+7. **When in doubt, check the model card.** Every Lift Wing model has a model
+   card on Meta-Wiki that documents training data, performance metrics, and
+   appropriate use cases. The model card is the authoritative source — not
+   the API docs, not the Wikitech page.
+
 ## Content Accuracy Checklist
 
 Before submitting a skill, verify every item:
