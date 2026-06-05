@@ -208,6 +208,13 @@ Before submitting a skill, verify every item:
 - [ ] Port numbers, hostnames, and connection strings are correct
 - [ ] Template names match current MediaWiki conventions
 
+### Documentation Freshness
+- [ ] **README** updated: skill table (`## Skills`), tool-developer table, and "What can I do" usage table all include the new/updated skill
+- [ ] **ROADMAP** updated: moved from "Planned" to "Published" with a brief description of what was added
+- [ ] **ROADMAP numbers** refreshed: skill count (run `ls -d .claude/skills/*/ | wc -l`), test count (run `python3 -m pytest tests/ --collect-only -q | tail -1`), test file count (run `ls tests/test_*.py | wc -l`)
+- [ ] **Test suite expanded** with new tests for any new Python assets or scripts
+- [ ] **Stale skill/test counts** in ROADMAP prose match reality (e.g., "17 skills" → actual count, "104 tests" → actual count)
+
 ### Guardrails
 - [ ] All known failure modes for this task are documented
 - [ ] Error messages direct the user to a solution
