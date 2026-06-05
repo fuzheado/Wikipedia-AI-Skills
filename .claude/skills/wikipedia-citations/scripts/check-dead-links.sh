@@ -108,29 +108,33 @@ while IFS= read -r url; do
     echo "$idx|$url" >> "$CHECK_CMD_FILE"
 done < "$TMPFILE"
 
-# The parallel worker: reads from stdin, processes one URL
-worker() {
-    local line="$1"
-    local idx="${line%%|*}"
-    local url="${line#*|}"
-    local result_file="$WORKDIR/result-$idx.txt"
+# Write the worker as a script (export -f doesn't always work with xargs)
+WORKER_SCRIPT="$WORKDIR/worker.sh"
+cat > "$WORKER_SCRIPT" << 'WORKER'
+#!/usr/bin/env bash
+line="$1"
+idx="${line%%|*}"
+url="${line#*|}"
+result_file="$WORKDIR/result-$idx.txt"
+total="$COUNT"
+ua="$UA"
 
+echo "  [$idx/$total] ${url:0:80}..." >&2
+
+{
     HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-      -H "User-Agent: $UA" "$url" 2>/dev/null || echo "000")
-
-    {
-        echo "url=$url"
-        echo "http_code=$HTTP_CODE"
-        if [[ "$HTTP_CODE" == "000" ]]; then
-            echo "status=error"
-        elif [[ "$HTTP_CODE" == "200" || "$HTTP_CODE" == "304" ]]; then
-            echo "status=live"
-        elif [[ "$HTTP_CODE" -ge 301 && "$HTTP_CODE" -le 308 ]]; then
-            echo "status=redirect"
-        else
-            echo "status=dead"
-            ARCHIVE_URL=$(curl -s "https://archive.org/wayback/available?url=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$url'))")" \
-              -H "User-Agent: $UA" 2>/dev/null | python3 -c "
+      -H "User-Agent: $ua" "$url" 2>/dev/null || echo "000")
+    echo "http_code=$HTTP_CODE"
+    if [[ "$HTTP_CODE" == "000" ]]; then
+        echo "status=error"
+    elif [[ "$HTTP_CODE" == "200" || "$HTTP_CODE" == "304" ]]; then
+        echo "status=live"
+    elif [[ "$HTTP_CODE" -ge 301 && "$HTTP_CODE" -le 308 ]]; then
+        echo "status=redirect"
+    else
+        echo "status=dead"
+        ARCHIVE_URL=$(curl -s "https://archive.org/wayback/available?url=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$url'))")" \
+          -H "User-Agent: $ua" 2>/dev/null | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 snap = d.get('archived_snapshots', {}).get('closest', {})
@@ -138,17 +142,16 @@ if snap:
     print(snap.get('url', ''))
 else:
     print('')
-")
-            echo "archive_url=$ARCHIVE_URL"
-        fi
-    } > "$result_file"
-}
-export -f worker
-export UA WORKDIR
+" 2>/dev/null)
+        echo "archive_url=$ARCHIVE_URL"
+    fi
+} > "$result_file"
+WORKER
+chmod +x "$WORKER_SCRIPT"
 
-# Run workers in parallel using xargs
+export WORKDIR COUNT UA
 echo "   Launching $PARALLEL parallel workers..."
-cat "$CHECK_CMD_FILE" | xargs -P "$PARALLEL" -I {} bash -c 'worker "$@"' _ {} 2>/dev/null
+cat "$CHECK_CMD_FILE" | xargs -P "$PARALLEL" -I {} env WORKDIR="$WORKDIR" COUNT="$COUNT" UA="$UA" bash "$WORKER_SCRIPT" {}
 
 # ── Collect and display results ────────────────────────────────────────────
 LIVE=0
