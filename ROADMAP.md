@@ -97,6 +97,22 @@
 - **Cross-API pipeline script** (`wikimedia-api-access/assets/cross_api_pipeline.py`) — a runnable 4-step demo showing Pageviews → Wikidata ID resolution → P31 entity classification → content analysis, with proper batch processing, rate limiting, and title normalization.
 - **Scenario C (Top Pages)** in `wikimedia-pageviews/SKILL.md` — adds the Top Pages REST endpoint as a third data retrieval path alongside the existing SQL and per-article API scenarios. Includes date format warnings and cross-API chaining guidance.
 
+### Agent integration (event hooks + custom tools)
+
+See **[AGENT-INTEGRATION-STRATEGY.md](AGENT-INTEGRATION-STRATEGY.md)** for the full analysis and phased implementation plan.
+
+**Summary:** Evolve from passive SKILL.md files only to a three-layer architecture:
+1. **Event hooks** (`pi.on()`) — auto-enforce User-Agent, rate limiting, auth — invisible to the LLM, fires on every relevant tool call
+2. **Custom tools** (`pi.registerTool()`) — callable functions for vector search, page quality, pageviews, diffs, etc. — visible in the LLM's tool list, deterministic execution
+3. **Skills (retained)** — reference documentation and creative tasks, serendipitous discovery
+
+**Phases:**
+- Phase 0: Single pi extension at `.pi/extensions/wikimedia-skills/index.ts`
+- Phase 1: Top 3 hooks (User-Agent, rate limit backoff, SSH tunnel health)
+- Phase 2: Top 5 custom tools (vector search, page quality, pageviews, page assessment, diffs)
+- Phase 3: Keyword-based auto-activation via `before_agent_start`
+- Phase 4: Event-driven cross-tool orchestration
+
 ### Process
 
 - Write CONTRIBUTING.md with skill authoring guidelines ✅
