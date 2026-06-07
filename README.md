@@ -201,6 +201,14 @@ compatibility: opencode
 ...agent-facing instructions...
 ```
 
+## Design context
+
+For background on the design motivations and community tools that inspired this project, see
+**[PAWS, Quarry, and the Wikimedia AI Facility](https://docs.google.com/presentation/d/1KWzhtDk4LnpwT-FCSYSMa4moOWcx9OZ2RF9i_REQOfI/edit?usp=sharing)**
+— a presentation covering the origins of [PAWS](https://wikitech.wikimedia.org/wiki/PAWS) (hosted Jupyter notebooks
+for Wikimedia) and [Quarry](https://quarry.wmcloud.org/) (public SQL query interface for wiki databases), and what they
+suggest about designing an AI-assisted editing facility for the Wikimedia community.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on adding new skills, improving existing ones, and the pull request process. All skills must follow the YAML frontmatter format and pass the content accuracy checklist.
