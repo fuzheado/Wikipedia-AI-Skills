@@ -1,6 +1,6 @@
 # Wikipedia AI Skills
 
-A curated collection of skill files for AI coding agents - [Pi](https://github.com/earendil-works/pi-coding-agent), [OpenCode](https://opencode.ai), [Claude Code](https://docs.anthropic.com/en/docs/claude-code), and any agent that supports the `.claude/<name>/SKILL.md` convention - to help with Wikipedia, Wikimedia, and Wikidata-related tasks.
+A curated collection of skill files for AI coding agents - [Pi](https://github.com/earendil-works/pi), [OpenCode](https://opencode.ai), [Claude Code](https://docs.anthropic.com/en/docs/claude-code), and any agent that supports the `.claude/<name>/SKILL.md` convention - to help with Wikipedia, Wikimedia, and Wikidata-related tasks.
 
 Whether you're editing a Wikipedia article, researching a topic, or building a Toolforge tool, these skills give your AI assistant expert guidance on Wikimedia's systems, policies, and data.
 
@@ -143,7 +143,7 @@ Once installed, your AI coding agent will discover the skill automatically throu
 
 ### Pi agent setup
 
-[Pi](https://github.com/earendil-works/pi-coding-agent) discovers skills from anywhere on the filesystem via `settings.json`.
+[Pi](https://github.com/earendil-works/pi) discovers skills from anywhere on the filesystem via `settings.json`.
 
 #### Step 1: Clone the repo
 

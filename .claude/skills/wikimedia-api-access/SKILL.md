@@ -7,7 +7,7 @@ compatibility: opencode
 
 All requests to Wikimedia APIs **must** include a descriptive `User-Agent` header or they will be blocked (HTTP 403 or 429). This is enforced by the [Wikimedia Foundation User-Agent Policy](https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy).
 
-> **💡 Pi users:** If you use the [pi coding agent](https://github.com/earendil-works/pi-coding-agent), install the companion extension from this repo to **automatically inject the User-Agent header** on every `curl`, `wget`, `python`, and `node` command that targets a Wikimedia server — no manual intervention needed. See the [README](../../../README.md#pi-agent-setup) for setup instructions.
+> **💡 Pi users:** If you use the [pi coding agent](https://github.com/earendil-works/pi), install the companion extension from this repo to **automatically inject the User-Agent header** on every `curl`, `wget`, `python`, and `node` command that targets a Wikimedia server — no manual intervention needed. See the [README](../../../README.md#pi-agent-setup) for setup instructions.
 
 ## **User-Agent Format**
 
