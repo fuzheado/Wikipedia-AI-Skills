@@ -28,6 +28,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 |-------|-------------------|
 | | **▸ Understanding Wikipedia** |
 | [wikipedia-page-anatomy](.claude/skills/wikipedia-page-anatomy/SKILL.md) | Navigate and understand the structure of a Wikipedia article — infoboxes, categories, references, templates, navboxes, redirects, disambiguation, and protection levels |
+| [wikipedia-categories](.claude/skills/wikipedia-categories/SKILL.md) | Understand and work with Wikipedia's category system — category trees, the three tests for valid categories (Verifiable/Neutral/Defining), topic vs. set categories, sort keys and DEFAULTSORT, querying via API, overcategorization rules, and category maintenance |
 | [wikipedia-edit-history](.claude/skills/wikipedia-edit-history/SKILL.md) | Read and analyze Wikipedia's page revision history — diffs, edit summaries, user contributions, byte changes, and vandalism detection |
 | [wikimedia-diffs](.claude/skills/wikimedia-diffs/SKILL.md) | Fetch, compare, and interpret diffs between Wikipedia page revisions — byte changes, HTML diff tables, and edit statistics |
 | [wikipedia-talk-page](.claude/skills/wikipedia-talk-page/SKILL.md) | Navigate and participate in Wikipedia talk pages — discussion conventions, signing, WikiProject banners, assessment ratings, and archiving |
@@ -67,6 +68,12 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 |---|---|
 | | **▸ Understanding Wikipedia** |
 | Understand the structure of a Wikipedia article (infobox, categories, templates, navboxes) | `wikipedia-page-anatomy` |
+| Understand the category system — valid categories, sort keys, tree structure, and querying | `wikipedia-categories` |
+| Evaluate whether a proposed category is valid (Verifiable/Neutral/Defining test) | `wikipedia-categories` |
+| Find all pages in a category or category tree via API | `wikipedia-categories` |
+| Find the intersection of two categories | `bash .claude/skills/wikipedia-categories/assets/category-intersect.py "Physicists" "German scientists"` |
+| Inspect all categories assigned to an article with metadata | `python3 .claude/skills/wikipedia-categories/assets/category-inspector.py Albert_Einstein` |
+| Explore a category hierarchy interactively from the CLI | `bash .claude/skills/wikipedia-categories/scripts/category-tree.sh Physics 3 pages` |
 | Analyze page revision history, diffs, user contributions, and detect vandalism | `wikipedia-edit-history` |
 | Compare two revisions and understand what changed | `wikimedia-diffs` |
 | Participate in talk page discussions, sign comments, and find WikiProject assessments | `wikipedia-talk-page` |
