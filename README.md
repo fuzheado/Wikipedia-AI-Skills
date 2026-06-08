@@ -28,6 +28,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 |-------|-------------------|
 | | **▸ Understanding Wikipedia** |
 | [wikipedia-page-anatomy](.claude/skills/wikipedia-page-anatomy/SKILL.md) | Navigate and understand the structure of a Wikipedia article — infoboxes, categories, references, templates, navboxes, redirects, disambiguation, and protection levels |
+| [wikipedia-templates](.claude/skills/wikipedia-templates/SKILL.md) | Create, design, and understand MediaWiki templates — template syntax, parser functions, magic words, transclusion vs substitution, Lua modules, template types taxonomy, API detection, and maintenance workflows |
 | [wikipedia-categories](.claude/skills/wikipedia-categories/SKILL.md) | Understand and work with Wikipedia's category system — category trees, the three tests for valid categories (Verifiable/Neutral/Defining), topic vs. set categories, sort keys and DEFAULTSORT, all API query patterns, Pywikibot generators, PetScan/WDQS/Special pages, overcategorization rules, category maintenance, and a full comparison of all access methods |
 | [wikipedia-edit-history](.claude/skills/wikipedia-edit-history/SKILL.md) | Read and analyze Wikipedia's page revision history — diffs, edit summaries, user contributions, byte changes, and vandalism detection |
 | [wikimedia-diffs](.claude/skills/wikimedia-diffs/SKILL.md) | Fetch, compare, and interpret diffs between Wikipedia page revisions — byte changes, HTML diff tables, and edit statistics |
@@ -68,6 +69,8 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 |---|---|
 | | **▸ Understanding Wikipedia** |
 | Understand the structure of a Wikipedia article (infobox, categories, templates, navboxes) | `wikipedia-page-anatomy` |
+| Understand how MediaWiki templates work — syntax, parser functions, magic words, Lua modules | `wikipedia-templates` |
+| Create, inspect, or design a new template for a Wikipedia article | `wikipedia-templates` |
 | Understand the category system — valid categories, sort keys, tree structure, and querying | `wikipedia-categories` |
 | Evaluate whether a proposed category is valid (Verifiable/Neutral/Defining test) | `wikipedia-categories` |
 | Find all pages in a category or category tree via API | `wikipedia-categories` |

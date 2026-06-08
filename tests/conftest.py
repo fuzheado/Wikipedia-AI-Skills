@@ -37,6 +37,7 @@ SKILL_NAMES = [
     'wikipedia-en-biography-writing',
     'wikipedia-page-anatomy',
     'wikipedia-talk-page',
+    'wikipedia-templates',
 ]
 
 

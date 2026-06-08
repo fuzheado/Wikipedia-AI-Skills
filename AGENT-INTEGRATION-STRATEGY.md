@@ -270,6 +270,7 @@ How each skill maps to the three layers:
 | wikipedia-en-biography-writing | Creative task — NPOV/BLP judgment, not a single API call |
 | wikipedia-en-article-audit | Multi-step pipeline — 6 diagnoses, produces DAG |
 | wikipedia-page-anatomy | Pure reference — no action, just structural knowledge |
+| wikipedia-templates | Pure reference + creative — template syntax/parser functions/magic words reference, template design judgment |
 | wikipedia-talk-page | Pure reference — discussion conventions, archiving |
 | wikipedia-edit-history | Reference + creative — edit interpretation, not just data fetch |
 | wikimedia-cdn-assets | Configuration reference — static CDN paths |
@@ -324,6 +325,7 @@ prompt and inject concise bullet-point instructions from the relevant skill:
 | "page view", "traffic", "popularity" | wikimedia-pageviews (date format warning) |
 | "article quality", "FA", "GA", "rating" | wikimedia-page-assessment (schema reminder) |
 | "diff", "revision", "change", "edit" | wikimedia-diffs (API endpoints) |
+| "template", "infobox", "parser function", "magic word", "Lua module", "#invoke" | wikipedia-templates (syntax quick-ref) |
 | "citation", "reference", "cite", "source" | wikipedia-citations (template param reminder) |
 | "commons", "image", "media", "upload" | wikimedia-commons (license policy) |
 
