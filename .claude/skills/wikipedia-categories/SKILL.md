@@ -297,6 +297,21 @@ The HTML uses `<div>` elements with these classes:
 > (like `CategoryTreeItem`) will break `</div>` balancing.
 > See `scripts/category-tree.sh` for a working parser.
 
+> **Trade-off vs. `list=categorymembers`:** `action=categorytree` makes a single
+> API call regardless of depth (fast, one round-trip) but returns pre-rendered
+> HTML rather than structured JSON. The HTML classes (`CategoryTreeSection`,
+> `CategoryTreeItem`, etc.) are CSS hooks for the extension's own UI, not a
+> stable public API — they could change across MediaWiki versions.
+>
+> For more data-rich access (page IDs, namespaces, sort keys, timestamps),
+> use `list=categorymembers` with `cmtype=subcat` recursively. This returns
+> clean JSON at the cost of N sequential API calls for depth N.
+>
+> | Approach | Calls | Response format | Data per node |
+> |---|---|---|---|
+> | `action=categorytree` | 1 | Pre-rendered HTML | Link text only |
+> | `list=categorymembers` (recursive) | N | Structured JSON | ID, title, ns, sortkey, timestamp |
+
 The `options` parameter is a JSON object:
 
 | Option | Values | Default | Description |

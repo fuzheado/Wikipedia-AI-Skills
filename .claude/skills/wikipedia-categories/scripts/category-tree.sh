@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
 # category-tree.sh — Explore a Wikipedia category hierarchy from the CLI
 #
-# Usage:
-#   ./category-tree.sh Physics                  # Subcategories, 2 levels deep
-#   ./category-tree.sh Physics 3                # Subcategories, 3 levels deep
-#   ./category-tree.sh Physics 2 pages          # Articles + subcategories
-#   ./category-tree.sh Physics 1 all            # Everything (pages, subcats, files)
-#   ./category-tree.sh Physics 1 parents        # Go upward (parent categories)
-#   ./category-tree.sh Physics 2 categories en  # Specify language
+# Uses action=categorytree (1 API call, returns pre-rendered HTML).
+# For alternatives, see the skill's "Category Hierarchy" section.
 #
 # Requires: curl, jq, python3
 #
@@ -28,15 +23,58 @@
 #    style="display:none"> — the style attribute must not break the regex.
 # 3. Empty category branches have a bare <div></div> inside the section.
 #
-# See scripts/category-tree.sh here for a working parser, and the SKILL.md
-# "Category Hierarchy" section for the table of div classes.
+# See the SKILL.md "Category Hierarchy" section for the table of div classes.
 
 set -euo pipefail
 
-CATEGORY="${1:?Usage: $0 <category> [depth=2] [mode=categories|pages|all|parents] [lang=en]}"
+usage() {
+  cat <<'EOF'
+category-tree.sh — Explore a Wikipedia category hierarchy
+
+USAGE:
+  ./category-tree.sh <category> [depth] [mode] [language]
+
+ARGUMENTS:
+  category   Category name (required, without "Category:" prefix)
+  depth      How many levels deep to recurse (default: 2)
+  mode       What to show (default: categories)
+               categories  — subcategories only
+               pages       — articles + subcategories
+               all         — everything (pages, subcats, files)
+               parents     — go upward (show parent categories)
+  language   Wikipedia language code (default: en)
+
+EXAMPLES:
+  ./category-tree.sh Physics                  Deepest 2 levels
+  ./category-tree.sh Physics 3                Deepest 3 levels
+  ./category-tree.sh "2026 protests"          Category with spaces
+  ./category-tree.sh Physics 2 pages          Show articles too
+  ./category-tree.sh Physics 1 all            Everything at 1 level
+  ./category-tree.sh Physics 1 parents        Show parent categories
+  ./category-tree.sh Frankreich 1 categories de  German Wikipedia
+
+HOW IT WORKS:
+  Makes a single API call to action=categorytree — fast, one round-trip,
+  but returns pre-rendered HTML that requires parsing. Subcategories are
+  indented with ├─ and grouped under their parent marked with 📂.
+
+  For a more data-rich alternative (structured JSON with page IDs,
+  namespaces, sort keys), use list=categorymembers recursively via the
+  Wikimedia Action API instead. That approach trades more API calls for
+  clean JSON at the cost of N round-trips for depth N.
+EOF
+  exit 0
+}
+
+CATEGORY="${1:-}"
 DEPTH="${2:-2}"
 MODE="${3:-categories}"
 LANG="${4:-en}"
+
+if [ -z "$CATEGORY" ]; then
+  usage
+fi
+
 API="https://${LANG}.wikipedia.org/w/api.php"
 
 echo "🔍 Category tree for: $CATEGORY"
@@ -72,21 +110,18 @@ stack = []
 output = []
 i = 0
 while i < len(html):
-    # Match a div with class attribute
     m = re.match(r"<div\s+class=\"([^\"]*)\"[^>]*>", html[i:])
     if m:
         stack.append(m.group(1))
         i += m.end()
         continue
 
-    # Match a div without class attribute (other attributes ok)
     m = re.match(r"<div[^>]*>", html[i:])
     if m:
         stack.append("")
         i += m.end()
         continue
 
-    # Closing div
     m = re.match(r"</div>", html[i:])
     if m:
         if stack:
@@ -94,7 +129,6 @@ while i < len(html):
         i += m.end()
         continue
 
-    # Links — record if we are inside at least one CategoryTreeSection
     m = re.match(r"<a[^>]*>([^<]+)</a>", html[i:])
     if m:
         section_depth = sum(1 for cls in stack if cls == "CategoryTreeSection")

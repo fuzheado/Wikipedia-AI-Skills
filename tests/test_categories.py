@@ -28,13 +28,13 @@ class TestCategoryTreeScript:
         assert (CAT_SCRIPT.stat().st_mode & 0o111), "Script is not executable"
 
     def test_script_requires_category(self):
-        """Running without arguments should print usage and exit non-zero."""
+        """Running without arguments should print usage and exit zero."""
         result = subprocess.run(
             ['bash', str(CAT_SCRIPT)],
             capture_output=True, text=True, timeout=10,
         )
-        assert result.returncode != 0
-        assert 'Usage:' in result.stderr
+        assert result.returncode == 0
+        assert 'USAGE' in result.stdout or 'USAGE' in result.stderr
 
     @pytest.mark.slow
     def test_script_returns_tree_for_physics(self):
