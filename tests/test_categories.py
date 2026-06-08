@@ -101,12 +101,13 @@ class TestCategoryInspector:
         assert CAT_INSPECTOR.exists()
 
     def test_inspector_requires_title(self):
-        """Running without arguments should exit with error."""
+        """Running without arguments should print usage."""
         result = subprocess.run(
             [sys.executable, str(CAT_INSPECTOR)],
             capture_output=True, text=True, timeout=10,
         )
-        assert result.returncode != 0
+        assert result.returncode == 0
+        assert 'usage:' in result.stdout.lower() or 'USAGE' in result.stdout
 
     @pytest.mark.slow
     def test_inspector_fetches_categories(self):
@@ -164,12 +165,13 @@ class TestCategoryIntersect:
         assert CAT_INTERSECT.exists()
 
     def test_intersect_requires_at_least_one_category(self):
-        """Running without arguments should exit with error."""
+        """Running without arguments should print usage."""
         result = subprocess.run(
             [sys.executable, str(CAT_INTERSECT)],
             capture_output=True, text=True, timeout=10,
         )
-        assert result.returncode != 0
+        assert result.returncode == 0
+        assert 'usage:' in result.stdout.lower() or 'USAGE' in result.stdout
 
     @pytest.mark.slow
     def test_intersect_manual_fallback(self):
