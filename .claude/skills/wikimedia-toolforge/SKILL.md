@@ -238,6 +238,24 @@ toolforge env unset MY_VARIABLE
 
 Store sensitive values as environment variables via `toolforge env set`. These are stored securely and not shown in `env list` output. Do not hardcode secrets in source files.
 
+### 6.5 MediaWiki API Authentication (Bot Passwords)
+
+If your Toolforge tool authenticates against the MediaWiki API to make edits
+(e.g., via bot passwords or Pywikibot), be aware that the API's `lgname`
+parameter requires **underscores** where usernames have spaces:
+
+```python
+# ✗ Fails silently with "Unknown error"
+lgname = "AL Wiki MIT@mybot"
+
+# ✓ Works
+lgname = "AL_Wiki_MIT@mybot"
+```
+
+See the **[pywikibot](../pywikibot/SKILL.md)** skill ("Login fails" troubleshooting
+section) and the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill
+("Login Username Quirk" section) for full details.
+
 ## SOP 7: Logs & Debugging
 
 ### 7.1 Web Service Logs

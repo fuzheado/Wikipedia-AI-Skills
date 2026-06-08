@@ -22,6 +22,13 @@ TOOLFORGE_SQL_PASSWORD="your-password"   # Your replica DB password
 TOOLFORGE_DB_PORT="3307"                 # Local port for tunnel (optional, default 3307)
 ```
 
+> **Note:** Toolforge system usernames use underscores (`_`) internally.
+> If your wiki display name has spaces (e.g., `"AL Wiki MIT"`), your Toolforge
+> shell username will typically use the underscore form. This is consistent
+> with how the MediaWiki API handles usernames — see the
+> **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill
+> ("Login Username Quirk" section) if you're also making API calls.
+
 ---
 
 ## Getting Credentials

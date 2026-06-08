@@ -750,6 +750,25 @@ Scripts are only available in repository mode. Run from the `core/` directory. O
 - Some wikis require OAuth — check wiki's bot policy
 - Run `python pwb.py login` explicitly to test authentication
 
+### ⚠️ MediaWiki API username quirk: spaces → underscores
+
+The MediaWiki `action=login` API requires the **internal database form** of usernames,
+where spaces are stored as underscores (`_`). The `lgname` parameter will fail if you
+pass a username with literal spaces (e.g., `"AL Wiki MIT"`), even though that's how
+the username displays on wiki pages and in the `Special:BotPasswords` confirmation message.
+
+**Always normalize** usernames by replacing spaces with underscores before passing
+them to `lgname` (or let Pywikibot handle it — it does this internally via `Site.login()`).
+
+If you're calling the Action API directly:
+```python
+lgname = "AL_Wiki_MIT"       # ✓ Works
+lgname = "AL Wiki MIT"       # ✗ Fails with "Unknown error"
+```
+
+Pywikibot handles this automatically in most cases, but if you're writing raw API
+calls or a custom auth flow, remember to normalize the username.
+
 ### Rate limiting / 429 errors
 Adjust in `user-config.py`:
 ```python

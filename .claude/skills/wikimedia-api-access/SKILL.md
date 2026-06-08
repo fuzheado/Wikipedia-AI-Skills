@@ -144,6 +144,41 @@ if resp.status_code == 429:
   Add `rvsection=0` or `section=0` if you only need the lead section, or
   use `exintro` with `prop=extracts` for a concise summary.
 
+### ⚠️ Login Username Quirk: Spaces → Underscores
+
+The MediaWiki `action=login` API requires the **internal database form** of
+usernames, where spaces are stored as underscores (`_`). The `lgname` parameter
+will fail silently (returning `"Unknown error"`) if you pass a username with
+literal spaces, even though that's how the username displays on wiki pages and in
+the `Special:BotPasswords` confirmation message.
+
+**Always normalize** usernames before passing them to `lgname`:
+
+```python
+# ✗ This will FAIL with "Unknown error"
+lgname = "AL Wiki MIT"
+
+# ✓ This works
+lgname = "AL_Wiki_MIT"
+```
+
+If you're using bot passwords, the same rule applies:
+
+```python
+# ✗ Fails
+lgname = "AL Wiki MIT@mybot"
+
+# ✓ Works
+lgname = "AL_Wiki_MIT@mybot"
+```
+
+**Note:** `action=login` also requires **POST**, not GET. See the
+[MediaWiki API documentation](https://www.mediawiki.org/wiki/API:Login) for
+the full login flow (including the two-step `NeedToken` case).
+
+See the **[pywikibot](../pywikibot/SKILL.md)** skill's Troubleshooting section
+for more on bot password authentication.
+
 ## **Example Use Cases**
 
 - **Fetch article content:** "Get the wikitext for 'Python (programming language)' using the Action API."
