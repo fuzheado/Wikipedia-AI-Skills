@@ -279,6 +279,24 @@ Use the CategoryTree extension:
 GET https://en.wikipedia.org/w/api.php?action=categorytree&category=Physics&format=json
 ```
 
+The response is in `$.categorytree["*"]` and contains **HTML** (not JSON-structured data).
+The HTML uses `<div>` elements with these classes:
+
+| Class | Purpose |
+|---|---|
+| `CategoryTreeSection` | Wraps one category and its children |
+| `CategoryTreeItem` | The category name/link itself |
+| `CategoryTreeChildren` | Wraps nested subcategories (may be collapsed) |
+| `CategoryTreeBullet` | Expand/collapse toggle icon |
+
+> ⚠️ **Parsing gotcha:** This is `<div>`-based HTML, not `<li>`/`<ul>` lists.
+> Nested sections are sibling `<div class="CategoryTreeSection">` elements
+> inside `<div class="CategoryTreeChildren">`. Collapsed children use
+> `style="display:none"` on the children div. Any parser must track
+> **all** `<div>` tags for correct nesting — omitting unrelated divs
+> (like `CategoryTreeItem`) will break `</div>` balancing.
+> See `scripts/category-tree.sh` for a working parser.
+
 The `options` parameter is a JSON object:
 
 | Option | Values | Default | Description |

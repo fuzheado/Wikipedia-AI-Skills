@@ -10,6 +10,26 @@
 #   ./category-tree.sh Physics 2 categories en  # Specify language
 #
 # Requires: curl, jq, python3
+#
+# ⚠️ CategoryTree API HTML structure:
+# The API returns <div>-based HTML, not <li>/<ul> lists. The nesting is:
+#   <div class="CategoryTreeSection">
+#     <div class="CategoryTreeItem"><a>Name</a></div>
+#     <div class="CategoryTreeChildren">          ← may have style="display:none"
+#       <div class="CategoryTreeSection">...       ← nested subcategories
+#     </div>
+#   </div>
+#
+# Key gotchas:
+# 1. The parser must track ALL <div> tags, not just the ones it cares about.
+#    If you skip CategoryTreeItem/CategoryTreeBullet divs, their </div>
+#    closes will pop the wrong entry from your tracking stack.
+# 2. Collapsed subcategories use <div class="CategoryTreeChildren"
+#    style="display:none"> — the style attribute must not break the regex.
+# 3. Empty category branches have a bare <div></div> inside the section.
+#
+# See scripts/category-tree.sh here for a working parser, and the SKILL.md
+# "Category Hierarchy" section for the table of div classes.
 
 set -euo pipefail
 
