@@ -1,6 +1,6 @@
 ---
 name: wikimedia-eventstreams
-description: Consume real-time streams of Wikimedia events (edits, page creations, deletions, moves, log entries, and more) via Server-Sent Events (SSE). Covers the EventStreams HTTP service, all available streams with their schemas, client libraries (Python, JavaScript, curl), client-side filtering, historical replay, canary event handling, connection management with auto-reconnect, and building real-time tools like live dashboards, patrol monitors, and cross-wiki trackers
+description: Consume real-time streams of Wikimedia events (edits, page creations, deletions, moves, log entries) via Server-Sent Events (SSE). Covers the EventStreams HTTP service, stream schemas, client libraries (Python/JS/curl), filtering, historical replay, canary handling, auto-reconnect, and building live dashboards, patrol monitors, and cross-wiki trackers
 license: MIT
 compatibility: opencode
 ---
