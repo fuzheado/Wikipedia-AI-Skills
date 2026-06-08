@@ -59,7 +59,7 @@
 
 ### Planned skills
 
-- ~~**Categories**~~ — ✅ Published as `wikipedia-categories`. Covers the full category system: tree hierarchy, the three tests (Verifiable/Neutral/Defining), topic vs. set categories, eponymous categories, sort keys and DEFAULTSORT conventions, the six-question validity checklist, all three API query patterns (`list=categorymembers`, `prop=categories`, `action=categorytree`), PetScan for intersections, overcategorization rules, naming conventions, and category maintenance. Ships with `scripts/category-tree.sh`, `assets/category-inspector.py`, `assets/category-intersect.py`, and reference docs for overcategorization and naming conventions.
+- ~~**Categories**~~ — ✅ Published as `wikipedia-categories`. Covers the full category system: tree hierarchy, the three tests (Verifiable/Neutral/Defining), topic vs. set categories, eponymous categories, sort keys and DEFAULTSORT conventions, the six-question validity checklist, all API query patterns (including `generator=categorymembers`), Pywikibot generators and built-in scripts (`category.py`, `category_redirect`, `category_graph`, `commonscat`), PetScan intersections, WDQS/SPARQL for cross-wiki recursion, all Special pages, a comprehensive comparison of all 10 access methods with trade-off analysis, overcategorization rules, naming conventions, and category maintenance. Ships with `scripts/category-tree.sh`, `assets/category-inspector.py`, `assets/category-intersect.py`, and reference docs for overcategorization and naming conventions.
 
 - **General-topic article drafting** — SOPs for writing non-biography Wikipedia articles (events, organizations, concepts, places). Different structure templates, different notability criteria, different citation patterns. Prior art exists in the original project roadmap.
 
@@ -91,7 +91,7 @@
 
 ### Completed improvements
 
-- **`wikipedia-categories` skill** — new skill covering the Wikipedia category system end-to-end: tree hierarchy, three validity tests (Verifiable/Neutral/Defining), topic vs. set categories, sort keys and DEFAULTSORT, all three API query patterns, PetScan intersection, overcategorization rules, naming conventions. Ships with 2 reference docs, 1 CLI script, and 2 Python assets. The proposal was written first in `proposals/categories-skill.md` before implementation.
+- **`wikipedia-categories` skill** — new skill covering the Wikipedia category system end-to-end: tree hierarchy, three validity tests (Verifiable/Neutral/Defining), topic vs. set categories, sort keys and DEFAULTSORT, comprehensive comparison of all access methods (Action API, Pywikibot, PetScan, WDQS, Special pages) with trade-off analysis, Pywikibot generators and built-in scripts, overcategorization rules, naming conventions, and category maintenance. Ships with 2 reference docs, 1 CLI script, and 2 Python assets. The proposal was written first in `proposals/categories-skill.md` before implementation.
 
 - **Title Format Guide** (section 11 of `wikimedia-api-access/references/endpoints.md`) — cross-API table documenting underscore-vs-space title formats across 6 endpoints, with correct/wrong code comparison. Fixes the single most costly bug when chaining Pageviews, Action API, and SQL results.
 - **Expanded 429 Retry-After handling** in `wikimedia-api-access/SKILL.md` — dedicated subsection explaining the importance of server-supplied Retry-After values, an anti-pattern warning against fixed backoff, and three common causes of 429 responses.
