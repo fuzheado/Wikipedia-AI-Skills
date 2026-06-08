@@ -17,5 +17,6 @@
   "interceptCurl": true,
   "interceptPython": true,
   "interceptNode": true,
-  "interceptWget": true
+  "interceptWget": true,
+  "interceptRetry": true
 }

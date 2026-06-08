@@ -80,6 +80,23 @@ function injectUserAgent(cmd, opts) {
   return cmd;
 }
 
+function injectRetry(cmd, opts) {
+  if (!opts.interceptRetry) return cmd;
+
+  const normalized = normalizeContinuations(cmd.trim());
+  if (!targetsWikimedia(normalized)) return cmd;
+
+  if (/^curl\b/.test(normalized) && !/--retry\b/.test(cmd)) {
+    return cmd.replace(/^curl\b/, "curl --retry 3 --retry-delay 10");
+  }
+
+  if (/^wget\b/.test(normalized) && !/--tries\b/.test(cmd)) {
+    return cmd.replace(/^wget\b/, "wget --tries=4 --waitretry=10");
+  }
+
+  return cmd;
+}
+
 const DEFAULT_OPTS = {
   userAgent: "WikipediaAIAgent/1.0 (user@email.com) SkillsDemo",
   interceptCurl: true,
@@ -87,6 +104,9 @@ const DEFAULT_OPTS = {
   interceptNode: true,
   interceptWget: true,
 };
+
+const RETRY_ON = { interceptRetry: true };
+const RETRY_OFF = { interceptRetry: false };
 
 // ===========================================================================
 // Tests
@@ -342,6 +362,74 @@ describe("injectUserAgent()", () => {
   });
 });
 
+describe("injectRetry()", () => {
+  describe("curl", () => {
+    it("injects --retry 3 --retry-delay 10", () => {
+      const result = injectRetry(
+        "curl https://en.wikipedia.org/w/api.php",
+        RETRY_ON,
+      );
+      assert(result.startsWith("curl --retry 3 --retry-delay 10"));
+      assert(result.includes("https://en.wikipedia.org/w/api.php"));
+    });
+
+    it("does not double-inject if --retry already present", () => {
+      const cmd = "curl --retry 5 https://en.wikipedia.org/w/api.php";
+      assert.equal(injectRetry(cmd, RETRY_ON), cmd);
+    });
+
+    it("works alongside User-Agent injection", () => {
+      // Simulate the pipeline: injectUserAgent then injectRetry
+      const cmd = "curl https://en.wikipedia.org/w/api.php";
+      const withUA = injectUserAgent(cmd, DEFAULT_OPTS);
+      const withRetry = injectRetry(withUA, RETRY_ON);
+      assert(withRetry.startsWith("curl --retry 3 --retry-delay 10 -H 'User-Agent:"));
+      assert(withRetry.includes("https://en.wikipedia.org/w/api.php"));
+    });
+  });
+
+  describe("wget", () => {
+    it("injects --tries=4 --waitretry=10", () => {
+      const result = injectRetry(
+        "wget -O- https://en.wikipedia.org/w/api.php",
+        RETRY_ON,
+      );
+      assert(result.startsWith("wget --tries=4 --waitretry=10"));
+      assert(result.includes("https://en.wikipedia.org/w/api.php"));
+    });
+
+    it("does not double-inject if --tries already present", () => {
+      const cmd = "wget --tries=2 https://en.wikipedia.org/w/api.php";
+      assert.equal(injectRetry(cmd, RETRY_ON), cmd);
+    });
+  });
+
+  describe("disabled", () => {
+    it("does nothing when interceptRetry is false", () => {
+      const cmd = "curl https://en.wikipedia.org/w/api.php";
+      assert.equal(injectRetry(cmd, RETRY_OFF), cmd);
+    });
+  });
+
+  describe("non-Wikimedia commands", () => {
+    it("passes through git", () => {
+      assert.equal(injectRetry("git push", RETRY_ON), "git push");
+    });
+
+    it("passes through non-Wikimedia curl", () => {
+      const cmd = "curl https://api.github.com/repos/user/repo";
+      assert.equal(injectRetry(cmd, RETRY_ON), cmd);
+    });
+  });
+
+  describe("python is not affected", () => {
+    it("passes through python3 commands", () => {
+      const cmd = "python3 script.py https://en.wikipedia.org/w/api.php";
+      assert.equal(injectRetry(cmd, RETRY_ON), cmd);
+    });
+  });
+});
+
 describe("config.json validation", () => {
   it("config.json exists and is valid JSON", () => {
     const configPath = resolve(__dirname, "config.json");
@@ -357,6 +445,7 @@ describe("config.json validation", () => {
     assert(typeof config.interceptPython === "boolean");
     assert(typeof config.interceptNode === "boolean");
     assert(typeof config.interceptWget === "boolean");
+    assert(typeof config.interceptRetry === "boolean");
   });
 });
 

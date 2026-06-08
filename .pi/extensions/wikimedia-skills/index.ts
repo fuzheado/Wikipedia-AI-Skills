@@ -26,6 +26,7 @@ const __dirname = dirname(__filename);
 export type {
   ExtensionConfig,
   InjectOptions,
+  RetryOptions,
 } from "./core";
 export {
   DEFAULT_USER_AGENT,
@@ -34,6 +35,7 @@ export {
   targetsWikimedia,
   hasUserAgentAlready,
   injectUserAgent,
+  injectRetry,
 } from "./core";
 
 import {
@@ -41,7 +43,9 @@ import {
   type ExtensionConfig,
   targetsWikimedia,
   injectUserAgent,
+  injectRetry,
   type InjectOptions,
+  type RetryOptions,
 } from "./core";
 
 // ---------------------------------------------------------------------------
@@ -80,6 +84,7 @@ function tryParseConfig(filePath: string): ExtensionConfig | null {
       interceptPython: parsed.interceptPython ?? DEFAULT_CONFIG.interceptPython,
       interceptNode: parsed.interceptNode ?? DEFAULT_CONFIG.interceptNode,
       interceptWget: parsed.interceptWget ?? DEFAULT_CONFIG.interceptWget,
+      interceptRetry: parsed.interceptRetry ?? DEFAULT_CONFIG.interceptRetry,
     };
   } catch {
     return null;
@@ -142,6 +147,11 @@ function buildInjectOptions(): InjectOptions {
   };
 }
 
+/** Build RetryOptions from current config. */
+function buildRetryOptions(): RetryOptions {
+  return { interceptRetry: getConfig().interceptRetry };
+}
+
 // ---------------------------------------------------------------------------
 // Extension entry point
 // ---------------------------------------------------------------------------
@@ -152,7 +162,8 @@ export default function (pi: ExtensionAPI) {
     reloadConfig();
   });
 
-  // Intercept every bash tool call and inject User-Agent when targeting Wikimedia
+  // Intercept every bash tool call and inject User-Agent + retry flags
+  // when targeting Wikimedia
   pi.on("tool_call", async (event, ctx) => {
     if (event.toolName !== "bash") return;
     if (!getConfig().enabled) return;
@@ -162,11 +173,16 @@ export default function (pi: ExtensionAPI) {
     // Fast path: skip commands that don't mention any Wikimedia domain
     if (!targetsWikimedia(cmd)) return;
 
-    const opts = buildInjectOptions();
-    const modified = injectUserAgent(cmd, opts);
+    // Stage 1: inject User-Agent header
+    const uaOpts = buildInjectOptions();
+    const withUA = injectUserAgent(cmd, uaOpts);
 
-    if (modified !== cmd) {
-      event.input.command = modified;
+    // Stage 2: inject retry flags (piped from Stage 1 output)
+    const retryOpts = buildRetryOptions();
+    const withRetry = injectRetry(withUA, retryOpts);
+
+    if (withRetry !== cmd) {
+      event.input.command = withRetry;
     }
   });
 }

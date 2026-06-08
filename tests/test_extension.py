@@ -49,6 +49,11 @@ class TestExtensionStructure:
                 f"core.ts must export pure function '{func}'"
             )
 
+        # Also check injectRetry
+        assert 'export function injectRetry' in content, (
+            "core.ts must export pure function 'injectRetry'"
+        )
+
     def test_config_json_exists_and_valid(self):
         path = EXT_DIR / 'config.json'
         assert path.is_file(), f"Missing config.json at {path}"
@@ -63,6 +68,7 @@ class TestExtensionStructure:
         assert isinstance(config.get('interceptPython'), bool)
         assert isinstance(config.get('interceptNode'), bool)
         assert isinstance(config.get('interceptWget'), bool)
+        assert isinstance(config.get('interceptRetry'), bool)
 
     def test_package_json_exists_and_valid(self):
         path = EXT_DIR / 'package.json'

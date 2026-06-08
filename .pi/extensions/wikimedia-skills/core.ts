@@ -25,6 +25,7 @@ export interface ExtensionConfig {
   interceptPython: boolean;
   interceptNode: boolean;
   interceptWget: boolean;
+  interceptRetry: boolean;
 }
 
 export const DEFAULT_CONFIG: ExtensionConfig = {
@@ -34,6 +35,7 @@ export const DEFAULT_CONFIG: ExtensionConfig = {
   interceptPython: true,
   interceptNode: true,
   interceptWget: true,
+  interceptRetry: true,
 };
 
 /** Options passed to injectUserAgent */
@@ -43,6 +45,14 @@ export interface InjectOptions {
   interceptPython: boolean;
   interceptNode: boolean;
   interceptWget: boolean;
+}
+
+/**
+ * Options passed to injectRetry.
+ * Separate from InjectOptions since retry is a distinct concern.
+ */
+export interface RetryOptions {
+  interceptRetry: boolean;
 }
 
 /**
@@ -142,5 +152,39 @@ export function injectUserAgent(cmd: string, opts: InjectOptions): string {
   }
 
   // No pattern matched — return unchanged
+  return cmd;
+}
+
+/**
+ * Inject automatic retry flags into curl and wget commands targeting
+ * Wikimedia domains.
+ *
+ * curl uses --retry 3 --retry-delay 10 — curl treats HTTP 429 as a transient
+ *   error by default when --retry is set, so this handles the most common
+ *   rate-limit scenario without needing --retry-all-errors.
+ * wget uses --tries=4 --waitretry=10 — equivalent retry logic for wget.
+ *
+ * Kept as a separate function from injectUserAgent so the two concerns
+ * can be toggled independently in config.json.
+ *
+ * Takes the already-modified command (from injectUserAgent) as input
+ * and returns it with retry flags added.
+ */
+export function injectRetry(cmd: string, opts: RetryOptions): string {
+  if (!opts.interceptRetry) return cmd;
+
+  const normalized = normalizeContinuations(cmd.trim());
+  if (!targetsWikimedia(normalized)) return cmd;
+
+  // curl: skip if --retry is already present
+  if (/^curl/.test(normalized) && !/--retry/.test(cmd)) {
+    return cmd.replace(/^curl/, "curl --retry 3 --retry-delay 10");
+  }
+
+  // wget: skip if --tries is already present
+  if (/^wget/.test(normalized) && !/--tries/.test(cmd)) {
+    return cmd.replace(/^wget/, "wget --tries=4 --waitretry=10");
+  }
+
   return cmd;
 }
