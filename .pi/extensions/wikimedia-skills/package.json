@@ -1,0 +1,10 @@
+{
+  "name": "wikimedia-skills",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pi extension for Wikimedia AI Skills — auto-injects User-Agent headers on Wikimedia requests",
+  "license": "MIT",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

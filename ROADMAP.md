@@ -108,9 +108,11 @@ See **[AGENT-INTEGRATION-STRATEGY.md](AGENT-INTEGRATION-STRATEGY.md)** for the f
 2. **Custom tools** (`pi.registerTool()`) — callable functions for vector search, page quality, pageviews, diffs, etc. — visible in the LLM's tool list, deterministic execution
 3. **Skills (retained)** — reference documentation and creative tasks, serendipitous discovery
 
+**Done:**
+- ✅ **Phase 0:** Single pi extension at `.pi/extensions/wikimedia-skills/index.ts` — auto-injects User-Agent headers on all `curl`, `wget`, `python`, and `node` commands targeting Wikimedia servers. Ships with unit tests (36 tests via `node --test`), extension structure validation (13 tests via `pytest`), config.json for customization, and full README install docs.
+
 **Phases:**
-- Phase 0: Single pi extension at `.pi/extensions/wikimedia-skills/index.ts`
-- Phase 1: Top 3 hooks (User-Agent, rate limit backoff, SSH tunnel health)
+- Phase 1: Top 3 hooks — rate limit backoff (`tool_result` interceptor for 429), SSH tunnel health check (`tool_call` before SQL)
 - Phase 2: Top 5 custom tools (vector search, page quality, pageviews, page assessment, diffs)
 - Phase 3: Keyword-based auto-activation via `before_agent_start`
 - Phase 4: Event-driven cross-tool orchestration
@@ -120,14 +122,14 @@ See **[AGENT-INTEGRATION-STRATEGY.md](AGENT-INTEGRATION-STRATEGY.md)** for the f
 - Write CONTRIBUTING.md with skill authoring guidelines ✅
 - Set up a GitHub issue template for skill suggestions
 - Add `.claude.json` project configuration for agent discovery ✅
-- **Add skill tests** ✅ — `pytest`-based test suite in `tests/` with 197 tests:
+- **Add skill tests** ✅ — `pytest`-based test suite in `tests/` with 210 tests:
     - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 20 skills (5 checks each: exists, required fields, description length, MIT license, directory match; duplicate entries removed)
     - `test_cross_api_pipeline.py`: Mock-based unit tests for the pipeline script (title normalization, batch splitting, P31 classification, citation counting, namespace filtering)
     - `test_markdown_sops.py`: Content-accuracy checks for new/modified SOPs (batch entity classification, Scenario C, Title Format Guide, 429 Retry-After)
     - `test_liftwing_multi_model.py`: Mock-based tests for the Lift Wing multi-model scorer (cache, extractors, formatting, error handling)
     - `test_article_quality_report.py`: Mock-based tests for the article quality report generator (all 4 model extractors, format functions, chaining)
     - `test_citations.py`: Mock-based tests for citation tools (wayback inspector, dead link scanner, citation linter, citation generator — 25 tests)
-    - Coverage meets the 3-5 test minimum per affected skill; the full suite serves as a foundation to expand iteratively.
+    - `test_extension.py`: Extension structure and config validation (13 tests)
 
 ## Key decisions
 

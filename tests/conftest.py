@@ -8,6 +8,9 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILLS_DIR = REPO_ROOT / '.claude' / 'skills'
 
+# Path to pi extensions
+EXTENSIONS_DIR = REPO_ROOT / '.pi' / 'extensions'
+
 # Add assets directory to path so we can import the pipeline script
 sys.path.insert(0, str(SKILLS_DIR / 'wikimedia-api-access' / 'assets'))
 

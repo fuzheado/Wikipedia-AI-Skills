@@ -277,33 +277,35 @@ How each skill maps to the three layers:
 
 ## Implementation Path
 
-### Phase 0: Foundation (one extension)
+### ✅ Phase 0: Foundation (one extension) — DONE
 
-Create a single pi extension at `.pi/extensions/wikimedia-skills/index.ts` that
-houses all hooks and tools. One auto-discovered file. The extension:
+A single pi extension at `.pi/extensions/wikimedia-skills/index.ts` houses the
+first event hook. The extension:
 
-1. Registers the event hooks (User-Agent, rate limiting, auth)
-2. Registers each custom tool from the action-oriented list
-3. Uses `before_agent_start` to inject relevant skill bullet points based on
-   user prompt keywords
+1. ✅ Registers the User-Agent enforcement event hook
+2. ⬜ Registers custom tools (future)
+3. ⬜ Uses `before_agent_start` for keyword-based auto-activation (future)
 
-```typescript
-// ~/.pi/agent/extensions/wikimedia-skills/index.ts
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+See the [README](../README.md#pi-agent-setup) for install instructions.
 
-export default function (pi: ExtensionAPI) {
-  registerHooks(pi);   // Layer 1
-  registerTools(pi);   // Layer 2
-  registerAutoActivation(pi);  // Layer 2.5
-}
-```
+### ✅ Phase 1, Item 1: User-Agent enforcement — DONE
 
-### Phase 1: Top 3 hooks (highest-ROI)
+Creates a `pi.on("tool_call")` event hook that automatically injects a
+descriptive `User-Agent` header into every `curl`, `wget`, `python`, and
+`node` bash command targeting a Wikimedia domain (`*.wikipedia.org`,
+`*.wikidata.org`, `*.wikimedia.org`, `*.wmcloud.org`, `*.toolforge.org`).
 
-1. **User-Agent enforcement** (`tool_call`) — eliminates 403 errors entirely
-2. **Rate-limit backoff** (`tool_result` interceptor for 429) — auto-retry with
+- Ships with a placeholder UA that users replace via `~/.config/wikimedia-skills/config.json` or `WIKIMEDIA_USER_AGENT` env var
+- UI: no-op skip injected if UA already present
+  - Configurable per-tool type (curl, wget, python, node) via `config.json`
+  - Users config survived `git pull` by placing config in `~/.config/`
+  - 36 node --test unit tests + 17 pytest structure tests
+
+### Remaining Phase 1 hooks
+
+1. **Rate-limit backoff** (`tool_result` interceptor for 429) — auto-retry with
    exponential backoff
-3. **SSH tunnel health check** (`tool_call` before SQL) — prevents "can't
+2. **SSH tunnel health check** (`tool_call` before SQL) — prevents "can't
    connect to database" failures
 
 ### Phase 2: Top 5 custom tools (highest frequency)

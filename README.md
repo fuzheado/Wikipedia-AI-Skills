@@ -143,24 +143,89 @@ Once installed, your AI coding agent will discover the skill automatically throu
 
 ### Pi agent setup
 
-[Pi](https://github.com/earendil-works/pi-coding-agent) discovers skills from anywhere on the filesystem via `settings.json`:
+[Pi](https://github.com/earendil-works/pi-coding-agent) discovers skills from anywhere on the filesystem via `settings.json`.
+
+#### Step 1: Clone the repo
 
 ```bash
 mkdir -p ~/.pi/repos
 git clone https://github.com/fuzheado/Wikipedia-AI-Skills.git ~/.pi/repos/Wikipedia-AI-Skills
 ```
 
-Then add the skills path to `~/.pi/agent/settings.json`:
+#### Step 2: Add skills and extension to pi's settings
+
+Edit `~/.pi/agent/settings.json`:
 
 ```json
 {
   "skills": [
     "~/.pi/repos/Wikipedia-AI-Skills/.claude/skills"
+  ],
+  "extensions": [
+    "~/.pi/repos/Wikipedia-AI-Skills/.pi/extensions/wikimedia-skills"
   ]
 }
 ```
 
-After restarting pi, all the skills will be available on-demand.
+#### Step 3: Set your own contact info in the User-Agent (required)
+
+The extension ships with a placeholder User-Agent. **You must replace the contact information with your own** — Wikimedia uses this to reach you if your requests cause issues.
+
+Choose one of these methods:
+
+> **Option A (recommended) — Persistent config that survives `git pull`**
+
+Copy the template to your home config directory, then edit the copy:
+
+```bash
+# 1. Create the user config directory
+mkdir -p ~/.config/wikimedia-skills
+
+# 2. Copy the template (this is a one-time copy)
+cp ~/.pi/repos/Wikipedia-AI-Skills/.pi/extensions/wikimedia-skills/config.json \
+   ~/.config/wikimedia-skills/config.json
+
+# 3. Open the copy and replace the userAgent value with your own info
+$EDITOR ~/.config/wikimedia-skills/config.json
+```
+
+In that file, change the `"userAgent"` value to your own contact info. The format is:
+
+```
+<client>/<version> (<contact URL or email>) <project>
+```
+
+For example:
+
+```json
+{
+  "userAgent": "MyBot/1.0 (https://github.com/yourname; yourname@example.com) SkillsDemo"
+}
+```
+
+> **Option B — Quick override (lasts one shell session)**
+
+```bash
+export WIKIMEDIA_USER_AGENT="MyBot/1.0 (https://github.com/yourname; yourname@example.com) SkillsDemo"
+```
+
+#### Step 4: Reload pi
+
+```bash
+/reload
+```
+
+After reloading, the **User-Agent injection extension** is active: every `curl`, `wget`, `python`, and `node` command targeting a Wikimedia server automatically gets a compliant User-Agent — no 403 errors, no manual intervention needed.
+
+#### How the User-Agent is resolved
+
+The extension checks these locations in order (first match wins):
+
+1. `WIKIMEDIA_USER_AGENT` environment variable
+2. `~/.config/wikimedia-skills/config.json` (your personal config — survives `git pull`)
+3. The repo's `.pi/extensions/wikimedia-skills/config.json` (shipped default — do not edit, `git pull` overwrites it)
+
+> ⚠️ **Do not edit the repo's `config.json` directly.** It is a template and `git pull` will overwrite your changes. Always use `~/.config/wikimedia-skills/config.json` or the `WIKIMEDIA_USER_AGENT` environment variable.
 
 ---
 
