@@ -165,7 +165,7 @@ export default function (pi: ExtensionAPI) {
   });
 
   // Register custom tools (Layer 2)
-  registerVectorSearchTool(pi, resolveUA);
+  registerVectorSearchTool(pi, resolveUserAgent);
 
   // Intercept every bash tool call and inject User-Agent + retry flags
   // when targeting Wikimedia
