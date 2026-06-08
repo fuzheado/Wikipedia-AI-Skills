@@ -96,6 +96,31 @@ class TestExtensionStructure:
             "node_modules should not be checked into the repo"
         )
 
+    def test_tools_directory_exists(self):
+        tools_dir = EXT_DIR / 'tools'
+        assert tools_dir.is_dir(), f"Missing tools/ directory at {tools_dir}"
+
+    def test_vector_search_tool_exists(self):
+        tool = EXT_DIR / 'tools' / 'vector-search.ts'
+        assert tool.is_file(), f"Missing tools/vector-search.ts at {tool}"
+        content = tool.read_text('utf-8')
+        assert 'registerVectorSearchTool' in content, (
+            "vector-search.ts must export registerVectorSearchTool"
+        )
+        assert 'pi.registerTool' in content, (
+            "vector-search.ts must call pi.registerTool()"
+        )
+        assert 'wd-vectordb.wmcloud.org' in content, (
+            "vector-search.ts should use the Vector Database API"
+        )
+
+    def test_vector_search_tool_has_format_results(self):
+        tool = EXT_DIR / 'tools' / 'vector-search.ts'
+        content = tool.read_text('utf-8')
+        assert 'export function formatResults' in content, (
+            "vector-search.ts must export formatResults for testing"
+        )
+
 
 class TestExtensionConfigDefaults:
     """Default config values should match Wikimedia policy."""

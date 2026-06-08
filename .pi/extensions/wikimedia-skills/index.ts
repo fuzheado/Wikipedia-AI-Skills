@@ -19,6 +19,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { registerVectorSearchTool } from "./tools/vector-search";
+
 // Resolve __dirname for ESM-compatible access to config.json
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -161,6 +163,9 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_start", async () => {
     reloadConfig();
   });
+
+  // Register custom tools (Layer 2)
+  registerVectorSearchTool(pi, resolveUA);
 
   // Intercept every bash tool call and inject User-Agent + retry flags
   // when targeting Wikimedia

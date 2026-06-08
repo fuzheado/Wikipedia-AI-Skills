@@ -108,6 +108,16 @@ const DEFAULT_OPTS = {
 const RETRY_ON = { interceptRetry: true };
 const RETRY_OFF = { interceptRetry: false };
 
+function formatVectorResults(results) {
+  if (results.length === 0) return "QID\tsimilarity\tsource";
+  const rows = results.map((r) => {
+    const score = r.similarity_score != null ? r.similarity_score.toFixed(4) : "-";
+    const source = r.source ?? "";
+    return `${r.QID}\t${score}\t${source}`;
+  });
+  return `QID\tsimilarity\tsource\n${rows.join("\n")}`;
+}
+
 // ===========================================================================
 // Tests
 // ===========================================================================
@@ -427,6 +437,58 @@ describe("injectRetry()", () => {
       const cmd = "python3 script.py https://en.wikipedia.org/w/api.php";
       assert.equal(injectRetry(cmd, RETRY_ON), cmd);
     });
+  });
+});
+
+describe("formatVectorResults()", () => {
+  it("formats a single result as TSV", () => {
+    const result = formatVectorResults([
+      { QID: "Q42", similarity_score: 0.8758, source: "Vector Search" },
+    ]);
+    assert(result.includes("Q42"));
+    assert(result.includes("0.8758"));
+    assert(result.includes("Vector Search"));
+    assert(result.startsWith("QID"));
+  });
+
+  it("formats multiple results", () => {
+    const results = [
+      { QID: "Q42", similarity_score: 0.9, source: "Vector Search" },
+      { QID: "Q5", similarity_score: 0.8, source: "Keyword Search" },
+      { QID: "Q123", similarity_score: 0.7, source: "Vector Search, Keyword Search" },
+    ];
+    const table = formatVectorResults(results);
+    const lines = table.split("\n");
+    assert.equal(lines.length, 4); // header + 3 results
+    assert(lines[1].startsWith("Q42"));
+    assert(lines[2].startsWith("Q5"));
+    assert(lines[3].startsWith("Q123"));
+  });
+
+  it("handles empty results", () => {
+    const table = formatVectorResults([]);
+    assert.equal(table, "QID\tsimilarity\tsource"); // header only
+  });
+
+  it("shows dash for missing similarity_score", () => {
+    const result = formatVectorResults([
+      { QID: "Q42" },
+    ]);
+    assert(result.includes("Q42\t-"));
+  });
+
+  it("shows empty string for missing source", () => {
+    const result = formatVectorResults([
+      { QID: "Q42", similarity_score: 0.9 },
+    ]);
+    assert(result.includes("0.9000\t"));
+  });
+
+  it("rounds similarity_score to 4 decimal places", () => {
+    const result = formatVectorResults([
+      { QID: "Q42", similarity_score: 0.123456789 },
+    ]);
+    assert(result.includes("0.1235"));
   });
 });
 
