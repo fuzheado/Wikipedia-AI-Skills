@@ -451,6 +451,154 @@ When asked to evaluate whether a category is valid or whether an article belongs
 
 ---
 
+## Comparison: All Category Access Methods
+
+This table covers every way to access category data, from lightweight API calls
+through Pywikibot and external tools. Use it to pick the right approach for
+your task.
+
+### Quick Decision Guide
+
+| Task | Best method | Why |
+|---|---|---|
+| Quick CLI tree of subcategories | `action=categorytree` | 1 call, built-in recursion |
+| Get all articles in a category with metadata | `list=categorymembers` | Clean JSON, page IDs, sort keys |
+| Traverse deep category hierarchy programmatically | Pywikibot `cat.subcategories(recurse=True)` | Handles pagination + recursion automatically |
+| Intersection of multiple categories | PetScan | Built-in AND/OR/NOT, filter by template/namespace |
+| Category member counts only | `prop=categoryinfo` | 1 call, no pagination needed |
+| Find what categories an article belongs to | `prop=categories` | Inverse direction |
+| Find all categories matching a prefix | `list=allcategories` | Discover categories by name |
+| Bulk edit/move/redirect categories | Pywikibot `category.py` script | Built for mass operations |
+| Cross-wiki category analysis | WDQS (SPARQL) | Recursive across all Wikimedia wikis |
+| Manual browsing | Special:CategoryTree | Interactive, no coding |
+
+### Detailed Comparison
+
+#### Action API — query modules
+
+| Module | Direction | Returns | Recursive? | Calls for depth N |
+|---|---|---|---|---|
+| `list=categorymembers` | Category → members | JSON: page IDs, titles, ns, sort keys, timestamp, type | Manual | N |
+| `prop=categories` | Article → categories | JSON: category titles, sort keys, hidden status | No | 1 |
+| `prop=categoryinfo` | Category → counts | JSON: page count, subcat count, file count, size | No | 1 |
+| `list=allcategories` | Whole wiki → categories | JSON: category names, member counts | No | 1 (paginated) |
+| `action=categorytree` | Category → tree (HTML) | Pre-rendered HTML with `<div>` elements | Built-in (depth param) | 1 |
+
+**`list=categorymembers` key parameters:**
+
+| Parameter | Purpose |
+|---|---|
+| `cmtype=page|subcat|file` | Filter by member type |
+| `cmnamespace=0` | Filter by namespace |
+| `cmprop=title|sortkey|timestamp|ids|type` | What data to return |
+| `cmsort=sortkey|timestamp` | Sort order |
+| `cmdir=asc|desc` | Sort direction |
+| `cmstart` / `cmend` | Timestamp range (requires `cmsort=timestamp`) |
+| `cmcontinue` | Pagination token (next 500) |
+| `generator=categorymembers` | Use as generator to feed other query props |
+
+**Generator pattern** (fetch members + page content in one call):
+
+```
+GET /w/api.php?action=query&generator=categorymembers&gcmtitle=Category:Physics
+  &prop=extracts|info&exintro&inprop=url&format=json
+```
+
+This is more efficient than fetching members first, then fetching each page's
+content separately.
+
+#### Pywikibot
+
+Pywikibot wraps the Action API with automatic pagination, rate limiting, and
+recursion. Its page generators are the recommended way to do anything beyond
+one-shot API calls.
+
+| Generator | CLI flag | Python method | Recursive? |
+|---|---|---|---|
+| Pages in a category | `-cat:Physics` | `pagegenerators.CategorizedPageGenerator(cat)` | `recurse=True` |
+| Pages including subcategories | `-catr:Physics` | Same with `recurse=True` | Yes (int for depth) |
+| Subcategories only | `-subcats:Physics` | `cat.subcategories()` | `recurse=True` |
+| Subcategories recursively | `-subcatsr:Physics` | Same with `recurse=True` | Yes (int for depth) |
+| All members (pages + subcats + files) | `-cat:Physics` (includes all) | `cat.members()` | `recurse=True` |
+
+**Programmatic usage:**
+
+```python
+import pywikibot
+from pywikibot import pagegenerators
+
+site = pywikibot.Site("en", "wikipedia")
+cat = pywikibot.Category(site, "Physics")
+
+# Member counts
+print(cat.categoryinfo)  # {"size": 68, "pages": 22, "files": 0, "subcats": 46}
+
+# Articles (non-recursive)
+for page in cat.articles():
+    print(page.title())
+
+# Subcategories, 2 levels deep
+for subcat in cat.subcategories(recurse=2):
+    print(subcat.title())
+
+# All members recursively (pages + subcategories + files)
+for member in cat.members(recurse=True):
+    print(member.title())
+```
+
+**Built-in scripts for category maintenance:**
+
+| Script | Purpose | Example |
+|---|---|---|
+| `category.py` | Add/remove/move/tidy/clean/tree/listify | `pwb.py category move -from:"Old" -to:"New"` |
+| `category_redirect` | Fix redirected categories | `pwb.py category_redirect -cat:"Category:Redirects"` |
+| `category_graph` | Visualize hierarchy as DOT/SVG/HTML | `pwb.py category_graph -from Physics -depth 3` |
+| `commonscat` | Add `{{commonscat}}` to category pages | `pwb.py commonscat -start:Category:!` |
+
+#### External Tools
+
+| Tool | Best for | How |
+|---|---|---|
+| **PetScan** | Category intersection + filtering | Web UI at `https://petscan.wmflabs.org/` or URL API |
+| **WDQS (SPARQL)** | Cross-wiki recursive category queries | `https://query.wikidata.org/sparql` |
+| **Special:CategoryTree** | Interactive manual browsing | Browser-based, expand/collapse |
+| **Special:Categories** | Discover all categories on a wiki | Alphabetical with member counts |
+
+**PetScan example URL** — find FA-class articles in Category:Physics:
+
+```
+https://petscan.wmflabs.org/?language=en&project=wikipedia&categories=Physics
+  &ns[0]=1&interface_language=en&wikidata_item=yes&templates_yes=WikiProject_Physics
+```
+
+**WDQS example** — find all subcategories recursively:
+
+```sparql
+SELECT ?category ?categoryLabel WHERE {
+  wd:Q413 wdt:P910 ?category .                        # Main topic's category
+  ?category wdt:P279* ?subcategory .                   # Recursive subcategories
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+```
+
+#### Trade-off Summary
+
+```
+Speed (fewer calls):
+  action=categorytree (1)  >  prop=categoryinfo (1)  >  list=categorymembers (N)  >  Pywikibot (N + overhead)
+
+Data richness:
+  Pywikibot (full objects)  >  list=categorymembers (IDs + metadata)  >  action=categorytree (link text only)
+
+Ease of use:
+  PetScan (web UI)  >  Pywikibot CLI (-catr)  >  Action API direct  >  action=categorytree (needs HTML parser)
+
+Stability:
+  list=categorymembers (stable, documented)  >  Pywikibot (stable, wraps API)  >  action=categorytree (unstable HTML)
+```
+
+---
+
 ## Quick Reference: API Patterns
 
 ```
