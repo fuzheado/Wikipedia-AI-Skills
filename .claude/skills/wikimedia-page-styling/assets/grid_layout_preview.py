@@ -14,6 +14,7 @@ Usage:
 
 import argparse
 import math
+import sys
 import textwrap
 
 
@@ -104,7 +105,12 @@ def main():
     parser.add_argument("--columns", type=int, help="Fixed number of columns (instead of auto-fit)")
     parser.add_argument("--output-css", action="store_true", help="Output CSS only")
     parser.add_argument("--preview", action="store_true", help="Show text preview")
-    
+
+    # Show help when invoked with no arguments (all have defaults)
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
     args = parser.parse_args()
     
     # Generate CSS

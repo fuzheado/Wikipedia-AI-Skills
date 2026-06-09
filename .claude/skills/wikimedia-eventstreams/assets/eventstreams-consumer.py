@@ -21,11 +21,15 @@ import sys
 import time
 from datetime import datetime, timezone
 
-try:
-    from requests_sse import EventSource
-except ImportError:
-    print("Install requests-sse: pip install requests-sse")
-    sys.exit(1)
+
+def _ensure_requests_sse():
+    """Lazy import so --help works without the dependency installed."""
+    try:
+        from requests_sse import EventSource
+        return EventSource
+    except ImportError:
+        print("Install requests-sse: pip install requests-sse", file=sys.stderr)
+        sys.exit(1)
 
 
 # ──────────────────────────────────────────────
@@ -62,6 +66,7 @@ class EventStreamsConsumer:
         last_id = None
         retry_delay = 1
         headers = {'User-Agent': self.user_agent}
+        EventSource = _ensure_requests_sse()
 
         while True:
             try:
@@ -165,6 +170,13 @@ def main():
                         help='Show all events from all wikis (no filter)')
     parser.add_argument('--format', choices=['json', 'text'], default='text',
                         help='Output format')
+
+    # Show help when invoked with no arguments (connecting to a live
+    # stream is expensive and should not happen accidentally)
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
     args = parser.parse_args()
 
     consumer = EventStreamsConsumer(

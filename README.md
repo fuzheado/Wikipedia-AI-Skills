@@ -247,6 +247,19 @@ The extension checks these locations in order (first match wins):
 
 ---
 
+## Script compliance
+
+All shell and Python scripts in this repository follow a **script compliance standard**
+defined in [`.claude/guidelines/script-audit-guidelines.md`](.claude/guidelines/script-audit-guidelines.md):
+
+- ✅ **Zero-argument guard** — every script prints a helpful usage message when invoked with no arguments
+- ✅ **Portable bash** — no bash 4+ features (`declare -A`, `${var,,}`) that break on macOS's default bash 3.2
+- ✅ **Safe piped output** — `curl | python3` patterns use temp files with HTTP status checks instead of silently passing empty/invalid input
+- ✅ **`--help` support** — every script responds to `--help` with full documentation
+- ✅ **Deferred imports** — Python scripts with optional dependencies show help before crashing on missing imports
+
+See the [full guidelines](.claude/guidelines/script-audit-guidelines.md) for the pre-commit hook, CI workflow templates, and checklist for new scripts.
+
 ## Testing
 
 New contributions should include tests. The project uses `pytest` with a test suite in

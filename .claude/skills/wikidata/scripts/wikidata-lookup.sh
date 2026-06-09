@@ -30,10 +30,24 @@ echo ""
 API="https://www.wikidata.org/w/api.php"
 PARAMS="action=wbgetentities&ids=$ID&props=labels|descriptions|aliases|claims|sitelinks&languages=en&format=json"
 
-curl -s -H "User-Agent: $UA" "$API?$PARAMS" | python3 -c "
+TMPFILE=$(mktemp /tmp/wikidata-lookup.XXXXXX)
+trap 'rm -f "$TMPFILE"' EXIT
+
+curl -s -w "\n%{http_code}" -H "User-Agent: $UA" "$API?$PARAMS" > "$TMPFILE" 2>&1 || true
+
+HTTP_CODE=$(tail -1 "$TMPFILE")
+sed '$d' "$TMPFILE" > "${TMPFILE}.body"
+
+if [ "$HTTP_CODE" != "200" ]; then
+    echo "Error: API returned HTTP $HTTP_CODE" >&2
+    exit 1
+fi
+
+python3 -c "
 import json, sys
 
-data = json.load(sys.stdin)
+with open('${TMPFILE}.body') as f:
+    data = json.load(f)
 entities = data.get('entities', {})
 if not entities:
     print('Entity not found.')

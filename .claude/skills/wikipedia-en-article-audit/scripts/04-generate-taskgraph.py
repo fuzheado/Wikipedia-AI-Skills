@@ -5,13 +5,9 @@
 Reads diagnosis.json + verification.json and produces:
   - taskgraph.json   (validated task DAG)
   - analysis.md      (human-readable report)
-
-Usage:
-  python3 scripts/04-generate-taskgraph.py
-  python3 scripts/04-generate-taskgraph.py --project-dir /path/to/project
-  python3 scripts/04-generate-taskgraph.py --force
 """
 
+import argparse
 import json
 import os
 import re
@@ -260,19 +256,31 @@ def generate_analysis_md(diagnosis, verification, tasks):
 # ── Main ────────────────────────────────────────────────────────────
 
 def main():
-    project_dir = Path.cwd()
-    force = False
+    parser = argparse.ArgumentParser(
+        description="Generate taskgraph.json and analysis.md from diagnosis.json + verification.json",
+    )
+    parser.add_argument(
+        "--project-dir", default=".",
+        help="Project directory containing diagnosis.json and verification.json (default: .)"
+    )
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Overwrite analysis.md even if verification.json is newer"
+    )
 
-    args = sys.argv[1:]
-    while args:
-        if args[0] == "--project-dir" and len(args) > 1:
-            project_dir = Path(args[1])
-            args = args[2:]
-        elif args[0] == "--force":
-            force = True
-            args = args[1:]
-        else:
-            args = args[1:]
+    # Show help when invoked with no arguments
+    if len(sys.argv) == 1:
+        parser.print_help()
+        print(file=sys.stderr)
+        print("Examples:", file=sys.stderr)
+        print("  python3 scripts/04-generate-taskgraph.py", file=sys.stderr)
+        print("  python3 scripts/04-generate-taskgraph.py --project-dir /path/to/project", file=sys.stderr)
+        print("  python3 scripts/04-generate-taskgraph.py --force", file=sys.stderr)
+        sys.exit(1)
+
+    args = parser.parse_args()
+    project_dir = Path(args.project_dir)
+    force = args.force
 
     # Load inputs
     diagnosis_path = project_dir / "diagnosis.json"

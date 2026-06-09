@@ -196,7 +196,14 @@ def main():
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     
     args = parser.parse_args()
-    
+
+    # Early validation: require either template or --project
+    if not args.template and not args.project:
+        parser.print_help()
+        print()
+        print("Error: Specify a template name or --project.")
+        sys.exit(1)
+
     if args.project:
         templates = get_project_templates(args.wiki, args.project)
         print(f"Scanning {len(templates)} templates in project '{args.project}'...")
@@ -273,7 +280,11 @@ def main():
             print(f"\n  🎨 Uses TemplateStyles")
     
     else:
+        # Safety net — should be unreachable due to early validation above
+        parser.print_help()
+        print()
         print("Error: Specify a template name or --project.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

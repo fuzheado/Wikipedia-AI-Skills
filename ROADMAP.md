@@ -108,6 +108,8 @@
 
 ### Completed improvements
 
+- **Script compliance audit** — Completed a full audit of all 33+ shell and Python scripts across all skills. Fixed 8 scripts with missing zero-argument guards, bash 4+ incompatibilities (`declare -A` → `case`), unsafe `curl | python3` pipes (→ temp files with HTTP status checks), non-portable `mktemp` templates, deferred imports that blocked `--help`. Published `.claude/guidelines/script-audit-guidelines.md` with compliance standard, pre-commit hook template, and CI workflow template.
+
 - **`wikipedia-categories` skill** — new skill covering the Wikipedia category system end-to-end: tree hierarchy, three validity tests (Verifiable/Neutral/Defining), topic vs. set categories, sort keys and DEFAULTSORT, comprehensive comparison of all access methods (Action API, Pywikibot, PetScan, WDQS, Special pages) with trade-off analysis, Pywikibot generators and built-in scripts, overcategorization rules, naming conventions, and category maintenance. Ships with 2 reference docs, 1 CLI script, and 2 Python assets. The proposal was written first in `proposals/categories-skill.md` before implementation.
 
 - **Title Format Guide** (section 11 of `wikimedia-api-access/references/endpoints.md`) — cross-API table documenting underscore-vs-space title formats across 6 endpoints, with correct/wrong code comparison. Fixes the single most costly bug when chaining Pageviews, Action API, and SQL results.

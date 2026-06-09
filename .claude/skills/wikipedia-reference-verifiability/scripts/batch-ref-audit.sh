@@ -1,10 +1,33 @@
 #!/usr/bin/env bash
 # Batch reference audit for recently created Wikipedia pages.
 # Combines the PageTriage two-pass pipeline with reference URL analysis.
-#
-# Usage: ./batch-ref-audit.sh [--days 7] [--limit 100] [--no-quality]
 
 set -euo pipefail
+
+show_usage() {
+    cat <<EOF
+Usage: $(basename "$0") [options]
+
+Audit recently-created Wikipedia pages for references that lack URLs.
+Combines the PageTriage two-pass pipeline with reference URL analysis.
+
+OPTIONS:
+  --days N       Days back to scan (default: 7)
+  --limit N      Max pages to analyze (default: 100)
+  --no-quality   Skip ML quality predictions
+  --help         Show this help and exit
+
+EXAMPLES:
+  $(basename "$0")                         # last 7 days, 100 pages
+  $(basename "$0") --days 3 --limit 50      # last 3 days, 50 pages
+  $(basename "$0") --days 1 --no-quality    # yesterday, skip ML
+EOF
+    exit 0
+}
+
+if [ $# -eq 0 ]; then
+    show_usage
+fi
 
 DAYS=7
 LIMIT=100
@@ -15,7 +38,8 @@ while [ $# -gt 0 ]; do
         --days) DAYS="$2"; shift 2 ;;
         --limit) LIMIT="$2"; shift 2 ;;
         --no-quality) NO_QUALITY="--no-quality"; shift ;;
-        *) echo "Unknown option: $1"; exit 1 ;;
+        --help|-h) show_usage ;;
+        *) echo "Unknown option: $1" >&2; echo "Usage: $(basename "$0") --help" >&2; exit 1 ;;
     esac
 done
 

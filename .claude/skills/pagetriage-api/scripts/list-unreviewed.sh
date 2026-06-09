@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # List unreviewed mainspace pages via the PageTriage API.
-# Usage: ./list-unreviewed.sh <wiki> [limit]
+#
+# Usage: ./list-unreviewed.sh [wiki] [limit]
 #   wiki:  enwiki (default), testwiki, ruwiki, etc.
 #   limit: number of results (default 50)
 #
@@ -9,17 +10,30 @@
 
 set -euo pipefail
 
+if [ $# -eq 0 ]; then
+    echo "Usage: $(basename "$0") [wiki] [limit]" >&2
+    echo "" >&2
+    echo "List unreviewed mainspace pages via the PageTriage API." >&2
+    echo "" >&2
+    echo "  wiki   Wiki short name: enwiki (default), testwiki, ruwiki" >&2
+    echo "  limit  Number of results (default 50)" >&2
+    echo "" >&2
+    echo "Examples:" >&2
+    echo "  $(basename "$0")                  # enwiki, 50 results" >&2
+    echo "  $(basename "$0") testwiki 10       # testwiki, 10 results" >&2
+    exit 1
+fi
+
 WIKI="${1:-enwiki}"
 LIMIT="${2:-50}"
 
-# Map wiki short name to domain
-declare -A DOMAINS
-DOMAINS=(
-  [enwiki]="en.wikipedia.org"
-  [testwiki]="test.wikipedia.org"
-  [ruwiki]="ru.wikipedia.org"
-)
-DOMAIN="${DOMAINS[$WIKI]:-${WIKI}.wikipedia.org}"
+# Map wiki short name to domain (portable, no bash 4+ associative arrays)
+case "$WIKI" in
+    enwiki)  DOMAIN="en.wikipedia.org" ;;
+    testwiki) DOMAIN="test.wikipedia.org" ;;
+    ruwiki)  DOMAIN="ru.wikipedia.org" ;;
+    *)       DOMAIN="${WIKI}.wikipedia.org" ;;
+esac
 
 API="https://${DOMAIN}/w/api.php"
 

@@ -26,7 +26,7 @@ echo ""
 # See: https://gitlab.wikimedia.org/repos/data-engineering/airflow-dags/-/blob/main/main/dags/commons/commons_category_allow_list.tsv
 COMMONS_CATEGORY="Smithsonian_American_Art_Museum"
 
-TMPDIR=$(mktemp -d /tmp/wikimedia-api-test.XXXXXX)
+TMPDIR=$(mktemp -d 2>/dev/null || mktemp -d -t wikimedia-api)
 trap 'rm -rf "$TMPDIR"' EXIT
 
 # ──────────────────────────────────────────────

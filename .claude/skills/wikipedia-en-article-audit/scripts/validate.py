@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 """
 validate.py — Validate a taskgraph.json against its schema.
-
-Usage:
-    python3 validate.py                         # validate the default taskgraph.json
-    python3 validate.py path/to/taskgraph.json  # validate a specific file
 """
 
+import argparse
 import json
 import sys
 import os
@@ -67,10 +64,24 @@ def check_verify_steps(tasks):
     return warnings
 
 def main():
-    if len(sys.argv) > 1:
-        graph_path = Path(sys.argv[1])
-    else:
-        graph_path = HERE / "taskgraph.json"
+    parser = argparse.ArgumentParser(
+        description="Validate a taskgraph.json against its JSON Schema and DAG structure",
+    )
+    parser.add_argument(
+        "graph_path", nargs="?", default=HERE / "taskgraph.json",
+        help="Path to taskgraph.json (default: taskgraph.json in script directory)"
+    )
+
+    if len(sys.argv) == 1 and not (HERE / "taskgraph.json").exists():
+        parser.print_help()
+        print(file=sys.stderr)
+        print("Examples:", file=sys.stderr)
+        print(f"  python3 scripts/validate.py", file=sys.stderr)
+        print(f"  python3 scripts/validate.py path/to/taskgraph.json", file=sys.stderr)
+        sys.exit(1)
+
+    args = parser.parse_args()
+    graph_path = Path(args.graph_path)
     schema_path = HERE / "taskgraph.schema.json"
 
     if not graph_path.exists():

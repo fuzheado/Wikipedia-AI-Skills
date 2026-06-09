@@ -256,6 +256,13 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--days", type=int, default=3, help="Days back")
     p.add_argument("--limit", type=int, default=50, help="Max pages")
     p.add_argument("--no-quality", action="store_true", help="Skip ML predictions")
+
+    # Show help when invoked with no arguments (all have defaults, so
+    # argparse won't do this automatically)
+    if len(sys.argv) == 1:
+        p.print_help()
+        sys.exit(1)
+
     return p.parse_args()
 
 

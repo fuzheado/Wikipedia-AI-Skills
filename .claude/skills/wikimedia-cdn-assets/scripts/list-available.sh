@@ -29,9 +29,24 @@ echo ""
 
 API_URL="https://api.cdnjs.com/libraries?search=${SEARCH}&fields=version,latest,name,description"
 
-curl -s -H "User-Agent: CDNCheck/1.0" --max-time 15 "$API_URL" | python3 -c "
+TMPFILE=$(mktemp /tmp/cdnjs-search.XXXXXX)
+trap 'rm -f "$TMPFILE"' EXIT
+
+curl -s -w "\n%{http_code}" -H "User-Agent: CDNCheck/1.0" --max-time 15 "$API_URL" > "$TMPFILE" 2>&1 || true
+
+HTTP_CODE=$(tail -1 "$TMPFILE")
+sed '$d' "$TMPFILE" > "${TMPFILE}.body"
+
+if [ "$HTTP_CODE" != "200" ]; then
+    echo -e "${RED}❌ API returned HTTP ${HTTP_CODE}${NC}" >&2
+    exit 1
+fi
+
+python3 -c "
 import json, sys
-data = json.load(sys.stdin)
+
+with open('${TMPFILE}.body') as f:
+    data = json.load(f)
 results = data.get('results', [])
 limit = min(int(sys.argv[1]), len(results))
 
@@ -53,4 +68,4 @@ for r in results[:limit]:
     print(f'{name:<30} {version:<12} {path:<50}')
 print()
 print(f'Showing top {limit} of {len(results)} results.')
-" "$LIMIT" 2>/dev/null || echo -e "${RED}API request failed${NC}"
+" "$LIMIT"
