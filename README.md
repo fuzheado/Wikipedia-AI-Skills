@@ -39,10 +39,15 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [wikidata-vector-search](.claude/skills/wikidata-vector-search/SKILL.md) | Query Wikidata by meaning, concept, or natural-language description using the Wikidata Vector Database's semantic embeddings — fuzzy semantic search, "find like this", cross-lingual retrieval, and similarity scoring when you don't know the exact QID or label |
 | [wikipedia-citations](.claude/skills/wikipedia-citations/SKILL.md) | Master Wikipedia citations — CS1/CS2 templates, Wayback Machine archiving, dead link detection, bare URL expansion, citation validation, and maintenance templates |
 | [wikimedia-commons](.claude/skills/wikimedia-commons/SKILL.md) | Search, upload, and understand Wikimedia Commons — the free media repository of images, video, sound, 3D files, PDFs, and other media used across Wikipedia and its sister projects. Browse categories, find reusable media, and retrieve file metadata |
+| [wikipedia-wikitables](.claude/skills/wikipedia-wikitables/SKILL.md) | Create, parse, style, and fix MediaWiki wikitable syntax — delimiters, header/data cells, CSS classes, inline CSS styling (alignment, colors, backgrounds), rowspan/colspan, accessibility `scope` attributes, sortable and collapsible tables, and programmatic table generation from Python/CSV data |
+| [wikimedia-page-styling](.claude/skills/wikimedia-page-styling/SKILL.md) | Use TemplateStyles to load custom CSS on wiki pages — build responsive grid/flexbox layouts, card-based tile systems, color themes, button systems, and full visual design systems that transform plain wiki pages into rich, interactive-looking interfaces |
+| [mediawiki-page-navigation](.claude/skills/mediawiki-page-navigation/SKILL.md) | Build navigation systems in MediaWiki — menu bars, subpage hierarchies, breadcrumbs, tabs, and the template logic that powers them. Covers `#titleparts`, `#ifexist`, dynamic sub-navigation loading, and page-hierarchy-aware link generation |
+| [mediawiki-translate-extension](.claude/skills/mediawiki-translate-extension/SKILL.md) | Work with the Translate extension for multilingual wiki content — marking pages for translation, writing translatable templates, using `#timef` for locale-aware dates, managing language subpages, and building i18n-aware navigation |
 | | **▸ Analyzing Articles** |
 | [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties or the REST API |
 | [wikimedia-page-assessment](.claude/skills/wikimedia-page-assessment/SKILL.md) | Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners on any Wikimedia wiki with the PageAssessments extension |
 | [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) | Score article quality, revert risk, edit quality (goodfaith/damaging), readability, topic classification, reference quality, language identification, content translation recommendations, article descriptions, and article country using Wikimedia ML inference APIs (Lift Wing and legacy ORES) |
+| [wikipedia-reference-verifiability](.claude/skills/wikipedia-reference-verifiability/SKILL.md) | Analyze whether a page's references contain URLs — detect bare plain-text citations, template-based citations without `url=` parameters, shortened footnotes (harvsp/sfn), and named ref reuse. Useful for article quality assessment, NPP review triage, and citation maintenance |
 | | **▸ Writing & Improving** |
 | [wikipedia-en-biography-writing](.claude/skills/wikipedia-en-biography-writing/SKILL.md) | Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and biographies of living persons (BLP) policies |
 | [wikipedia-en-article-audit](.claude/skills/wikipedia-en-article-audit/SKILL.md) | Audit a Wikipedia article for structural issues, factual errors, and NPOV violations, then produce a machine-readable task graph (DAG) that another agent can execute to fix all identified problems |
@@ -60,6 +65,8 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [wikimedia-eventstreams](.claude/skills/wikimedia-eventstreams/SKILL.md) | Consume real-time streams of Wikimedia events (edits, page creations, deletions, moves, log entries) via Server-Sent Events (SSE). Covers all available streams, event schemas, client libraries (Python/JS/curl), client-side filtering, historical replay, canary event handling, and building live dashboards, patrol monitors, and cross-wiki trackers |
 | [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) | Score revisions and articles using Lift Wing ML models — revert risk, article quality, topic classification, readability, reference quality, language identification, and more. Includes ORES migration guidance |
 | [wikipedia-citations](.claude/skills/wikipedia-citations/SKILL.md) | Master Wikipedia citations — CS1/CS2 templates, Wayback Machine archiving, dead link detection, bare URL expansion, citation validation, and maintenance templates |
+| [pagetriage-api](.claude/skills/pagetriage-api/SKILL.md) | Work with the PageTriage extension (New Pages Feed / Page Curation) — list unreviewed pages, check patrol status, tag pages, and patrol new content on wikis where PageTriage is deployed (primarily enwiki) |
+| [wikipedia-reference-verifiability](.claude/skills/wikipedia-reference-verifiability/SKILL.md) | Analyze whether a page's references contain URLs — detect bare plain-text citations, template-based citations without `url=` parameters, shortened footnotes, and named ref reuse |
 
 ---
 
@@ -82,6 +89,10 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | Participate in talk page discussions, sign comments, and find WikiProject assessments | `wikipedia-talk-page` |
 | | **▸ Working with Content** |
 | Extract infobox data, citations, or internal links from an article's wikitext | `wikimedia-wikitext` |
+| Create, style, or parse a MediaWiki table from scratch | `wikipedia-wikitables` |
+| Add custom CSS styling to a wiki page using TemplateStyles | `wikimedia-page-styling` |
+| Build navigation bars, breadcrumbs, or subpage hierarchies | `mediawiki-page-navigation` |
+| Set up a page for translation into multiple languages | `mediawiki-translate-extension` |
 | Query Wikidata for structured facts (e.g., "all museums in Paris with coordinates") | `wikidata` |
 | Classify Wikipedia articles by entity type (person, place, film, organization) | `wikidata` (batch entity classification SOP) |
 | Search Wikidata by meaning, description, or concept when you don't know the exact label | `wikidata-vector-search` |
@@ -99,6 +110,8 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | | **▸ Analyzing Articles** |
 | Check how popular an article is and see its traffic trends | `wikimedia-pageviews` |
 | Find article quality ratings (FA/GA/B/C/Start/Stub) and WikiProject assessments | `wikimedia-page-assessment` |
+| Check whether a page's references have any clickable URLs | `wikipedia-reference-verifiability` |
+| Find new Wikipedia pages with suspicious (URL-free) references | `pagetriage-api` (two-pass pipeline) or `wikipedia-reference-verifiability` |
 | Score the latest edit to a page and get a patrol verdict (revert risk + goodfaith + damaging) | `python3 .claude/skills/wikimedia-ml-services/assets/patrol_simulator.py Albert_Einstein` |
 | Get a full article quality report (quality + readability + topics + reference risk) | `python3 .claude/skills/wikimedia-ml-services/assets/article_quality_report.py Albert_Einstein en` |
 | Score a single revision against multiple models in parallel with caching | `python3 .claude/skills/wikimedia-ml-services/assets/liftwing_multi_model.py enwiki 123456789 --all` |
@@ -119,6 +132,8 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | Harvest infobox data from Wikipedia into Wikidata statements | `pywikibot` (harvest_template script) |
 | Fix redirected categories across an entire wiki | `pywikibot` (category_redirect script) |
 | Transfer images from a local wiki to Wikimedia Commons with full attribution history | `pywikibot` (image_transfer script) |
+| List unreviewed pages in the New Pages Feed queue | `pagetriage-api` (requires patrol right) |
+| Check a page's review/patrol status | `pagetriage-api` |
 | Watch Wikipedia edits happen in real time as a live feed | `wikimedia-eventstreams` |
 | Build a live dashboard showing edits per minute or active editors | `wikimedia-eventstreams` |
 | Monitor cross-wiki activity by the same user across multiple projects simultaneously | `wikimedia-eventstreams` |

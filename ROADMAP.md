@@ -43,6 +43,18 @@
 
 - **wikimedia-eventstreams** — Complete. Covers the EventStreams HTTP service (SSE-based real-time event streaming). Includes the complete stream catalog (18 streams: recentchange, revision-create, page-create, page-delete, page-move, page-links-change, revision-tags-change, ML prediction streams, Wikidata RDF mutation streams, and more), event schema reference for all recentchange fields with wiki/type/namespace/user/bot metadata, client libraries (Python `requests-sse`, Pywikibot `comms.eventstreams.EventStreams`, Node.js `wikimedia-streams`, browser `EventSource`, `curl` + `jq`), client-side filtering patterns (by wiki, type, namespace, user, bot flag, title pattern), mandatory canary event handling (`meta.domain === 'canary'`), connection lifecycle management with auto-reconnect using `Last-Event-ID`, historical replay via `?since=`, 15-minute timeout handling, and real-world tool patterns (live edit counter, cross-wiki monitor, Wikidata batch edit detector, patrol monitor). Ships with `assets/eventstreams-consumer.py` (207 lines, reusable Python consumer with CLI args, filters, and auto-reconnect), `references/stream-schemas.md` (compact field reference for all stream schemas), and `scripts/test-eventstreams.sh` (connectivity verification script).
 
+- **wikimedia-page-styling** — Complete. Covers TemplateStyles for loading custom CSS on wiki pages — responsive grid/flexbox layouts, card-based tile systems, color themes, button systems, and full visual design systems that transform plain wiki pages into rich, interactive-looking interfaces.
+
+- **mediawiki-page-navigation** — Complete. Covers building navigation systems in MediaWiki — menu bars, subpage hierarchies, breadcrumbs, tabs, and the template logic that powers them. Includes `#titleparts` parsing, `#ifexist` link validation, dynamic sub-navigation loading, menu bar design, and page-hierarchy-aware link generation.
+
+- **mediawiki-translate-extension** — Complete. Covers the Translate extension for multilingual wiki content — marking pages for translation with `<translate>` tags, writing translatable templates (avoiding `{{PLURAL:}}` inside translate tags, using `{{formatnum:}}` for locale-aware numbers), using `#timef` for locale-aware date formatting, managing language subpages, and building i18n-aware navigation.
+
+- **wikipedia-reference-verifiability** — Complete. Covers analyzing whether a page's references contain URLs — detecting bare plain-text citations, template-based citations without `url=` parameters (18+ parameter names), shortened footnotes (harvsp/sfn/harvnb), and named ref reuse. Ships with `scripts/check-ref-urls.sh`, `scripts/batch-ref-audit.sh`, `assets/ref_url_checker.py` (importable library with `has_any_url_refs`, `has_infobox`, `get_shortened_footnotes`), and a 27-test test suite.
+
+- **pagetriage-api** — Complete. Covers the PageTriage extension API — listing unreviewed pages (`action=pagetriagelist`), marking pages reviewed/unreviewed (`action=pagetriageaction`), applying curation tags (`action=pagetriagetagging`), and the legacy `unreviewedpages` API. Documents the patrol permission model, review status codes (0=unreviewed through 3=autopatrolled), and the `pagetriage_page` SQL table. Front matter warns that PageTriage is primarily deployed on enwiki and testwiki only. Ships with `scripts/list-unreviewed.sh`, `scripts/check-status.sh`, `assets/pagetriage_client.py` (Python API client), and `assets/patrol_simulator.py` (two-pass pipeline demo).
+
+- **wikipedia-wikitables** — Complete. Covers creating, parsing, styling, and fixing MediaWiki wikitable syntax — delimiters (`{|`, `|}`, `|-`, `|+`), header vs. data cells (`!` vs. `|`), 6 built-in CSS classes and their combinations (`wikitable`, `sortable`, `mw-collapsible`, `mw-collapsed`, `mw-datatable`, `sortbottom`), inline CSS at table/row/cell level (alignment, colors, spacing, borders), accessibility (`scope` attributes), colspan/rowspan, and programmatic generation from Python dicts or CSV. Ships with `scripts/wikitable-to-html.sh` (preview in browser), `scripts/generate-table.sh` (CSV → wikitable), `assets/wikitable_tools.py` (importable library with `dicts_to_wikitable`, `parse_wikitable`, `style_cell`, `csv_to_wikitable`), and a 25-test test suite.
+
 ### Project infrastructure
 
 - `.claude/skills/<name>/SKILL.md` directory structure with YAML frontmatter (name, description, license, compatibility)
@@ -127,8 +139,8 @@ See **[AGENT-INTEGRATION-STRATEGY.md](AGENT-INTEGRATION-STRATEGY.md)** for the f
 - Write CONTRIBUTING.md with skill authoring guidelines ✅
 - Set up a GitHub issue template for skill suggestions
 - Add `.claude.json` project configuration for agent discovery ✅
-- **Add skill tests** ✅ — `pytest`-based test suite in `tests/` with 210 tests:
-    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 20 skills (5 checks each: exists, required fields, description length, MIT license, directory match; duplicate entries removed)
+- **Add skill tests** ✅ — `pytest`-based test suite in `tests/` with 290 tests:
+    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 28 skills (5 checks each: exists, required fields, description length, MIT license, directory match; duplicate entries removed)
     - `test_cross_api_pipeline.py`: Mock-based unit tests for the pipeline script (title normalization, batch splitting, P31 classification, citation counting, namespace filtering)
     - `test_markdown_sops.py`: Content-accuracy checks for new/modified SOPs (batch entity classification, Scenario C, Title Format Guide, 429 Retry-After)
     - `test_liftwing_multi_model.py`: Mock-based tests for the Lift Wing multi-model scorer (cache, extractors, formatting, error handling)

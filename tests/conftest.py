@@ -16,6 +16,9 @@ sys.path.insert(0, str(SKILLS_DIR / 'wikimedia-api-access' / 'assets'))
 
 # All skill directories (alphabetical order, no duplicates)
 SKILL_NAMES = [
+    'mediawiki-page-navigation',
+    'mediawiki-translate-extension',
+    'pagetriage-api',
     'pywikibot',
     'wikidata',
     'wikidata-vector-search',
@@ -29,6 +32,7 @@ SKILL_NAMES = [
     'wikimedia-eventstreams',
     'wikimedia-ml-services',
     'wikimedia-page-assessment',
+    'wikimedia-page-styling',
     'wikimedia-pageviews',
     'wikimedia-toolforge',
     'wikimedia-wikitext',
@@ -36,8 +40,10 @@ SKILL_NAMES = [
     'wikipedia-en-article-audit',
     'wikipedia-en-biography-writing',
     'wikipedia-page-anatomy',
+    'wikipedia-reference-verifiability',
     'wikipedia-talk-page',
     'wikipedia-templates',
+    'wikipedia-wikitables',
 ]
 
 
