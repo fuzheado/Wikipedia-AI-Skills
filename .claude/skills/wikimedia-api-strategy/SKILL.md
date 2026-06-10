@@ -1,5 +1,5 @@
 ---
-name: wikipedia-api-strategy
+name: wikimedia-api-strategy
 description: Choose the right Wikimedia API or tool for the task — a decision framework covering REST API, Action API, SPARQL, SQL database replicas, EventStreams, and Pywikibot, with latency/complexity/authentication trade-offs for each approach
 depends_on: [wikimedia-api-access]
 license: MIT

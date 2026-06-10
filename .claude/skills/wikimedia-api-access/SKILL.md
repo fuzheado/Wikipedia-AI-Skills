@@ -9,6 +9,8 @@ All requests to Wikimedia APIs **must** include a descriptive `User-Agent` heade
 
 > **💡 Pi users:** If you use the [pi coding agent](https://github.com/earendil-works/pi), install the companion extension from this repo to **automatically inject the User-Agent header** on every `curl`, `wget`, `python`, and `node` command that targets a Wikimedia server — no manual intervention needed. See the [README](../../../README.md#pi-agent-setup) for setup instructions.
 
+> 💡 **Not sure which tool to use?** See **[wikimedia-api-strategy](../wikimedia-api-strategy/SKILL.md)** for a decision framework comparing REST API, Action API, SPARQL, SQL replicas, EventStreams, and Pywikibot — with latency/complexity/authentication trade-offs and common anti-patterns.
+
 ## **User-Agent Format**
 
 The generic format is:
