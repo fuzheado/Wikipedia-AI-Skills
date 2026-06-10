@@ -55,7 +55,7 @@ params = {
     "prop": "diff|diffsize|ids|title|size",
     "format": "json",
 }
-resp = requests.get("https://en.wikipedia.org/w/api.php", params=params, headers=headers)
+resp = requests.get("https://en.wikipedia.org/w/api.php", params=params, headers=headers, timeout=30)
 data = resp.json()
 ```
 
@@ -75,7 +75,7 @@ rv = s.get(API, params={
     "action": "query", "prop": "revisions",
     "titles": "Python (programming language)",
     "rvlimit": "2", "rvprop": "ids", "format": "json",
-}).json()
+}, timeout=30).json()
 page = list(rv["query"]["pages"].values())[0]
 revs = page["revisions"]
 from_rev, to_rev = revs[1]["revid"], revs[0]["revid"]
@@ -85,7 +85,7 @@ diff = s.get(API, params={
     "action": "compare",
     "fromrev": from_rev, "torev": to_rev,
     "prop": "diff|diffsize|ids|title|size", "format": "json",
-}).json()
+}, timeout=30).json()
 ```
 
 ### Response Fields
@@ -145,7 +145,7 @@ import requests
 headers = {"User-Agent": "MyBot/1.0 (user@example.com)"}
 url = "https://en.wikipedia.org/w/rest.php/v1/revision/123456789/compare/123456790"
 
-resp = requests.get(url, headers=headers)
+resp = requests.get(url, headers=headers, timeout=30)
 data = resp.json()
 ```
 

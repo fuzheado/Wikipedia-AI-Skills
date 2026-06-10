@@ -202,6 +202,25 @@ with EventSource(url, headers=headers) as stream:
             if change['meta']['domain'] == 'canary':
                 continue
             print(f"{change['user']} edited {change['title']}")
+
+# Each event is a dict with this structure:
+# {
+#   "event": "recentchange",
+#   "id": "123456789",
+#   "type": "edit" | "new" | "log" | "categorize",
+#   "namespace": 0,
+#   "title": "Albert Einstein",
+#   "user": "SomeEditor",
+#   "bot": false,
+#   "minor": false,
+#   "timestamp": 1717000000,
+#   "comment": "/* section */ edit summary",
+#   "wiki": "enwiki",
+#   "revision": {"old": 123456788, "new": 123456789},
+#   "meta": {"domain": "en.wikipedia.org", "uri": "...", ...}
+# }
+# Access: change["title"], change["user"], change["timestamp"]
+# Always check: change["meta"]["domain"] != "canary"
 ```
 
 ### 3. Python (with Pywikibot — recommended)

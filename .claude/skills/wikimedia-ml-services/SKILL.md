@@ -94,7 +94,7 @@ headers = {
 url = "https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-articlequality:predict"
 data = {"rev_id": 123456789}
 
-resp = requests.post(url, json=data, headers=headers)
+resp = requests.post(url, json=data, headers=headers, timeout=30)
 result = resp.json()
 ```
 
@@ -217,7 +217,7 @@ def score_revision_revscoring(wiki: str, rev_id: int, model: str) -> dict:
     Note: Revscoring models return the old ORES response format.
     """
     url = f"https://api.wikimedia.org/service/lw/inference/v1/models/{wiki}-{model}:predict"
-    resp = requests.post(url, json={"rev_id": rev_id}, headers=HEADERS)
+    resp = requests.post(url, json={"rev_id": rev_id}, headers=HEADERS, timeout=30)
     resp.raise_for_status()
     return resp.json()
 
@@ -244,7 +244,7 @@ headers = {"User-Agent": "MyBot/1.0 (user@example.com) ContentGapResearch"}
 url = "https://api.wikimedia.org/service/lw/inference/v1/models/revertrisk-language-agnostic:predict"
 data = {"rev_id": 123456789, "lang": "en"}
 
-resp = requests.post(url, json=data, headers=headers)
+resp = requests.post(url, json=data, headers=headers, timeout=30)
 result = resp.json()
 # result["output"]["prediction"] is a bool (false = safe, true = likely reverted)
 # result["output"]["probabilities"]["true"] is a float 0.0–1.0
@@ -284,7 +284,7 @@ headers = {"User-Agent": "MyBot/1.0 (user@example.com) ContentGapResearch"}
 url = "https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-articlequality:predict"
 data = {"rev_id": 123456789}
 
-resp = requests.post(url, json=data, headers=headers)
+resp = requests.post(url, json=data, headers=headers, timeout=30)
 result = resp.json()
 scores = result["enwiki"]["scores"]["123456789"]["articlequality"]["score"]
 grade = scores["prediction"]          # "FA", "GA", "B", "C", "Start", "Stub"
@@ -322,7 +322,7 @@ headers = {"User-Agent": "MyBot/1.0 (user@example.com) ContentGapResearch"}
 url = "https://api.wikimedia.org/service/lw/inference/v1/models/outlink-topic-model:predict"
 data = {"page_title": "Douglas_Adams", "lang": "en"}
 
-resp = requests.post(url, json=data, headers=headers)
+resp = requests.post(url, json=data, headers=headers, timeout=30)
 result = resp.json()
 # result["prediction"]["results"] is an array of {topic, score} objects:
 # [
@@ -363,7 +363,7 @@ headers = {"User-Agent": "MyBot/1.0 (user@example.com) ContentGapResearch"}
 url = "https://api.wikimedia.org/service/lw/inference/v1/models/readability:predict"
 data = {"rev_id": 123456789, "lang": "en"}
 
-resp = requests.post(url, json=data, headers=headers)
+resp = requests.post(url, json=data, headers=headers, timeout=30)
 result = resp.json()
 # Takes rev_id (not page_title). Returns:
 # result["output"]["score"] is a float 0–1 readability score
@@ -396,7 +396,7 @@ headers = {"User-Agent": "MyBot/1.0 (user@example.com) ContentGapResearch"}
 url = "https://api.wikimedia.org/service/lw/inference/v1/models/reference-need:predict"
 data = {"rev_id": 123456789, "lang": "en"}
 
-resp = requests.post(url, json=data, headers=headers)
+resp = requests.post(url, json=data, headers=headers, timeout=30)
 result = resp.json()
 # Returns a single reference_need_score (float 0–1), not per-sentence breakdown:
 # result["reference_need_score"] — higher = more claims need citations
@@ -410,7 +410,7 @@ score = result["reference_need_score"]
 url = "https://api.wikimedia.org/service/lw/inference/v1/models/reference-risk:predict"
 data = {"rev_id": 123456789, "lang": "en"}
 
-resp = requests.post(url, json=data, headers=headers)
+resp = requests.post(url, json=data, headers=headers, timeout=30)
 result = resp.json()
 # Returns:
 # result["reference_risk_score"] — float, higher = riskier citations
@@ -433,7 +433,7 @@ headers = {"User-Agent": "MyBot/1.0 (user@example.com) ContentGapResearch"}
 url = "https://api.wikimedia.org/service/lw/inference/v1/models/langid:predict"
 data = {"text": "Albert Einstein was a German-born theoretical physicist."}
 
-resp = requests.post(url, json=data, headers=headers)
+resp = requests.post(url, json=data, headers=headers, timeout=30)
 result = resp.json()
 # result["wikicode"] is the language code, e.g., "en"
 # result["score"] is the confidence (float 0–1)
@@ -458,7 +458,7 @@ headers = {"User-Agent": "MyBot/1.0 (user@example.com) ContentGapResearch"}
 url = "https://api.wikimedia.org/service/lw/inference/v1/models/article-country:predict"
 data = {"title": "Albert_Einstein", "lang": "en"}
 
-resp = requests.post(url, json=data, headers=headers)
+resp = requests.post(url, json=data, headers=headers, timeout=30)
 result = resp.json()
 # result["prediction"]["results"] is an array sorted by score (descending):
 # [
@@ -490,7 +490,7 @@ params = {
     "seed": "Apple",      # Seed article for personalized recommendations
 }
 
-resp = requests.get(url, params=params, headers=headers)
+resp = requests.get(url, params=params, headers=headers, timeout=30)
 result = resp.json()
 # result["recommendations"] is an array of:
 # {"title": "Flamenco (apple)", "pageviews": 0, "wikidata_id": "Q19597233",
@@ -516,35 +516,46 @@ If you encounter code that calls ORES, here is the migration pattern:
 ### ORES Call (Legacy)
 ```bash
 # ORES — GET, batch multiple models in one call
-curl 'https://ores.wikimedia.org/v3/scores/enwiki/12345?models=goodfaith|damaging'
+curl -s -H "User-Agent: MyBot/1.0 (user@example.com) LiftWingMigration" \
+  'https://ores.wikimedia.org/v3/scores/enwiki/12345?models=goodfaith|damaging'
 ```
 
 ### Equivalent Lift Wing Calls
 ```bash
 # Lift Wing — POST, one call per model
-curl -X POST 'https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-goodfaith:predict' \
+curl -s -X POST -H "User-Agent: MyBot/1.0 (user@example.com) LiftWingMigration" \
+  'https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-goodfaith:predict' \
+  -H 'Content-Type: application/json' \
   -d '{"rev_id": 12345}'
-curl -X POST 'https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-damaging:predict' \
+curl -s -X POST -H "User-Agent: MyBot/1.0 (user@example.com) LiftWingMigration" \
+  'https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-damaging:predict' \
+  -H 'Content-Type: application/json' \
   -d '{"rev_id": 12345}'
 ```
 
 ### ORES → Lift Wing Feature Extraction
 ```bash
 # ORES could return features with ?features=True
-curl 'https://ores.wikimedia.org/v3/scores/enwiki/12345/goodfaith?features=True'
+curl -s -H "User-Agent: MyBot/1.0 (user@example.com) LiftWingMigration" \
+  'https://ores.wikimedia.org/v3/scores/enwiki/12345/goodfaith?features=True'
 
 # Lift Wing equivalent
-curl -X POST 'https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-goodfaith:predict' \
+curl -s -X POST -H "User-Agent: MyBot/1.0 (user@example.com) LiftWingMigration" \
+  'https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-goodfaith:predict' \
+  -H 'Content-Type: application/json' \
   -d '{"rev_id": 12345, "extended_output": "True"}'
 ```
 
 ### ORES → Modern Revert Risk
 ```bash
 # Old: two calls for goodfaith + damaging
-curl 'https://ores.wikimedia.org/v3/scores/enwiki/12345?models=goodfaith|damaging'
+curl -s -H "User-Agent: MyBot/1.0 (user@example.com) LiftWingMigration" \
+  'https://ores.wikimedia.org/v3/scores/enwiki/12345?models=goodfaith|damaging'
 
 # New: single call to revertrisk with language parameter
-curl -X POST 'https://api.wikimedia.org/service/lw/inference/v1/models/revertrisk-language-agnostic:predict' \
+curl -s -X POST -H "User-Agent: MyBot/1.0 (user@example.com) LiftWingMigration" \
+  'https://api.wikimedia.org/service/lw/inference/v1/models/revertrisk-language-agnostic:predict' \
+  -H 'Content-Type: application/json' \
   -d '{"rev_id": 12345, "lang": "en"}'
 ```
 

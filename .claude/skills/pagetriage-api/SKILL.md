@@ -25,14 +25,17 @@ compatibility: opencode
 ## SOP: Checking PageTriage Availability on a Wiki
 
 ```bash
-curl -s "https://en.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=extensions&format=json" | python3 -c "import sys,json; ext=[e['name'] for e in json.load(sys.stdin)['query']['extensions'] if 'PageTriage' in e['name']]; print('✓ PageTriage enabled' if ext else '✗ PageTriage not available')"
+curl -s -H "User-Agent: MyBot/1.0 (user@example.com) PageTriageCheck" \
+  "https://en.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=extensions&format=json" \
+  | python3 -c "import sys,json; ext=[e['name'] for e in json.load(sys.stdin)['query']['extensions'] if 'PageTriage' in e['name']]; print('✓ PageTriage enabled' if ext else '✗ PageTriage not available')"
 ```
 
 Or check the API sandbox for PageTriage-specific modules:
 
 ```bash
 # Look for pagetriagelist in the module list
-curl -s "https://en.wikipedia.org/w/api.php?action=help&modules=main&format=json" | grep -i pagetriage
+curl -s -H "User-Agent: MyBot/1.0 (user@example.com) PageTriageCheck" \
+  "https://en.wikipedia.org/w/api.php?action=help&modules=main&format=json" | grep -i pagetriage
 ```
 
 ---
@@ -85,7 +88,8 @@ GET https://en.wikipedia.org/w/api.php?action=pagetriagelist&...&format=json
 
 **Example — last 50 unreviewed articles:**
 ```bash
-curl -s "https://en.wikipedia.org/w/api.php?action=pagetriagelist&showunreviewed=1&noredirects=1&limit=50&format=json"
+curl -s -H "User-Agent: MyBot/1.0 (user@example.com) PageTriageCheck" \
+  "https://en.wikipedia.org/w/api.php?action=pagetriagelist&showunreviewed=1&noredirects=1&limit=50&format=json"
 ```
 
 ### `action=pagetriageaction` — Mark reviewed/unreviewed
@@ -105,6 +109,7 @@ POST https://en.wikipedia.org/w/api.php?action=pagetriageaction&...
 **Example — mark a page as reviewed:**
 ```bash
 curl -s -X POST "https://en.wikipedia.org/w/api.php" \
+  -H "User-Agent: MyBot/1.0 (user@example.com) PageTriageCheck" \
   -d "action=pagetriageaction" \
   -d "pageid=12345" \
   -d "reviewed=1" \
@@ -157,7 +162,8 @@ users). For truly unauthenticated access, use `list=recentchanges` without the
 
 ```bash
 # Last 50 new mainspace pages (no patrol info — works for anyone)
-curl -s "https://en.wikipedia.org/w/api.php?action=query&list=recentchanges&rctype=new&rcnamespace=0&rclimit=50&format=json"
+curl -s -H "User-Agent: MyBot/1.0 (user@example.com) PageTriageCheck" \
+  "https://en.wikipedia.org/w/api.php?action=query&list=recentchanges&rctype=new&rcnamespace=0&rclimit=50&format=json"
 ```
 
 The response includes `pageid`, `revid`, `title`, `user`, and `timestamp` but no

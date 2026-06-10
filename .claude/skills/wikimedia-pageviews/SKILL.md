@@ -49,7 +49,7 @@ def get_historical_views(article_title, start_date, end_date, project='en.wikipe
     headers = {'User-Agent': 'Wiki Bot/1.0 (https://meta.wikimedia.org; your-email@example.com) WikiBot'}
     url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/{project}/all-access/all-agents/{article_title}/daily/{start_date}/{end_date}"
     
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=30)
     return response.json().get('items', []) if response.status_code == 200 else []
 
 ```
@@ -75,7 +75,7 @@ end = datetime.utcnow() - timedelta(days=3)
 date_str = end.strftime('%Y/%m/%d')  # Slashes: 2026/05/25
 
 url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{date_str}"
-resp = requests.get(url, headers=headers)
+resp = requests.get(url, headers=headers, timeout=30)
 data = resp.json()
 for article in data['items'][0]['articles'][:10]:
     print(f"{article['rank']}. {article['article']} — {article['views']} views")

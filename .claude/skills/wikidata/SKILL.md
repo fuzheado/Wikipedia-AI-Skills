@@ -484,6 +484,35 @@ SELECT ?item ?itemLabel WHERE {
 }
 ```
 
+```python
+import requests
+
+query = """
+SELECT ?item ?itemLabel WHERE {
+  wd:Q33999 wdt:P279* wd:Q5.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+"""
+
+headers = {
+    "User-Agent": "MyBot/1.0 (https://example.com; user@example.com) ClassCheck",
+    "Accept": "application/sparql-results+json",
+}
+resp = requests.get(
+    "https://query.wikidata.org/sparql",
+    params={"format": "json", "query": query},
+    headers=headers,
+    timeout=60,
+)
+data = resp.json()
+
+# If the query returns results, Q33999 IS a subclass of Q5
+if data["results"]["bindings"]:
+    print("Actor is a subclass of Human")
+else:
+    print("Actor is NOT a subclass of Human")
+```
+
 For programmatic use, precompute a transitive closure for commonly-needed ancestors and cache the results.
 
 ### Typical Pipeline Pattern

@@ -95,6 +95,24 @@ def wikimedia_request(url, params=None, max_retries=3):
             )
         resp.raise_for_status()
     raise Exception(f"Request failed after {max_retries} retries")
+
+# Typical response structure (Action API query):
+# {
+#   "batchcomplete": "",
+#   "query": {
+#     "pages": {
+#       "12345": {                                # ← page ID as string key
+#         "pageid": 12345,
+#         "ns": 0,
+#         "title": "Albert Einstein",
+#         ...other requested properties...
+#       }
+#     }
+#   },
+#   "continue": {"continue": "-||", ...}        # ← pagination cursor (if more results)
+# }
+# Access: data["query"]["pages"]["12345"]["title"]
+# Iterate: for page_id, page_data in data["query"]["pages"].items():
 ```
 
 ### **Browser-Based JavaScript**

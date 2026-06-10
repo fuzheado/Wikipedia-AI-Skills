@@ -154,7 +154,8 @@ entirely mechanical — no creativity or judgment required.
 #### 1a. Resolve the article title
 
 ```bash
-curl -s "https://en.wikipedia.org/w/api.php?action=query&titles=$TITLE&redirects=1&format=json"
+curl -s -H "User-Agent: MyBot/1.0 (user@example.com) AuditTool" \
+  "https://en.wikipedia.org/w/api.php?action=query&titles=$TITLE&redirects=1&format=json"
 ```
 
 - If the title is a redirect, follow it to the canonical page.
