@@ -31,7 +31,7 @@ compatibility: opencode
 
 ## What Pywikibot Is
 
-Pywikibot is a **Python library and collection of ready-to-run CLI scripts** that automates work on MediaWiki sites. It started in 2003 and is at version **11.3.0** (MIT license). It wraps the MediaWiki Action API (`api.php`) into a high-level Python object model so you work with `Page`, `Site`, `ItemPage`, `Category`, `User` objects instead of raw HTTP/JSON.
+Pywikibot is a **Python library and collection of ready-to-run CLI scripts** that automates work on MediaWiki sites. It started in 2003 and is at version **11.3+** (MIT license). It wraps the MediaWiki Action API (`api.php`) into a high-level Python object model so you work with `Page`, `Site`, `ItemPage`, `Category`, `User` objects instead of raw HTTP/JSON.
 
 It is the **de-facto standard bot framework** for the Wikimedia ecosystem — used on Wikipedia, Wikidata, Commons, Wiktionary, and thousands of third-party MediaWiki wikis.
 
@@ -302,7 +302,7 @@ from pywikibot import pagegenerators
 site = pywikibot.Site('en', 'wikipedia')
 
 # Generator: pages in a category (recursive)
-gen = site.categorypages('Physics', recurse=True)
+gen = site.categorizedpages('Physics', recurse=True)
 
 # Generator: pages linking to a specific page
 gen = site.pagebacklinks('Albert Einstein', namespaces=[0])
@@ -322,7 +322,7 @@ for page in gen:
 
 ```python
 # All main-namespace pages in Category:Physics and subcats that link to Einstein
-gen = site.categorypages('Physics', recurse=True)
+gen = site.categorizedpages('Physics', recurse=True)
 gen = site.pagebacklinks('Albert Einstein', namespaces=[0])
 # Intersect them:
 gen = pagegenerators.IntersectPageGenerator(gen1, gen2)

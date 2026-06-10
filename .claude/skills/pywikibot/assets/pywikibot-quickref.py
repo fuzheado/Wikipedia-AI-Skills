@@ -67,7 +67,7 @@ def page_generators():
     site = pywikibot.Site('en', 'wikipedia')
 
     # Pages in a category
-    gen = site.categorypages('Physics', recurse=False)
+    gen = site.categorizedpages('Physics', recurse=False)
     for i, page in enumerate(gen):
         if i >= 5:
             break
@@ -227,7 +227,7 @@ class AppendTextBot(ExistingPageBot):
 def run_bot():
     """Run the custom bot on pages from Category:Physics."""
     site = pywikibot.Site('en', 'wikipedia')
-    gen = site.categorypages('Physics')
+    gen = site.categorizedpages('Physics')
     bot = AppendTextBot(
         generator=gen,
         text='[[Category:Physics stubs]]',

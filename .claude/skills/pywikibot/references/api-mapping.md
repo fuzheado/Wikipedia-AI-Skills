@@ -46,7 +46,7 @@ The `action=query` submodules map to Pywikibot **page generators** (all accessib
 | `allusers` | `Site.allusers()` | — |
 | `backlinks` | `Site.pagebacklinks()` | `-links:` |
 | `blocks` | `Site.blocks()` | — |
-| `categorymembers` | `Site.categorypages()`, `Category.articles()`, `Category.subcategories()` | `-cat:`, `-catr:`, `-subcats:` |
+| `categorymembers` | `Site.categorizedpages()`, `Category.articles()`, `Category.subcategories()` | `-cat:`, `-catr:`, `-subcats:` |
 | `contributions` | `User.contributions()` | — |
 | `embeddedin` | `Site.page_embeddedin()` | `-transcludes:` |
 | `exturlusage` | `Site.exturlusage()` | — |
