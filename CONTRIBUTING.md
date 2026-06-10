@@ -30,6 +30,7 @@ name: skill-name
 description: Short description for agent discovery
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 ```
 
@@ -38,20 +39,39 @@ The fields are:
 | Field | Required | Description |
 |---|---|---|
 | `name` | Yes | Hyphenated, lowercase identifier (e.g., `wikimedia-pageviews`). This is how agents reference the skill. |
-| `description` | Yes | One sentence describing what the skill does. Shown in the agent's `<available_skills>` list. Keep under 200 characters. |
+| `description` | Yes | One sentence describing what the skill does. Shown in the agent's `<available_skills>` list. Aim for under 200 characters, max 400. |
 | `license` | Yes | Must be `MIT` for this project. |
 | `compatibility` | Yes | The agent platform (e.g., `opencode`, `claude-code`). Use `opencode` as the default. |
-| `depends_on` | No | A list of skill names this skill depends on (e.g., `[wikimedia-api-access]`). |
 | `last_verified` | Yes | ISO-8601 date (e.g., `2026-06-10`) when the skill's content was last reviewed for accuracy against the systems it documents. Bump this when making substantive edits. |
+| `depends_on` | No | A list of skill names this skill depends on (e.g., `[wikimedia-api-access]`). |
+| `skill_discovery_hints` | No | A list of keyword groups that help AI agents discover this skill by topic. Each group is a `{keywords: [...]}` mapping. Add when the skill covers a topic that users commonly search for by these terms. |
+
+Example with optional fields:
+
+```yaml
+---
+name: wikidata
+description: Understand and query Wikidata — SPARQL, Wikibase APIs, RDF dumps
+license: MIT
+compatibility: opencode
+last_verified: 2026-06-10
+depends_on: [wikimedia-api-access]
+skill_discovery_hints:
+  - keywords: ["SPARQL", "Wikidata", "knowledge graph", "QID", "entity"]
+  - keywords: ["cross-wiki", "interlanguage", "sitelink"]
+---
+```
 
 ### Frontmatter Validation Checklist
 
 - [ ] `name` is lowercase, hyphenated, and unique
-- [ ] `description` is under 200 characters and describes what the agent will be able to do
+- [ ] `description` is under 200 characters (max 400) and describes what the agent will be able to do
 - [ ] `license` is `MIT`
 - [ ] `compatibility` is `opencode` (or appropriate platform)
-- [ ] `last_verified` is a valid ISO-8601 date and reasonably current
+- [ ] `last_verified` is a valid ISO-8601 date
+- [ ] `last_verified` is reasonably current (check `skill-freshness.yml` CI if applicable)
 - [ ] If `depends_on` is present, each dependency exists in the repository
+- [ ] `skill_discovery_hints` keywords are lowercase, relevant, and not duplicated across skills
 - [ ] No trailing spaces in frontmatter values
 
 ## Skill Authoring Guidelines
