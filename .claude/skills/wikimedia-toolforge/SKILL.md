@@ -3,6 +3,7 @@ name: wikimedia-toolforge
 description: Manage Toolforge accounts, web services, Kubernetes pods, cron jobs, and file deployment for Wikimedia tools
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 Toolforge (formerly Wikimedia Tool Labs) is a cloud hosting platform for community-developed tools that interact with Wikimedia wikis and data. This skill covers account setup, service management, deployment, and debugging.

@@ -1,0 +1,85 @@
+name: Skill Freshness Check
+on:
+  schedule:
+    # Run weekly on Monday at 09:00 UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  check-freshness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check last_verified dates
+        run: |
+          import os
+          import re
+          from datetime import datetime, timedelta
+          from pathlib import Path
+
+          today = datetime.utcnow()
+          stale_6m = []
+          stale_1y = []
+          missing = []
+          errors = []
+
+          for skill_dir in sorted(Path(".claude/skills").iterdir()):
+              path = skill_dir / "SKILL.md"
+              if not path.exists():
+                  continue
+
+              text = path.read_text()
+              # Extract frontmatter
+              m = re.search(r'^---\n(.*?)\n---', text, re.DOTALL)
+              if not m:
+                  errors.append(f"{skill_dir.name}: no frontmatter")
+                  continue
+
+              import yaml
+              try:
+                  data = yaml.safe_load(m.group(1))
+              except Exception as e:
+                  errors.append(f"{skill_dir.name}: YAML parse error: {e}")
+                  continue
+
+              lv = data.get("last_verified")
+              if not lv:
+                  missing.append(skill_dir.name)
+                  continue
+
+              try:
+                  verified = datetime.strptime(str(lv), "%Y-%m-%d")
+                  age = (today - verified).days
+                  if age > 365:
+                      stale_1y.append(f"{skill_dir.name} (last verified {lv}, {age} days ago)")
+                  elif age > 180:
+                      stale_6m.append(f"{skill_dir.name} (last verified {lv}, {age} days ago)")
+              except ValueError:
+                  errors.append(f"{skill_dir.name}: invalid date format '{lv}'")
+
+          # Output results
+          if missing:
+              print(f"::warning::Skills missing last_verified: {', '.join(missing)}")
+          if errors:
+              for e in errors:
+                  print(f"::error::{e}")
+
+          if stale_1y:
+              print("::warning::Skills not reviewed in over 1 year:")
+              for s in stale_1y:
+                  print(f"  ::warning::{s}")
+              print()
+
+          if stale_6m:
+              print("Skills not reviewed in 6-12 months (consider review):")
+              for s in stale_6m:
+                  print(f"  - {s}")
+              print()
+
+          if stale_1y or missing or errors:
+              print(f"❌ Found {len(stale_1y)} stale (>1yr), {len(missing)} missing, {len(errors)} errors")
+              exit(1)
+          else:
+              print(f"✅ All {len(list(Path('.claude/skills').iterdir()))} skills are fresh")
+        shell: python3

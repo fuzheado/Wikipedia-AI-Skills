@@ -3,6 +3,7 @@ name: wikipedia-page-anatomy
 description: Navigate and understand the structure of a Wikipedia article — infoboxes, categories, references, templates, navboxes, redirects, disambiguation, and protection levels
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** The search examples below use the Action API. All requests must include a descriptive `User-Agent` header or they will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.

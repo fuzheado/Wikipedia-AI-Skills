@@ -8,6 +8,7 @@ skill_discovery_hints:
   - keywords: ["depicts", "haswbstatement", "structured data", "media search"]
   - keywords: ["license", "copyright", "CC BY", "Creative Commons", "public domain"]
   - keywords: ["EXIF", "metadata", "file info", "global usage"]
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.

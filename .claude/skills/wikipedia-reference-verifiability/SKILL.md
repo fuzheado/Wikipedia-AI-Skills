@@ -4,6 +4,7 @@ description: Analyze whether a Wikipedia page's references contain URLs — dete
 depends_on: [wikimedia-api-access, wikimedia-wikitext]
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** The API calls in this skill need a descriptive `User-Agent`

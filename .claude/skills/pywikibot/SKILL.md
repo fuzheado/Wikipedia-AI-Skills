@@ -3,6 +3,7 @@ name: pywikibot
 description: Use Pywikibot — the Python library and CLI tool suite for automating work on MediaWiki sites (Wikipedia, Wikidata, Commons, and any other MediaWiki wiki). Covers installation, configuration, the core object model, page generators, the bot framework, built-in scripts, and Wikidata/Commons integration
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** Pywikibot sets `User-Agent` automatically based on your `user-config.py` settings, but any direct `curl`/`requests` calls in this skill still need a proper header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for format and rate-limiting patterns. Before writing custom code alongside Pywikibot, load that skill for the required User-Agent boilerplate.

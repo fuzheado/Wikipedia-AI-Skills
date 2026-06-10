@@ -10,6 +10,7 @@ skill_discovery_hints:
   - keywords: ["error", "exception", "retry", "timeout", "connection", "failure", "debug"]
   - keywords: ["422", "parent revision", "model error", "Lift Wing error"]
   - keywords: ["SPARQL timeout", "query timeout", "504", "gateway"]
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** All API calls below need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.

@@ -3,6 +3,7 @@ name: wikimedia-diffs
 description: Fetch, compare, and interpret diffs between Wikipedia page revisions — wikitext changes, visual differences, and diff statistics via the Action API and REST API
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** The diff examples below use the Action API and REST API. All requests must include a descriptive `User-Agent` header or they will be blocked. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.

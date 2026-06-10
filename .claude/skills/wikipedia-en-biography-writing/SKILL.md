@@ -3,6 +3,7 @@ name: wikipedia-en-biography-writing
 description: Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and biographies of living persons (BLP) policies
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 

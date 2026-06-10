@@ -3,6 +3,7 @@ name: wikipedia-en-article-audit
 description: Audit an English Wikipedia article for structural issues, factual errors, and NPOV violations, then produce a machine-readable task graph (DAG) that another agent can execute to fix all identified problems
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **Read-only policy: This skill audits only. It never edits live Wikipedia articles.**

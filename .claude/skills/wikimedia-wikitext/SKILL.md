@@ -3,6 +3,7 @@ name: wikimedia-wikitext
 description: Parse, extract, and manipulate Wikipedia and MediaWiki wikitext (wiki markup, templates, infoboxes, citations, links) using proper AST-based tooling instead of fragile regex patterns
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** The API examples below use the Action API and REST API. All requests must include a descriptive `User-Agent` header or they will be blocked. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.

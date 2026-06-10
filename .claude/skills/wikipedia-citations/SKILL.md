@@ -4,6 +4,7 @@ description: Master Wikipedia citations — CS1/CS2 templates, Wayback Machine a
 depends_on: [wikimedia-api-access]
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** API calls below need a descriptive `User-Agent` header.

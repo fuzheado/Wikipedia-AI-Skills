@@ -4,6 +4,7 @@ description: Create, parse, style, and fix MediaWiki wikitable syntax — delimi
 depends_on: [wikimedia-wikitext]
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **Prerequisite:** This skill assumes basic familiarity with wikitext templates.

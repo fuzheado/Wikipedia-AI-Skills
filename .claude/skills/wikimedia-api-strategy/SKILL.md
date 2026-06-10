@@ -9,6 +9,7 @@ skill_discovery_hints:
   - keywords: ["REST vs Action", "SPARQL vs API", "Pywikibot vs API", "SQL vs API"]
   - keywords: ["performance", "fastest", "rate limit", "batch", "bulk", "scale"]
   - keywords: ["read only", "read write", "analytics", "real time"]
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** All API calls below need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format, rate limiting, and error handling. If you get HTTP 403 or 429, load that skill before debugging.

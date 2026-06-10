@@ -3,6 +3,7 @@ name: wikimedia-database
 description: Execute SQL queries against Wikipedia database replicas (enwiki, wikidata, commonswiki) via an SSH tunnel to Toolforge, with connection management and data handling guardrails
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 Enables the agent to execute dynamic SQL queries against Wikimedia production replicas (e.g., `enwiki`, `enwiki_p`, `wikidata`, `commonswiki`) by leveraging a local SSH tunnel and specific environment variables for multi-layer authentication.

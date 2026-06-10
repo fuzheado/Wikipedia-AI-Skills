@@ -7,6 +7,7 @@ skill_discovery_hints:
   - keywords: ["SPARQL", "Wikidata", "knowledge graph", "semantic query", "QID", "Q number", "P number", "entity"]
   - keywords: ["cross-wiki", "interlanguage", "sitelink", "language link", "gap analysis"]
   - keywords: ["image", "P18", "property lookup", "item type", "instance of", "P31"]
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns. Before writing any code, load that skill for the required User-Agent boilerplate.

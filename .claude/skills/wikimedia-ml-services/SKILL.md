@@ -12,6 +12,7 @@ skill_discovery_hints:
   - keywords: ["reference", "citation quality", "reference need", "unsourced", "reference risk"]
   - keywords: ["language detection", "langid", "identify language"]
   - keywords: ["translation", "content translation", "cross-language", "recommendation"]
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** All API calls below need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.

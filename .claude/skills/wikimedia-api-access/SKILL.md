@@ -3,6 +3,7 @@ name: wikimedia-api-access
 description: Access Wikipedia and Wikimedia APIs (REST, Action API, SPARQL) with correct User-Agent headers, rate limiting, and 429/403 error handling
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 All requests to Wikimedia APIs **must** include a descriptive `User-Agent` header or they will be blocked (HTTP 403 or 429). This is enforced by the [Wikimedia Foundation User-Agent Policy](https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy).

@@ -7,6 +7,7 @@ skill_discovery_hints:
   - keywords: ["real-time", "stream", "SSE", "EventStreams", "live", "recent change", "recentchange"]
   - keywords: ["new page", "page creation", "patrol", "monitor", "watch", "live feed"]
   - keywords: ["edit event", "revision create", "log event", "streaming"]
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** All examples in this skill connect to `stream.wikimedia.org`. Requests without a descriptive `User-Agent` header may be throttled. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns. Before writing code, load that skill for the required User-Agent boilerplate.

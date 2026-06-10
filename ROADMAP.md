@@ -143,6 +143,8 @@
 
 - **Pywikibot `categorypages` → `categorizedpages` rename** — Updated all 5 occurrences of the deprecated `site.categorypages()` method to `site.categorizedpages()` (renamed in Pywikibot v11.3). Affected files: `SKILL.md` (2 code examples), `assets/pywikibot-quickref.py` (2 calls), `references/api-mapping.md` (mapping table).
 
+- **Skill freshness metadata (`last_verified`)** — Added `last_verified: YYYY-MM-DD` to the YAML frontmatter of all 30 skills, documenting when each skill was last reviewed for accuracy. Updated `CONTRIBUTING.md` to require this field. Added test check (`test_last_verified_is_date`) to the test suite. Created `.github/workflows/skill-freshness.yml` — a weekly CI workflow that flags skills not reviewed in >6 months (warning) or >1 year (error).
+
 - **`wikipedia-categories` skill** — new skill covering the Wikipedia category system end-to-end: tree hierarchy, three validity tests (Verifiable/Neutral/Defining), topic vs. set categories, sort keys and DEFAULTSORT, comprehensive comparison of all access methods (Action API, Pywikibot, PetScan, WDQS, Special pages) with trade-off analysis, Pywikibot generators and built-in scripts, overcategorization rules, naming conventions, and category maintenance. Ships with 2 reference docs, 1 CLI script, and 2 Python assets. The proposal was written first in `proposals/categories-skill.md` before implementation.
 
 - **Title Format Guide** (section 11 of `wikimedia-api-access/references/endpoints.md`) — cross-API table documenting underscore-vs-space title formats across 6 endpoints, with correct/wrong code comparison. Fixes the single most costly bug when chaining Pageviews, Action API, and SQL results.

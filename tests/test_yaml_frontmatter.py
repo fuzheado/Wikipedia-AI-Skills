@@ -39,18 +39,30 @@ class TestYamlFrontmatter:
 
     @pytest.mark.parametrize('skill_name', SKILL_NAMES)
     def test_required_fields(self, skill_name):
-        """Frontmatter must contain name, description, license, compatibility."""
+        """Frontmatter must contain name, description, license, compatibility, last_verified."""
         text = read_skill(skill_name)
         frontmatter = extract_yaml_frontmatter(text)
         assert frontmatter is not None
 
-        for field in ('name', 'description', 'license', 'compatibility'):
+        for field in ('name', 'description', 'license', 'compatibility', 'last_verified'):
             assert field in frontmatter, (
                 f"{skill_name}/SKILL.md frontmatter missing '{field}'"
             )
             assert frontmatter[field], (
                 f"{skill_name}/SKILL.md frontmatter '{field}' is empty"
             )
+
+    @pytest.mark.parametrize('skill_name', SKILL_NAMES)
+    def test_last_verified_is_date(self, skill_name):
+        """last_verified must be a valid ISO-8601 date."""
+        import re
+        text = read_skill(skill_name)
+        frontmatter = extract_yaml_frontmatter(text)
+        assert frontmatter is not None
+        lv = frontmatter.get('last_verified', '')
+        assert re.match(r'^\d{4}-\d{2}-\d{2}$', str(lv)), (
+            f"{skill_name}/SKILL.md last_verified='{lv}' is not a valid ISO-8601 date"
+        )
 
     @pytest.mark.parametrize('skill_name', SKILL_NAMES)
     def test_description_length(self, skill_name):

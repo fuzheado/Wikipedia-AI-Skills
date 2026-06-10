@@ -3,6 +3,7 @@ name: wikimedia-cdn-assets
 description: Load JavaScript, CSS, and fonts for Toolforge tools from Wikimedia's privacy-preserving cdnjs mirror, ensuring user privacy and policy compliance
 license: MIT
 compatibility: all
+last_verified: 2026-06-10
 ---
 
 ## SOP: Load Web Assets from Wikimedia's CDN

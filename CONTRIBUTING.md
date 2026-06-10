@@ -42,6 +42,7 @@ The fields are:
 | `license` | Yes | Must be `MIT` for this project. |
 | `compatibility` | Yes | The agent platform (e.g., `opencode`, `claude-code`). Use `opencode` as the default. |
 | `depends_on` | No | A list of skill names this skill depends on (e.g., `[wikimedia-api-access]`). |
+| `last_verified` | Yes | ISO-8601 date (e.g., `2026-06-10`) when the skill's content was last reviewed for accuracy against the systems it documents. Bump this when making substantive edits. |
 
 ### Frontmatter Validation Checklist
 
@@ -49,6 +50,7 @@ The fields are:
 - [ ] `description` is under 200 characters and describes what the agent will be able to do
 - [ ] `license` is `MIT`
 - [ ] `compatibility` is `opencode` (or appropriate platform)
+- [ ] `last_verified` is a valid ISO-8601 date and reasonably current
 - [ ] If `depends_on` is present, each dependency exists in the repository
 - [ ] No trailing spaces in frontmatter values
 

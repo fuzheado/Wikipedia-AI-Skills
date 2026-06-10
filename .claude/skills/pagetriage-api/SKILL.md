@@ -4,6 +4,7 @@ description: Work with the PageTriage extension (New Pages Feed / Page Curation)
 depends_on: [wikimedia-api-access]
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **PageTriage is primarily deployed on English Wikipedia.** As of mid-2026,

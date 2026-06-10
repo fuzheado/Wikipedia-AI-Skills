@@ -3,6 +3,7 @@ name: wikimedia-pageviews
 description: Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties (sorting/filtering) or the REST API (precise historical data)
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 Enables the agent to retrieve traffic and popularity statistics for Wikipedia articles. Since historical pageview logs are not stored in the SQL replicas, the agent must distinguish between using a **cached SQL property** for sorting and the **REST API** for precise historical data.

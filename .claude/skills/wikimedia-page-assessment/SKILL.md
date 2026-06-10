@@ -3,6 +3,7 @@ name: wikimedia-page-assessment
 description: Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners on any Wikimedia wiki with the PageAssessments extension
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 Enables the agent to retrieve quality and importance ratings for Wikipedia

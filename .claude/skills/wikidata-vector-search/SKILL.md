@@ -3,6 +3,7 @@ name: wikidata-vector-search
 description: Query Wikidata by meaning, concept, or natural-language description — not just by exact label match. Uses semantic embeddings to find items (QIDs) and properties (PIDs) via vector similarity, keyword search, and Reciprocal Rank Fusion. Covers fuzzy semantic search, concept matching, similarity lookups, cross-lingual queries, and "find like this" when you do not know the exact QID or label
 license: MIT
 compatibility: opencode
+last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** All calls to the Vector Database API require a descriptive `User-Agent` header. Requests without one are blocked with HTTP 403. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
