@@ -224,14 +224,14 @@ if [ -z "$TASK" ]; then
     echo
     echo "Describe what you want to do, or pick a category:"
     echo
-    echo "  ${BOLD}1${NC}  Read a single page"
-    echo "  ${BOLD}2${NC}  Batch query (multiple pages with filters)"
-    echo "  ${BOLD}3${NC}  Analytics / bulk data"
-    echo "  ${BOLD}4${NC}  Real-time monitoring"
-    echo "  ${BOLD}5${NC}  Edit pages / bot operations"
-    echo "  ${BOLD}6${NC}  Graph queries / Wikidata relations"
-    echo "  ${BOLD}7${NC}  Page patrol / triage"
-    echo "  ${BOLD}q${NC}  Quit"
+    echo -e "  ${BOLD}1${NC}  Read a single page"
+    echo -e "  ${BOLD}2${NC}  Batch query (multiple pages with filters)"
+    echo -e "  ${BOLD}3${NC}  Analytics / bulk data"
+    echo -e "  ${BOLD}4${NC}  Real-time monitoring"
+    echo -e "  ${BOLD}5${NC}  Edit pages / bot operations"
+    echo -e "  ${BOLD}6${NC}  Graph queries / Wikidata relations"
+    echo -e "  ${BOLD}7${NC}  Page patrol / triage"
+    echo -e "  ${BOLD}q${NC}  Quit"
     echo
     echo -e "  Or describe your task in words: ${CYAN}./api-strategy.sh \"pageviews for 50 physics articles\"${NC}"
     echo
