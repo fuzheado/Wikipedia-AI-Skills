@@ -3,5 +3,9 @@
 *.pyc
 .pytest_cache/
 node_modules/
+# Skill-creator test artifacts
+assessment-workspace/
+evals/
+
 pi-coding-agent-draft.md
 progress.md

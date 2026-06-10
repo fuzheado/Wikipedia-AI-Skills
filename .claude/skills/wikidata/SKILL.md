@@ -129,6 +129,10 @@ Wikidata's most powerful query interface is the **SPARQL endpoint** at `https://
 
 Open https://query.wikidata.org in a browser — a full-featured query editor with syntax highlighting, auto-complete for Q/P IDs, and result visualization (table, map, timeline, graph). You can also share queries via a short URL.
 
+> 💡 **Canonical example galleries:** The Wikidata community maintains two curated collections you can study and adapt:
+> - **[Basic SPARQL examples](https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/queries/examples)** — Categories, coordinates, dates, labels, qualifiers, references, and property paths with runnable links
+> - **[Advanced SPARQL examples](https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/queries/examples/advanced)** — Subqueries, federated queries, array aggregation, service links, and complex property chains
+
 ### **Programmatic Access**
 
 ```sparql

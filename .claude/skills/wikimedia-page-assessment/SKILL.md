@@ -4,6 +4,9 @@ description: Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importan
 license: MIT
 compatibility: opencode
 last_verified: 2026-06-10
+skill_discovery_hints:
+  - keywords: ["WikiProject", "WikiProject assessment", "article quality", "GA", "FA", "page assessment", "content assessment"]
+  - keywords: ["popular pages", "WikiProject popular pages", "Assessment subpage", "quality matrix", "importance rating"]
 ---
 
 Enables the agent to retrieve quality and importance ratings for Wikipedia
@@ -175,6 +178,152 @@ if Python dependencies are missing.
 * "For the 'Physics' WikiProject, find all B-class articles with Top importance that haven't been assessed in over 5 years."
 
 ---
+
+## **SOP: Finding Pre-built WikiProject Reports**
+
+Many active WikiProjects maintain auto-generated subpages that summarize their
+coverage and article statistics. These are often more accessible than running
+SQL queries, especially for single-project lookups or when you don't have
+database access.
+
+### **`/Assessment` — Quality and Importance Matrix**
+
+Most WikiProjects have an `/Assessment` subpage (e.g.,
+`Wikipedia:WikiProject_Physics/Assessment`) that displays a color-coded table
+of article count by quality × importance, updated weekly by WP 1.0 bot.
+
+**URL pattern:**
+```
+https://en.wikipedia.org/wiki/Wikipedia:WikiProject_<Name>/Assessment
+```
+
+Replace `<Name>` with the WikiProject name — **case-sensitive**:
+- ✅ `Wikipedia:WikiProject Physics/Assessment`
+- ✅ `Wikipedia:WikiProject Medicine/Assessment`
+- ❌ `Wikipedia:WikiProject physics/Assessment`
+
+**What the page contains:** A table with importance (Top/High/Mid/Low/???)
+as columns and quality (FA/FL/A/GA/B/C/Start/Stub/List) as rows. Each cell
+shows the count of articles at that intersection, linked to the corresponding
+category page for deeper inspection.
+
+**To check programmatically:**
+
+```python
+import requests
+
+def has_assessment_page(project_name):
+    """Check if a WikiProject has an /Assessment subpage."""
+    headers = {'User-Agent': 'MyBot/1.0 (me@example.com) SkillsDemo'}
+    title = f"Wikipedia:WikiProject_{project_name}/Assessment"
+    url = "https://en.wikipedia.org/w/api.php"
+    params = {
+        'action': 'query',
+        'titles': title,
+        'format': 'json',
+        'prop': 'info'
+    }
+    resp = requests.get(url, headers=headers, params=params, timeout=10)
+    data = resp.json()
+    pages = data['query']['pages']
+    # Page key '-1' indicates a missing page
+    return '-1' not in pages
+
+print(has_assessment_page("Physics"))    # True
+print(has_assessment_page("Chemistry"))  # True
+```
+
+### **`/Popular_pages` — Pageviews by Quality and Importance**
+
+Many WikiProjects also have a `/Popular_pages` subpage (e.g.,
+`Wikipedia:WikiProject_Physics/Popular_pages`) generated monthly by the
+[Community Tech popular pages bot](https://meta.wikimedia.org/wiki/Community_Tech/Popular_pages_bot).
+Each entry lists an article with its rank, monthly pageviews, quality class,
+and importance — a pre-computed intersection of traffic data and assessment
+data that saves you from cross-referencing two separate APIs.
+
+**URL pattern:**
+```
+https://en.wikipedia.org/wiki/Wikipedia:WikiProject_<Name>/Popular_pages
+```
+
+**Master list of all Popular_pages reports:**
+```
+https://en.wikipedia.org/wiki/User:Community_Tech_bot/Popular_pages
+```
+This page indexes every WikiProject that has opted into the popular pages bot,
+grouped by topic category (Science, History, Geography, etc.). Browse it to
+discover which projects have traffic data available.
+
+**To check programmatically:**
+
+```python
+def has_popular_pages(project_name):
+    """Check if a WikiProject has a /Popular_pages subpage."""
+    headers = {'User-Agent': 'MyBot/1.0 (me@example.com) SkillsDemo'}
+    title = f"Wikipedia:WikiProject_{project_name}/Popular_pages"
+    url = "https://en.wikipedia.org/w/api.php"
+    params = {
+        'action': 'query',
+        'titles': title,
+        'format': 'json',
+        'prop': 'info'
+    }
+    resp = requests.get(url, headers=headers, params=params, timeout=10)
+    pages = resp.json()['query']['pages']
+    return '-1' not in pages
+
+print(has_popular_pages("Physics"))     # True
+print(has_popular_pages("Medicine"))    # True
+```
+
+**What the page contains:** A multi-column table:
+| Rank | Page | Views | Quality | Importance |
+|------|------|-------|---------|------------|
+| 1 | Article Title | 1,234,567 | B | Top |
+| 2 | Another Article | 987,654 | GA | High |
+
+The data is pre-sorted by pageviews descending. The bot has already handled
+the cross-API join of pageviews data with assessment data.
+
+### **Finding All WikiProjects (Discovery)**
+
+To discover which WikiProjects exist, use one of these approaches:
+
+- **Manual directory (curated):**
+  `https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Council/Directory`
+
+- **Automatic directory (bot-updated):**
+  `https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Directory`
+
+- **Category-based API query:**
+  WikiProjects are listed in `Category:WikiProjects` and its subcategories:
+  ```
+  action=query&list=categorymembers&cmtitle=Category:WikiProjects&cmtype=page&cmlimit=max&format=json
+  ```
+
+### **Use Cases for Agents**
+
+* "Find the Assessment page for WikiProject Chemistry and report the quality distribution."
+* "Get the top 10 most-viewed articles in WikiProject Physics from its Popular_pages report."
+* "Browse the master Popular_pages index to find which WikiProjects have traffic data."
+* "Check whether WikiProject Medicine has both an Assessment page and a Popular_pages page."
+
+### **Guardrails**
+
+1. **Case sensitivity:** WikiProject names in URLs are case-sensitive.
+   `Wikipedia:WikiProject_physics/Popular_pages` returns a 404;
+   `Wikipedia:WikiProject_Physics/Popular_pages` works.
+2. **Not all projects opt in:** Only projects that opted in to the bot-generated
+   reports have `/Assessment` and/or `/Popular_pages`. Always check existence
+   before attempting to fetch.
+3. **Data lag:** Popular_pages data is generated monthly; the most recent
+   report may be 1–2 months behind. Assessment pages are refreshed weekly.
+4. **Red links are normal:** A WikiProject page may exist while its subpages
+   are missing. Handle 404s gracefully via the API check above.
+
+---
+
 
 ## **Tooling**
 
