@@ -110,6 +110,13 @@
 
 - **Script compliance audit** — Completed a full audit of all 33+ shell and Python scripts across all skills. Fixed 8 scripts with missing zero-argument guards, bash 4+ incompatibilities (`declare -A` → `case`), unsafe `curl | python3` pipes (→ temp files with HTTP status checks), non-portable `mktemp` templates, deferred imports that blocked `--help`. Published `.claude/guidelines/script-audit-guidelines.md` with compliance standard, pre-commit hook template, and CI workflow template.
 
+- **Code example standardization** — Systematic fixes to make code examples self-contained and copy-pasteable across all skills:
+  - **Curl User-Agent headers:** Added `-H "User-Agent: ..."` to 16 curl commands in 3 skills (pagetriage-api, wikimedia-ml-services, wikipedia-en-article-audit) that previously required manual header setup
+  - **Curl `-s` flag:** Added `-s` (silent) to 7 curl commands in wikimedia-ml-services (only skill missing it)
+  - **Python `timeout=` parameter:** Added `timeout=30` or `timeout=60` to 17 `requests.post()` and `requests.get()` calls across 3 skills (wikimedia-ml-services, wikimedia-diffs, wikimedia-pageviews) to prevent hanging on slow API responses
+  - **Response structure documentation:** Added annotated JSON with field descriptions and access patterns to wikimedia-api-access (Action API query response) and wikimedia-eventstreams (SSE event schema)
+  - **SPARQL Python wrappers:** Wrapped the last raw SPARQL block in wikidata (P279 subclass traversal) with complete Python request code including User-Agent, timeout, and response parsing
+
 - **`wikipedia-error-handling` skill** — New skill (added June 2026) covering HTTP error handling across all Wikimedia APIs: status code reference, per-service rate limits, universal retry pattern, SPARQL-specific rate limiting, User-Agent 403 debugging, Lift Wing model errors (422, 404, empty scores), EventStreams connection drops and canary events, SPARQL error handling (timeout, syntax, empty results), and a general debugging checklist. Ships with `scripts/check-api-status.sh` (connectivity checker for 9 endpoints) and `assets/api_client.py` (reusable Python client with retry, rate limiting, SPARQL, Lift Wing, and EventStreams methods).
 
 - **Known Limitations sections** — Added to `wikimedia-ml-services/SKILL.md`: 8 documented limitations including 422 on revision 1, ~60s articlequality latency, no prediction cache, frozen Revscoring models, wiki coverage gaps, per-second rate limits, internal-only models, and heavy model performance.
