@@ -74,9 +74,13 @@
 
 ## What's outstanding
 
-### Planned skills
+### Planned skills (completed)
 
-- ~~**Categories**~~ — ✅ Published as `wikipedia-categories`. Covers the full category system: tree hierarchy, the three tests (Verifiable/Neutral/Defining), topic vs. set categories, eponymous categories, sort keys and DEFAULTSORT conventions, the six-question validity checklist, all API query patterns (including `generator=categorymembers`), Pywikibot generators and built-in scripts (`category.py`, `category_redirect`, `category_graph`, `commonscat`), PetScan intersections, WDQS/SPARQL for cross-wiki recursion, all Special pages, a comprehensive comparison of all 10 access methods with trade-off analysis, overcategorization rules, naming conventions, and category maintenance. Ships with `scripts/category-tree.sh`, `assets/category-inspector.py`, `assets/category-intersect.py`, and reference docs for overcategorization and naming conventions.
+- **~~Categories~~** — ✅ Published as `wikipedia-categories`.
+- **~~ORES / Lift Wing (ML services)~~** — ✅ Published as `wikimedia-ml-services`.
+- **~~API Strategy~~** — ✅ Published as `wikipedia-api-strategy`. Covers decision framework for all 6 access methods, task-specific decision trees, anti-pattern catalog, and performance comparisons. Ships with interactive CLI and importable Python module.
+
+### Future skill candidates Covers the full category system: tree hierarchy, the three tests (Verifiable/Neutral/Defining), topic vs. set categories, eponymous categories, sort keys and DEFAULTSORT conventions, the six-question validity checklist, all API query patterns (including `generator=categorymembers`), Pywikibot generators and built-in scripts (`category.py`, `category_redirect`, `category_graph`, `commonscat`), PetScan intersections, WDQS/SPARQL for cross-wiki recursion, all Special pages, a comprehensive comparison of all 10 access methods with trade-off analysis, overcategorization rules, naming conventions, and category maintenance. Ships with `scripts/category-tree.sh`, `assets/category-inspector.py`, `assets/category-intersect.py`, and reference docs for overcategorization and naming conventions.
 
 - **General-topic article drafting** — SOPs for writing non-biography Wikipedia articles (events, organizations, concepts, places). Different structure templates, different notability criteria, different citation patterns. Prior art exists in the original project roadmap.
 
@@ -109,6 +113,8 @@
 ### Completed improvements
 
 - **Script compliance audit** — Completed a full audit of all 33+ shell and Python scripts across all skills. Fixed 8 scripts with missing zero-argument guards, bash 4+ incompatibilities (`declare -A` → `case`), unsafe `curl | python3` pipes (→ temp files with HTTP status checks), non-portable `mktemp` templates, deferred imports that blocked `--help`. Published `.claude/guidelines/script-audit-guidelines.md` with compliance standard, pre-commit hook template, and CI workflow template.
+
+- **`wikipedia-api-strategy` skill** — New skill (added June 2026) providing a decision framework for choosing between the 6 Wikimedia access methods (REST API, Action API, SPARQL, SQL replicas, EventStreams, Pywikibot). Covers: quick decision flowchart, latency/complexity/authentication comparison table, 6 decision trees by task category (reading, batch, analytics, real-time, editing, graph queries), performance comparison (API vs. SQL speed ratios), strategy selection SOP with constraint checking, common anti-patterns with better alternatives, and quick reference cards by data size/operation scale. Ships with `scripts/api-strategy.sh` (interactive CLI with keyword-based task auto-detection) and `assets/api_selector.py` (importable Python module with `recommend()` and `compare()` functions).
 
 - **Code example standardization** — Systematic fixes to make code examples self-contained and copy-pasteable across all skills:
   - **Curl User-Agent headers:** Added `-H "User-Agent: ..."` to 16 curl commands in 3 skills (pagetriage-api, wikimedia-ml-services, wikipedia-en-article-audit) that previously required manual header setup
@@ -167,7 +173,7 @@ See **[AGENT-INTEGRATION-STRATEGY.md](AGENT-INTEGRATION-STRATEGY.md)** for the f
 - Set up a GitHub issue template for skill suggestions
 - Add `.claude.json` project configuration for agent discovery ✅
 - **Add skill tests** ✅ — `pytest`-based test suite in `tests/` with 290 tests:
-    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 29 skills (5 checks each: exists, required fields, description length, MIT license, directory match; duplicate entries removed)
+    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 30 skills (5 checks each: exists, required fields, description length, MIT license, directory match; duplicate entries removed)
     - `test_cross_api_pipeline.py`: Mock-based unit tests for the pipeline script (title normalization, batch splitting, P31 classification, citation counting, namespace filtering)
     - `test_markdown_sops.py`: Content-accuracy checks for new/modified SOPs (batch entity classification, Scenario C, Title Format Guide, 429 Retry-After)
     - `test_liftwing_multi_model.py`: Mock-based tests for the Lift Wing multi-model scorer (cache, extractors, formatting, error handling)

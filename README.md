@@ -59,6 +59,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 |-------|-------------------|
 | [wikimedia-api-access](.claude/skills/wikimedia-api-access/SKILL.md) | Access Wikipedia and Wikimedia APIs (REST, Action, SPARQL) with correct User-Agent headers, rate limiting, and 429/403 error handling |
 | [wikipedia-error-handling](.claude/skills/wikipedia-error-handling/SKILL.md) | Handle HTTP errors, rate limits, and API failures across all Wikimedia services — retry strategies, backoff patterns, error response formats, and recovery procedures for the Action API, REST API, SPARQL, Lift Wing ML, and EventStreams. Ships with an `api_client.py` reusable Python client and a `check-api-status.sh` connectivity checker. |
+| [wikipedia-api-strategy](.claude/skills/wikipedia-api-strategy/SKILL.md) | Choose the right Wikimedia API or tool for the task — decision framework covering REST API, Action API, SPARQL, SQL database replicas, EventStreams, and Pywikibot, with latency/complexity/authentication trade-offs. Ships with an `api_selector.py` importable module and an `api-strategy.sh` interactive CLI. |
 | [wikimedia-database](.claude/skills/wikimedia-database/SKILL.md) | Execute SQL queries against Wikipedia database replicas (enwiki, wikidata, commonswiki) via an SSH tunnel to Toolforge |
 | [wikimedia-toolforge](.claude/skills/wikimedia-toolforge/SKILL.md) | Manage Toolforge accounts, web services, Kubernetes pods, cron jobs, and file deployment for Wikimedia tools |
 | [wikimedia-cdn-assets](.claude/skills/wikimedia-cdn-assets/SKILL.md) | Load JavaScript, CSS, and fonts for Toolforge tools from Wikimedia's privacy-preserving cdnjs mirror, ensuring user privacy and policy compliance |
@@ -123,6 +124,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | Draft a well-structured Wikipedia biography with proper citations and section ordering | `wikipedia-en-biography-writing` (see ⚠️ warning above) |
 | Audit an article for factual errors, NPOV violations, and structural problems | `wikipedia-en-article-audit` (read-only — never edits live articles) |
 | | **▸ Building Tools** |
+| Figure out which API or tool to use for a given task | `wikipedia-api-strategy` |
 | Build a bot or script that fetches data from Wikipedia | `wikimedia-api-access` |
 | Handle HTTP 429/403/422 errors and retry failed API calls | `wikipedia-error-handling` |
 | Test which Wikimedia APIs are reachable from your environment | `bash .claude/skills/wikipedia-error-handling/scripts/check-api-status.sh` |
