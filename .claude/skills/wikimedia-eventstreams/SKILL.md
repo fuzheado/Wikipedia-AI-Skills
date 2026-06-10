@@ -3,9 +3,21 @@ name: wikimedia-eventstreams
 description: Consume real-time streams of Wikimedia events (edits, page creations, deletions, moves, log entries) via Server-Sent Events (SSE). Covers the EventStreams HTTP service, stream schemas, client libraries (Python/JS/curl), filtering, historical replay, canary handling, auto-reconnect, and building live dashboards, patrol monitors, and cross-wiki trackers
 license: MIT
 compatibility: opencode
+skill_discovery_hints:
+  - keywords: ["real-time", "stream", "SSE", "EventStreams", "live", "recent change", "recentchange"]
+  - keywords: ["new page", "page creation", "patrol", "monitor", "watch", "live feed"]
+  - keywords: ["edit event", "revision create", "log event", "streaming"]
 ---
 
 > ⚠️ **User-Agent required:** All examples in this skill connect to `stream.wikimedia.org`. Requests without a descriptive `User-Agent` header may be throttled. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns. Before writing code, load that skill for the required User-Agent boilerplate.
+
+---
+
+> 💡 **Related skills for common workflows:**
+> - **[wikimedia-ml-services](../wikimedia-ml-services/SKILL.md)** — Score events from the stream (revert risk, goodfaith, damaging) for real-time patrol and vandalism detection
+> - **[wikimedia-diffs](../wikimedia-diffs/SKILL.md)** — Fetch and classify diffs for edits detected in the stream (addition-heavy, deletion-heavy, replacement patterns)
+> - **[pagetriage-api](../pagetriage-api/SKILL.md)** — Check PageTriage review status for new pages detected in the stream
+> - **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** — Required User-Agent headers and rate limiting for any follow-up API calls
 
 ---
 

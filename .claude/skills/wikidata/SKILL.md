@@ -3,9 +3,19 @@ name: wikidata
 description: Understand and query Wikidata — the free, collaborative, multilingual knowledge graph that underpins Wikipedia's inter-language links, Commons structured data, and semantic facts across all Wikimedia projects. Covers SPARQL, the Wikibase REST/Action APIs, RDF data dumps, and semantic web concepts
 license: MIT
 compatibility: opencode
+skill_discovery_hints:
+  - keywords: ["SPARQL", "Wikidata", "knowledge graph", "semantic query", "QID", "Q number", "P number", "entity"]
+  - keywords: ["cross-wiki", "interlanguage", "sitelink", "language link", "gap analysis"]
+  - keywords: ["image", "P18", "property lookup", "item type", "instance of", "P31"]
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns. Before writing any code, load that skill for the required User-Agent boilerplate.
+
+> 💡 **Related skills for common workflows:**
+> - **[wikimedia-ml-services](../wikimedia-ml-services/SKILL.md)** — Score article quality (FA/GA/B/C/Start/Stub) for items found via SPARQL, to enrich query results with quality data
+> - **[wikimedia-pageviews](../wikimedia-pageviews/SKILL.md)** — Get traffic data for Wikipedia articles linked to queried items, for ranking by popularity
+> - **[wikipedia-categories](../wikipedia-categories/SKILL.md)** — Cross-reference Wikidata items with Wikipedia category tree membership
+> - **[wikimedia-commons](../wikimedia-commons/SKILL.md)** — Find media files for items missing images (P18) via Commons search
 
 Wikidata (https://www.wikidata.org) is a **free, collaborative, multilingual knowledge graph** that serves as the central structured data repository for the Wikimedia ecosystem. It is operated by the Wikimedia Foundation and is openly editable by anyone.
 
@@ -63,6 +73,27 @@ Properties describe relationships between items or attach values to them. Each p
 
 ---
 
+## **Quick Reference: What Do You Want to Do?**
+
+| Goal | Best Method | Endpoint / Query | Key Parameters |
+|------|-------------|------------------|----------------|
+| Look up a single item's label, description, or statements | Action API (`wbgetentities`) | `https://www.wikidata.org/w/api.php` | `action=wbgetentities&ids=Q937&props=labels\|descriptions\|claims` |
+| Search for an item by name | Action API (`wbsearchentities`) | `https://www.wikidata.org/w/api.php` | `action=wbsearchentities&search=Einstein&language=en&limit=50` |
+| Resolve Wikipedia titles to QIDs (batch) | Action API (`prop=pageprops`) | `https://en.wikipedia.org/w/api.php` | `action=query&prop=pageprops&ppprop=wikibase_item&titles=Title1\|Title2` |
+| Check what class/type an item is (P31) | Action API (`wbgetentities`) + claims | `https://www.wikidata.org/w/api.php` | `action=wbgetentities&ids=Q937&props=claims` → access `claims.P31[].mainsnak.datavalue.value.id` |
+| Find all items matching criteria | **SPARQL** | `https://query.wikidata.org/sparql` | See SPARQL examples below |
+| Check if an item has a specific property value | **SPARQL** (faster) or Action API | SPARQL: `?item wdt:P166 wd:Q38104.` API: `wbgetentities` + filter locally | SPARQL is 10-100× faster for filtering across many items |
+| Check sitelinks (which Wikipedia languages have an article for this item) | Action API (`wbgetentities`) | `https://www.wikidata.org/w/api.php` | `action=wbgetentities&ids=Q937&props=sitelinks` → access `entities.Q937.sitelinks` |
+| Find Wikipedia articles missing in another language | **SPARQL** with `schema:isPartOf` | `https://query.wikidata.org/sparql` | See "Cross-Language Gap Analysis" query below |
+| Get the image (P18) for an item | Action API (`wbgetentities`) | `https://www.wikidata.org/w/api.php` | `action=wbgetentities&ids=Q937&props=claims` → access `claims.P18[].mainsnak.datavalue.value` (Commons filename) |
+| Batch-fetch data for 50+ items | Action API (batch 50 at a time) | `https://www.wikidata.org/w/api.php` | `action=wbgetentities&ids=Q1\|Q2\|...\|Q50&props=labels\|claims` |
+| Get item edit history | Action API (`prop=revisions`) | `https://www.wikidata.org/w/api.php` | `action=query&prop=revisions&titles=Q937` |
+| Explore schema/properties visually | Browser | `https://www.wikidata.org/wiki/Q937` or `https://www.wikidata.org/wiki/P31` | — |
+
+> ⚠️ **All API calls require a descriptive `User-Agent` header.** See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill.
+
+---
+
 ## **How Wikidata Works Under the Hood**
 
 Wikidata is built on the **Wikibase** software, which is a **MediaWiki extension**. This means:
@@ -109,10 +140,110 @@ SELECT ?museum ?museumLabel ?coords WHERE {
 }
 ```
 
-Access via the REST API:
+Access via the REST API with Python:
+```python
+import requests
+
+query = """
+SELECT ?museum ?museumLabel ?coords WHERE {
+  ?museum wdt:P31 wd:Q33506;
+          wdt:P131 wd:Q90;
+          wdt:P625 ?coords.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+"""
+
+headers = {
+    "User-Agent": "MyBot/1.0 (https://example.com; user@example.com) SPARQLQuery",
+    "Accept": "application/sparql-results+json",
+}
+resp = requests.get(
+    "https://query.wikidata.org/sparql",
+    params={"format": "json", "query": query},
+    headers=headers,
+    timeout=60,
+)
+resp.raise_for_status()
+data = resp.json()
+
+# Response structure:
+# {
+#   "head": {"vars": ["museum", "museumLabel", "coords"]},
+#   "results": {
+#     "bindings": [
+#       {
+#         "museum": {"type": "uri", "value": "http://www.wikidata.org/entity/Q..."},
+#         "museumLabel": {"type": "literal", "value": "Louvre"},
+#         "coords": {"type": "literal", "value": "Point(2.33 48.86)"},
+#       },
+#       ...
+#     ]
+#   }
+# }
+# Access: data["results"]["bindings"][0]["museumLabel"]["value"]
+
+for result in data["results"]["bindings"]:
+    name = result.get("museumLabel", {}).get("value", "?")
+    print(name)
 ```
-GET https://query.wikidata.org/sparql?format=json&query=SELECT...
+
+### **Cross-Language Gap Analysis (Sitelink Check)**
+
+Find Wikidata items that have an English Wikipedia article but **no** French Wikipedia article — useful for cross-wiki content gap analysis:
+
+```sparql
+# Find items with English articles missing French equivalents
+SELECT ?item ?itemLabel ?enArticle WHERE {
+  # Item has an English Wikipedia article
+  ?enArticle schema:about ?item ;
+             schema:isPartOf <https://en.wikipedia.org/> .
+  
+  # Item does NOT have a French Wikipedia article
+  FILTER NOT EXISTS {
+    ?frArticle schema:about ?item ;
+               schema:isPartOf <https://fr.wikipedia.org/> .
+  }
+  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+LIMIT 100
 ```
+
+```python
+import requests
+
+query = """
+SELECT ?item ?itemLabel ?enArticle WHERE {
+  ?enArticle schema:about ?item ;
+             schema:isPartOf <https://en.wikipedia.org/> .
+  FILTER NOT EXISTS {
+    ?frArticle schema:about ?item ;
+               schema:isPartOf <https://fr.wikipedia.org/> .
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+LIMIT 100
+"""
+
+headers = {
+    "User-Agent": "MyBot/1.0 (https://example.com; user@example.com) GapAnalysis",
+    "Accept": "application/sparql-results+json",
+}
+resp = requests.get(
+    "https://query.wikidata.org/sparql",
+    params={"format": "json", "query": query},
+    headers=headers,
+    timeout=60,
+)
+data = resp.json()
+
+for result in data["results"]["bindings"]:
+    item_qid = result["item"]["value"].split("/")[-1]  # Extract Q ID from URI
+    label = result.get("itemLabel", {}).get("value", "?")
+    print(f"{item_qid}: {label}")
+```
+
+> 💡 **Note on SPARQL sitelink patterns:** The `schema:about` / `schema:isPartOf` pattern is the standard way to query sitelinks. Unlike regular properties (P-numbers), sitelinks use a different RDF schema. The `FILTER NOT EXISTS` variant finds gaps (articles missing in a given language). For bulk checking across known QIDs, use the `VALUES` clause to batch-check 50-100 at a time.
 
 ### **Rate Limits & Usage Guidelines**
 

@@ -110,6 +110,22 @@
 
 - **Script compliance audit** — Completed a full audit of all 33+ shell and Python scripts across all skills. Fixed 8 scripts with missing zero-argument guards, bash 4+ incompatibilities (`declare -A` → `case`), unsafe `curl | python3` pipes (→ temp files with HTTP status checks), non-portable `mktemp` templates, deferred imports that blocked `--help`. Published `.claude/guidelines/script-audit-guidelines.md` with compliance standard, pre-commit hook template, and CI workflow template.
 
+- **`wikipedia-error-handling` skill** — New skill (added June 2026) covering HTTP error handling across all Wikimedia APIs: status code reference, per-service rate limits, universal retry pattern, SPARQL-specific rate limiting, User-Agent 403 debugging, Lift Wing model errors (422, 404, empty scores), EventStreams connection drops and canary events, SPARQL error handling (timeout, syntax, empty results), and a general debugging checklist. Ships with `scripts/check-api-status.sh` (connectivity checker for 9 endpoints) and `assets/api_client.py` (reusable Python client with retry, rate limiting, SPARQL, Lift Wing, and EventStreams methods).
+
+- **Known Limitations sections** — Added to `wikimedia-ml-services/SKILL.md`: 8 documented limitations including 422 on revision 1, ~60s articlequality latency, no prediction cache, frozen Revscoring models, wiki coverage gaps, per-second rate limits, internal-only models, and heavy model performance.
+
+- **JSON response structure annotations** — Added to `wikimedia-ml-services/SKILL.md` (Revscoring ORES envelope, modern revert-risk envelope, modern articlequality continuous score, all with access patterns) and `wikimedia-diffs/SKILL.md` (Action API compare response with net/churn distinction).
+
+- **Decision tables** — Added to `wikidata/SKILL.md` (11-row "What Do You Want to Do?" table) and `wikimedia-commons/SKILL.md` (10-row table), matching the effective format from `wikipedia-categories`.
+
+- **Diff classification SOP** — Added to `wikimedia-diffs/SKILL.md`: change type classification by byte statistics and diff table structure, common vandalism signatures table, and integration guidance with ML revert-risk scoring.
+
+- **Cross-language SPARQL sitelink examples** — Added to `wikidata/SKILL.md`: complete Python code for cross-language gap analysis using `schema:about` / `schema:isPartOf` pattern with `FILTER NOT EXISTS`. All SPARQL examples now include full Python request code with response parsing.
+
+- **Cross-references between related skills** — Added to `wikidata` (→ ml-services, pageviews, categories, commons), `wikimedia-eventstreams` (→ ml-services, diffs, pagetriage-api), `wikipedia-page-anatomy` (→ templates, wikitext, citations, categories).
+
+- **`skill_discovery_hints` metadata** — Added to 5 skills: `wikidata`, `wikimedia-ml-services`, `wikimedia-eventstreams`, `wikimedia-commons`, `wikipedia-error-handling`. Each maps keywords to skills for automatic agent discovery.
+
 - **WDQS SPARQL rate limits documented** — Researched and documented WDQS-specific rate limits (60s query timeout, 60s processing per 60s window, 30 errors/min, 429 with Retry-After, SLO 95%) in `wikidata/SKILL.md` and `references/wikidata-api.md`. Added 429 handling code example with retry logic. Documented `Accept-Encoding: gzip, deflate` requirement, POST body format for large queries, and `SERVICE wikibase:label` performance warning. Fixed `sparql-query.sh` to use temp-file + HTTP status pattern with explicit 429 detection.
 
 - **`wikipedia-categories` skill** — new skill covering the Wikipedia category system end-to-end: tree hierarchy, three validity tests (Verifiable/Neutral/Defining), topic vs. set categories, sort keys and DEFAULTSORT, comprehensive comparison of all access methods (Action API, Pywikibot, PetScan, WDQS, Special pages) with trade-off analysis, Pywikibot generators and built-in scripts, overcategorization rules, naming conventions, and category maintenance. Ships with 2 reference docs, 1 CLI script, and 2 Python assets. The proposal was written first in `proposals/categories-skill.md` before implementation.
@@ -144,7 +160,7 @@ See **[AGENT-INTEGRATION-STRATEGY.md](AGENT-INTEGRATION-STRATEGY.md)** for the f
 - Set up a GitHub issue template for skill suggestions
 - Add `.claude.json` project configuration for agent discovery ✅
 - **Add skill tests** ✅ — `pytest`-based test suite in `tests/` with 290 tests:
-    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 28 skills (5 checks each: exists, required fields, description length, MIT license, directory match; duplicate entries removed)
+    - `test_yaml_frontmatter.py`: YAML frontmatter validation for all 29 skills (5 checks each: exists, required fields, description length, MIT license, directory match; duplicate entries removed)
     - `test_cross_api_pipeline.py`: Mock-based unit tests for the pipeline script (title normalization, batch splitting, P31 classification, citation counting, namespace filtering)
     - `test_markdown_sops.py`: Content-accuracy checks for new/modified SOPs (batch entity classification, Scenario C, Title Format Guide, 429 Retry-After)
     - `test_liftwing_multi_model.py`: Mock-based tests for the Lift Wing multi-model scorer (cache, extractors, formatting, error handling)

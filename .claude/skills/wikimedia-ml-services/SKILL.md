@@ -4,6 +4,14 @@ description: Score article quality, revert risk, edit quality (goodfaith/damagin
 depends_on: [wikimedia-api-access]
 license: MIT
 compatibility: opencode
+skill_discovery_hints:
+  - keywords: ["revert", "vandalism", "quality", "FA", "GA", "Start", "Stub", "article quality", "goodfaith", "damaging"]
+  - keywords: ["readability", "grade level", "Flesch-Kincaid", "reading score"]
+  - keywords: ["topic", "classification", "category prediction", "outlink", "article topic"]
+  - keywords: ["Lift Wing", "ORES", "ML", "machine learning", "inference", "model score"]
+  - keywords: ["reference", "citation quality", "reference need", "unsourced", "reference risk"]
+  - keywords: ["language detection", "langid", "identify language"]
+  - keywords: ["translation", "content translation", "cross-language", "recommendation"]
 ---
 
 > ⚠️ **User-Agent required:** All API calls below need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -111,19 +119,21 @@ headers = {
 
 ### Handling Response Structure
 
+> ⚠️ **This is the single most common source of bugs.** The response formats are nested and non-obvious. Always check the response structure before writing access code.
+
 **Revscoring models** on Lift Wing use the **old ORES response format** (not the Lift Wing envelope):
 ```json
 {
-  "enwiki": {
+  "enwiki": {                            # ← key is the wiki code (changes per model!)
     "models": {
       "articlequality": {"version": "0.9.2"}
     },
     "scores": {
-      "123456789": {
-        "articlequality": {
+      "123456789": {                      # ← key is the revision ID as a STRING
+        "articlequality": {              # ← key is the model name
           "score": {
-            "prediction": "C",
-            "probability": {
+            "prediction": "C",           # ← "FA"/"GA"/"B"/"C"/"Start"/"Stub"
+            "probability": {              # ← per-class confidence (sums to 1.0)
               "B": 0.02, "C": 0.78, "FA": 0.0,
               "GA": 0.12, "Start": 0.07, "Stub": 0.01
             }
@@ -135,11 +145,14 @@ headers = {
 }
 ```
 
-Access the prediction: `result[wiki]["scores"][str(rev_id)][model_name]["score"]["prediction"]`
+**Access pattern:**
+```python
+result[wiki]["scores"][str(rev_id)][model_name]["score"]["prediction"]
+# Example:
+grade = result["enwiki"]["scores"]["123456789"]["articlequality"]["score"]["prediction"]
+```
 
-**Modern models** have per-model response schemas. See the model-specific SOPs below.
-
-**Modern revert-risk models** use a unified envelope:
+**Modern revert-risk models** use a flat unified envelope:
 ```json
 {
   "model_name": "revertrisk-language-agnostic",
@@ -147,11 +160,41 @@ Access the prediction: `result[wiki]["scores"][str(rev_id)][model_name]["score"]
   "wiki_db": "enwiki",
   "revision_id": 123456789,
   "output": {
-    "prediction": false,
-    "probabilities": {"true": 0.34, "false": 0.66}
+    "prediction": false,                 # ← bool: true = likely reverted
+    "probabilities": {
+      "true": 0.34,                       # ← float 0-1: probability of revert
+      "false": 0.66
+    }
   }
 }
 ```
+
+**Access pattern:**
+```python
+risk = result["output"]["probabilities"]["true"]   # ← float 0-1
+prediction = result["output"]["prediction"]          # ← bool
+```
+
+**Modern articlequality model (continuous score):**
+```json
+{
+  "model_name": "articlequality",
+  "model_version": "1",
+  "wiki_db": "enwiki",
+  "revision_id": 123456789,
+  "output": {
+    "prediction": {"score": 0.72}        # ← float 0-1, NOT a discrete grade
+  }
+}
+```
+
+**Access pattern:**
+```python
+score = result["output"]["prediction"]["score"]    # ← float 0-1
+# 0.72 is closer to "B" grade (the continuous model is different from the discrete Revscoring model!)
+```
+
+**Modern models** have per-model response schemas. See the model-specific SOPs below.
 
 ---
 
@@ -603,6 +646,21 @@ Models in the "experimental" Kubernetes namespace are only accessible from WMF p
 | Outlink-based article topic | [Model card](https://meta.wikimedia.org/wiki/Machine_learning_models/Language_agnostic_link-based_article_topic_model) |
 | Article descriptions | [Model cards (description generation)](https://meta.wikimedia.org/wiki/Machine_learning_models) |
 | Logo detection | [Model card](https://meta.wikimedia.org/wiki/Machine_learning_models/Logo_detection) |
+
+---
+
+## Known Limitations
+
+| Limitation | Affected Models | Impact | Workaround |
+|------------|:---------------:|--------|------------|
+| **Revert-risk models return HTTP 422 for revision 1.** New pages have no parent revision to compare against, so the model cannot compute a score. | `revertrisk-language-agnostic`, `revertrisk-multilingual`, `revertrisk-wikidata` | Cannot score brand-new page creations — a common use case for real-time patrol tools. | Use the `articlequality` model as a fallback for new pages (it scores the revision itself, not the diff). Note that `articlequality` has ~60s processing latency (see below). |
+| **Articlequality model has ~60s processing latency.** Newly created revisions are not immediately available for scoring. The model returns empty scores for revisions less than ~60 seconds old. | `articlequality`, `{wiki}-articlequality` | Real-time patrol tools may get empty scores for very new pages. | Retry with exponential backoff (max 3 attempts, 30s apart). Or accept the empty score as "unknown" and re-score later. |
+| **Lift Wing has no prediction cache.** Unlike ORES (which pre-computed scores), every call to Lift Wing runs a fresh inference. | All models | Scoring the same revision twice wastes rate limit quota and doubles latency. Risk: rate limit exhaustion in batch operations. | Implement your own cache (see [SOP: Implementing Caching](#sop-implementing-caching-lift-wing-has-none)). Use an LRU cache with TTL for short-lived tools, Redis/SQLite for persistent services. |
+| **Revscoring models are frozen — no retraining.** The `{wiki}-goodfaith`, `{wiki}-damaging`, `{wiki}-articlequality` etc. models are ported from ORES with no further updates. | All Revscoring models (`{wiki}-*`) | Model accuracy degrades over time (model drift). No new language coverage. | Migrate to modern models (`revertrisk-*`, `articlequality` continuous, `outlink-topic-model`) where available. Check the [model list](https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing#Revscoring_models_(migrated_from_ORES)) for coverage. |
+| **Not all models cover all wikis.** Revscoring models only work on the wikis they were trained on. | `{wiki}-*` Revscoring models | Calling a model with an unsupported wiki returns a 404 or empty prediction. | Check the [model list](https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing#Revscoring_models_(migrated_from_ORES)) before using a wiki-specific model. Use language-agnostic modern models for broader coverage. |
+| **Per-second rate limits are tighter than per-hour.** Anonymous: 15 req/s. Authenticated: 100 req/s. Batch operations can hit the per-second limit before the per-hour limit. | All models | 429 errors during batch scoring. | Add `time.sleep(0.1)` between requests (10 req/s). Use `requests.Session()` for connection reuse. Implement exponential backoff on 429. Authenticate via OAuth for 100 req/s. |
+| **Some models are internal-only.** Models in the "experimental" Kubernetes namespace are not accessible from external clients. | Varies | 403/404 errors when calling models not in the public API. | Only use models listed in the [public API reference](https://api.wikimedia.org/wiki/Lift_Wing_API/Reference). |
+| **`article-descriptions` model is heavy and slow.** Generating a short description is computationally expensive due to the beam search pattern. | `article-descriptions` | Requests can take 10-30 seconds or timeout. | Use `num_beams=1` for faster (but lower quality) results. Increase HTTP timeout to 60s. |
 
 ---
 

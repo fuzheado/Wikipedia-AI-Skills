@@ -58,6 +58,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | Skill | What it helps with |
 |-------|-------------------|
 | [wikimedia-api-access](.claude/skills/wikimedia-api-access/SKILL.md) | Access Wikipedia and Wikimedia APIs (REST, Action, SPARQL) with correct User-Agent headers, rate limiting, and 429/403 error handling |
+| [wikipedia-error-handling](.claude/skills/wikipedia-error-handling/SKILL.md) | Handle HTTP errors, rate limits, and API failures across all Wikimedia services — retry strategies, backoff patterns, error response formats, and recovery procedures for the Action API, REST API, SPARQL, Lift Wing ML, and EventStreams. Ships with an `api_client.py` reusable Python client and a `check-api-status.sh` connectivity checker. |
 | [wikimedia-database](.claude/skills/wikimedia-database/SKILL.md) | Execute SQL queries against Wikipedia database replicas (enwiki, wikidata, commonswiki) via an SSH tunnel to Toolforge |
 | [wikimedia-toolforge](.claude/skills/wikimedia-toolforge/SKILL.md) | Manage Toolforge accounts, web services, Kubernetes pods, cron jobs, and file deployment for Wikimedia tools |
 | [wikimedia-cdn-assets](.claude/skills/wikimedia-cdn-assets/SKILL.md) | Load JavaScript, CSS, and fonts for Toolforge tools from Wikimedia's privacy-preserving cdnjs mirror, ensuring user privacy and policy compliance |
@@ -123,6 +124,9 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | Audit an article for factual errors, NPOV violations, and structural problems | `wikipedia-en-article-audit` (read-only — never edits live articles) |
 | | **▸ Building Tools** |
 | Build a bot or script that fetches data from Wikipedia | `wikimedia-api-access` |
+| Handle HTTP 429/403/422 errors and retry failed API calls | `wikipedia-error-handling` |
+| Test which Wikimedia APIs are reachable from your environment | `bash .claude/skills/wikipedia-error-handling/scripts/check-api-status.sh` |
+| Use a reusable Python client with built-in retry and rate limiting | `python3 .claude/skills/wikipedia-error-handling/assets/api_client.py --help` |
 | Chain multiple APIs (Pageviews → Wikidata → content analysis) with correct title normalization | `wikimedia-api-access` (cross-API pipeline script) |
 | Run SQL queries on the Wikipedia database to analyze page data at scale | `wikimedia-database` |
 | Deploy a web tool to Toolforge and manage its services | `wikimedia-toolforge` |

@@ -3,6 +3,11 @@ name: wikimedia-commons
 description: Search, upload, and understand Wikimedia Commons — the free media repository of images, video, sound, 3D files, PDFs, and other media used across Wikipedia and its sister projects. Browse categories, find reusable media, and retrieve file metadata
 license: MIT
 compatibility: opencode
+skill_discovery_hints:
+  - keywords: ["Commons", "image", "media", "photo", "file", "upload", "thumbnail"]
+  - keywords: ["depicts", "haswbstatement", "structured data", "media search"]
+  - keywords: ["license", "copyright", "CC BY", "Creative Commons", "public domain"]
+  - keywords: ["EXIF", "metadata", "file info", "global usage"]
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -28,6 +33,25 @@ Commons accepts uploads in many formats. The most common categories:
 | 3D Models | STL (rendered via [3D viewer](https://commons.wikimedia.org/wiki/Commons:3D)) |
 | Documents | PDF, DjVu |
 | Animations | GIF, APNG, animated SVG |
+
+## **Quick Reference: What Do You Want to Find?**
+
+| Goal | Best Method | API / Endpoint | Key Parameters |
+|------|-------------|----------------|----------------|
+| Find images by keyword | Action API search (`srnamespace=6`) | `https://commons.wikimedia.org/w/api.php` | `action=query&list=search&srnamespace=6&srsearch=keyword&srlimit=50` |
+| Find images with visual browsing | MediaSearch backend | `https://commons.wikimedia.org/w/api.php` | `action=query&list=search&srnamespace=6&srbackend=MediaSearch&srsearch=keyword` |
+| Find files by structured data (e.g., "depicts human") | `haswbstatement:` prefix in search | `https://commons.wikimedia.org/w/api.php` | `srsearch=haswbstatement:P180=Q5` (works in `srsearch` for Action API, or directly in the web search box) |
+| Get file metadata (license, author, date) | Action API (`prop=imageinfo`) | `https://commons.wikimedia.org/w/api.php` | `action=query&prop=imageinfo&titles=File:Example.jpg&iiprop=extmetadata\|user\|timestamp` |
+| Check where a file is used across wikis | Action API (`prop=globalusage`) | `https://commons.wikimedia.org/w/api.php` | `action=query&prop=globalusage&titles=File:Example.jpg` |
+| Generate a thumbnail | REST API | `https://commons.wikimedia.org/api/rest_v1/page/pdf/{title}` or image scaling endpoint | See Commons API reference |
+| Find files in a specific category | Action API (`list=categorymembers`) | `https://commons.wikimedia.org/w/api.php` | `action=query&list=categorymembers&cmtitle=Category:Bridges_in_Paris&cmnamespace=6` |
+| Get EXIF/camera data | Action API (`prop=imageinfo`) with `iiprop=metadata` | `https://commons.wikimedia.org/w/api.php` | `action=query&prop=imageinfo&titles=File:Example.jpg&iiprop=metadata` |
+| Upload a single file | Action API (`action=upload`) | `https://commons.wikimedia.org/w/api.php` | Requires authentication + bot password. See [Uploading to Commons](#uploading-to-commons). |
+| Check licensing | Action API (`prop=imageinfo`) with `iiprop=extmetadata` | `https://commons.wikimedia.org/w/api.php` | Parse `extmetadata.Credit.value` and `extmetadata.LicenseShortName.value` for license info |
+
+> ⚠️ **All API calls require a descriptive `User-Agent` header.** See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill.
+
+---
 
 ## **Searching Commons**
 

@@ -37,7 +37,10 @@ This works for any Wikimedia project — just change the hostname and provide th
 
 ## SOP: Fetching Diffs via the Action API
 
-The Action API's `compare` module returns an HTML table diff plus revision metadata.
+The Action API's `compare` module returns an HTML table diff plus revision metadata. Common workflows that use diffs:
+- Real-time patrol (see **[wikimedia-eventstreams](../wikimedia-eventstreams/SKILL.md)**): detect an edit → fetch its diff → classify the change
+- Vandalism detection (see **[wikimedia-ml-services](../wikimedia-ml-services/SKILL.md)**): score an edit for revert risk → fetch diff → analyze patterns
+- Article monitoring: track changes to watched pages over time
 
 ### Basic Diff Between Two Revisions (Absolute IDs Required)
 
@@ -91,22 +94,36 @@ diff = s.get(API, params={
 {
   "compare": {
     "fromtitle": "Python (programming language)",
-    "fromrevid": 123456789,
-    "fromsize": 24500,
-    "torevid": 123456790,
-    "tosize": 24620,
-    "diffsize": 150,   ← total bytes changed (churn, not net)
-    "*": "...HTML diff table..."
+    "fromrevid": 123456789,   # ← old revision ID (int)
+    "fromsize": 24500,         # ← old page size in bytes (int)
+    "torevid": 123456790,      # ← new revision ID (int)
+    "tosize": 24620,           # ← new page size in bytes (int)
+    "diffsize": 150,           # ← total churn: additions + removals (int, NOT net change!)
+    "*": "...HTML diff table..."  # ← HTML table with class="diff" (string)
   }
 }
+```
+
+**Access pattern:**
+```python
+cmp = data["compare"]
+diffsize = cmp["diffsize"]     # total churn (e.g., 150 bytes added + removed)
+net_change = cmp["tosize"] - cmp["fromsize"]  # actual net change (e.g., +120 bytes)
+# To estimate additions vs. removals:
+if net_change >= 0:
+    added = net_change
+    removed = diffsize - net_change
+else:
+    removed = -net_change
+    added = diffsize + net_change
 ```
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `fromrevid` / `torevid` | int | Revision IDs |
 | `fromsize` / `tosize` | int | Page sizes in bytes |
-| `diffsize` | int | Total bytes changed (added + removed churn) |
-| `*` | string | HTML table of the diff |
+| `diffsize` | int | Total bytes changed (added + removed churn — NOT net change) |
+| `*` | string | HTML table of the diff (parse with BeautifulSoup) |
 
 ---
 
@@ -217,6 +234,69 @@ for td in soup.find_all("td", class_="diff-deletedline"):
 for span in soup.find_all("span", class_="diffchange"):
     print(f"~ {span.get_text()}")
 ```
+
+---
+
+## SOP: Classifying Diff Types (Change Pattern Analysis)
+
+For real-time patrol, vandalism detection, and edit pattern analysis, classify diffs by their change characteristics. This is commonly combined with ML scores from **[wikimedia-ml-services](../wikimedia-ml-services/SKILL.md)**.
+
+### Classification by Byte Statistics
+
+```python
+cmp = data["compare"]
+diffsize = cmp.get("diffsize", 0)
+fromsize = cmp.get("fromsize", 0)
+tosize = cmp.get("tosize", 0)
+net = tosize - fromsize
+
+if diffsize < 50:
+    change_type = "minor_tweak"       # Very small change
+elif net < 0 and abs(net) > diffsize * 0.7:
+    change_type = "deletion_heavy"    # >70% of churn is removal
+elif diff size > 0 and net > diffsize * 0.7:
+    change_type = "addition_heavy"    # >70% of churn is addition
+elif diffsize > 1000 and abs(net) < diffsize * 0.3:
+    change_type = "replacement"       # High churn, low net = content swapped
+else:
+    change_type = "mixed"             # Balanced additions and removals
+```
+
+### Classification by Diff Table Structure
+
+```python
+from bs4 import BeautifulSoup
+
+soup = BeautifulSoup(data["compare"]["*"], "html.parser")
+additions = len(soup.find_all("td", class_="diff-addedline"))
+deletions = len(soup.find_all("td", class_="diff-deletedline"))
+
+if additions == 0 and deletions > 0:
+    pattern = "pure_deletion"
+elif deletions == 0 and additions > 0:
+    pattern = "pure_addition"
+elif additions > 0 and deletions > 0:
+    ratio = additions / deletions
+    if ratio > 5:
+        pattern = "mostly_addition"
+    elif deletions / additions > 5:
+        pattern = "mostly_deletion"
+    else:
+        pattern = "balanced_edit"
+```
+
+### Common Vandalism Signatures
+
+| Diff Pattern | Suspicious? | Common Explanation |
+|-------------|:-----------:|-------------------|
+| Large deletion (>50% of page), no edit summary | 🚨 High | Page blanking vandalism |
+| Massive addition (>50KB), new user, no summary | 🚨 High | Possible copyvio or test edit |
+| High churn with zero net change | ⚠️ Medium | Likely content replacement — could be legitimate or vandalism |
+| Very small diff (<10 bytes) on main page | 🟢 Low | Likely typo fix or formatting |
+| Single URL replacement in external links | ⚠️ Medium | Possible link spam |
+| Diff adds invisible Unicode chars (zero-width, RTL markers) | 🚨 High | Obfuscated vandalism |
+
+> 💡 **Integration tip:** Combine diff classification with ML revert-risk scores from `revertrisk-language-agnostic` (see wikimedia-ml-services) for a more accurate vandalism detector. High revert probability + addition-heavy diff = much more likely to be vandalism.
 
 ---
 
