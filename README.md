@@ -278,6 +278,21 @@ New contributions should include tests. The project uses `pytest` with a test su
 - **Code execution** - runnable Python assets (like the cross-API pipeline script and the
   Pywikibot quick reference) have mock-based unit tests
 
+## Research & Validation
+
+The skills in this repository were validated through a systematic A/B test — **24 parallel agent runs across 12 tasks in 3 rounds of escalating complexity** — comparing agent performance with and without skill injection.
+
+**Key findings:**
+- **2.8× average speedup** with skills loaded (2.2× for simple tasks → 3.1× for complex cross-domain tasks)
+- **50% silent failure rate without skills** vs. **0% with skills** — the no-skills agents produced plausible-looking wrong answers in half of all tasks
+- The gap widens with task complexity: the most complex tasks showed the largest advantage
+
+See **[`research/ab-testing/`](research/ab-testing/)** for the full reports, including:
+- Round-by-round results (R1: simple APIs, R2: multi-step workflows, R3: cross-domain orchestration)
+- Meta-analysis synthesizing all 12 comparisons
+- Skills improvement recommendations derived from test findings
+- Code example consistency audit
+
 ```bash
 pip install pytest pyyaml requests
 python -m pytest tests/
