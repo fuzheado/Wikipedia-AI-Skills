@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # SPARQL Quick Query for Wikidata
 # Runs a SPARQL query against the Wikidata Query Service and displays results.
+#
+# Respects WDQS rate limits: 60s query timeout, 60s processing per 60s window,
+# 30 errors per minute. See the wikidata skill SKILL.md for full details.
+#
 # Usage:
 #   ./sparql-query.sh "SELECT ?item ?itemLabel WHERE { ... }"
 #   ./sparql-query.sh --examples
@@ -52,12 +56,37 @@ echo ""
 echo "Running..."
 echo ""
 
-curl -s -H "User-Agent: $UA" -H "Accept: application/sparql-results+json" \
+# Fetch to temp file with HTTP status (avoids pipe-on-failure issues)
+TMPFILE=$(mktemp /tmp/sparql-query.XXXXXX)
+trap 'rm -f "$TMPFILE"' EXIT
+
+curl -s --compressed -w "\n%{http_code}" \
+    -H "User-Agent: $UA" \
+    -H "Accept: application/sparql-results+json" \
+    --max-time 65 \
     "$ENDPOINT?format=json&query=$(python3 -c "import urllib.parse; print(urllib.parse.quote('''$QUERY'''))")" \
-    | python3 -c "
+    > "$TMPFILE" 2>&1 || true
+
+HTTP_CODE=$(tail -1 "$TMPFILE")
+sed '$d' "$TMPFILE" > "${TMPFILE}.body"
+
+if [ "$HTTP_CODE" = "429" ]; then
+    RETRY_AFTER=$(grep -i 'retry-after' "$TMPFILE" 2>/dev/null | grep -oE '[0-9]+' || echo "60")
+    echo "⚠️  Rate limited (HTTP 429). Retry-After: ${RETRY_AFTER}s" >&2
+    echo "   WDQS allows 60s processing per 60s window per client." >&2
+    echo "   Waiting ${RETRY_AFTER}s before you can retry..." >&2
+    exit 1
+elif [ "$HTTP_CODE" != "200" ]; then
+    echo "Error: SPARQL endpoint returned HTTP ${HTTP_CODE}" >&2
+    cat "${TMPFILE}.body" 2>/dev/null | python3 -m json.tool 2>/dev/null || true
+    exit 1
+fi
+
+python3 -c "
 import json, sys
 
-data = json.load(sys.stdin)
+with open('${TMPFILE}.body') as f:
+    data = json.load(f)
 head = data.get('head', {}).get('vars', [])
 results = data.get('results', {}).get('bindings', [])
 

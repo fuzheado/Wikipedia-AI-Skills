@@ -28,6 +28,25 @@ action=wbgetentities&ids=P31&props=labels|descriptions|claims&format=json
 
 Base: `https://query.wikidata.org/sparql`
 
+### Rate Limits
+
+| Limit | Value |
+|-------|-------|
+| Query timeout | 60 seconds hard deadline |
+| Processing time | 60s per 60s window per client (user-agent + IP) |
+| Error rate | 30 per minute (burst 60) |
+| 429 response | Respect `Retry-After` header; ignoring leads to ban |
+| SLO | 95% availability |
+
+**Required headers:** `User-Agent`, `Accept: application/sparql-results+json`, `Accept-Encoding: gzip, deflate`
+
+**Large queries:** Use POST with `query=` prefix in the body. POST body must be `query=SELECT...` (not just the raw SPARQL).
+
+**See also:**
+- [Official User Manual](https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual)
+- [Query optimization guide](https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/query_optimization)
+- [Service limits discussion](https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/query_limits)
+
 ### Common pattern: Items matching a class
 ```sparql
 SELECT ?item ?itemLabel WHERE {

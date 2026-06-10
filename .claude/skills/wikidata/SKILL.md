@@ -114,7 +114,48 @@ Access via the REST API:
 GET https://query.wikidata.org/sparql?format=json&query=SELECT...
 ```
 
-Use the `wikimedia-api-access` skill for the required User-Agent header, rate limiting, and retry patterns.
+### **Rate Limits & Usage Guidelines**
+
+The WDQS SPARQL endpoint has **stricter limits than the general Wikimedia APIs** because a SPARQL query is more resource-intensive than a typical REST call.
+
+| Limit | Value | Notes |
+|-------|-------|-------|
+| **Query timeout** | 60 seconds | Hard deadline per query — both web UI and API |
+| **Processing time** | 60s per 60s window | Per client (user-agent + IP pair) |
+| **Error rate** | 30 errors per minute | Burst allowed to 60; errors are queries that fail, not empty results |
+| **429 response** | `Retry-After` header | Stop sending immediately and wait; ignoring 429 leads to a ban |
+| **SLO** | 95% availability | Lower than other WMF services — plan for intermittent failures |
+| **Query size** | URL length limit | Use POST with `query=` body prefix for large queries |
+
+**Required headers:**
+- `User-Agent` — descriptive string with contact info (strictly enforced; see [wikimedia-api-access](../wikimedia-api-access/SKILL.md))
+- `Accept: application/sparql-results+json` — for JSON results
+- `Accept-Encoding: gzip, deflate` — required per robot policy
+
+**429 handling pattern:**
+```python
+import time
+import requests
+
+resp = requests.get(
+    "https://query.wikidata.org/sparql",
+    params={"format": "json", "query": query},
+    headers={"User-Agent": UA, "Accept": "application/sparql-results+json"},
+    timeout=30,
+)
+
+if resp.status_code == 429:
+    retry_after = int(resp.headers.get("Retry-After", 60))
+    print(f"Rate limited — waiting {retry_after}s", file=sys.stderr)
+    time.sleep(retry_after)
+    # Retry the request
+elif resp.status_code != 200:
+    resp.raise_for_status()
+```
+
+**⚠️ `SERVICE wikibase:label` performance warning:** The label service can make queries dramatically slower. When optimizing an expensive query, disable the label service first, get the query efficient, then re-enable it. See the [official query optimization guide](https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/query_optimization) for more patterns.
+
+**Use the `wikimedia-api-access` skill** for the required User-Agent header, general rate limiting, and retry patterns.
 
 ### **Why SPARQL vs. `haswbstatement:` (Commons)**
 
