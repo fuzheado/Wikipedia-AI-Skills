@@ -64,6 +64,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [wikimedia-database](.claude/skills/wikimedia-database/SKILL.md) | Execute SQL queries against Wikipedia database replicas (enwiki, wikidata, commonswiki) via an SSH tunnel to Toolforge |
 | [wikimedia-toolforge](.claude/skills/wikimedia-toolforge/SKILL.md) | Manage Toolforge accounts, web services, Kubernetes pods, cron jobs, and file deployment for Wikimedia tools |
 | [wikimedia-cdn-assets](.claude/skills/wikimedia-cdn-assets/SKILL.md) | Load JavaScript, CSS, and fonts for Toolforge tools from Wikimedia's privacy-preserving cdnjs mirror, ensuring user privacy and policy compliance |
+| [wikimedia-search-cirrussearch](.claude/skills/wikimedia-search-cirrussearch/SKILL.md) | Search Wikimedia wikis using CirrusSearch — syntax cheat sheet (insource, hastemplate, linksto, deepcategory, haswbstatement), API parameters, prefix vs full-text vs title search, ranking caveats, maintenance queries, and combining search with PetScan, SPARQL, and categories. Ships with a Python search client, maintenance query library, CLI search tool, and pre-built query runner |
 | [pywikibot](.claude/skills/pywikibot/SKILL.md) | Use Pywikibot - the Python library and CLI tool suite for automating work on MediaWiki sites. Covers installation, the core object model (Site, Page, Category, User, ItemPage), page generators, the bot framework, built-in scripts (archivebot, replace, harvest_template, claimit, and 50+ more), Wikidata/Wikibase integration, Commons file operations, and Toolforge/PAWS deployment |
 | [wikimedia-eventstreams](.claude/skills/wikimedia-eventstreams/SKILL.md) | Consume real-time streams of Wikimedia events (edits, page creations, deletions, moves, log entries) via Server-Sent Events (SSE). Covers all available streams, event schemas, client libraries (Python/JS/curl), client-side filtering, historical replay, canary event handling, and building live dashboards, patrol monitors, and cross-wiki trackers |
 | [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) | Score revisions and articles using Lift Wing ML models — revert risk, article quality, topic classification, readability, reference quality, language identification, and more. Includes ORES migration guidance |
@@ -139,6 +140,11 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | Run SQL queries on the Wikipedia database to analyze page data at scale | `wikimedia-database` |
 | Deploy a web tool to Toolforge and manage its services | `wikimedia-toolforge` |
 | Load jQuery, Bootstrap, or fonts in a Toolforge tool without breaking privacy policy | `wikimedia-cdn-assets` |
+| Find pages matching complex criteria (by template, category, link, wikitext, or structured data) | `wikimedia-search-cirrussearch` |
+| Run a CirrusSearch query from the command line against any Wikimedia wiki | `bash .claude/skills/wikimedia-search-cirrussearch/scripts/cirrus-search.sh "hastemplate:Infobox scientist"` |
+| Run common maintenance queries (unsourced BLPs, dead links, missing images, etc.) | `bash .claude/skills/wikimedia-search-cirrussearch/scripts/maintenance-queries.sh unsourced-blp` |
+| Programmatically search with full CirrusSearch syntax in Python | `python3 .claude/skills/wikimedia-search-cirrussearch/assets/search_client.py --help` |
+| List all available maintenance query types | `bash .claude/skills/wikimedia-search-cirrussearch/scripts/maintenance-queries.sh list` |
 | Run bulk bot operations (edit 10K pages, scrape templates into Wikidata, archive talk pages, move categories) | `pywikibot` |
 | Write a custom Wikipedia bot in a few lines of Python | `pywikibot` |
 | Harvest infobox data from Wikipedia into Wikidata statements | `pywikibot` (harvest_template script) |
