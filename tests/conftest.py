@@ -14,40 +14,11 @@ EXTENSIONS_DIR = REPO_ROOT / '.pi' / 'extensions'
 # Add assets directory to path so we can import the pipeline script
 sys.path.insert(0, str(SKILLS_DIR / 'wikimedia-api-access' / 'assets'))
 
-# All skill directories (alphabetical order, no duplicates)
-SKILL_NAMES = [
-    'mediawiki-page-navigation',
-    'mediawiki-translate-extension',
-    'pagetriage-api',
-    'pywikibot',
-    'wikidata',
-    'wikidata-vector-search',
-    'wikipedia-categories',
-    'wikipedia-citations',
-    'wikimedia-api-access',
-    'wikimedia-api-strategy',
-    'wikimedia-auth-oauth',
-    'wikimedia-cdn-assets',
-    'wikimedia-commons',
-    'wikimedia-database',
-    'wikimedia-diffs',
-    'wikimedia-eventstreams',
-    'wikimedia-ml-services',
-    'wikimedia-page-assessment',
-    'wikimedia-page-styling',
-    'wikimedia-pageviews',
-    'wikimedia-toolforge',
-    'wikimedia-wikitext',
-    'wikipedia-edit-history',
-    'wikipedia-en-article-audit',
-    'wikipedia-en-biography-writing',
-    'wikipedia-error-handling',
-    'wikipedia-page-anatomy',
-    'wikipedia-reference-verifiability',
-    'wikipedia-talk-page',
-    'wikipedia-templates',
-    'wikipedia-wikitables',
-]
+# Auto-discover all skill directories (alphabetical, no manual list to maintain)
+SKILL_NAMES = sorted(
+    d.name for d in SKILLS_DIR.iterdir()
+    if d.is_dir() and (d / 'SKILL.md').exists()
+)
 
 
 def skill_path(name):

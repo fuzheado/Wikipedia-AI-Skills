@@ -1,0 +1,122 @@
+name: Skill Registration Check
+on:
+  pull_request:
+    paths:
+      - '.claude/skills/*/SKILL.md'
+      - 'README.md'
+      - 'ROADMAP.md'
+      - 'tests/conftest.py'
+  push:
+    branches: [main]
+    paths:
+      - '.claude/skills/*/SKILL.md'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  check-skill-registration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check all skills are registered in README.md
+        run: |
+          import re
+          from pathlib import Path
+
+          errors = []
+          skills_dir = Path(".claude/skills")
+          readme = (Path("README.md")).read_text()
+
+          for skill_dir in sorted(skills_dir.iterdir()):
+              if not skill_dir.is_dir():
+                  continue
+              if not (skill_dir / "SKILL.md").exists():
+                  continue
+
+              name = skill_dir.name
+
+              # Check 1: Skill name appears in README.md
+              if name not in readme:
+                  errors.append(
+                      f"{name}/SKILL.md: not found in README.md — "
+                      f"add it to the skills table and the 'What can I do' table"
+                  )
+
+              # Check 2: Skill link path is correct
+              expected_link = f".claude/skills/{name}/SKILL.md"
+              if expected_link not in readme:
+                  errors.append(
+                      f"{name}/SKILL.md: link '{expected_link}' not found in README.md"
+                  )
+
+          if errors:
+              print(f"❌ Found {len(errors)} registration issue(s):")
+              for e in errors:
+                  print(f"   • {e}")
+              exit(1)
+          else:
+              print(f"✅ All {len(list(skills_dir.iterdir()))} skills are registered in README.md")
+        shell: python3
+
+  check-conftest-auto-discovery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify conftest.py auto-discovers all skill directories
+        run: |
+          import sys
+          sys.path.insert(0, "tests")
+          from conftest import SKILL_NAMES, SKILLS_DIR
+
+          on_disk = sorted(d.name for d in SKILLS_DIR.iterdir()
+                          if d.is_dir() and (d / "SKILL.md").exists())
+
+          if SKILL_NAMES != on_disk:
+            missing = set(on_disk) - set(SKILL_NAMES)
+            extra = set(SKILL_NAMES) - set(on_disk)
+            print("❌ SKILL_NAMES mismatch!")
+            if missing:
+                print(f"   Missing from SKILL_NAMES: {sorted(missing)}")
+            if extra:
+                print(f"   Extra in SKILL_NAMES (no dir): {sorted(extra)}")
+            print("   (conftest.py uses auto-discovery; this should never happen)")
+            exit(1)
+          else:
+            print(f"✅ conftest.py discovers all {len(SKILL_NAMES)} skills correctly")
+        shell: python3
+
+  check-roadmap-mentions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check new skills are mentioned in ROADMAP.md
+        run: |
+          from pathlib import Path
+
+          skills_dir = Path(".claude/skills")
+          roadmap = (Path("ROADMAP.md")).read_text()
+          errors = []
+
+          for skill_dir in sorted(skills_dir.iterdir()):
+              if not skill_dir.is_dir():
+                  continue
+              if not (skill_dir / "SKILL.md").exists():
+                  continue
+
+              name = skill_dir.name
+              if name not in roadmap:
+                  errors.append(
+                      f"{name}: not mentioned in ROADMAP.md — "
+                      f"add it to the 'Published skills' section"
+                  )
+
+          if errors:
+              print(f"❌ {len(errors)} skill(s) missing from ROADMAP.md:")
+              for e in errors:
+                  print(f"   • {e}")
+              exit(1)
+          else:
+              print(f"✅ All skills are mentioned in ROADMAP.md")
+        shell: python3

@@ -231,11 +231,20 @@ Before submitting a skill, verify every item:
 - [ ] Template names match current MediaWiki conventions
 
 ### Documentation Freshness
-- [ ] **README** updated: skill table (`## Skills`), tool-developer table, and "What can I do" usage table all include the new/updated skill
-- [ ] **ROADMAP** updated: moved from "Planned" to "Published" with a brief description of what was added
-- [ ] **ROADMAP numbers** refreshed: skill count (run `ls -d .claude/skills/*/ | wc -l`), test count (run `python3 -m pytest tests/ --collect-only -q | tail -1`), test file count (run `ls tests/test_*.py | wc -l`)
-- [ ] **Test suite expanded** with new tests for any new Python assets or scripts
-- [ ] **Stale skill/test counts** in ROADMAP prose match reality (e.g., "17 skills" → actual count, "104 tests" → actual count)
+- [ ] **README** updated:
+  - Skill table (`## Skills`) — add to the appropriate category (For editors / For tool developers)
+  - "What can I do" usage table — add relevant use-case rows
+  - Verify the link path follows the pattern `.claude/skills/<name>/SKILL.md`
+- [ ] **ROADMAP** updated:
+  - Add to "Published skills" section with a brief description of what ships with the skill
+  - Remove from "Future skill candidates" if it was listed there
+  - Keep prose references to counts generic ("all skills") — hardcoded counts go stale
+- [ ] **CI will verify on push:** The `.github/workflows/skill-registration-check.yml` CI workflow checks that:
+  - Every skill directory is linked in `README.md`
+  - Every skill is mentioned in `ROADMAP.md` under Published skills
+  - `conftest.py` auto-discovers all skill directories (no manual list needed)
+- [ ] **Test suite** — `conftest.py` auto-discovers new skills (no manual SKILL_NAMES entry needed)
+- [ ] **New tests added** for any new Python assets or scripts
 
 ### Guardrails
 - [ ] All known failure modes for this task are documented
@@ -280,10 +289,17 @@ Test that the agent respects each guardrail. For example, if a skill says "never
 
 1. **Fork and branch** — Create a feature branch from `main`
 2. **One change per PR** — If you have multiple changes, submit separate PRs
-3. **Update the README** — If adding a new skill, add it to the skill table in README.md
-4. **Update the ROADMAP** — Move the completed item from "Planned" to "Published" if it was listed
-5. **Run the checklist** — Go through the [Content Accuracy Checklist](#content-accuracy-checklist)
-6. **Open the PR** — Include a clear description of what changed and why
+3. **Update the README** — If adding a new skill, add it to the skill table in README.md and the "What can I do" usage table
+4. **Update the ROADMAP** — Add to "Published skills" with a brief description; remove from "Future skill candidates" if listed
+5. **Do NOT update `tests/conftest.py`** — It auto-discovers skill directories from the filesystem
+6. **Run the checklist** — Go through the [Content Accuracy Checklist](#content-accuracy-checklist)
+7. **Run the full test suite:** `python3 -m pytest tests/ -q`
+8. **Open the PR** — Include a clear description of what changed and why
+
+> **CI will catch missed registrations.** The `.github/workflows/skill-registration-check.yml` workflow
+> runs on every push to the `main` branch and on PRs that touch skill files. It verifies that every
+> skill directory is linked in `README.md` and mentioned in `ROADMAP.md`. If the CI fails, fix the
+> documentation before merging.
 
 ### PR Template
 
