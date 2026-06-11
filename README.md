@@ -60,6 +60,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [wikimedia-api-access](.claude/skills/wikimedia-api-access/SKILL.md) | Access Wikipedia and Wikimedia APIs (REST, Action, SPARQL) with correct User-Agent headers, rate limiting, and 429/403 error handling |
 | [wikipedia-error-handling](.claude/skills/wikipedia-error-handling/SKILL.md) | Handle HTTP errors, rate limits, and API failures across all Wikimedia services — retry strategies, backoff patterns, error response formats, and recovery procedures for the Action API, REST API, SPARQL, Lift Wing ML, and EventStreams. Ships with an `api_client.py` reusable Python client and a `check-api-status.sh` connectivity checker. |
 | [wikimedia-api-strategy](.claude/skills/wikimedia-api-strategy/SKILL.md) | Choose the right Wikimedia API or tool for the task — decision framework covering REST API, Action API, SPARQL, SQL database replicas, EventStreams, and Pywikibot, with latency/complexity/authentication trade-offs. Ships with an `api_selector.py` importable module and an `api-strategy.sh` interactive CLI. |
+| [wikimedia-auth-oauth](.claude/skills/wikimedia-auth-oauth/SKILL.md) | Authenticate Wikimedia API clients for editing, patrol, upload, and user-specific operations — OAuth 1.0a/2.0 flows, bot passwords, CSRF tokens, permission checks, and secure credential storage for standalone tools and web apps. Ships with an importable OAuth 2.0 Python library, a Flask demo app, and a CLI bot-password editor. |
 | [wikimedia-database](.claude/skills/wikimedia-database/SKILL.md) | Execute SQL queries against Wikipedia database replicas (enwiki, wikidata, commonswiki) via an SSH tunnel to Toolforge |
 | [wikimedia-toolforge](.claude/skills/wikimedia-toolforge/SKILL.md) | Manage Toolforge accounts, web services, Kubernetes pods, cron jobs, and file deployment for Wikimedia tools |
 | [wikimedia-cdn-assets](.claude/skills/wikimedia-cdn-assets/SKILL.md) | Load JavaScript, CSS, and fonts for Toolforge tools from Wikimedia's privacy-preserving cdnjs mirror, ensuring user privacy and policy compliance |
@@ -125,6 +126,11 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | Audit an article for factual errors, NPOV violations, and structural problems | `wikipedia-en-article-audit` (read-only — never edits live articles) |
 | | **▸ Building Tools** |
 | Figure out which API or tool to use for a given task | `wikimedia-api-strategy` |
+| Authenticate a tool to edit Wikipedia on behalf of a user | `wikimedia-auth-oauth` |
+| Build a multi-user web app with OAuth 2.0 login (Wikimedia account) | `wikimedia-auth-oauth` (Flask demo app template) |
+| Write a bot that edits pages using a bot password | `wikimedia-auth-oauth` (CLI bot-password editor) |
+| Check a user's permissions before attempting a wiki action | `wikimedia-auth-oauth` (`oauth2_client.py` library) |
+| Securely store OAuth tokens and bot passwords on Toolforge | `wikimedia-auth-oauth` (credential storage SOP) |
 | Build a bot or script that fetches data from Wikipedia | `wikimedia-api-access` |
 | Handle HTTP 429/403/422 errors and retry failed API calls | `wikipedia-error-handling` |
 | Test which Wikimedia APIs are reachable from your environment | `bash .claude/skills/wikipedia-error-handling/scripts/check-api-status.sh` |
