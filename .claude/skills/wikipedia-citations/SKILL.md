@@ -677,3 +677,4 @@ URL in a browser before relying on it.
 | [`references/maintenance-templates.md`](./references/maintenance-templates.md) | Full catalog of citation-related maintenance templates with usage guidance |
 | [`references/tools-decision-guide.md`](./references/tools-decision-guide.md) | When to use each tool — flowchart, pipelines, strengths/weaknesses of all 10+ methods |
 | [`references/fetch-contexts.md`](./references/fetch-contexts.md) | Where metadata fetching happens (your machine vs WMF servers vs Toolforge vs IA) and how it affects success rates |
+| [`references/perennial-sources.md`](./references/perennial-sources.md) | Community consensus on 200+ frequently discussed sources — generally reliable, no consensus, generally unreliable, deprecated, and blacklisted, organized by category with cross-references to maintenance templates |
