@@ -14,8 +14,37 @@ set -euo pipefail
 QL_URL="https://qlever.cs.uni-freiburg.de/api/wikimedia-commons"
 WCQS_URL="https://commons-query.wikimedia.org/sparql"
 
+show_usage() {
+    cat >&2 <<EOF
+Usage: $0 [--ql|--wcqs] "SPARQL_QUERY"
+
+Run a SPARQL query against Commons structured data.
+
+Endpoints:
+  --ql     QLever (default) — open access, no authentication required.
+           URL: $QL_URL
+           Recommended for scripts, automated tools, and federated queries.
+
+  --wcqs   Official WCQS — requires a Commons account and the WCQS_AUTH_TOKEN
+           environment variable set to your wcqsOauth cookie value.
+           URL: $WCQS_URL
+           See: https://commons.wikimedia.org/wiki/Commons:SPARQL_query_service/API_endpoint
+
+Examples:
+  $0 "SELECT ?file WHERE { ?file wdt:P180 wd:Q42 } LIMIT 10"
+  $0 --wcqs "SELECT ?file WHERE { ?file wdt:P180 wd:Q42 } LIMIT 10"
+
+More examples: https://commons.wikimedia.org/wiki/Commons:SPARQL_query_service/queries/examples
+EOF
+    exit 1
+}
+
 endpoint="$QL_URL"
 auth_cookie=""
+
+if [[ $# -eq 0 ]]; then
+    show_usage
+fi
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -35,16 +64,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -h|--help)
-            echo "Usage: $0 [--ql|--wcqs] \"SPARQL_QUERY\""
-            echo ""
-            echo "Endpoints:"
-            echo "  --ql     QLever (default, no auth required)"
-            echo "  --wcqs   Official WCQS (requires WCQS_AUTH_TOKEN env var)"
-            echo ""
-            echo "Examples:"
-            echo "  $0 \"SELECT ?file WHERE { ?file wdt:P180 wd:Q42 } LIMIT 10\""
-            echo "  $0 --wcqs \"SELECT ?file WHERE { ?file wdt:P180 wd:Q42 } LIMIT 10\""
-            exit 0
+            show_usage
             ;;
         *)
             break
@@ -53,9 +73,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ $# -lt 1 ]]; then
-    echo "Error: No SPARQL query provided." >&2
-    echo "Usage: $0 [--ql|--wcqs] \"SPARQL_QUERY\"" >&2
-    exit 1
+    echo "Error: No SPARQL query provided after endpoint flag." >&2
+    show_usage
 fi
 
 query="$1"
