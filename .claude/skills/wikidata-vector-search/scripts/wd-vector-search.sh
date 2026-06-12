@@ -122,7 +122,19 @@ fi
 parse_lang() {
     local raw="$1"
     [[ "$raw" == *.* ]] && raw="${raw%%.*}"
-    case "$raw" in
+    # Normalize the language code using Python/i18n_utils
+    # Handles alias codes: zh-yue→yue, no→nb, bat-smg→sgs, etc.
+    local normalized
+    normalized=$(python3 -c "
+import sys
+sys.path.insert(0, '$(dirname "$0")/../../wikimedia-i18n-l10n-for-tools/assets')
+try:
+    from i18n_utils import normalize_language_code
+    print(normalize_language_code('$raw'))
+except ImportError:
+    print('$raw')
+" 2>/dev/null || echo "$raw")
+    case "$normalized" in
         commons|commonswiki)
             VDB_LANG="en"; SITE_CODE="commonswiki";    LABEL_LANG="en" ;;
         meta|metawiki)
@@ -134,13 +146,13 @@ parse_lang() {
         species|specieswiki)
             VDB_LANG="en"; SITE_CODE="specieswiki";     LABEL_LANG="en" ;;
         *)
-            if [[ "$raw" =~ ^([a-z]{2,})(wiki|wikisource|wiktionary|wikivoyage|wikibooks|wikinews|wikiquote|wikiversity|wikimedia)$ ]]; then
+            if [[ "$normalized" =~ ^([a-z]{2,})(wiki|wikisource|wiktionary|wikivoyage|wikibooks|wikinews|wikiquote|wikiversity|wikimedia)$ ]]; then
                 VDB_LANG="${BASH_REMATCH[1]}"
-                SITE_CODE="$raw"
+                SITE_CODE="$normalized"
                 LABEL_LANG="$VDB_LANG"
             else
-                VDB_LANG="$raw"
-                SITE_CODE="${raw}wiki"
+                VDB_LANG="$normalized"
+                SITE_CODE="${normalized}wiki"
                 LABEL_LANG="$VDB_LANG"
             fi
             ;;

@@ -20,9 +20,7 @@ Usage:
 """
 
 import re
-from typing import Any, Dict, List, Optional, Tuple
-
-from notability_checker import Source
+from typing import Any, Dict, List, Optional
 
 
 # Reliable domains (news/academic)
@@ -63,10 +61,12 @@ UNRELIABLE_PATTERNS: List[str] = [
 SOURCE_TYPE_RATINGS: Dict[str, Dict[str, Any]] = {
     "academic_journal": {"reliable": True, "significant_possible": True, "type": "academic"},
     "news_feature": {"reliable": True, "significant_possible": True, "type": "news"},
-    "news_article": {"reliable": True, "significant_possible": False, "type": "news"},
+    # news_article CAN be significant — depends on depth, not type alone
+    "news_article": {"reliable": True, "significant_possible": None, "type": "news"},
     "book": {"reliable": True, "significant_possible": True, "type": "book"},
     "book_review": {"reliable": True, "significant_possible": True, "type": "review"},
     "documentary": {"reliable": True, "significant_possible": True, "type": "documentary"},
+    "reference": {"reliable": False, "significant_possible": False, "type": "reference"},
     "press_release": {"reliable": False, "significant_possible": False, "type": "press_release"},
     "blog": {"reliable": False, "significant_possible": False, "type": "blog"},
     "social_media": {"reliable": False, "significant_possible": False, "type": "social_media"},
@@ -90,8 +90,10 @@ SIGNIFICANCE_NEGATIVE = [
     "appoints", "hires", "promoted", "named",
     "briefly", "mentions", "in passing", "roundup",
     "earnings", "quarterly", "financial results",
-    "match report", "game recap", "score",
+    "match report", "game recap",
     "obituary", "death notice",
+    # Note: bare "score" was removed because it causes false positives
+    # (e.g., "Score: 95 in peer review"). Use more specific patterns.
 ]
 
 
@@ -142,7 +144,10 @@ class SourceEvaluator:
             rating = SOURCE_TYPE_RATINGS[source_type]
             if result["reliable"] is None:
                 result["reliable"] = rating["reliable"]
-            result["significant"] = rating["significant_possible"]
+            # Only set significant from type if the type is definitive
+            sp = rating["significant_possible"]
+            if sp is not None and result["significant"] is None:
+                result["significant"] = sp
             result["notes"].append(f"Type: {source_type}")
             if not rating["reliable"]:
                 result["notes"].append(
@@ -231,31 +236,72 @@ class SourceEvaluator:
         """Classify a source by its likely type."""
         combined = f"{url} {title}".lower()
 
-        if any(d in combined for d in ["nature.com", "science.org", "springer",
-                                         "wiley", "ieee", "acm", "arxiv"]):
-            return "academic_journal"
-        if any(d in combined for d in ["imdb", "discogs", "musicbrainz",
-                                        "goodreads", "worldcat"]):
-            return "database"
-        if any(d in combined for d in ["linkedin", "facebook", "twitter",
-                                        "instagram", "youtube", "tiktok"]):
-            return "social_media"
+        # Self-published / blog platforms
         if any(d in combined for d in ["blogspot", "wordpress", "medium",
                                         "substack", "patreon"]):
             return "blog"
-        if "press release" in title.lower():
-            return "press_release"
         if any(d in combined for d in ["wikipedia", "fandom"]):
             return "self_published"
+
+        # Social media
+        if any(d in combined for d in ["linkedin", "facebook", "twitter",
+                                        "instagram", "youtube", "tiktok"]):
+            return "social_media"
+
+        # Press release
+        if "press release" in title.lower():
+            return "press_release"
+
+        # Academic
+        if any(d in combined for d in ["nature.com", "science.org", "springer",
+                                        "wiley", "ieee", "acm", "arxiv"]):
+            return "academic_journal"
+        if "google.com/books" in url or "google.books" in url:
+            return "book"
+
+        # Databases / directories
+        if any(d in combined for d in ["imdb", "discogs", "musicbrainz",
+                                        "goodreads", "worldcat"]):
+            return "database"
+        if any(d in combined for d in ["crunchbase", "zoominfo"]):
+            return "directory"
+
+        # Reviews
         if "review" in title.lower():
             return "book_review" if "book" in title.lower() else "review"
+
+        # Feature / in-depth content
         if any(w in combined for w in ["profile", "feature", "in-depth"]):
             return "news_feature"
-        if any(d in combined for d in ["nytimes", "guardian", "bbc", "reuters",
-                                        "apnews", "washingtonpost", "wsj"]):
+
+        # Major news outlets
+        major_news = [
+            "nytimes", "washingtonpost", "wsj", "theguardian", "guardian",
+            "bbc", "reuters", "apnews", "cnet", "cbsnews", "cnn", "nbcnews",
+            "abcnews", "usatoday", "bloomberg", "ft.com", "economist",
+            "newyorker", "theatlantic", "npr", "pbs", "latimes",
+            "chicagotribune", "bostonglobe", "time.com", "forbes", "wired",
+            "arstechnica", "theverge", "politico", "huffpost", "buzzfeednews",
+        ]
+        if any(d in combined for d in major_news):
             return "news_article"
-        if any(d in combined for d in ["crunchbase", "zoominfo", "bloomberg"]):
-            return "directory"
+
+        # Other known news/media (lower confidence)
+        other_news = [
+            "ibtimes", "cbc", "cnet", "newscientist", "spiegel",
+            "lemonde", "elpais", "zeit.de", "thelocal", "dw.com",
+        ]
+        if any(d in combined for d in other_news):
+            return "news_article"
+
+        # StackExchange / forums → reference material
+        if any(d in combined for d in ["stackoverflow", "stackexchange",
+                                        "stackexchange.com", "superuser"]):
+            return "reference"
+
+        # Personal blogs / self-published (catch-all)
+        if any(d in combined for d in ["blog.", ".blog.", "code", "dev.to"]):
+            return "blog"
 
         return "unknown"
 
@@ -264,16 +310,25 @@ class SourceEvaluator:
 if __name__ == "__main__":
     import argparse
     import json
+    import sys
 
     parser = argparse.ArgumentParser(
-        description="Evaluate a source for Wikipedia notability"
+        description="Evaluate a source for Wikipedia notability. "
+        "If no arguments are given, prints usage info."
     )
     parser.add_argument("--title", help="Source title or headline")
-    parser.add_argument("--type", help="Source type (news_feature, press_release, etc.)")
-    parser.add_argument("--url", help="Source URL")
-    parser.add_argument("--desc", help="Free-form description")
+    parser.add_argument("--type",
+                        help="Source type (academic_journal, news_article, news_feature, "
+                             "book, book_review, press_release, blog, social_media, "
+                             "self_published, reference, database, directory)")
+    parser.add_argument("--url", help="Source URL (used for domain reliability check)")
+    parser.add_argument("--desc", help="Free-form description of the source")
 
     args = parser.parse_args()
+
+    if not any([args.title, args.type, args.url, args.desc]):
+        parser.print_help()
+        sys.exit(0)
 
     evaluator = SourceEvaluator()
     result = evaluator.evaluate(

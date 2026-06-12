@@ -243,11 +243,42 @@ The response includes a `redirects` array mapping the source title to the target
 
 A disambiguation page lists multiple articles sharing the same or similar title. Identified by the `{{disambiguation}}` template (or variants like `{{geodis}}`, `{{hndis}}`, `{{schooldis}}`).
 
-**API detection:**
+**API detection (preferred — REST API):**
+```
+https://en.wikipedia.org/api/rest_v1/page/summary/Title
+```
+Check the `type` field in the JSON response: `"type": "disambiguation"` indicates a disambiguation page, `"type": "standard"` indicates a regular article. This is simpler than parsing categories and works across all language editions.
+
+**API detection (fallback — Action API):**
 ```
 action=query&prop=categories&titles=Title&format=json
 ```
 Check if any category matches `*disambiguation*` (e.g., `Category:Disambiguation pages`).
+
+**Cross-lingual detection (when you only have the page title):**
+
+If you're working with interlanguage links from the Action API and don't want to make additional API calls, disambiguation pages can often be identified by known suffixes in the page title. This is useful for filtering language editions before fetching their content:
+
+```python
+_DISAMBIG_PATTERNS = (
+    '(disambiguation)',            # English
+    '(egyértelműsítő lap)',        # Hungarian
+    '(desambiguación)',            # Spanish
+    '(Begriffsklärung)',           # German
+    '(homonymie)',                 # French
+    '(disambigua)',                # Italian
+    '(消歧義)', '(消歧义)',         # Chinese
+    '(曖昧さ回避)',                  # Japanese
+    '(동음이의)', '(동음이의어)',      # Korean
+    '(anlam ayrımı)',              # Turkish
+    '(неоднозначность)',           # Russian
+    '(توضيح)',                     # Arabic
+    '(ابهام‌زدایی)',               # Persian
+)
+
+def is_disambiguation_title(title):
+    return any(p in title for p in _DISAMBIG_PATTERNS)
+```
 
 **When to follow vs. stop:**
 

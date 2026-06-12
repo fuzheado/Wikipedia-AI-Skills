@@ -80,18 +80,116 @@ When a language has no ISO 639-1 code, Wikimedia uses the ISO 639-3 code:
 | `vep` | Veps | `vep.wikipedia.org` |
 | `ady` | Adyghe | `ady.wikipedia.org` |
 
-### Special Wikimedia Language Codes
+### Deprecated/Redirected Language Codes
 
-| Code | Purpose | Example |
-|------|---------|---------|
-| `simple` | Simple English | `simple.wikipedia.org` |
-| `be-tarask` | Belarusian (Taraškievica) | `be-tarask.wikipedia.org` |
-| `cbk-zam` | Chavacano (Zamboangueño) | `cbk-zam.wikipedia.org` |
-| `roa-rup` | Aromanian | `roa-rup.wikipedia.org` |
-| `bat-smg` | Samogitian | `bat-smg.wikipedia.org` |
+MediaWiki maintains a canonical mapping of old/deprecated codes to their
+replacements (`$wgDummyLanguageCodes`). If you receive one of these codes
+from any source (user input, external API, Accept-Language header), normalize
+it using `normalize_language_code()` from the `i18n_utils` module.
 
-These are **not** BCP 47 valid — they are Wikimedia-specific identifiers.
-Always treat them as opaque identifiers.
+| Deprecated Code | Canonical Code | Notes |
+|-----------------|---------------|-------|
+| `zh-yue` | `yue` | Cantonese — ISO 639-3 code is `yue` |
+| `no` | `nb` | Norwegian macrolanguage → Bokmål |
+| `zh-classical` | `lzh` | Classical Chinese |
+| `zh-min-nan` | `nan` | Min Nan Chinese |
+| `bat-smg` | `sgs` | Samogitian |
+| `roa-rup` | `rup` | Aromanian |
+| `be-x-old` | `be-tarask` | Belarusian (old orthography → Taraškievica) |
+| `als` | `gsw` | Alemannic (was wrongly using ISO code for Tosk Albanian) |
+| `fiu-vro` | `vro` | Võro |
+| `bh` | `bho` | Bihari → Bhojpuri |
+| `simple` | `en` | Simple English → English (for internal API use) |
+
+### Non-Standard Wikipedia Subdomains
+
+These Wikipedia subdomains don't match standard ISO/BCP 47 codes. They are
+Wikimedia-specific identifiers that should be treated as opaque strings.
+Source: https://meta.wikimedia.org/wiki/Special_language_codes
+
+| Subdomain | Language | Notes |
+|-----------|----------|-------|
+| `simple` | Simple English | Uses `en` for internal logic |
+| `be-tarask` | Belarusian (Taraškievica) | Contains hyphen in subdomain |
+| `cbk-zam` | Chavacano de Zamboanga | No ISO 639 code; deprecated `cbk` assigned to superset |
+| `bat-smg` | Samogitian | Should be `sgs` (stalled rename) |
+| `roa-rup` | Aromanian | Should be `rup` (stalled rename) |
+| `zh-classical` | Classical Chinese | Should be `lzh` (stalled rename) |
+| `zh-min-nan` | Min Nan Chinese | Should be `nan` (stalled rename) |
+| `zh-yue` | Cantonese | Should be `yue` (stalled rename) |
+| `eml` | Emilian-Romagnol | ISO retired, split to `egl`/`rgn` |
+| `fiu-vro` | Võro | Should be `vro` (stalled rename) |
+| `map-bms` | Banyumasan | No ISO code (Javanese superset) |
+| `nds-nl` | Dutch Low Saxon | Duplicated with Low German `nds` |
+| `nrm` | Norman | ISO code `nrm` ≠ language (conflict with Narom) |
+| `roa-tara` | Tarantino | No ISO code |
+| `sh` | Serbo-Croatian | Deprecated ISO 639-1, still valid BCP 47 |
+| `srn` | Sranan Tongo | |
+
+### BCP 47 Language Tags (from `$wgExtraLanguageCodes`)
+
+When you need to produce valid BCP 47 language tags (for HTML `lang` attributes,
+Accept-Language headers, or standards-compliant output), use these mappings:
+
+| Wikimedia Code | BCP 47 Tag | Notes |
+|----------------|------------|-------|
+| `simple` | `en-simple` | Simple English as a variant of English |
+| `zh-hans` | `zh-Hans` | Chinese (Simplified) |
+| `zh-hant` | `zh-Hant` | Chinese (Traditional) |
+| `zh-cn` | `zh-Hans-CN` | Chinese (China, Simplified) |
+| `zh-sg` | `zh-Hans-SG` | Chinese (Singapore, Simplified) |
+| `zh-my` | `zh-Hans-MY` | Chinese (Malaysia, Simplified) |
+| `zh-tw` | `zh-Hant-TW` | Chinese (Taiwan, Traditional) |
+| `zh-hk` | `zh-Hant-HK` | Chinese (Hong Kong, Traditional) |
+| `zh-mo` | `zh-Hant-MO` | Chinese (Macau, Traditional) |
+| `sr-ec` | `sr-Cyrl` | Serbian (Cyrillic) |
+| `sr-el` | `sr-Latn` | Serbian (Latin) |
+| `sr` | `sr` | Serbian (canonical code stays as-is) |
+| `crh-cyrl` | `crh-Cyrl` | Crimean Tatar (Cyrillic) |
+| `crh-latn` | `crh-Latn` | Crimean Tatar (Latin) |
+| `kk-arab` | `kk-Arab` | Kazakh (Arabic) |
+| `kk-cyrl` | `kk-Cyrl` | Kazakh (Cyrillic) |
+| `kk-latn` | `kk-Latn` | Kazakh (Latin) |
+| `kk-cn` | `kk-Arab-CN` | Kazakh (China, Arabic) |
+| `kk-kz` | `kk-Cyrl-KZ` | Kazakh (Kazakhstan, Cyrillic) |
+| `kk-tr` | `kk-Latn-TR` | Kazakh (Turkey, Latin) |
+| `ku-arab` | `ckb` | Kurdish (Arabic script → Central Kurdish) |
+| `ku-latn` | `ku-Latn` | Kurdish (Latin) |
+| `tg-cyrl` | `tg-Cyrl` | Tajik (Cyrillic) |
+| `tg-latn` | `tg-Latn` | Tajik (Latin) |
+| `uz-cyrl` | `uz-Cyrl` | Uzbek (Cyrillic) |
+| `uz-latn` | `uz-Latn` | Uzbek (Latin) |
+| `de-ch` | `de-CH` | German (Switzerland) |
+| `en-gb` | `en-GB` | English (United Kingdom) |
+| `als` | `gsw` | Alemannic (BCP 47 uses ISO 639-3 `gsw`) |
+| `de-formal` | `de-x-formal` | German (formal, private use) |
+| `nl-informal` | `nl-x-informal` | Dutch (informal, private use) |
+| `hu-formal` | `hu-x-formal` | Hungarian (formal, private use) |
+
+### Quick Reference: Code Resolution Flow
+
+```
+User input ("zh-yue", "no", "simple")
+    │
+    ▼
+normlize_language_code(code)     ← uses $wgDummyLanguageCodes
+    │
+    ├─▶ Canonical internal code ("yue", "nb", "en")
+    │      Use for: Action API, SPARQL, Wikidata API,
+    │      sitelinks, mediawiki domain construction
+    │
+    ▼
+language_code_to_bcp47(code)      ← uses $wgExtraLanguageCodes
+    │
+    ├─▶ BCP 47 tag ("yue", "nb", "en-simple")
+    │      Use for: HTML lang, Accept-Language, standards
+    │
+    ▼
+language_to_domain(code)          ← uses SPECIAL_DOMAINS
+    │
+    ├─▶ Wiki domain ("yue.wikipedia.org", "nb.wikipedia.org")
+           Use for: API base URLs
+```
 
 ## How to Determine If a Language Code Exists
 

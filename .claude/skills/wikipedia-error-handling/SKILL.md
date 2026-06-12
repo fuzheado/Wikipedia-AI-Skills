@@ -113,6 +113,53 @@ for item in items:
     # ...
 ```
 
+### Concurrent Workers and Burst Rate Limits
+
+When scraping **many language editions** concurrently (e.g., fetching the same article from 300+ `{lang}.wikipedia.org` domains), the combined request rate can trigger 429s even though each individual session stays under the limit. This happens because Wikimedia enforces rate limits **per IP**, not per domain — hitting 300 different Wikipedia domains from one IP address still counts as one sustained stream.
+
+**Symptoms:**
+- First 50–100 requests succeed, then a burst of 429s
+- Earlier requests in the batch succeed, later ones fail
+- The rate limit is triggered by *sustained rate*, not total requests
+
+**Prevention strategies (in order of effectiveness):**
+
+1. **Reduce concurrent workers** — 6 workers is safer than 12 for large jobs:
+   ```python
+   with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+       futures = {executor.submit(fetch, l, t): (l, t) for l, t in languages}
+   ```
+
+2. **Add jitter between batch submissions** — Instead of submitting all futures at once, stagger them slightly:
+   ```python
+   import time, random
+   futures = {}
+   for i, (lang, title) in enumerate(languages):
+       futures[executor.submit(fetch, lang, title)] = (lang, title)
+       if i > 0 and i % 20 == 0:
+           time.sleep(random.uniform(0.5, 1.5))  # brief pause every 20
+   ```
+
+3. **Cache aggressively** — Many use cases involve re-checking the same articles. Cache results to disk so that re-runs (e.g., with different parameters) skip HTTP entirely. A simple `{lang}:{title}` → `{response_text}` JSON file works well for this.
+
+**Retry pattern for 429 with concurrent workers:**
+```python
+def fetch_with_retry(lang, title):
+    """Fetch with exponential backoff on 429."""
+    import time
+    url = f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{title}"
+    for attempt in range(4):
+        resp = requests.get(url, headers=HEADERS, timeout=15)
+        if resp.status_code == 200:
+            return resp.json().get('extract')
+        if resp.status_code == 429:
+            retry_after = int(resp.headers.get('Retry-After', 2))
+            time.sleep(retry_after + (2 ** attempt))  # backoff + Retry-After
+            continue
+        return None  # Other errors (404, etc.) are final
+    return None
+```
+
 ### SPARQL-Specific Rate Limiting
 
 The Wikidata SPARQL endpoint has its own stricter limits (see the **[wikidata](../wikidata/SKILL.md)** skill for details). Key rules:

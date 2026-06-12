@@ -105,6 +105,8 @@ def format_short(report: NotabilityReport) -> str:
     parts = [f"[{verdict}] {report.subject_name}"]
     if sngs:
         parts.append(f"({sngs})")
+    elif report.applicable_sngs:
+        parts.append("(" + ",".join(report.applicable_sngs) + "?)")
     parts.append(f"[{gng}]")
     parts.append(f"[confidence:{confidence}]")
 
@@ -113,14 +115,12 @@ def format_short(report: NotabilityReport) -> str:
 
 def generate_afd_summary(
     report: NotabilityReport,
-    include_sources: bool = True,
 ) -> str:
     """
     Generate a notability summary suitable for an AfD discussion.
 
     Args:
         report: NotabilityReport from the checker
-        include_sources: Whether to include source details
 
     Returns:
         AfD-ready summary text
@@ -172,7 +172,8 @@ def generate_notability_tag(report: NotabilityReport) -> str:
     Generate the appropriate maintenance template tag for a page.
 
     Returns:
-        Wiki template string (e.g., {{notability|date=June 2026}})
+        Wiki template string (e.g., {{notability|date=June 2026}}),
+        or a deletion suggestion for not_notable subjects.
     """
     from datetime import datetime, timezone
 
@@ -183,8 +184,8 @@ def generate_notability_tag(report: NotabilityReport) -> str:
         return ""  # No tag needed
 
     if report.overall_verdict == "not_notable":
-        # Not truly notable — may need CSD or AfD instead
-        return ""
+        # Suggest CSD or PROD instead of a maintenance tag
+        return "'''Note:''' Subject may not meet notability guidelines. Consider [[WP:PROD]] or [[WP:CSD]] if the article already exists."
 
     # Unclear — add notability tag
     return "{{notability|date=" + date_str + "}}"
@@ -199,11 +200,15 @@ if __name__ == "__main__":
     )
     parser.add_argument("--name", required=True, help="Subject name")
     parser.add_argument("--verdict", default="unclear",
-                        choices=["notable", "not_notable", "unclear"])
+                        choices=["notable", "not_notable", "unclear"],
+                        help="Notability verdict to format (default: unclear)")
     parser.add_argument("--format", default="full",
-                        choices=["full", "short", "afd", "tag"])
-    parser.add_argument("--type", default="person")
-    parser.add_argument("--description", default="")
+                        choices=["full", "short", "afd", "tag"],
+                        help="Output format: full report, short summary, AfD summary, or maintenance tag (default: full)")
+    parser.add_argument("--type", default="person",
+                        help="Subject type for the report (default: person)")
+    parser.add_argument("--description", default="",
+                        help="Subject description for the report")
 
     args = parser.parse_args()
 

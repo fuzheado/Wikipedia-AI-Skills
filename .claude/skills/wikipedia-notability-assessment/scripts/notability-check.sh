@@ -69,11 +69,18 @@ if [ -n "$TYPE" ]; then
 fi
 
 for src in "${SOURCES[@]+${SOURCES[@]}}"; do
+    [ -n "$src" ] || continue
     PY_ARGS+=("--source" "$src")
 done
 
 if [ "$JSON" = true ]; then
     PY_ARGS+=("--json")
+fi
+
+if [ "$FORMAT" = "afd" ]; then
+    PY_ARGS+=("--afd")
+elif [ "$FORMAT" = "short" ]; then
+    PY_ARGS+=("--short")
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

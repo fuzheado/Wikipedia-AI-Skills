@@ -240,6 +240,49 @@ class TestSNG:
         assert result.applicable
         assert result.confidence == "low"  # NCORP needs source evaluation
 
+    def test_nastro_exoplanet(self):
+        from notability_checker import NotabilityChecker
+        checker = NotabilityChecker()
+        result = checker.check_sng("NASTRO",
+            "Confirmed exoplanet orbiting Proxima Centauri")
+        assert result.applicable
+        assert len(result.criteria_met) > 0
+        assert result.confidence == "high"
+
+    def test_nnumber_known(self):
+        from notability_checker import NotabilityChecker
+        checker = NotabilityChecker()
+        result = checker.check_sng("NNUMBER",
+            "The number 42")
+        assert result.applicable
+        assert len(result.criteria_met) > 0
+
+    def test_nnumber_mathematical(self):
+        from notability_checker import NotabilityChecker
+        checker = NotabilityChecker()
+        result = checker.check_sng("NNUMBER",
+            "The constant pi")
+        assert result.applicable
+        assert len(result.criteria_met) > 0
+
+    def test_nspecies_described(self):
+        from notability_checker import NotabilityChecker
+        checker = NotabilityChecker()
+        result = checker.check_sng("NSPECIES",
+            "A described species of butterfly")
+        assert result.applicable
+        assert len(result.criteria_met) > 0
+        assert result.confidence == "high"
+
+    def test_nastro_unclear(self):
+        from notability_checker import NotabilityChecker
+        checker = NotabilityChecker()
+        result = checker.check_sng("NASTRO",
+            "A star in the sky")
+        assert result.applicable
+        assert len(result.criteria_met) == 0  # Unclear type
+        assert result.confidence == "low"
+
 
 class TestExclusions:
     """Tests for exclusion rule checking."""
@@ -519,6 +562,16 @@ class TestNotabilityTemplates:
         tag = generate_notability_tag(report)
         assert tag == ""  # No tag needed for notable subjects
 
+    def test_notability_tag_not_notable(self):
+        """not_notable should suggest CSD/PROD, not return empty."""
+        from notability_checker import NotabilityReport
+        from notability_templates import generate_notability_tag
+        report = NotabilityReport("Test", "person", "",
+                                   overall_verdict="not_notable")
+        tag = generate_notability_tag(report)
+        assert tag != ""
+        assert "CSD" in tag or "PROD" in tag
+
 
 # =========================================================================
 # Script tests
@@ -578,6 +631,20 @@ class TestScripts:
         assert result.returncode == 0
         data = json.loads(result.stdout)
         assert data["verdict"]["overall"] == "notable"
+
+    def test_checker_script_afd(self):
+        """Test --afd flag produces AfD-ready output."""
+        import subprocess
+        result = subprocess.run(
+            ["python3", str(ASSETS_DIR / "notability_checker.py"),
+             "Jane Smith",
+             "--description", "Professor at MIT, Nobel Prize winner",
+             "--type", "academic",
+             "--afd"],
+            capture_output=True, text=True, timeout=10,
+        )
+        assert result.returncode == 0
+        assert "Keep" in result.stdout or "Meets" in result.stdout
 
     def test_evaluator_script_help(self):
         import subprocess

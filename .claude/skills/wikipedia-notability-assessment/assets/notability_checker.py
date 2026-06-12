@@ -326,6 +326,7 @@ class NotabilityChecker:
         reliable_count = 0
         independent_count = 0
         significant_count = 0
+        unknown_significant_count = 0  # reliable+independent but significance unknown
 
         for src in sources:
             src_type = src.get("type", "unknown")
@@ -337,15 +338,22 @@ class NotabilityChecker:
             if src_type in ("press_release", "self_published", "blog", "social_media"):
                 independent = False
                 significant = False
-            elif src_type in ("academic", "news", "book", "review", "documentary"):
+            elif src_type in (
+                "academic", "news", "news_article", "news_feature",
+                "book", "review", "book_review", "documentary",
+            ):
                 reliable = reliable if reliable is not None else True
 
             if reliable:
                 reliable_count += 1
             if independent:
                 independent_count += 1
-            if significant:
+            if significant is True:
                 significant_count += 1
+            elif significant is None and reliable and independent:
+                # Reliable+independent source with unknown significance —
+                # could be significant, depends on article content
+                unknown_significant_count += 1
 
             result.source_details.append({
                 "title": src.get("title", ""),
@@ -358,8 +366,18 @@ class NotabilityChecker:
         result.source_count = len(sources)
         result.reliable_sources = reliable_count >= 2
         result.independent_sources = independent_count >= 2
-        result.significant_coverage = significant_count >= 1
-        result.multiple_sources = reliable_count >= 2
+        # Significant coverage can be explicit (True) or implied (reliable+independent
+        # from a source type that reasonably could provide significant coverage)
+        result.significant_coverage = (
+            significant_count >= 1
+            or (unknown_significant_count >= 2 and significant_count >= 0)
+        )
+        # "Multiple sources" means at least 2 sources that are both reliable AND independent
+        qualifying = sum(
+            1 for sd in result.source_details
+            if sd.get("reliable") and sd.get("independent")
+        )
+        result.multiple_sources = qualifying >= 2
 
         # Passes GNG if all four conditions met
         result.passed = (
@@ -370,10 +388,14 @@ class NotabilityChecker:
         )
 
         if result.passed:
-            result.notes = (
-                f"Passes GNG: {significant_count} sources with significant coverage, "
-                f"{reliable_count} reliable, {independent_count} independent."
-            )
+            details = []
+            if significant_count > 0:
+                details.append(f"{significant_count} confirmed significant coverage")
+            if unknown_significant_count > 0:
+                details.append(f"{unknown_significant_count} additional from reliable+independent sources")
+            details.append(f"{reliable_count} reliable")
+            details.append(f"{independent_count} independent")
+            result.notes = "Passes GNG: " + ", ".join(details) + "."
         else:
             failures = []
             if not result.significant_coverage:
@@ -456,10 +478,10 @@ class NotabilityChecker:
                 "retrospective", "permanent collection",
             ]):
                 criteria.append("Major exhibition or museum representation")
-            if "review" in desc_lower and any(w in desc_lower for w in ["critically", "acclaim", "best-selling", "bestseller"]):
-                # More precise check
-                if "review" in desc_lower or "critically" in desc_lower:
-                    criteria.append("Independent critical attention")
+            if "review" in desc_lower and any(
+                w in desc_lower for w in ["critically", "acclaim", "best-selling", "bestseller"]
+            ):
+                criteria.append("Independent critical attention")
 
             if criteria:
                 result.applicable = True
@@ -578,11 +600,61 @@ class NotabilityChecker:
             if "review" in desc_lower and (
                 "book" in desc_lower or "novel" in desc_lower or "published" in desc_lower
             ):
+                result.criteria_met = ["Multiple independent reviews"]
                 result.confidence = "medium"
-                result.details = "Book may meet NBOOK, but reviews need verification."
+                result.details = "Book has reviews in independent sources — likely meets NBOOK."
+
+        elif sng == "NASTRO":
+            result.applicable = True
+            if any(term in desc_lower for term in [
+                "exoplanet", "confirmed exoplanet", "numbered asteroid",
+                "ngc ", "ic ", "messier", "named comet", "periodic comet",
+                "supernova",
+            ]):
+                result.criteria_met = ["Confirmed or cataloged astronomical object"]
+                result.confidence = "high"
+                result.details = "Confirmed astronomical object — generally notable per NASTRO."
+            else:
+                result.confidence = "low"
+                result.details = "Astronomical object type unclear. Confirmed exoplanets, numbered asteroids, NGC/IC objects, and named comets are notable."
+
+        elif sng == "NNUMBER":
+            # Numbers 1-99 are generally notable. Others need mathematical significance.
+            result.applicable = True
+            desc_number = desc_lower.strip()
+            # Simple check: is the description a number or about a number?
+            import re as _re
+            number_match = _re.search(r'\b([1-9][0-9]?)\b', desc_number)
+            if number_match:
+                n = int(number_match.group(1))
+                if 1 <= n <= 99:
+                    result.criteria_met = [f"Number between 1 and 99 — per NNUMBER"]
+                    result.confidence = "high"
+                    result.details = f"Number {n} is generally notable per NNUMBER."
+                    return result
+            if any(term in desc_lower for term in ["constant", "π", "pi", "euler", "fibonacci"]):
+                result.criteria_met = ["Mathematically significant number"]
+                result.confidence = "medium"
+                result.details = "Mathematically significant — likely meets NNUMBER."
+            else:
+                result.confidence = "low"
+                result.details = "Most numbers beyond 99 are not notable. Only 1-99 and mathematically significant numbers have articles."
+
+        elif sng == "NSPECIES":
+            result.applicable = True
+            if any(term in desc_lower for term in [
+                "species", "subspecies", "taxon", "described",
+                "genus", "family", "order", "class", "phylum",
+            ]):
+                result.criteria_met = ["Described species or higher taxon"]
+                result.confidence = "high"
+                result.details = "All described species are presumed notable per NSPECIES."
+            else:
+                result.confidence = "low"
+                result.details = "NSPECIES: All described species are notable. Undescribed or hypothetical species are not."
 
         # Default for unhandled SNGs
-        if not result.criteria_met and result.applicable:
+        if not result.criteria_met and result.applicable and result.details:
             pass  # Keep as-is
 
         return result
@@ -602,7 +674,7 @@ class NotabilityChecker:
         desc_lower = description.lower()
 
         # BLP1E: Person notable for only one event
-        if subject_type in ("person",) and any(
+        if subject_type == "person" and any(
             term in desc_lower for term in [
                 "survivor of", "witness to", "victim of", "only known for",
             ]
@@ -656,27 +728,53 @@ if __name__ == "__main__":
     parser.add_argument("--type", help="Subject type (academic, artist, company, etc.)")
     parser.add_argument("--description", "-d", required=True, help="Subject description")
     parser.add_argument("--source", "-s", action="append",
-                        help="Sources in format: title|type|reliable|independent|significant "
-                             "(e.g., 'Nature article|academic|yes|yes|yes')")
+                        help="Source URL or pipe-delimited metadata. "
+                             "Bare URLs are auto-classified. "
+                             "Pipe format: title|type|reliable|independent|significant "
+                             "(e.g., 'Nature article|academic|yes|yes|yes'). "
+                             "Can be repeated.")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--afd", action="store_true", help="Output AfD-ready summary")
+    parser.add_argument("--short", action="store_true", help="One-line summary")
 
     args = parser.parse_args()
 
     checker = NotabilityChecker()
     sources = []
 
+    # Import SourceEvaluator for auto-classification of raw URLs
+    from source_evaluator import SourceEvaluator
+    source_eval = SourceEvaluator()
+
     if args.source:
         for s in args.source:
             parts = s.split("|")
-            src = {"title": parts[0] if len(parts) > 0 else ""}
-            if len(parts) > 1:
-                src["type"] = parts[1]
-            if len(parts) > 2:
-                src["reliable"] = parts[2].lower() in ("yes", "true", "1")
-            if len(parts) > 3:
-                src["independent"] = parts[3].lower() in ("yes", "true", "1")
-            if len(parts) > 4:
-                src["significant"] = parts[4].lower() in ("yes", "true", "1")
+            has_pipes = len(parts) > 1
+
+            if has_pipes:
+                # Pipe-delimited format: title|type|reliable|independent|significant
+                src = {"title": parts[0] if len(parts) > 0 else ""}
+                if len(parts) > 1:
+                    src["type"] = parts[1]
+                if len(parts) > 2:
+                    src["reliable"] = parts[2].lower() in ("yes", "true", "1")
+                if len(parts) > 3:
+                    src["independent"] = parts[3].lower() in ("yes", "true", "1")
+                if len(parts) > 4:
+                    src["significant"] = parts[4].lower() in ("yes", "true", "1")
+            else:
+                # Bare URL — auto-classify using SourceEvaluator
+                url = parts[0]
+                cls = source_eval.classify_source(url=url)
+                ev = source_eval.evaluate(url=url, source_type=cls)
+                src = {
+                    "title": url,
+                    "url": url,
+                    "type": cls,
+                    "reliable": ev["reliable"],
+                    "independent": ev["independent"],
+                    "significant": ev["significant"],
+                }
             sources.append(src)
 
     report = checker.assess(
@@ -688,42 +786,12 @@ if __name__ == "__main__":
 
     if args.json:
         print(json.dumps(report.to_dict(), indent=2, ensure_ascii=False))
+    elif args.afd:
+        from notability_templates import generate_afd_summary
+        print(generate_afd_summary(report))
+    elif args.short:
+        from notability_templates import format_short
+        print(format_short(report))
     else:
-        print(f"=== Notability Assessment ===")
-        print(f"Subject: {report.subject_name}")
-        print(f"Type:    {report.subject_type}")
-        print(f"Desc:    {report.description}")
-        print()
-        print(f"Verdict: {report.overall_verdict.upper()}")
-        print(f"Confidence: {report.confidence}")
-        print()
-
-        if report.sng_results:
-            print("--- SNG Checks ---")
-            for s in report.sng_results:
-                status = "✓" if s.applicable and s.criteria_met else "?"
-                print(f"  [{status}] {s.sng}: {s.details}")
-            print()
-
-        print("--- GNG Check ---")
-        g = report.gng
-        gng_status = "✓ PASS" if g.passed else "✗ FAIL"
-        print(f"  GNG: {gng_status}")
-        print(f"  Significant coverage: {'✓' if g.significant_coverage else '✗'}")
-        print(f"  Reliable sources:     {'✓' if g.reliable_sources else '✗'}")
-        print(f"  Independent sources:  {'✓' if g.independent_sources else '✗'}")
-        print(f"  Multiple sources:     {'✓' if g.multiple_sources else '✗'}")
-        print(f"  Sources evaluated:    {g.source_count}")
-        if g.notes:
-            print(f"  Notes: {g.notes}")
-        print()
-
-        if report.exclusion_flags:
-            print("--- Exclusion Flags ---")
-            for flag in report.exclusion_flags:
-                print(f"  ⚠ {flag}")
-            print()
-
-        print("--- Recommendations ---")
-        for rec in report.recommendations:
-            print(f"  → {rec}")
+        from notability_templates import format_report
+        print(format_report(report))

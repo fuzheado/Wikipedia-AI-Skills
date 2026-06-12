@@ -220,6 +220,32 @@ the full login flow (including the two-step `NeedToken` case).
 - **Batch lookup:** "For each page in this list of 50 titles, fetch the page ID and word count from the API."
 - **Troubleshoot 403:** "Check the User-Agent header and confirm it follows the Wikimedia format."
 
+### REST API `/page/summary` Response Details
+
+The `/{lang}.wikipedia.org/api/rest_v1/page/summary/{title}` endpoint returns a JSON response with several useful fields beyond `extract` and `thumbnail`:
+
+```json
+{
+  "type": "standard",                // ← page type: "standard" or "disambiguation"
+  "title": "Albert Einstein",
+  "displaytitle": "Albert Einstein",
+  "extract": "Albert Einstein was a German-born...",  // ← lead paragraph (may be empty for DAB pages)
+  "description": "German-born theoretical physicist",
+  "pageid": 736,
+  "content_urls": {
+    "desktop": {"page": "https://en.wikipedia.org/wiki/Albert_Einstein"},
+    "mobile": {"page": "https://en.m.wikipedia.org/wiki/Albert_Einstein"}
+  }
+}
+```
+
+**Key notes:**
+
+- **`type` field:** Use `type == "disambiguation"` to detect disambiguation pages without parsing templates or categories (more reliable than checking for `{{disambiguation}}` templates).
+- **`extract` may be empty** even when the page exists. Disambiguation pages and pages consisting only of an infobox return an empty string for `extract` but still return HTTP 200.
+- **Unicode control characters:** Some language editions include bare Unicode formatting characters (e.g., U+200E LEFT-TO-RIGHT MARK) in the `extract` text. These are not removed by `.strip()` — filter them with `''.join(c for c in text if c.isprintable())` before processing.
+- **The `type` field is only available in the REST API**, not in the Action API's `prop=extracts`. If you use the Action API, you'd need to check categories or templates instead.
+
 ---
 
 ## **Tooling**

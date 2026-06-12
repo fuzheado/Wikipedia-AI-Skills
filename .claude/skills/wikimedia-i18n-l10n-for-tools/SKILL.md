@@ -940,9 +940,54 @@ Don't apply English plural rules (one/other) to all languages:
 
 Use ICU MessageFormat or the `babel` library instead of simple `if count == 1` checks.
 
-### 9. `be-tarask` and Similar Codes Are Not BCP 47 Valid
+### 9. Language Code Normalization: Aliases, Renames, and Non-Standard Codes
 
-Wikimedia uses some non-standard language codes (`be-tarask`, `simple`, `cbk-zam`, `roa-rup`, `bat-smg`). These are opaque identifiers. Treat them as strings, not language tags.
+Wikimedia has a complex history of language code usage. The same language can
+be referred to by multiple codes depending on the source:
+
+| Context | Example Codes |
+|---------|--------------|
+| Wikipedia subdomain | `yue.wikipedia.org`, `nb.wikipedia.org` |
+| ISO 639-1/3 standard | `yue`, `nb` (canonical) |
+| Deprecated alias | `zh-yue` (old MediaWiki code → `yue`) |
+| Deprecated alias | `no` (ISO macrolanguage → `nb`) |
+| BCP 47 tag | `en-simple` (Simple English as English variant) |
+
+**The critical mappings** (from MediaWiki `$wgDummyLanguageCodes`):
+
+| Alias | Canonical | Why |
+|-------|-----------|-----|
+| `zh-yue` → | `yue` | Cantonese Wikipedia subdomain was renamed |
+| `no` → | `nb` | ISO macrolanguage code redirects to Bokmål |
+| `zh-classical` → | `lzh` | Classical Chinese uses ISO 639-3 |
+| `zh-min-nan` → | `nan` | Min Nan uses ISO 639-3 |
+| `bat-smg` → | `sgs` | Samogitian (deprecated code) |
+| `roa-rup` → | `rup` | Aromanian (deprecated code) |
+| `als` → | `gsw` | Alemannic (was wrongly using Tosk Albanian's ISO code) |
+| `fiu-vro` → | `vro` | Võro (deprecated code) |
+| `be-x-old` → | `be-tarask` | Belarusian old orthography (renamed) |
+| `simple` → | `en` | Simple English uses English message files |
+
+**How to handle this in your code:**
+
+```python
+from i18n_utils import normalize_language_code, language_code_to_bcp47
+
+# User passes an old/alias code — normalize it
+lang = normalize_language_code("zh-yue")   # → "yue"
+lang = normalize_language_code("no")       # → "nb"
+lang = normalize_language_code("zh-yue")   # → "yue"
+
+# For HTML output, convert to BCP 47
+tag = language_code_to_bcp47("simple")     # → "en-simple"
+tag = language_code_to_bcp47("zh-cn")     # → "zh-Hans-CN"
+
+# Always normalize before building API URLs or making cross-system comparisons
+```
+
+**Full reference:** See the [language-codes.md](references/language-codes.md) reference doc
+for the complete mapping tables including BCP 47 conversion, non-standard Wikipedia
+subdomains, and all `$wgExtraLanguageCodes` mappings.
 
 ### 10. Cross-Wiki API Calls Have Different Rate Limits
 

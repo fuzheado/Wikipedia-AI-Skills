@@ -1,9 +1,14 @@
 ---
 name: wikimedia-phabricator
-description: Navigate Wikimedia's Phabricator instance — search tasks, interpret task status and project tags, file bug reports, and track WMF development priorities
+description: Navigate Wikimedia's Phabricator instance — search tasks, track project status, file bug reports, and understand why something might not work or what's in development
 license: MIT
 compatibility: opencode
 last_verified: 2026-06-12
+skill_discovery_hints:
+  - keywords: ["Phabricator", "Phab", "bug report", "bug tracker", "known issue", "known bug", "feature request", "task"]
+  - keywords: ["in development", "being worked on", "project status", "roadmap", "sprint", "workboard", "deployment status"]
+  - keywords: ["why doesn't", "why won't", "broken", "not working", "regression", "reported", "submit a bug"]
+  - keywords: ["phab:", "tracking ticket", "development tracking", "task status"]
 ---
 
 > **When to use this skill:** A user asks why a Wikipedia feature behaves a certain way, whether a bug is known, whether something is being worked on, or wants to report a problem. **Phabricator is the canonical place to check** — it is the WMF's centralized task tracker for all software bugs, feature requests, and project planning across MediaWiki, Wikimedia apps, and Toolforge.

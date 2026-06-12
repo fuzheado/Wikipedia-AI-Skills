@@ -6,6 +6,8 @@ Usage:
     from i18n_utils import (
         detect_language,
         resolve_fallback,
+        normalize_language_code,
+        language_code_to_bcp47,
         normalize_title,
         language_to_domain,
         domain_to_language,
@@ -20,6 +22,14 @@ Usage:
     # Resolve fallback chain
     chain = resolve_fallback("pt-br")
     # → ["pt-br", "pt", "es", "en"]
+
+    # Normalize a language code (handles aliases like zh-yue→yue, no→nb)
+    code = normalize_language_code("zh-yue")
+    # → "yue"
+
+    # Convert to BCP 47 tag
+    tag = language_code_to_bcp47("simple")
+    # → "en-simple"
 
     # Normalize a page title to MediaWiki standard (NFC)
     title = normalize_title("Spielberg\\u0301")
@@ -145,6 +155,85 @@ SPECIAL_DOMAINS = {
     "roa-rup": "roa-rup.wikipedia.org",
     "bat-smg": "bat-smg.wikipedia.org",
     "srn": "srn.wikipedia.org",
+}
+
+# Deprecated/alias language codes → canonical Wikimedia internal code
+# Source: MediaWiki $wgDummyLanguageCodes
+# These are codes that were renamed or never corresponded to a real interface language.
+# When you receive one of these codes from any source, normalize to the canonical value.
+DUMMY_LANGUAGE_CODES: Dict[str, str] = {
+    "als": "gsw",              # Alemannic (was wrongly using ISO code for Tosk Albanian)
+    "bat-smg": "sgs",          # Samogitian (deprecated code → ISO 639-3)
+    "be-x-old": "be-tarask",   # Belarusian old orthography (renamed)
+    "bh": "bho",               # Bihari → Bhojpuri
+    "fiu-vro": "vro",          # Võro (deprecated code → ISO 639-3)
+    "no": "nb",                # Norwegian macrolanguage → Bokmål
+    "roa-rup": "rup",          # Aromanian (deprecated code → ISO 639-3)
+    "simple": "en",            # Simple English → English (for internal API use)
+    "zh-classical": "lzh",     # Classical Chinese (deprecated code → ISO 639-3)
+    "zh-min-nan": "nan",       # Min Nan (deprecated code → ISO 639-3)
+    "zh-yue": "yue",           # Cantonese (deprecated code → ISO 639-3)
+}
+
+# Canonical language code → valid BCP 47 tag
+# Source: MediaWiki $wgExtraLanguageCodes
+# Use these for HTML lang attributes, Accept-Language headers, and BCP 47 contexts.
+EXTRA_LANGUAGE_CODES: Dict[str, str] = {
+    "als": "gsw",
+    "crh-cyrl": "crh-Cyrl",
+    "crh-latn": "crh-Latn",
+    "de-ch": "de-CH",
+    "de-formal": "de-x-formal",
+    "en-gb": "en-GB",
+    "hu-formal": "hu-x-formal",
+    "kk-arab": "kk-Arab",
+    "kk-cyrl": "kk-Cyrl",
+    "kk-latn": "kk-Latn",
+    "kk-cn": "kk-Arab-CN",
+    "kk-kz": "kk-Cyrl-KZ",
+    "kk-tr": "kk-Latn-TR",
+    "ku-arab": "ckb",         # Kurdish (Arabic script) → Central Kurdish
+    "ku-latn": "ku-Latn",
+    "nl-informal": "nl-x-informal",
+    "simple": "en-simple",
+    "sr-ec": "sr-Cyrl",
+    "sr-el": "sr-Latn",
+    "tg-cyrl": "tg-Cyrl",
+    "tg-latn": "tg-Latn",
+    "uz-cyrl": "uz-Cyrl",
+    "uz-latn": "uz-Latn",
+    "zh-hans": "zh-Hans",
+    "zh-hant": "zh-Hant",
+    "zh-cn": "zh-Hans-CN",
+    "zh-hk": "zh-Hant-HK",
+    "zh-mo": "zh-Hant-MO",
+    "zh-my": "zh-Hans-MY",
+    "zh-sg": "zh-Hans-SG",
+    "zh-tw": "zh-Hant-TW",
+}
+
+# Non-standard Wikipedia subdomains — codes that exist as wiki URLs but differ
+# from canonical ISO/BCP 47 codes. Includes codes still in active use.
+# Source: https://meta.wikimedia.org/wiki/Special_language_codes
+NON_STANDARD_WIKI_CODES: Dict[str, str] = {
+    "als": "gsw",              # alemannische Wikipedia (uses ISO 639-3 gsw)
+    "bat-smg": "sgs",          # Žemaitėška Wikipedia (Samogitian)
+    "cbk-zam": "cbk-zam",      # Chavacano de Zamboanga (no ISO code)
+    "eml": "egl",              # Emiliàn e rumagnòl (retired ISO, split to egl/rgn)
+    "fiu-vro": "vro",          # Võro Wikipedia
+    "iu": "iu",                # Inuktitut (ISO macrolanguage)
+    "ksh": "ksh",              # Ripoarisch (ISO code is for Kölsch subset)
+    "map-bms": "map-bms",       # Basa Banyumasan (no ISO code)
+    "nds-nl": "nds-nl",         # Nedersaksies (Dutch Low Saxon)
+    "nrm": "nrf",              # Nouormand (ISO code conflicts with Narom)
+    "roa-rup": "rup",          # Armãneashti Wikipedia (Aromanian)
+    "roa-tara": "roa-tara",     # Tarandíne (Tarantino, no ISO code)
+    "sh": "sh",                # Srpskohrvatski (deprecated ISO 639-1, still valid BCP 47)
+    "simple": "simple",         # Simple English (subdomain is the code)
+    "srn": "srn",              # Sranan Tongo
+    "zh-classical": "lzh",      # Classical Chinese (Wikipedia subdomain)
+    "zh-min-nan": "nan",        # Min Nan (Wikipedia subdomain)
+    "zh-yue": "yue",           # Cantonese (Wikipedia subdomain)
 }
 
 # Invisible characters that cause problems in Wikimedia APIs
@@ -285,12 +374,134 @@ def is_rtl(lang: str) -> bool:
     return lang.split("-")[0].lower() in RTL_LANGUAGES
 
 
+def normalize_language_code(code: str) -> str:
+    """
+    Normalize a language code to the canonical Wikimedia internal code.
+
+    Resolves deprecated aliases, legacy codes, and common alternate codes
+    to the canonical code that Wikimedia APIs expect.
+
+    Based on MediaWiki's $wgDummyLanguageCodes configuration, which captures
+    all historical renames and code reassignments.
+
+    Args:
+        code: A language code from any source (e.g., "zh-yue", "no", "bat-smg")
+
+    Returns:
+        Canonical Wikimedia language code (e.g., "yue", "nb", "sgs")
+
+    Examples:
+        >>> normalize_language_code("zh-yue")
+        "yue"
+        >>> normalize_language_code("yue")
+        "yue"
+        >>> normalize_language_code("no")
+        "nb"
+        >>> normalize_language_code("nb")
+        "nb"
+        >>> normalize_language_code("bat-smg")
+        "sgs"
+        >>> normalize_language_code("simple")
+        "en"
+        >>> normalize_language_code("en")
+        "en"
+        >>> normalize_language_code("zh-classical")
+        "lzh"
+    """
+    if not code:
+        return code
+
+    lower = code.lower().strip()
+
+    # 1. Direct alias lookup (handles zh-yue→yue, no→nb, etc.)
+    if lower in DUMMY_LANGUAGE_CODES:
+        return DUMMY_LANGUAGE_CODES[lower]
+
+    # 2. Already canonical
+    return lower
+
+
+def language_code_to_bcp47(code: str) -> str:
+    """
+    Convert a Wikimedia language code to a valid BCP 47 language tag.
+
+    BCP 47 tags are used for HTML lang attributes, Accept-Language headers,
+    and other standards-compliant contexts. Wikimedia uses mostly ISO 639
+    codes internally, but some codes need BCP 47 formatting (e.g., script
+    variants like sr-ec → sr-Cyrl, region variants like zh-cn → zh-Hans-CN).
+
+    Based on MediaWiki's $wgExtraLanguageCodes and LanguageCode::bcp47().
+
+    Args:
+        code: A Wikimedia language code (e.g., "simple", "zh-cn", "sr-ec")
+
+    Returns:
+        BCP 47 language tag (e.g., "en-simple", "zh-Hans-CN", "sr-Cyrl")
+
+    Examples:
+        >>> language_code_to_bcp47("simple")
+        "en-simple"
+        >>> language_code_to_bcp47("zh-cn")
+        "zh-Hans-CN"
+        >>> language_code_to_bcp47("zh-tw")
+        "zh-Hant-TW"
+        >>> language_code_to_bcp47("sr-ec")
+        "sr-Cyrl"
+        >>> language_code_to_bcp47("sr")
+        "sr"
+        >>> language_code_to_bcp47("en")
+        "en"
+        >>> language_code_to_bcp47("yue")
+        "yue"
+    """
+    if not code:
+        return code
+
+    lower = code.lower().strip()
+
+    # 1. Check the original code against EXTRA_LANGUAGE_CODES first
+    #    (e.g., "simple" has BCP 47 "en-simple" but normalizes to "en")
+    if lower in EXTRA_LANGUAGE_CODES:
+        return EXTRA_LANGUAGE_CODES[lower]
+
+    # 2. Normalize to canonical internal code (e.g., zh-yue → yue)
+    canonical = normalize_language_code(lower)
+
+    # 3. Look up BCP 47 mapping for the canonical code
+    if canonical in EXTRA_LANGUAGE_CODES:
+        return EXTRA_LANGUAGE_CODES[canonical]
+
+    # 4. BCP 47 casing rules:
+    #    - First subtag (language): lowercase
+    #    - Second subtag (script, 4 chars): title case
+    #    - Second subtag (region, 2 chars): uppercase
+    #    - All other subtags: lowercase
+    parts = canonical.split("-")
+    bcp47_parts = []
+    for i, part in enumerate(parts):
+        if i == 0:
+            bcp47_parts.append(part.lower())
+        elif len(part) == 4:
+            bcp47_parts.append(part[0].upper() + part[1:].lower())
+        elif len(part) == 2:
+            bcp47_parts.append(part.upper())
+        else:
+            bcp47_parts.append(part.lower())
+
+    return "-".join(bcp47_parts)
+
+
 def language_to_domain(lang: str, project: str = "wikipedia") -> str:
     """
     Convert a language code to a Wikimedia wiki domain.
 
+    Handles the full chain:
+    1. Normalizes alias codes (zh-yue → yue, no → nb)
+    2. Checks SPECIAL_DOMAINS for non-standard subdomains
+    3. Falls back to the standard {code}.{project}.org pattern
+
     Args:
-        lang: Language code (e.g., "fr", "de", "simple")
+        lang: Language code (e.g., "fr", "de", "simple", "zh-yue")
         project: Project type (wikipedia, wiktionary, wikisource, etc.)
 
     Returns:
@@ -305,12 +516,19 @@ def language_to_domain(lang: str, project: str = "wikipedia") -> str:
     if project == "mediawiki":
         return "www.mediawiki.org"
 
-    # Check for special domains
-    special_key = f"{lang}.{project}.org"
-    if lang in SPECIAL_DOMAINS and project == "wikipedia":
-        return SPECIAL_DOMAINS[lang]
+    # Normalize the language code first
+    normalized = normalize_language_code(lang)
 
-    return f"{lang}.{project}.org"
+    # Check for special domains (non-standard Wikipedia subdomains)
+    if normalized in SPECIAL_DOMAINS and project == "wikipedia":
+        return SPECIAL_DOMAINS[normalized]
+
+    # Check if the original code (before normalization) maps to a special domain
+    low_lang = lang.lower().strip()
+    if low_lang != normalized and low_lang in SPECIAL_DOMAINS and project == "wikipedia":
+        return SPECIAL_DOMAINS[low_lang]
+
+    return f"{normalized}.{project}.org"
 
 
 def domain_to_language(domain: str) -> Optional[str]:
@@ -423,35 +641,53 @@ def validate_language_code(code: str) -> bool:
     """
     Validate that a language code is a known Wikimedia language code.
 
-    Checks against ISO 639-1, ISO 639-3, and known special codes.
+    Checks against ISO 639-1, ISO 639-3, known special codes, and
+    deprecated/alias codes (which are valid inputs even if they resolve
+    to a different canonical code).
 
     Args:
         code: Language code to validate
 
     Returns:
-        True if the code is known
+        True if the code is known or can be normalized to a known code
     """
     if not code:
         return False
 
+    # Normalize first — if the alias itself maps somewhere, it's valid
+    normalized = normalize_language_code(code)
+
     # English is always valid
-    if code == "en":
+    if normalized == "en":
         return True
 
-    # Special Wikimedia codes
+    # Check if it's a known dummy/alias code (valid even before normalization)
+    # e.g., "zh-yue", "no", "bat-smg" are valid inputs even though they resolve away
+    low_code = code.lower().strip()
+    if low_code in DUMMY_LANGUAGE_CODES:
+        return True
+
+    # Check special non-standard Wikimedia wiki codes
     special_codes = {
-        "simple", "be-tarask", "cbk-zam", "roa-rup", "bat-smg", "srn",
+        "simple", "be-tarask", "cbk-zam", "roa-rup", "roa-tara",
+        "bat-smg", "srn", "eml", "map-bms", "nds-nl", "nrm", "sh",
     }
-    if code in special_codes:
+    if normalized in special_codes or low_code in special_codes:
         return True
 
     # Check if it has a known fallback chain (covers most major languages)
-    if code in FALLBACK_CHAINS:
+    if normalized in FALLBACK_CHAINS:
         return True
 
     # Check base code
-    base = code.split("-")[0]
+    base = normalized.split("-")[0]
     if base in FALLBACK_CHAINS:
+        return True
+
+    # Check non-standard wiki codes with fallback chains
+    if normalized in {"gsw", "vro", "rup", "lzh", "nan", "sgs"}:
+        return True
+    if low_code in {"gsw", "vro", "rup", "lzh", "nan", "sgs"}:
         return True
 
     return False
@@ -479,6 +715,14 @@ if __name__ == "__main__":
                        choices=["wikipedia", "wiktionary", "wikisource",
                                 "wikiquote", "wikibooks", "wikinews"])
 
+    # normalize-code
+    normc_p = sub.add_parser("normalize-code", help="Normalize a language code")
+    normc_p.add_argument("code", help="Language code to normalize (e.g., zh-yue, no)")
+
+    # bcp47
+    bcp_p = sub.add_parser("bcp47", help="Convert language code to BCP 47 tag")
+    bcp_p.add_argument("code", help="Language code (e.g., simple, zh-cn)")
+
     # normalize
     norm_p = sub.add_parser("normalize", help="Normalize a page title")
     norm_p.add_argument("title", help="Raw page title")
@@ -498,6 +742,14 @@ if __name__ == "__main__":
     elif args.command == "domain":
         domain = language_to_domain(args.lang, args.project)
         print(domain)
+    elif args.command == "normalize-code":
+        canonical = normalize_language_code(args.code)
+        bcp47 = language_code_to_bcp47(args.code)
+        print(f"Canonical: {canonical}")
+        print(f"BCP 47:    {bcp47}")
+    elif args.command == "bcp47":
+        tag = language_code_to_bcp47(args.code)
+        print(tag)
     elif args.command == "normalize":
         normalized = normalize_title(args.title)
         print(normalized)

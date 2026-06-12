@@ -250,6 +250,42 @@ for result in data["results"]["bindings"]:
 
 > 💡 **Note on SPARQL sitelink patterns:** The `schema:about` / `schema:isPartOf` pattern is the standard way to query sitelinks. Unlike regular properties (P-numbers), sitelinks use a different RDF schema. The `FILTER NOT EXISTS` variant finds gaps (articles missing in a given language). For bulk checking across known QIDs, use the `VALUES` clause to batch-check 50-100 at a time.
 
+### **Sitelink Quality: Real Articles vs. Disambiguation Pages**
+
+A common Wikidata quality issue: **a real article's interlanguage link points to a disambiguation page** in another language edition, rather than to a real article about the same topic.
+
+When this happens:
+- The English article "Sun" (about the star) might link to a page like `it:Test (disambigua)` instead of a real article
+- The Wikidata item for "Sun" (star) accidentally shares a sitelink with a disambiguation page item
+- The disambiguation page should be on its *own* Wikidata item (e.g., "Sun (disambiguation)")
+
+**Why it matters:** This pollutes cross-lingual analysis. A tool that fetches all interlanguage links for a real article will get disambiguation pages instead of real articles in affected languages.
+
+**Detection pattern** — when you have only the page title (from `langlinks` or `wbgetentities`), check for known disambiguation suffixes:
+
+```python
+_DISAMBIG_PATTERNS = (
+    '(disambiguation)',            # English
+    '(egyértelműsítő lap)',        # Hungarian
+    '(desambiguación)',            # Spanish
+    '(Begriffsklärung)',           # German
+    '(homonymie)',                 # French
+    '(disambigua)',                # Italian
+    '(неоднозначность)',           # Russian
+    '(توضيح)',                     # Arabic
+    # ... add others as needed
+)
+
+def is_disambiguation_title(title):
+    return any(p in title for p in _DISAMBIG_PATTERNS)
+```
+
+**How to fix:**
+1. Check the Wikidata item for the real article — does it contain a sitelink to a disambiguation page?
+2. Check if a separate Wikidata item exists for the disambiguation page (search for the title + "(disambiguation)")
+3. If it does, move the DAB sitelink to the DAB item. If it doesn't, create it.
+4. See [Wikidata:Disambiguation](https://www.wikidata.org/wiki/Wikidata:Disambiguation) for guidelines.
+
 ### **Rate Limits & Usage Guidelines**
 
 The WDQS SPARQL endpoint has **stricter limits than the general Wikimedia APIs** because a SPARQL query is more resource-intensive than a typical REST call.
