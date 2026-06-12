@@ -11,8 +11,9 @@ SKILLS_DIR = REPO_ROOT / '.claude' / 'skills'
 # Path to pi extensions
 EXTENSIONS_DIR = REPO_ROOT / '.pi' / 'extensions'
 
-# Add assets directory to path so we can import the pipeline script
+# Add assets directories to path so we can import skill assets
 sys.path.insert(0, str(SKILLS_DIR / 'wikimedia-api-access' / 'assets'))
+sys.path.insert(0, str(SKILLS_DIR / 'wikimedia-auth-oauth' / 'assets'))
 
 # Auto-discover all skill directories (alphabetical, no manual list to maintain)
 SKILL_NAMES = sorted(
