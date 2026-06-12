@@ -246,6 +246,7 @@ The `/{lang}.wikipedia.org/api/rest_v1/page/summary/{title}` endpoint returns a 
 
 **Key notes:**
 
+- **Mobile domains deprecated (Oct 2025):** Wikimedia unified mobile and desktop domains. `en.m.wikipedia.org` no longer serves content — it redirects to `en.wikipedia.org`. Do not construct `https://{lang}.m.wikipedia.org/` URLs in new code. The `content_urls.mobile.page` field returned by the API still exists but redirects to the desktop domain. See [Unifying mobile and desktop domains](https://diff.wikimedia.org/2025/11/21/unifying-mobile-and-desktop-domains/).
 - **`type` field:** Use `type == "disambiguation"` to detect disambiguation pages without parsing templates or categories (more reliable than checking for `{{disambiguation}}` templates).
 - **`extract` may be empty** even when the page exists. Disambiguation pages and pages consisting only of an infobox return an empty string for `extract` but still return HTTP 200.
 - **Unicode control characters:** Some language editions include bare Unicode formatting characters (e.g., U+200E LEFT-TO-RIGHT MARK) in the `extract` text. These are not removed by `.strip()` — filter them with `''.join(c for c in text if c.isprintable())` before processing.

@@ -662,7 +662,12 @@ Always use the `normalized` and `redirects` properties in API responses to get t
 
 ### 1. Language-to-Domain Mapping
 
-> **⚠️ Important:** The Action API's `prop=langlinks` returns **CLDR/BCP 47 language codes**
+> **⚠️ Important (2025):** Wikimedia unified mobile and desktop domains in October 2025.
+> The old `en.m.wikipedia.org` domains are now dead — they redirect to `en.wikipedia.org`.
+> **Do not construct `https://{lang}.m.wikipedia.org/` URLs.** All content is on the standard domain.
+> See [Unifying mobile and desktop domains](https://diff.wikimedia.org/2025/11/21/unifying-mobile-and-desktop-domains/).
+>
+> Additionally, the Action API's `prop=langlinks` returns **CLDR/BCP 47 language codes**
 > which sometimes differ from Wikipedia domain names. For example, `yue` (Cantonese)
 > resolves to `zh-yue.wikipedia.org`, not `yue.wikipedia.org`. A static mapping works
 > for common cases, but the **Site Matrix API** (`action=sitematrix`) is the canonical
