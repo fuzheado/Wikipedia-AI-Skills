@@ -53,7 +53,7 @@ There are two SPARQL endpoints you can use to query Commons structured data:
 | **Federation with WDQS** | Supported | Supported |
 | **Rate limits** | Per authenticated user (request-based) | Usual QLever rate limiting |
 
-> ⚠️ **Practical advice:** For automated tools, scripts, and programmatic access, **use QLever** — it requires no authentication and returns results via a standard SPARQL GET/POST endpoint. The official WCQS endpoint exists but its OAuth requirement makes it impractical for most programmatic use. The Commons examples page itself directs users to QLever as "the way faster [alternative] which does not require login."
+> ⚠️ **Practical advice:** For automated tools, scripts, and programmatic access, **use QLever** — it requires no authentication and returns results via a standard SPARQL GET/POST endpoint. The official WCQS endpoint exists but its OAuth requirement makes it impractical for most programmatic use. The [Commons SPARQL examples page](https://commons.wikimedia.org/wiki/Commons:SPARQL_query_service/queries/examples) itself directs users to QLever as "the way faster [alternative] which does not require login." It also contains dozens of runnable example queries you can adapt.
 
 ---
 

@@ -7,8 +7,35 @@
 
 set -euo pipefail
 
+show_usage() {
+    cat >&2 <<EOF
+Usage: $0 "Category:Name" [--csv]
+
+Check what percentage of files in a Commons category have SDC statements.
+
+Arguments:
+  Category:Name   Commons category name (e.g., "Bridges in Paris")
+  --csv           Output as CSV instead of human-readable
+
+Examples:
+  $0 "Category:Bridges in Paris"
+  $0 "Category:Media from iNaturalist" --csv
+EOF
+    exit 1
+}
+
+# --- Guard: no args or --help ---
+if [[ $# -eq 0 ]]; then
+    show_usage
+fi
+for arg in "$@"; do
+    if [[ "$arg" == "--help" || "$arg" == "-h" ]]; then
+        show_usage
+    fi
+done
+
 CATEGORY="$1"
-shift || { echo "Usage: $0 \"Category:Name\" [--csv]" >&2; exit 1; }
+shift
 CSV_MODE=false
 for arg in "$@"; do
     case "$arg" in
@@ -26,11 +53,10 @@ echo "Fetching files in $CATEGORY..." >&2
 FILES=()
 CMCONT=""
 while :; do
-    PARAMS="action=query&list=categorymembers&cmtitle=${CATEGORY}&cmtype=file&cmlimit=max&format=json"
-    [[ -n "$CMCONT" ]] && PARAMS="${PARAMS}&cmcontinue=${CMCONT}"
-
-    RESP=$(curl -s -G "$API" --data-urlencode "cmtitle=${CATEGORY}" \
-        -d "action=query" -d "list=categorymembers" -d "cmtype=file" -d "cmlimit=max" -d "format=json" \
+    RESP=$(curl -s -G "$API" \
+        -d "action=query" -d "list=categorymembers" \
+        --data-urlencode "cmtitle=${CATEGORY}" \
+        -d "cmtype=file" -d "cmlimit=max" -d "format=json" \
         ${CMCONT:+-d "cmcontinue=$CMCONT"} \
         -H "User-Agent: $UA")
 
@@ -71,12 +97,9 @@ HAS_CREATOR=0
 for ((i=0; i<TOTAL; i+=BATCH_SIZE)); do
     BATCH=("${FILES[@]:i:BATCH_SIZE}")
     M_IDS=""
-    declare -A TITLE_MAP
     for entry in "${BATCH[@]}"; do
         pid="${entry%%|*}"
-        title="${entry#*|}"
         M_IDS="${M_IDS}${M_IDS:+,}M${pid}"
-        TITLE_MAP["M${pid}"]="$title"
     done
 
     RESP=$(curl -s -G "$API" \
