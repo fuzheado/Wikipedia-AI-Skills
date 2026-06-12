@@ -194,6 +194,8 @@ All write operations to Commons SDC require authentication. Choose one of these 
 
 **Python with bot password:**
 
+> ⚠️ **Bot passwords are the simplest approach** for automated scripts. They work with HTTP Basic Auth and grant only the specific permissions your bot needs. However, you must follow the guardrails below to avoid accidentally editing as an anonymous/temp account.
+
 ```python
 import requests
 
@@ -203,20 +205,32 @@ SESSION.headers.update({
     "User-Agent": "MyBot/1.0 (https://example.com; user@example.com)",
 })
 
-# Get a CSRF token
+# 🛡️ Guardrail 1: Verify the authenticated user
+user_resp = SESSION.get(
+    "https://commons.wikimedia.org/w/api.php",
+    params={"action": "query", "meta": "userinfo", "format": "json"},
+)
+actual_user = user_resp.json()["query"]["userinfo"]["name"]
+expected_user = "User"  # strip @botname from "User@botname"
+assert actual_user == expected_user, f"Auth failed: got {actual_user}, expected {expected_user}"
+print(f"Authenticated as {actual_user}")
+
+# 🛡️ Guardrail 2: Get and validate CSRF token
+# An anonymous session returns "+\\" as the CSRF token; an authed one returns 40+ hex chars
 token_resp = SESSION.get(
     "https://commons.wikimedia.org/w/api.php",
-    params={
-        "action": "query",
-        "meta": "tokens",
-        "type": "csrf",
-        "format": "json",
-    },
+    params={"action": "query", "meta": "tokens", "type": "csrf", "format": "json"},
 )
 csrf_token = token_resp.json()["query"]["tokens"]["csrftoken"]
+assert csrf_token != "+\\", f"CSRF token is anonymous — login failed"
+assert len(csrf_token) > 10, f"CSRF token too short: {csrf_token[:10]}..."
+print(f"CSRF token obtained ({len(csrf_token)} chars)")
 ```
 
-> 💡 **Bot passwords are the simplest approach** for automated scripts. They work with HTTP Basic Auth and grant only the specific permissions your bot needs.
+> 🛡️ **Guardrails to apply to every write request:**
+> 1. Verify `userinfo` matches the expected account **before** any write
+> 2. Reject anonymous CSRF tokens (`+\`) — they mean you're not logged in
+> 3. Add `"assert": "user"` to every write request — MediaWiki itself rejects the edit if you're not logged in
 
 ### Option 2: Pywikibot (Framework)
 

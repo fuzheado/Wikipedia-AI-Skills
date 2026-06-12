@@ -54,8 +54,12 @@ SESSION.headers.update({
     "User-Agent": "MyBot/1.0 (https://example.com; user@example.com) ArchiverBot"
 })
 
-def login(bot_username: str, bot_password: str) -> dict:
-    """Log in with a bot password and return the login result."""
+def login(bot_username: str, bot_password: str) -> str:
+    """Log in with a bot password.
+
+    Returns the authenticated username on success.
+    Raises AssertionError if login fails — never silently falls back to anonymous.
+    """
     # Step 1: Get login token
     token_resp = SESSION.get(WIKI, params={
         "action": "query",
@@ -74,10 +78,28 @@ def login(bot_username: str, bot_password: str) -> dict:
         "lgtoken": login_token,
         "format": "json",
     }).json()
-    return login_resp
+
+    # 🛡️ Guardrail: Assert login succeeded
+    assert login_resp["login"]["result"] == "Success", \
+        f"Login failed: {login_resp['login'].get('reason', login_resp['login']['result'])}"
+
+    # 🛡️ Guardrail: Verify the authenticated user matches expectations
+    user_resp = SESSION.get(WIKI, params={
+        "action": "query",
+        "meta": "userinfo",
+        "format": "json",
+    }).json()
+    actual_user = user_resp["query"]["userinfo"]["name"]
+    # bot_username is "Account@BotName" — strip @BotName to get the canonical username
+    expected_user = bot_username.split("@")[0].replace("_", " ")
+    assert actual_user == expected_user, \
+        f"Logged in as {actual_user}, expected {expected_user}"
+
+    return actual_user
 
 # Usage:
-# login("YourWikiUsername@MyBotName", "generated_password_from_special_botpasswords")
+# authed_user = login("YourWikiUsername@MyBotName", "generated_password_from_special_botpasswords")
+# print(f"Authenticated as {authed_user}")
 ```
 
 > **⚠️ Always normalize spaces to underscores** in the `lgname` parameter.
@@ -95,23 +117,51 @@ def get_csrf_token() -> str:
         "type": "csrf",
         "format": "json",
     }).json()
-    return resp["query"]["tokens"]["csrftoken"]
+    csrf = resp["query"]["tokens"]["csrftoken"]
+
+    # 🛡️ Guardrail: Reject anonymous CSRF token
+    # An anonymous session returns `+\` as the CSRF token.
+    # An authenticated session returns a 40+ character hex string.
+    assert csrf != "+\\", \
+        "CSRF token is anonymous (got '+\\'). Call login() first and verify it succeeded."
+    assert len(csrf) > 10, \
+        f"CSRF token suspiciously short ({len(csrf)} chars): {csrf[:10]}..."
+
+    return csrf
 
 def edit_page(title: str, text: str, summary: str) -> dict:
     csrf = get_csrf_token()
+    # 🛡️ Guardrail: assert=user rejects the edit if not logged in
     resp = SESSION.post(WIKI, data={
         "action": "edit",
         "title": title,
         "text": text,
         "summary": summary,
         "token": csrf,
+        "assert": "user",        # ← Prevents anonymous/temp-account edits
         "format": "json",
     }).json()
-    return resp
+
+    # 🛡️ Guardrail: Verify the edit was attributed to the expected user
+    if "error" in resp:
+        raise RuntimeError(f"Edit failed: {resp['error']['code']} — {resp['error']['info']}")
+    edit = resp.get("edit", {})
+    assert edit.get("user"), \
+        f"Edit not attributed to any user — may have fallen back to anonymous. Response: {resp}"
+
+    return edit
 ```
 
-> **Important:** The CSRF token `+\\` (a literal backslash) is normal for anonymous/pre-login
-> contexts. After successful login, the real token will be returned.
+> 💡 **Why these guards matter:** An anonymous session's CSRF token is the literal string `+\`.
+> If login fails silently (e.g., wrong password, expired token, network issue), the code
+> would get this anonymous token and proceed to edit — which succeeds but creates a
+> temp-account edit attributed to `~2026-XXXXX-XX` instead of your bot.
+>
+> The three guardrails above catch this at different points:
+> 1. `login()` asserts `result == "Success"` and verifies `userinfo` — catches login failure immediately
+> 2. `get_csrf_token()` rejects `+\` tokens — catches anonymous sessions before any write
+> 3. `edit_page()` uses `assert=user` — WMF-side check rejects the edit if not logged in
+> 4. `edit_page()` checks `user` in response — final backstop after the edit
 
 ## SOP: OAuth 2.0 (Recommended for Public Tools)
 
