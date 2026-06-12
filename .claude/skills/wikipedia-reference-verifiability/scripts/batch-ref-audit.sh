@@ -50,9 +50,9 @@ echo "Batch reference audit — last ${DAYS} days, up to ${LIMIT} pages"
 echo "=============================================="
 echo ""
 
-# Use the patrol simulator from the pagetriage-api skill if available,
+# Use the patrol simulator from the wikipedia-pagetriage-api skill if available,
 # otherwise fall back to direct API calls.
-SIMULATOR="${SCRIPT_DIR}/../../pagetriage-api/assets/patrol_simulator.py"
+SIMULATOR="${SCRIPT_DIR}/../../wikipedia-pagetriage-api/assets/patrol_simulator.py"
 
 if [ -f "$SIMULATOR" ]; then
     python3 "$SIMULATOR" \
@@ -62,7 +62,7 @@ if [ -f "$SIMULATOR" ]; then
         2>&1
 else
     # Independent implementation: fetch new pages and run refcheck
-    echo "(pagetriage-api skill not found, using direct API)" >&2
+    echo "(wikipedia-pagetriage-api skill not found, using direct API)" >&2
     API="https://en.wikipedia.org/w/api.php"
 
     # Fetch new pages

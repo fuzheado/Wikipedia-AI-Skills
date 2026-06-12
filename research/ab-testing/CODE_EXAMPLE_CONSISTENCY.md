@@ -8,7 +8,7 @@
 
 | Category | Count | Skills |
 |:--------:|:-----:|--------|
-| **Python + curl/bash** | 17 | pagetriage-api, pywikibot, wikidata, wikimedia-api-access, wikimedia-database, wikimedia-diffs, wikimedia-eventstreams, wikimedia-ml-services, wikimedia-page-assessment, wikimedia-pageviews, wikimedia-toolforge, wikimedia-wikitext, wikipedia-citations, wikipedia-edit-history, wikipedia-en-article-audit, wikipedia-reference-verifiability, wikipedia-wikitables |
+| **Python + curl/bash** | 17 | wikipedia-pagetriage-api, pywikibot, wikidata, wikimedia-api-access, wikimedia-database, wikimedia-diffs, wikimedia-eventstreams, wikimedia-ml-services, wikimedia-page-assessment, wikimedia-pageviews, wikimedia-toolforge, wikimedia-wikitext, wikipedia-citations, wikipedia-edit-history, wikipedia-en-article-audit, wikipedia-reference-verifiability, wikipedia-wikitables |
 | **curl/bash only** | 10 | mediawiki-page-navigation, mediawiki-translate-extension, wikidata-vector-search, wikimedia-cdn-assets, wikimedia-commons, wikimedia-page-styling, wikipedia-en-biography-writing, wikipedia-page-anatomy, wikipedia-talk-page, wikipedia-templates |
 | **Python only** | 2 | wikipedia-categories, wikipedia-error-handling |
 
@@ -36,7 +36,7 @@
 |---------|--------|
 | `resp.raise_for_status()` | wikidata, wikimedia-ml-services, wikipedia-error-handling |
 | `if resp.status_code == 200:` | wikimedia-api-access, wikimedia-pageviews, wikimedia-wikitext, wikipedia-citations |
-| **No error handling in code examples** | pagetriage-api, pywikibot, wikimedia-database, wikimedia-diffs, wikimedia-eventstreams, wikimedia-page-assessment, wikimedia-toolforge, wikipedia-categories, wikipedia-edit-history, wikipedia-en-article-audit, wikipedia-reference-verifiability, wikipedia-wikitables |
+| **No error handling in code examples** | wikipedia-pagetriage-api, pywikibot, wikimedia-database, wikimedia-diffs, wikimedia-eventstreams, wikimedia-page-assessment, wikimedia-toolforge, wikipedia-categories, wikipedia-edit-history, wikipedia-en-article-audit, wikipedia-reference-verifiability, wikipedia-wikitables |
 
 **Observation:** The most common pattern in the no-skills A/B test failures was unhandled errors (429 rate limits, 422 model errors, 403 bad User-Agent). Yet most skill code examples don't show error handling.
 
@@ -45,7 +45,7 @@
 | Pattern | Skills |
 |:-------:|--------|
 | ✅ Use `Session()` | wikidata, wikimedia-api-access, wikimedia-database, wikimedia-diffs, wikimedia-ml-services, wikipedia-citations, wikipedia-error-handling |
-| ❌ Direct `requests.get()` | pagetriage-api, pywikibot, wikimedia-eventstreams, wikimedia-page-assessment, wikimedia-pageviews, wikimedia-toolforge, wikimedia-wikitext, wikipedia-categories, wikipedia-edit-history, wikipedia-en-article-audit, wikipedia-reference-verifiability, wikipedia-wikitables |
+| ❌ Direct `requests.get()` | wikipedia-pagetriage-api, pywikibot, wikimedia-eventstreams, wikimedia-page-assessment, wikimedia-pageviews, wikimedia-toolforge, wikimedia-wikitext, wikipedia-categories, wikipedia-edit-history, wikipedia-en-article-audit, wikipedia-reference-verifiability, wikipedia-wikitables |
 
 **Observation:** Session reuse reduces rate-limit risk (keeps TCP connections alive) and should be standard.
 
@@ -54,7 +54,7 @@
 | Pattern | Skills |
 |:-------:|--------|
 | ✅ Has `API_URL`, `API`, or `BASE_URL` variable | wikidata, wikimedia-api-access, wikimedia-diffs, wikimedia-pageviews, wikimedia-wikitext, wikipedia-citations, wikipedia-error-handling |
-| ❌ URL hardcoded inline | pagetriage-api, pywikibot, wikimedia-database, wikimedia-eventstreams, wikimedia-ml-services, wikimedia-page-assessment, wikipedia-edit-history, wikipedia-en-article-audit, wikipedia-reference-verifiability, wikipedia-wikitables |
+| ❌ URL hardcoded inline | wikipedia-pagetriage-api, pywikibot, wikimedia-database, wikimedia-eventstreams, wikimedia-ml-services, wikimedia-page-assessment, wikipedia-edit-history, wikipedia-en-article-audit, wikipedia-reference-verifiability, wikipedia-wikitables |
 
 ### 2e. Import style — inconsistent
 
@@ -86,7 +86,7 @@
 | Status | Skills |
 |:-------|--------|
 | ✅ `-H "User-Agent: ..."` in curl | wikidata-vector-search, mediawiki-page-navigation, mediawiki-translate-extension, wikimedia-page-styling, wikimedia-ml-services, wikimedia-eventstreams, wikipedia-citations |
-| ❌ **No User-Agent in curl examples** | **wikimedia-commons, wikipedia-page-anatomy, wikipedia-talk-page, wikipedia-templates, pagetriage-api, wikipedia-en-article-audit** |
+| ❌ **No User-Agent in curl examples** | **wikimedia-commons, wikipedia-page-anatomy, wikipedia-talk-page, wikipedia-templates, wikipedia-pagetriage-api, wikipedia-en-article-audit** |
 
 **Risk:** Copy-pasting these curl examples without a User-Agent will result in HTTP 403 errors. The skills mention User-Agent requirements in the text but don't enforce it in the actual code examples.
 
@@ -98,7 +98,7 @@
 |:-----:|--------|
 | ✅ **Annotated JSON with field descriptions and access patterns** | wikidata (new), wikimedia-ml-services (new), wikimedia-diffs (new), wikipedia-error-handling |
 | ⚠️ **JSON shown without access pattern comments** | wikimedia-pageviews, wikipedia-citations, wikimedia-eventstreams |
-| ❌ **No response structure shown** | pagetriage-api, pywikibot, wikimedia-api-access, wikimedia-commons, wikimedia-database, wikimedia-page-assessment, wikimedia-page-styling, wikimedia-toolforge, wikimedia-wikitext, wikipedia-categories, wikipedia-edit-history, wikipedia-en-article-audit, wikipedia-en-biography-writing, wikipedia-page-anatomy, wikipedia-reference-verifiability, wikipedia-talk-page, wikipedia-templates, wikipedia-wikitables |
+| ❌ **No response structure shown** | wikipedia-pagetriage-api, pywikibot, wikimedia-api-access, wikimedia-commons, wikimedia-database, wikimedia-page-assessment, wikimedia-page-styling, wikimedia-toolforge, wikimedia-wikitext, wikipedia-categories, wikipedia-edit-history, wikipedia-en-article-audit, wikipedia-en-biography-writing, wikipedia-page-anatomy, wikipedia-reference-verifiability, wikipedia-talk-page, wikipedia-templates, wikipedia-wikitables |
 
 **Observation:** This was identified as the single biggest time sink in the A/B test (10 minutes debugging ML response format). Most skills still lack response structure docs.
 
@@ -129,7 +129,7 @@ The table below scores each skill that has Python examples across 6 dimensions:
 | wikimedia-eventstreams | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | **1/6** |
 | wikimedia-wikitext | ✅ | ❌ | ✅ | ❌ | ✅ | ❌ | **3/6** |
 | pywikibot | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | **1/6** |
-| pagetriage-api | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | **1/6** |
+| wikipedia-pagetriage-api | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | **1/6** |
 | wikipedia-edit-history | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | **1/6** |
 | wikipedia-wikitables | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | **1/6** |
 | wikipedia-reference-verifiability | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | **1/6** |
@@ -144,7 +144,7 @@ The table below scores each skill that has Python examples across 6 dimensions:
 ## 7. Specific Issues Found
 
 ### Issue A: Curl examples without User-Agent headers (6 skills)
-- `wikimedia-commons`, `wikipedia-page-anatomy`, `wikipedia-talk-page`, `wikipedia-templates`, `pagetriage-api`, `wikipedia-en-article-audit`
+- `wikimedia-commons`, `wikipedia-page-anatomy`, `wikipedia-talk-page`, `wikipedia-templates`, `wikipedia-pagetriage-api`, `wikipedia-en-article-audit`
 - These will produce HTTP 403 when copy-pasted verbatim
 - Fix: Add `-H "User-Agent: Bot/1.0 (contact@example.com)"` to each curl example
 

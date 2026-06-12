@@ -72,7 +72,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [wikimedia-eventstreams](.claude/skills/wikimedia-eventstreams/SKILL.md) | Consume real-time streams of Wikimedia events (edits, page creations, deletions, moves, log entries) via Server-Sent Events (SSE). Covers all available streams, event schemas, client libraries (Python/JS/curl), client-side filtering, historical replay, canary event handling, and building live dashboards, patrol monitors, and cross-wiki trackers |
 | [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) | Score revisions and articles using Lift Wing ML models — revert risk, article quality, topic classification, readability, reference quality, language identification, and more. Includes ORES migration guidance |
 | [wikipedia-citations](.claude/skills/wikipedia-citations/SKILL.md) | Master Wikipedia citations — CS1/CS2 templates, Wayback Machine archiving, dead link detection, bare URL expansion, citation validation, and maintenance templates |
-| [pagetriage-api](.claude/skills/pagetriage-api/SKILL.md) | Work with the PageTriage extension (New Pages Feed / Page Curation) — list unreviewed pages, check patrol status, tag pages, and patrol new content on wikis where PageTriage is deployed (primarily enwiki) |
+| [wikipedia-pagetriage-api](.claude/skills/wikipedia-pagetriage-api/SKILL.md) | Work with the PageTriage extension (New Pages Feed / Page Curation) — list unreviewed pages, check patrol status, tag pages, and patrol new content on wikis where PageTriage is deployed (primarily enwiki) |
 | [wikipedia-reference-verifiability](.claude/skills/wikipedia-reference-verifiability/SKILL.md) | Analyze whether a page's references contain URLs — detect bare plain-text citations, template-based citations without `url=` parameters, shortened footnotes, and named ref reuse |
 | [wiktionary-and-wikisource](.claude/skills/wiktionary-and-wikisource/SKILL.md) | Work with Wiktionary (dictionary entries, translation tables, etymologies, audio pronunciations, lexemes) and Wikisource (proofread page workflow, OCR text extraction, quality validation, compiled works). Ships with a Wiktionary entry parser, Wikisource proofread checker, and text extractor |
 
@@ -119,7 +119,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | Check how popular an article is and see its traffic trends | `wikimedia-pageviews` |
 | Find article quality ratings (FA/GA/B/C/Start/Stub) and WikiProject assessments | `wikimedia-page-assessment` |
 | Check whether a page's references have any clickable URLs | `wikipedia-reference-verifiability` |
-| Find new Wikipedia pages with suspicious (URL-free) references | `pagetriage-api` (two-pass pipeline) or `wikipedia-reference-verifiability` |
+| Find new Wikipedia pages with suspicious (URL-free) references | `wikipedia-pagetriage-api` (two-pass pipeline) or `wikipedia-reference-verifiability` |
 | Score the latest edit to a page and get a patrol verdict (revert risk + goodfaith + damaging) | `python3 .claude/skills/wikimedia-ml-services/assets/patrol_simulator.py Albert_Einstein` |
 | Get a full article quality report (quality + readability + topics + reference risk) | `python3 .claude/skills/wikimedia-ml-services/assets/article_quality_report.py Albert_Einstein en` |
 | Score a single revision against multiple models in parallel with caching | `python3 .claude/skills/wikimedia-ml-services/assets/liftwing_multi_model.py enwiki 123456789 --all` |
@@ -173,8 +173,8 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | Harvest infobox data from Wikipedia into Wikidata statements | `pywikibot` (harvest_template script) |
 | Fix redirected categories across an entire wiki | `pywikibot` (category_redirect script) |
 | Transfer images from a local wiki to Wikimedia Commons with full attribution history | `pywikibot` (image_transfer script) |
-| List unreviewed pages in the New Pages Feed queue | `pagetriage-api` (requires patrol right) |
-| Check a page's review/patrol status | `pagetriage-api` |
+| List unreviewed pages in the New Pages Feed queue | `wikipedia-pagetriage-api` (requires patrol right) |
+| Check a page's review/patrol status | `wikipedia-pagetriage-api` |
 | Watch Wikipedia edits happen in real time as a live feed | `wikimedia-eventstreams` |
 | Build a live dashboard showing edits per minute or active editors | `wikimedia-eventstreams` |
 | Monitor cross-wiki activity by the same user across multiple projects simultaneously | `wikimedia-eventstreams` |

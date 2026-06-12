@@ -18,7 +18,7 @@ This second round tests **genuinely complex, multi-step Wikipedia automation wor
 | # | Task | Skills Used (A) | What It Tests |
 |---|------|-----------------|:-------------|
 | **5** | **Cross-wiki Content Gap Analyzer** — Find English Wikipedia articles in Category:Physics that lack a French equivalent, sorted by popularity | `wikidata`, `wikimedia-pageviews`, `wikipedia-categories`, `wikimedia-api-access` | Multi-API orchestration, Wikidata SPARQL sitelinks, recursive category traversal, pageview correlation |
-| **6** | **Real-time New Page Patrol Monitor** — Listen to EventStreams for new enwiki pages, score revert risk, check PageTriage status, run 30s | `wikimedia-eventstreams`, `wikimedia-ml-services`, `pagetriage-api`, `wikimedia-api-access` | Real-time SSE streams, ML model inference, API discovery under time pressure, async event handling |
+| **6** | **Real-time New Page Patrol Monitor** — Listen to EventStreams for new enwiki pages, score revert risk, check PageTriage status, run 30s | `wikimedia-eventstreams`, `wikimedia-ml-services`, `wikipedia-pagetriage-api`, `wikimedia-api-access` | Real-time SSE streams, ML model inference, API discovery under time pressure, async event handling |
 | **7** | **Citation Health vs. Article Quality Correlation** — Score 15 Physics articles for quality, parse citations, correlate verifiability with quality | `wikipedia-citations`, `wikimedia-wikitext`, `wikimedia-ml-services`, `wikimedia-api-access` | Domain-specific template knowledge, AST wikitext parsing, ML response format, data analysis |
 | **8** | **Article Structural Health Check** — Deep audit of "Python (programming language)" — infobox, lead, sections, templates, categories, navboxes | `wikipedia-page-anatomy`, `wikipedia-templates`, `wikimedia-wikitext`, `wikimedia-api-access` | Wiki markup conventions, template taxonomy, section structure rules, navbox patterns |
 
@@ -85,7 +85,7 @@ These are the **most popular potential French translations** — exactly the dat
 
 1. **Canary handling:** The EventStreams skill explicitly says *"You MUST discard all canary events"* with a `meta.domain == 'canary'` check. The no-skills variant didn't implement this — potentially processing test events as if they were real.
 
-2. **PageTriage API discovery:** The no-skills variant spent **~5 minutes** probing API module names (`list=pagetriagelist` → failed, `list=pagetriageaction` → failed, then `action=paraminfo&modules=*` to list everything, then grepping for "triage"). The skills variant got the correct `action=pagetriagelist&page_id=N` from the `pagetriage-api` skill instantly.
+2. **PageTriage API discovery:** The no-skills variant spent **~5 minutes** probing API module names (`list=pagetriagelist` → failed, `list=pagetriageaction` → failed, then `action=paraminfo&modules=*` to list everything, then grepping for "triage"). The skills variant got the correct `action=pagetriagelist&page_id=N` from the `wikipedia-pagetriage-api` skill instantly.
 
 3. **ML model limitation discovered:** Both variants discovered that the `revertrisk-language-agnostic` model returns **HTTP 422 "parent_revision_missing"** for new pages (revision 1). Neither skill explicitly documented this — it's a documentation gap. The no-skills agent discovered it through trial and error; the skills agent was slightly faster to pivot.
 

@@ -1,5 +1,5 @@
 ---
-name: pagetriage-api
+name: wikipedia-pagetriage-api
 description: Work with the PageTriage extension (New Pages Feed / Page Curation) — list unreviewed pages, check review status, tag pages, and patrol new content on wikis where PageTriage is deployed
 depends_on: [wikimedia-api-access]
 license: MIT

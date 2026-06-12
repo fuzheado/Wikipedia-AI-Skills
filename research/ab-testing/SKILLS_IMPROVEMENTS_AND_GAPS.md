@@ -57,7 +57,7 @@ After watching agents struggle (or breeze through) 12 different Wikipedia automa
 | `wikidata` (SPARQL) | `wikimedia-pageviews` (traffic) | Common workflow: query items → get pageviews for ranking |
 | `wikimedia-eventstreams` | `wikimedia-ml-services` | Common workflow: stream events → score ML models |
 | `wikimedia-eventstreams` | `wikimedia-diffs` | Common workflow: detect edit → fetch diff |
-| `wikimedia-eventstreams` | `pagetriage-api` | Common workflow: detect new page → check patrol status |
+| `wikimedia-eventstreams` | `wikipedia-pagetriage-api` | Common workflow: detect new page → check patrol status |
 | `wikipedia-page-anatomy` | `wikipedia-templates` | Template taxonomy needed for structural analysis |
 | `wikipedia-categories` | `wikidata` | Cross-wiki category analysis |
 | `wikipedia-citations` | `wikimedia-wikitext` | Citation extraction requires AST parsing |
@@ -100,7 +100,7 @@ And/or add a "Common Workflows" section with multi-skill code examples.
 **Examples needing improvement:**
 - `wikidata`: SPARQL examples are shown as raw query strings without Python request code. Add: `requests.get(endpoint, params={"format": "json", "query": query}, headers=headers)` wrapper.
 - `wikimedia-commons`: Shows curl examples for search but not Python. Add: `requests.get("https://commons.wikimedia.org/w/api.php", params={...}, headers=headers)`.
-- `pagetriage-api`: Shows parameter names but no complete request/response cycle.
+- `wikipedia-pagetriage-api`: Shows parameter names but no complete request/response cycle.
 
 **Fix:** Every API call example should follow this template:
 
