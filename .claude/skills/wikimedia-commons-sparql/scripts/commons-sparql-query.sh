@@ -11,7 +11,7 @@
 
 set -euo pipefail
 
-QL_URL="https://qlever.cs.uni-freiburg.de/api/wikimedia-commons"
+QL_URL="https://qlever.dev/api/wikimedia-commons"
 WCQS_URL="https://commons-query.wikimedia.org/sparql"
 
 show_usage() {

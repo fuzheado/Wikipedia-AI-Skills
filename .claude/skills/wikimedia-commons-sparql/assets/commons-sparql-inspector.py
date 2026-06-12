@@ -31,7 +31,7 @@ import requests
 
 # --- Configuration ---
 
-QL_URL = "https://qlever.cs.uni-freiburg.de/api/wikimedia-commons"
+QL_URL = "https://qlever.dev/api/wikimedia-commons"
 WCQS_URL = "https://commons-query.wikimedia.org/sparql"
 UA = "CommonsSPARQLInspector/1.0 (https://example.com; user@example.com)"
 

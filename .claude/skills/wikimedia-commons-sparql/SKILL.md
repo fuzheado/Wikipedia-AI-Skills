@@ -44,8 +44,8 @@ There are two SPARQL endpoints you can use to query Commons structured data:
 
 | Aspect | WCQS (Official) | QLever (Third-Party) |
 |--------|-----------------|---------------------|
-| **URL** | `https://commons-query.wikimedia.org/sparql` | `https://qlever.cs.uni-freiburg.de/api/wikimedia-commons` |
-| **Web UI** | `https://commons-query.wikimedia.org/` | `https://qlever.cs.uni-freiburg.de/wikimedia-commons` |
+| **URL** | `https://commons-query.wikimedia.org/sparql` | `https://qlever.dev/api/wikimedia-commons` |
+| **Web UI** | `https://commons-query.wikimedia.org/` | `https://qlever.dev/wikimedia-commons` |
 | **Authentication** | OAuth — requires a Commons account and manual cookie extraction | **None** — open access |
 | **Operated by** | Wikimedia Foundation (Search Platform team) | University of Freiburg (QLever project) |
 | **Status** | Beta; usage <1 query/min; may be decommissioned (see [T376979](https://phabricator.wikimedia.org/T376979)) | Active; updated from the `mediainfo-streaming-updater.mutation.v2` stream |
@@ -152,13 +152,15 @@ These are **not** Wikidata properties — they use the Schema.org vocabulary dir
 
 ## QLever: Practical Usage (Recommended Endpoint)
 
-QLever at `https://qlever.cs.uni-freiburg.de/api/wikimedia-commons` is the recommended endpoint for programmatic access. It requires **no authentication** and uses standard SPARQL over HTTP.
+QLever at `https://qlever.dev/api/wikimedia-commons` is the recommended endpoint for programmatic access. It requires **no authentication** and uses standard SPARQL over HTTP.
+
+> ⚠️ **Prefix requirement:** QLever requires explicit PREFIX declarations. All examples below include the common prefixes. Copy-paste ready.
 
 ### GET request (simple queries)
 
 ```bash
-curl -G "https://qlever.cs.uni-freiburg.de/api/wikimedia-commons" \
-  --data-urlencode "query=SELECT ?file WHERE { ?file wdt:P180 wd:Q42 . } LIMIT 10" \
+curl -G "https://qlever.dev/api/wikimedia-commons" \
+  --data-urlencode "query=PREFIX wd: <http://www.wikidata.org/entity/> PREFIX wdt: <http://www.wikidata.org/prop/direct/> SELECT ?file WHERE { ?file wdt:P180 wd:Q42 } LIMIT 10" \
   -H "Accept: application/sparql-results+json" \
   -H "User-Agent: MyBot/1.0 (https://example.com; user@example.com)"
 ```
@@ -166,10 +168,10 @@ curl -G "https://qlever.cs.uni-freiburg.de/api/wikimedia-commons" \
 ### POST request (long queries)
 
 ```bash
-curl -X POST "https://qlever.cs.uni-freiburg.de/api/wikimedia-commons" \
+curl -X POST "https://qlever.dev/api/wikimedia-commons" \
   -H "Accept: application/sparql-results+json" \
   -H "User-Agent: MyBot/1.0 (https://example.com; user@example.com)" \
-  -d "query=SELECT ?file WHERE { ?file wdt:P180 wd:Q42 . } LIMIT 10"
+  -d "query=PREFIX wd: <http://www.wikidata.org/entity/> PREFIX wdt: <http://www.wikidata.org/prop/direct/> SELECT ?file WHERE { ?file wdt:P180 wd:Q42 } LIMIT 10"
 ```
 
 ### Python with `requests`
@@ -178,6 +180,9 @@ curl -X POST "https://qlever.cs.uni-freiburg.de/api/wikimedia-commons" \
 import requests
 
 query = """
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT ?file WHERE {
   ?file wdt:P180 wd:Q42 .
 }
@@ -189,7 +194,7 @@ headers = {
     "Accept": "application/sparql-results+json",
 }
 resp = requests.get(
-    "https://qlever.cs.uni-freiburg.de/api/wikimedia-commons",
+    "https://qlever.dev/api/wikimedia-commons",
     params={"query": query},
     headers=headers,
     timeout=60,
@@ -207,9 +212,24 @@ for binding in data["results"]["bindings"]:
 
 - Rate limiting: standard QLever limits apply (generous for reasonable usage)
 - No OAuth, no cookies, no session management
-- The QLever web UI at `https://qlever.cs.uni-freiburg.de/wikimedia-commons` provides a WIkidata-Query-Service-like interface with "Try it!" links, example queries, and result visualization
+- The QLever web UI at `https://qlever.dev/wikimedia-commons` provides a WIkidata-Query-Service-like interface with "Try it!" links, example queries, and result visualization
 - Index information (last update date) is shown under the "Index Information" button in the UI
 - QLever also supports `#defaultView:ImageGrid`, `#defaultView:Map`, and other visual directives
+
+> ⚠️ **Required: explicit PREFIX declarations on QLever.** Unlike Blazegraph (used by WCQS and WDQS), which auto-registers common Wikidata prefixes (`wd:`, `wdt:`, `p:`, `ps:`, `pq:`), **QLever requires every prefix to be explicitly declared**. All SPARQL queries sent to the QLever endpoint must include PREFIX lines. Copy the block below as a header for every QLever query:
+>
+> ```sparql
+> PREFIX wd: <http://www.wikidata.org/entity/>
+> PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+> PREFIX p: <http://www.wikidata.org/prop/>
+> PREFIX ps: <http://www.wikidata.org/prop/statement/>
+> PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+> PREFIX schema: <http://schema.org/>
+> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+> PREFIX commons: <http://commons.wikimedia.org/wiki/Special:FilePath/>
+> ```
+>
+> The examples in this skill omit prefixes for brevity (they follow the WCQS/Blazegraph convention where prefixes are auto-registered). When running them against QLever, prepend the prefix block above.
 
 ---
 
