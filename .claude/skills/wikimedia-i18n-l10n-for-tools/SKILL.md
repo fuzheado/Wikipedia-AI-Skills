@@ -661,6 +661,14 @@ Always use the `normalized` and `redirects` properties in API responses to get t
 
 ### 1. Language-to-Domain Mapping
 
+> **⚠️ Important:** The Action API's `prop=langlinks` returns **CLDR/BCP 47 language codes**
+> which sometimes differ from Wikipedia domain names. For example, `yue` (Cantonese)
+> resolves to `zh-yue.wikipedia.org`, not `yue.wikipedia.org`. A static mapping works
+> for common cases, but the **Site Matrix API** (`action=sitematrix`) is the canonical
+> source for the correct domain of every Wikipedia language edition.
+
+#### Quick approach — static mapping (covers 95% of cases)
+
 ```python
 from i18n_utils import language_to_domain
 
@@ -678,6 +686,11 @@ domain = language_to_domain("simple")
 domain = language_to_domain("be-tarask")
 # → "be-tarask.wikipedia.org"
 
+# Known code/domain mismatches (not covered by static mapping):
+#   yue → zh-yue.wikipedia.org  (Cantonese)
+#   nan → zh-min-nan.wikipedia.org  (Min Nan Chinese)
+#   nb  → no.wikipedia.org  (Norwegian Bokmål → Norwegian)
+
 # Project wikis
 domain = language_to_domain("en", project="commons")
 # → "commons.wikimedia.org"
@@ -685,6 +698,50 @@ domain = language_to_domain("en", project="commons")
 domain = language_to_domain("en", project="wikidata")
 # → "www.wikidata.org"
 ```
+
+#### Authoritative approach — Site Matrix API (covers 100%, self-updating)
+
+For tools that fetch interlanguage links and need the correct domain every time,
+calling the Site Matrix API once at startup builds an authoritative mapping:
+
+```python
+import requests
+
+def build_domain_map() -> dict:
+    """Build {language_code: domain} from the Wikimedia Site Matrix."""
+    resp = requests.get("https://en.wikipedia.org/w/api.php", params={
+        "action": "sitematrix",
+        "format": "json",
+        "smtype": "language",
+    }, headers={"User-Agent": "MyBot/1.0 (contact)"}, timeout=15)
+    data = resp.json()
+    domain_map = {}
+    for smkey, smval in data.get("sitematrix", {}).items():
+        if smkey == "count" or not isinstance(smval, dict):
+            continue
+        lang_code = smval.get("code")
+        for site in smval.get("site", []):
+            if site.get("code") == "wiki" and "wikipedia.org" in site.get("url", ""):
+                # Extract domain from URL: "https://fr.wikipedia.org/w/" → "fr.wikipedia.org"
+                domain = site["url"].replace("https://", "").replace("/w/", "")
+                domain_map[lang_code] = domain
+    # Static fallbacks for edge cases not covered by the matrix
+    domain_map.update({
+        "yue": "zh-yue.wikipedia.org",
+        "nan": "zh-min-nan.wikipedia.org",
+        "nb": "no.wikipedia.org",
+    })
+    return domain_map
+
+# Usage
+domain_map = build_domain_map()
+domain = domain_map.get("yue", f"{lang}.wikipedia.org")
+# → "zh-yue.wikipedia.org"
+```
+
+This handles all ~362 language editions automatically, including edge cases
+like `yue`→`zh-yue`, `nan`→`zh-min-nan`, and `nb`→`no`. The API call takes
+~1 second and the result can be cached in memory for the lifetime of the tool.
 
 ### 2. Domain-to-Language Extraction
 

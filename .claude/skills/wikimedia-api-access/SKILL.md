@@ -60,6 +60,7 @@ response = requests.get('https://en.wikipedia.org/w/api.php', headers=headers)
 | Pageviews | `https://wikimedia.org/api/rest_v1/metrics/pageviews/` | Traffic statistics |
 | Commons Analytics | `https://wikimedia.org/api/rest_v1/metrics/commons-analytics/` | GLAM category/file usage stats (monthly, pre-compiled) |
 | Lift Wing ML | `https://api.wikimedia.org/service/lw/inference/v1/models/` | ML predictions (revert risk, article quality, topics) |
+| Site Matrix | `https://en.wikipedia.org/w/api.php?action=sitematrix` | Get correct domains for all Wikimedia wikis (handles code/domain mismatches like `yue`→`zh-yue`) |
 | Wikidata Query (SPARQL) | `https://query.wikidata.org/sparql` | Structured data queries |
 | Toolforge | `https://tools.wmflabs.org/` | Community tool hosting |
 
