@@ -159,6 +159,79 @@ if resp.status_code == 429:
     continue  # retry the request in a loop
 ```
 
+### Caching Strategy (Prevents Redundant Calls)
+
+When fetching the same set of pages across multiple runs (e.g., re-running
+a tool with different parameters), a simple disk cache avoids redundant
+HTTP requests and reduces rate-limit pressure.
+
+**Recommended pattern — JSON key-value cache:**
+
+```python
+import json, os
+
+CACHE_FILE = ".api_cache.json"
+_cache = {}
+
+if os.path.exists(CACHE_FILE):
+    with open(CACHE_FILE) as f:
+        _cache = json.load(f)
+
+def fetch_with_cache(lang, title):
+    key = f"{lang}:{title}"
+    if key in _cache:
+        return _cache[key]
+    url = f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{title}"
+    resp = requests.get(url, headers=HEADERS, timeout=15)
+    if resp.status_code == 200:
+        data = resp.json()
+        result = data.get("extract", "")
+        _cache[key] = result
+        with open(CACHE_FILE, "w") as f:
+            json.dump(_cache, f)
+        return result
+    return None
+```
+
+**Key points:**
+- Use `{lang}:{title}` as the cache key to avoid collisions
+- Write back to disk after each fetch (appending is fine for ~300 entries)
+- Keep cache files gitignored (they're session artifacts)
+- For large caches (>1000 entries), consider SQLite instead of JSON
+
+### Structured Error Returns from Fetch Functions
+
+When a fetch fails, return a **dict with `lead` and `error` fields** rather
+than a bare `None`. This lets callers distinguish between different failure
+modes without making additional API calls:
+
+```python
+def fetch_lead(lang, title) -> dict:
+    """Returns {"lead": str|None, "error": str|None}."""
+    url = f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{title}"
+    resp = requests.get(url, timeout=15)
+    if resp.status_code == 200:
+        data = resp.json()
+        extract = data.get("extract", "")
+        if extract and extract.strip():
+            return {"lead": extract, "error": None}
+        # HTTP 200 but empty extract — investigate why
+        page_type = data.get("type", "")
+        if page_type == "disambiguation":
+            return {"lead": None, "error": "Disambiguation page (no lead text)"}
+        if data.get("description"):
+            return {"lead": None, "error": f"Has description but no extract; type={page_type}"}
+        return {"lead": None, "error": f"No content; type={page_type}"}
+    return {"lead": None, "error": f"HTTP {resp.status_code}"}
+```
+
+This pattern lets consumers show actionable error messages:
+```
+❌  scn    Has description but no extract; type=standard
+❌  mhr    No content; type=standard
+❌  nb     HTTP 500
+```
+
 ### Common Causes of 429 Responses
 
 - **Too many requests in a short window** even with a proper User-Agent.
