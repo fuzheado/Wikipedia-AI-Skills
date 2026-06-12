@@ -7,6 +7,7 @@ skill_discovery_hints:
   - keywords: ["i18n", "l10n", "internationalization", "localization", "multilingual", "translation", "toolforge"]
   - keywords: ["RTL", "bidi", "right-to-left", "Arabic", "Hebrew", "Persian"]
   - keywords: ["Unicode", "Unicode normalization", "NFC", "page title", "cross-wiki"]
+  - keywords: ["domain mapping", "language to domain", "language code", "yue", "zh-yue", "nan", "zh-min-nan", "site matrix", "sitematrix", "wiki domain"]
   - keywords: ["message file", "ICU", "pluralization", "language fallback", "gettext"]
   - keywords: ["Wikidata label", "multilingual label", "wbgetentities", "language detection"]
 last_verified: 2026-06-11

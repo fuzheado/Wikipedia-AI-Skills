@@ -3,6 +3,10 @@ name: wikimedia-api-access
 description: Access Wikipedia and Wikimedia APIs (REST, Action API, SPARQL) with correct User-Agent headers, rate limiting, and 429/403 error handling
 license: MIT
 compatibility: opencode
+skill_discovery_hints:
+  - keywords: ["Wikipedia API", "Action API", "REST API", "API endpoint", "api.php", "rest_v1", "User-Agent", "rate limit", "API call"]
+  - keywords: ["Site Matrix", "sitematrix", "domain mapping", "language code", "language domain", "yue wikipedia", "zh-yue", "interlanguage"]
+  - keywords: ["page summary", "page extract", "extintro", "exintro", "page content", "fetch article", "get page"]
 last_verified: 2026-06-10
 ---
 
