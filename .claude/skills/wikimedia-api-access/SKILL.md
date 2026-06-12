@@ -197,8 +197,19 @@ lgname = "AL_Wiki_MIT@mybot"
 [MediaWiki API documentation](https://www.mediawiki.org/wiki/API:Login) for
 the full login flow (including the two-step `NeedToken` case).
 
-See the **[pywikibot](../pywikibot/SKILL.md)** skill's Troubleshooting section
-for more on bot password authentication.
+> 🛡️ **Critical: always verify login succeeded.** A login failure (wrong password,
+> expired token, network issue) returns `NeedToken` rather than raising an error.
+> If you proceed without checking, you'll get an anonymous CSRF token (`+\`) and
+> your edits will be attributed to a temporary account (`~2026-XXXXX-XX`) instead
+> of your bot. Always:
+> 1. Assert `login_resp["login"]["result"] == "Success"`
+> 2. Verify `userinfo` matches the expected username
+> 3. Use `assert="user"` on every write request
+>
+> See the **[wikimedia-auth-oauth](../wikimedia-auth-oauth/SKILL.md)** skill for
+> the full canonical login function with all guardrails built in, and the
+> **[pywikibot](../pywikibot/SKILL.md)** skill's Troubleshooting section for
+> bot password authentication.
 
 ## **Example Use Cases**
 

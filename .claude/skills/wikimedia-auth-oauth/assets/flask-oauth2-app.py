@@ -201,6 +201,13 @@ def edit_page(access_token: str, title: str, text: str, summary: str = "",
     )
     csrf_token = token_data["query"]["tokens"]["csrftoken"]
 
+    # 🛡️ Guardrail: reject anonymous CSRF token
+    if csrf_token == "+\\":
+        raise RuntimeError(
+            "Anonymous CSRF token — user session is not authenticated. "
+            "Check token is valid and not expired."
+        )
+
     # Make the edit
     api_url = f"https://{wiki}/w/api.php"
     resp = db.post(api_url, data={
@@ -209,10 +216,21 @@ def edit_page(access_token: str, title: str, text: str, summary: str = "",
         "text": text,
         "summary": summary,
         "token": csrf_token,
+        "assert": "user",        # 🛡️ Guardrail: reject if not logged in
         "format": "json",
     }, headers={"Authorization": f"Bearer {access_token}"})
     resp.raise_for_status()
-    return resp.json()
+    result = resp.json()
+    if "error" in result:
+        raise RuntimeError(
+            f"Edit failed: {result['error']['code']} — {result['error']['info']}"
+        )
+    edit = result.get("edit", {})
+    if not edit.get("user"):
+        raise RuntimeError(
+            f"Edit not attributed to any user — anonymous fallback. Response: {result}"
+        )
+    return result
 
 
 def login_required(f):

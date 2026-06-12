@@ -253,6 +253,15 @@ See the **[wikimedia-auth-oauth](../wikimedia-auth-oauth/SKILL.md)** skill for s
 
 All examples below assume you have an authenticated `SESSION` object with a CSRF token as shown above. The CSRF token must be sent as the `token` parameter with every write request.
 
+> 🛡️ **Auth guardrails — every write request must include these:**
+> 1. **`"assert": "user"`** — Add this parameter to every `SESSION.post()` call. It instructs the API to reject the request if you're not logged in, preventing anonymous/temp-account fallback edits.
+> 2. **Verify the CSRF token** — Anonymous sessions return `+\` as the token. Reject it: `assert csrf_token != "+\\"`
+> 3. **Check the edit response** — After any write, verify the response includes a `user` field matching your expected username.
+>
+> All code examples below show `"token": csrf_token` but omit `"assert": "user"` for brevity — you must add it to every write call.
+>
+> See the **[wikimedia-auth-oauth](../wikimedia-auth-oauth/SKILL.md)** skill for the full canonical pattern with all guardrails built in.
+
 ### 1. Reading SDC Data
 
 #### Get all SDC for a file

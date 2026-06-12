@@ -169,8 +169,19 @@ class BotPasswordClient:
             "text": text,
             "summary": summary,
             "token": csrf,
+            "assert": "user",        # 🛡️ Guardrail: reject if not logged in
         })
-        return resp
+        result = resp
+        if "error" in result:
+            raise RuntimeError(
+                f"Edit failed: {result['error']['code']} — {result['error']['info']}"
+            )
+        edit = result.get("edit", {})
+        if not edit.get("user"):
+            raise RuntimeError(
+                f"Edit not attributed to any user — anonymous fallback. Response: {result}"
+            )
+        return result
 
     def append_to_page(self, title: str, text: str, summary: str = "") -> dict:
         """Append text to an existing page."""

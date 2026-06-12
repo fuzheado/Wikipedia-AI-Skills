@@ -283,13 +283,27 @@ class WikimediaOAuth2Client:
     def get_csrf_token(
         self, access_token: str, wiki: str = "en.wikipedia.org"
     ) -> str:
-        """Fetch a CSRF token for write operations."""
+        """Fetch a CSRF token for write operations.
+
+        Returns:
+            A validated CSRF token string.
+
+        Raises:
+            AssertionError: If the token is anonymous (not authenticated).
+        """
         data = self.api_call(access_token, {
             "action": "query",
             "meta": "tokens",
             "type": "csrf",
         }, wiki)
-        return data["query"]["tokens"]["csrftoken"]
+        csrf = data["query"]["tokens"]["csrftoken"]
+        # 🛡️ Guardrail: Reject anonymous CSRF token
+        assert csrf != "+\\", \
+            "CSRF token is anonymous — the OAuth session is not authenticated. " \
+            "Check your access_token is valid and not expired."
+        assert len(csrf) > 10, \
+            f"CSRF token suspiciously short ({len(csrf)} chars)"
+        return csrf
 
     def edit_page(
         self,
@@ -328,10 +342,22 @@ class WikimediaOAuth2Client:
             "text": text,
             "summary": summary,
             "token": csrf,
+            "assert": "user",        # 🛡️ Guardrail: reject if not logged in
             "format": "json",
         })
         resp.raise_for_status()
-        return resp.json()
+        result = resp.json()
+
+        # 🛡️ Guardrail: verify the edit was attributed to a user
+        if "error" in result:
+            raise RuntimeError(
+                f"Edit failed: {result['error']['code']} — {result['error']['info']}"
+            )
+        edit = result.get("edit", {})
+        assert edit.get("user"), \
+            f"Edit not attributed to any user — anonymous fallback. Response: {result}"
+
+        return result
 
     def check_right(
         self, access_token: str, right: str,
