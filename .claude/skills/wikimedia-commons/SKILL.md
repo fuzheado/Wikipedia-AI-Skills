@@ -4,16 +4,35 @@ description: Search, upload, and understand Wikimedia Commons — the free media
 license: MIT
 compatibility: opencode
 skill_discovery_hints:
-  - keywords: ["Commons", "image", "media", "photo", "file", "upload", "thumbnail"]
-  - keywords: ["depicts", "haswbstatement", "structured data", "media search"]
-  - keywords: ["license", "copyright", "CC BY", "Creative Commons", "public domain"]
-  - keywords: ["EXIF", "metadata", "file info", "global usage"]
-last_verified: 2026-06-10
+  - keywords: ["Commons", "Commons file", "Commons upload", "image", "photo", "file", "media", "free media"]
+  - keywords: ["search Commons", "find image", "media search", "find file", "category"]
+  - keywords: ["license", "copyright", "CC BY", "Creative Commons", "public domain", "CC0"]
+  - keywords: ["upload", "UploadWizard", "upload file", "bulk upload", "Pattypan"]
+  - keywords: ["EXIF", "metadata", "file info", "global usage", "file metadata"]
+  - keywords: ["depicts", "haswbstatement", "structured data", "QuickStatements"]
+  - keywords: ["VRT", "permission", "Commons policy"]
+  - keywords: ["Commons namespaces", "gallery", "Creator namespace"]
+last_verified: 2026-06-16
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
 
 Wikimedia Commons (https://commons.wikimedia.org) is a **free media repository** — a central library of freely licensed images, audio, video, 3D models, PDF documents, and other media files. Media uploaded to Commons is available for use across all Wikimedia projects (Wikipedia, Wiktionary, Wikisource, etc.) and by the general public. As of 2026, Commons hosts over 100 million file uploads.
+
+### **Related Commons Skills**
+
+This skill covers the **generic** Commons workflow (search, upload, licensing, categories). Specialized file types and subsystems have their own dedicated skills:
+
+| Skill | Covers |
+|-------|--------|
+| **[wikimedia-commons-thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** | Thumbnail generation, thumb URL scheme, `iiurlwidth`/`iiurlheight`, `thumbmime` format conversion, responsive/retina URLs, REST API thumbnails, SPARQL `thumbnailUrl` |
+| **[wikimedia-commons-svg](../wikimedia-commons-svg/SKILL.md)** | SVG source access and editing, W3C validation, creation/optimization tools, versioning/diffing, vector-specific categories and SDC |
+| **[wikimedia-commons-pdf](../wikimedia-commons-pdf/SKILL.md)** | Multi-page PDF/DjVu model, page selection for thumbnails, Wikisource proofread integration, OCR, document metadata |
+| **[wikimedia-commons-audio-video](../wikimedia-commons-audio-video/SKILL.md)** | Audio/video format policy (patent restrictions), upload + transcoding, metadata (duration, codecs, resolution), player widget, TimedText subtitles, derivatives |
+| **[wikimedia-commons-sdc](../wikimedia-commons-sdc/SKILL.md)** | Structured Data on Commons — captions, depicts, copyright/license statements, batch editing |
+| **[wikimedia-commons-sparql](../wikimedia-commons-sparql/SKILL.md)** | Commons SPARQL queries via QLever and WCQS — MediaInfo entities, depicts/copyright/license graph, federated queries with Wikidata |
+
+---
 
 ## **What Commons Is — and Isn't**
 
@@ -26,14 +45,15 @@ Wikimedia Commons (https://commons.wikimedia.org) is a **free media repository**
 
 Commons accepts uploads in many formats. The most common categories:
 
-| Category | Common Formats |
-|----------|---------------|
-| Images | JPEG, PNG, GIF, SVG, TIFF, WebP, AVIF |
-| Audio | MP3, OGG (Vorbis/Opus), FLAC, WAV |
-| Video | WebM (VP8/VP9/AV1), OGV (Theora) |
-| 3D Models | STL (rendered via [3D viewer](https://commons.wikimedia.org/wiki/Commons:3D)) |
-| Documents | PDF, DjVu |
-| Animations | GIF, APNG, animated SVG |
+| Category | Common Formats | See Dedicated Skill |
+|----------|---------------|--------------------|
+| Images (raster) | JPEG, PNG, GIF, TIFF, WebP, AVIF | — |
+| Images (vector) | SVG | **[svg](../wikimedia-commons-svg/SKILL.md)** |
+| Audio | MP3, OGG (Vorbis/Opus), FLAC, WAV | **[audio-video](../wikimedia-commons-audio-video/SKILL.md)** |
+| Video | WebM (VP8/VP9/AV1), OGV (Theora) | **[audio-video](../wikimedia-commons-audio-video/SKILL.md)** |
+| 3D Models | STL (rendered via [3D viewer](https://commons.wikimedia.org/wiki/Commons:3D)) | — |
+| Documents | PDF, DjVu | **[pdf](../wikimedia-commons-pdf/SKILL.md)** |
+| Animations | GIF, APNG, animated SVG | **[svg](../wikimedia-commons-svg/SKILL.md)** (animated SVG) |
 
 ## **Quick Reference: What Do You Want to Find?**
 
@@ -44,7 +64,7 @@ Commons accepts uploads in many formats. The most common categories:
 | Find files by structured data (e.g., "depicts human") | `haswbstatement:` prefix in search | `https://commons.wikimedia.org/w/api.php` | `srsearch=haswbstatement:P180=Q5` (works in `srsearch` for Action API, or directly in the web search box) |
 | Get file metadata (license, author, date) | Action API (`prop=imageinfo`) | `https://commons.wikimedia.org/w/api.php` | `action=query&prop=imageinfo&titles=File:Example.jpg&iiprop=extmetadata\|user\|timestamp` |
 | Check where a file is used across wikis | Action API (`prop=globalusage`) | `https://commons.wikimedia.org/w/api.php` | `action=query&prop=globalusage&titles=File:Example.jpg` |
-| Generate a thumbnail | REST API | `https://commons.wikimedia.org/api/rest_v1/page/pdf/{title}` or image scaling endpoint | See Commons API reference |
+| Generate a thumbnail | Action API `iiurlwidth` or URL construction | `prop=imageinfo&iiurlwidth=800` | See **[thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** skill |
 | Find files in a specific category | Action API (`list=categorymembers`) | `https://commons.wikimedia.org/w/api.php` | `action=query&list=categorymembers&cmtitle=Category:Bridges_in_Paris&cmnamespace=6` |
 | Get EXIF/camera data | Action API (`prop=imageinfo`) with `iiprop=metadata` | `https://commons.wikimedia.org/w/api.php` | `action=query&prop=imageinfo&titles=File:Example.jpg&iiprop=metadata` |
 | Upload a single file | Action API (`action=upload`) | `https://commons.wikimedia.org/w/api.php` | Requires authentication + bot password. See [Uploading to Commons](#uploading-to-commons). |
@@ -314,9 +334,23 @@ VRT (formerly known as OTRS) is a team of trusted volunteers who handle permissi
 
 ## **Tooling**
 
+### Skills in This Family
+
+| Skill | Purpose |
+|-------|--------|
+| **[wikimedia-commons](../wikimedia-commons/SKILL.md)** *(this skill)* | Generic Commons — search, upload, licensing, categories, namespaces |
+| **[wikimedia-commons-thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** | Thumbnail generation, thumb URL scheme, `iiurlwidth`, `thumbmime` |
+| **[wikimedia-commons-svg](../wikimedia-commons-svg/SKILL.md)** | SVG files — editing, validation, optimization, versioning |
+| **[wikimedia-commons-pdf](../wikimedia-commons-pdf/SKILL.md)** | PDF/DjVu documents — page selection, Wikisource integration, OCR |
+| **[wikimedia-commons-audio-video](../wikimedia-commons-audio-video/SKILL.md)** | Audio/video — format policy, transcoding, TimedText, player |
+| **[wikimedia-commons-sdc](../wikimedia-commons-sdc/SKILL.md)** | Structured Data on Commons — captions, depicts, copyright, batch editing |
+| **[wikimedia-commons-sparql](../wikimedia-commons-sparql/SKILL.md)** | Commons SPARQL — MediaInfo entities, QLever, federated queries |
+
+### Scripts and Assets
+
 This skill includes helper scripts and reference docs:
 
-### 🔧 Quick Search Demo (`scripts/commons-search.sh`)
+#### 🔧 Quick Search Demo (`scripts/commons-search.sh`)
 
 Demonstrates searching Commons via the MediaSearch API and the Action API (traditional search).
 
@@ -325,7 +359,7 @@ Demonstrates searching Commons via the MediaSearch API and the Action API (tradi
 ./scripts/commons-search.sh --media "Mona Lisa"
 ```
 
-### 📚 Commons API Reference (`references/commons-api.md`)
+#### 📚 Commons API Reference (`references/commons-api.md`)
 
 Deep reference for the Commons-specific API endpoints:
 - `https://commons.wikimedia.org/w/api.php` — Action API for Commons (upload, search, file info, categories)
@@ -333,6 +367,6 @@ Deep reference for the Commons-specific API endpoints:
 - MediaSearch API (`Special:MediaSearch` underlying endpoint)
 - File metadata extraction patterns (EXIF, categories, usage across wikis)
 
-### 🐍 Commons File Inspector (`assets/commons-file-inspector.py`)
+#### 🐍 Commons File Inspector (`assets/commons-file-inspector.py`)
 
 A Python tool to inspect a Commons file's metadata — license, author, categories, usage, and EXIF data — using the Action and REST APIs.
