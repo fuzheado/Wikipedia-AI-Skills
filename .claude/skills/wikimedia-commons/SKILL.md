@@ -12,6 +12,7 @@ skill_discovery_hints:
   - keywords: ["depicts", "haswbstatement", "structured data", "QuickStatements"]
   - keywords: ["VRT", "permission", "Commons policy"]
   - keywords: ["Commons namespaces", "gallery", "Creator namespace"]
+  - keywords: ["CORS", "cross-origin", "upload.wikimedia.org", "browser app", "Canvas", "WebGL"]
 last_verified: 2026-06-16
 ---
 
@@ -69,6 +70,8 @@ Commons accepts uploads in many formats. The most common categories:
 | Get EXIF/camera data | Action API (`prop=imageinfo`) with `iiprop=metadata` | `https://commons.wikimedia.org/w/api.php` | `action=query&prop=imageinfo&titles=File:Example.jpg&iiprop=metadata` |
 | Upload a single file | Action API (`action=upload`) | `https://commons.wikimedia.org/w/api.php` | Requires authentication + bot password. See [Uploading to Commons](#uploading-to-commons). |
 | Check licensing | Action API (`prop=imageinfo`) with `iiprop=extmetadata` | `https://commons.wikimedia.org/w/api.php` | Parse `extmetadata.Credit.value` and `extmetadata.LicenseShortName.value` for license info |
+| **Browser app: display image** | Use `Special:FilePath/` URL | `https://commons.wikimedia.org/wiki/Special:FilePath/Example.jpg?width=800` | CORS-friendly redirect; works for `<img>` tags |
+| **Browser app: Canvas/WebGL** | Proxy through your server | Your server fetches from Commons, serves locally | See **[CORS Considerations](#browser-applications-cors-considerations)** section |
 
 > ⚠️ **All API calls require a descriptive `User-Agent` header.** See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill.
 
@@ -329,6 +332,73 @@ VRT (formerly known as OTRS) is a team of trusted volunteers who handle permissi
 | File whose author is unknown or unverifiable | ⛔ **Cannot be uploaded** — VRT cannot help without a clearly identified copyright holder |
 
 > 💡 **Tip:** When reaching out to a copyright holder to request a free license, point them to the [VRT release generator](https://wmf.legal-yes.com/#/) which walks them through the process in plain language.
+
+---
+
+## **Browser Applications: CORS Considerations**
+
+When building **browser-based tools** that display or process Commons media, you may encounter CORS (Cross-Origin Resource Sharing) restrictions. This is a common gotcha for developers new to Commons.
+
+### The Issue
+
+Media files served from `upload.wikimedia.org` **do not include CORS headers**. This is intentional — it prevents third-party sites from reading pixel data or using files in certain browser contexts.
+
+```
+# This works fine in server-side code:
+resp = requests.get('https://upload.wikimedia.org/wikipedia/commons/a/ab/Example.jpg')
+
+# But in browser JavaScript, this may fail:
+const img = new Image();
+img.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Example.jpg/800px-Example.jpg';
+// Works for display, but Canvas/WebGL access is blocked
+```
+
+### What Works, What Doesn't
+
+| Use Case | Direct URL from `upload.wikimedia.org` |
+|----------|:------------------------------------:|
+| Server-side download (Python, Node.js) | ✅ Works |
+| Display in `<img>` tag | ✅ Works |
+| CSS `background-image` | ⚠️ May fail in some browsers |
+| Canvas pixel access (`getImageData`) | ❌ Blocked (tainted canvas) |
+| WebGL textures | ❌ Blocked |
+| Audio/video processing | ⚠️ Limited |
+
+### Solutions
+
+**1. For simple display:** Use the file page redirect URL, which includes CORS headers:
+
+```javascript
+// Instead of:
+// https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Example.jpg/800px-Example.jpg
+
+// Use:
+const displayUrl = 'https://commons.wikimedia.org/wiki/Special:FilePath/Example.jpg?width=800';
+```
+
+**2. For Canvas/WebGL/processing:** Proxy through your server:
+
+```javascript
+// Browser requests from your origin
+const proxiedUrl = '/api/media?url=https://upload.wikimedia.org/...';
+
+// Your server fetches from Commons and caches locally
+// Browser sees same-origin response → no CORS restrictions
+```
+
+### Quick Decision Guide
+
+```
+Are you building a browser app?
+├── NO (server-side) → Fetch directly, no CORS issues
+└── YES
+    └── Just displaying images (<img>)?
+        ├── YES → Direct URL works, or use Special:FilePath
+        └── NO (Canvas, WebGL, processing)?
+            └── Proxy through your server
+```
+
+> 📖 **Full details:** See **[wikimedia-commons-thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** Section 10 for in-depth CORS handling, code examples, and the proxy pattern used by production tools.
 
 ---
 

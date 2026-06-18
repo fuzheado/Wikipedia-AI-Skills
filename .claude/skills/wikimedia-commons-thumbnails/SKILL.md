@@ -560,6 +560,123 @@ for title in files:
 
 ---
 
+## 10. CORS: When Direct Thumbnail URLs Are Blocked
+
+When embedding Commons thumbnails in browser-based applications (JavaScript, CSS `background-image`, `<img>` elements), you may encounter **CORS (Cross-Origin Resource Sharing) errors**. This happens when your application runs on one origin (e.g., `localhost:8765` or `your-app.toolforge.org`) and tries to fetch resources directly from `upload.wikimedia.org`.
+
+### The Problem
+
+```
+Access to image at 'https://upload.wikimedia.org/wikipedia/commons/thumb/...'
+from origin 'http://localhost:8765' has been blocked by CORS policy:
+No 'Access-Control-Allow-Origin' header is present on the requested resource.
+```
+
+Chrome DevTools shows: `net::ERR_BLOCKED_BY_ORB` (Opaque Response Blocking).
+
+### Why This Happens
+
+Wikimedia's image servers (`upload.wikimedia.org`) **do not send CORS headers** by default. This is intentional — it prevents third-party sites from:
+- Reading image pixel data via JavaScript Canvas APIs
+- Using the images in WebGL contexts that require `crossorigin` attributes
+- Exfiltrating user-specific information through image requests
+
+For most use cases, this is fine — images are displayed, not processed. But browser security policies now block certain operations on cross-origin images without explicit CORS headers.
+
+### Solutions
+
+| Approach | When to Use | Complexity |
+|----------|-------------|------------|
+| **Use the file page URL** | Displaying images in `<img>` tags | Low — works for simple display |
+| **Proxy through your server** | Canvas/WebGL/`background-image` in CSS | Medium — requires server-side code |
+| **Use the REST API thumbnail endpoint** | Modern browsers, single-origin apps | Low — returns CORS headers |
+
+#### 1. Use the File Page URL (Simple Display Only)
+
+For basic image display (no Canvas, no WebGL), use the **file page URL** instead of the direct upload URL:
+
+```
+# Direct upload URL (no CORS headers)
+https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Example.jpg/800px-Example.jpg
+
+# File page URL (CORS-friendly, redirects to thumbnail)
+https://commons.wikimedia.org/wiki/Special:FilePath/Example.jpg?width=800
+```
+
+The `Special:FilePath/` endpoint sets appropriate CORS headers and redirects to the actual image. This works for `<img>` tags but may still fail for Canvas/WebGL operations.
+
+#### 2. Proxy Through Your Server (Canvas/WebGL/`background-image`)
+
+For applications that need full access to image data (Canvas, WebGL textures, CSS `background-image`), **proxy the image through your own server**:
+
+```javascript
+// Client: request from your server
+const thumbUrl = '/images/abc123.jpg';  // your proxied path
+
+// Server (Node.js example):
+// 1. Download from Commons
+const resp = await fetch(thumbnailUrl);
+const buffer = await resp.arrayBuffer();
+
+// 2. Cache locally (e.g., SHA-256 hash filename)
+const hash = createHash('sha256').update(buffer).digest('hex');
+const filepath = `cache/${hash}.jpg`;
+await writeFile(filepath, buffer);
+
+// 3. Serve from your origin (same-origin = no CORS)
+return { url: `/images/${hash}.jpg`, original: thumbnailUrl };
+```
+
+**Key insight:** The browser requests from `your-origin` → your server fetches from Commons → your server caches and serves from `your-origin`. The browser sees the response as **same-origin**, so no CORS restrictions apply.
+
+**Example from the Wikimedia Photosphere Tours project:**
+
+```javascript
+// Server endpoint: /api/resolve?file=Example.jpg
+// Returns: { url: "/images/<hash>.jpg", thumb: "...", original: "..." }
+
+// Client uses the local path (same-origin, no CORS)
+scene.panorama = "/images/abc123.jpg";  // works in Canvas/WebGL/CSS
+
+// Server already provides direct Commons URLs for export (not for browser use)
+scene._thumb = "https://upload.wikimedia.org/.../200px-...";  // CORS blocked if used in browser
+scene._original = "https://upload.wikimedia.org/.../Example.jpg";  // fine for export/download
+```
+
+#### 3. Use REST API Thumbnail Endpoint
+
+The REST API's thumbnail endpoint (`/api/rest_v1/page/image/{title}/{width}px`) may include CORS headers in some configurations. Check the response headers for your specific use case.
+
+### Decision Tree
+
+```
+Do you need to read pixel data (Canvas, WebGL)?
+├── YES -> Proxy through your server (Solution 2)
+└── NO
+    └── Is it just for display (<img>, CSS background)?
+        ├── YES -> Try Special:FilePath URL (Solution 1)
+        └── Still blocked?
+            └── Proxy through your server (Solution 2)
+```
+
+### Common Pitfall: Ignoring Proxy Paths
+
+When your server returns both `url` (proxied path) and `thumb`/`original` (direct Commons URLs), **always use `url` for browser rendering**. A common mistake is to use `thumb` directly:
+
+```javascript
+// WRONG - direct Commons URL, CORS blocked
+const thumbUrl = scene._thumb;  // "https://upload.wikimedia.org/..."
+element.style.backgroundImage = `url(${thumbUrl})`;
+
+// CORRECT - proxied path, same-origin
+const thumbUrl = scene.panorama;  // "/images/abc123.jpg"
+element.style.backgroundImage = `url(${thumbUrl})`;
+```
+
+This pattern applies to thumbnails, panoramas, audio/video files, and any other media served from `upload.wikimedia.org`.
+
+---
+
 ## Related Skills
 
 | Skill | Relevance |

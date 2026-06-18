@@ -410,3 +410,89 @@ with WikimediaClient("MyBot/1.0 (user@example.com) MyProject") as client:
     # Pageviews
     top = client.top_pageviews("en.wikipedia")
 ```
+
+---
+
+## CORS: Browser Applications and Cross-Origin Requests
+
+When building **browser-based applications** (JavaScript, not server-side Python), you may encounter CORS (Cross-Origin Resource Sharing) restrictions. This section explains when this happens and how to handle it.
+
+### When CORS Becomes an Issue
+
+Most Wikimedia APIs (Action API, REST API, SPARQL) **do send CORS headers** and work fine from browser JavaScript. However, **media files served from `upload.wikimedia.org` do not** — and this is where you'll encounter CORS errors.
+
+| Resource | CORS Headers? | Browser Access |
+|----------|:-------------:|----------------|
+| Action API (`/w/api.php`) | Yes | Works from any origin |
+| REST API (`/api/rest_v1/`) | Yes | Works from any origin |
+| SPARQL (`query.wikidata.org/sparql`) | Yes | Works from any origin |
+| **Media files** (`upload.wikimedia.org`) | **No** | **Blocked for Canvas/WebGL/`background-image`** |
+| File page redirects (`Special:FilePath/`) | Yes | Works for `<img>` display |
+
+### The Problem: `upload.wikimedia.org` Has No CORS Headers
+
+```
+Access to image at 'https://upload.wikimedia.org/wikipedia/commons/thumb/...'
+from origin 'http://localhost:3000' has been blocked by CORS policy:
+No 'Access-Control-Allow-Origin' header is present on the requested resource.
+```
+
+Chrome DevTools shows: `net::ERR_BLOCKED_BY_ORB` (Opaque Response Blocking).
+
+This affects:
+- **Canvas pixel access** (`canvas.getContext('2d').getImageData()`)
+- **WebGL textures** (`texImage2D`)
+- **CSS `background-image`** in some browsers
+- **Audio/video elements** for certain operations
+
+### Solution: Proxy Through Your Server
+
+For browser apps that need full access to media content, **proxy the request through your own server**:
+
+```
+Browser -> Your Server -> Commons API -> Your Server -> Browser
+         (same-origin)   (no CORS)     (same-origin)
+```
+
+The browser sees the response as **same-origin**, so CORS restrictions don't apply.
+
+**Server-side pattern (Node.js):**
+
+```javascript
+// API endpoint: /api/media?url=...
+app.get('/api/media', async (req, res) => {
+  const mediaUrl = req.query.url;
+  const resp = await fetch(mediaUrl);
+  const buffer = await resp.arrayBuffer();
+  
+  // Cache with SHA-256 hash filename
+  const hash = createHash('sha256').update(buffer).digest('hex');
+  const cachedPath = `cache/${hash}.jpg`;
+  await writeFile(cachedPath, buffer);
+  
+  res.json({ url: `/cache/${hash}.jpg` });
+});
+```
+
+**Client-side usage:**
+
+```javascript
+// Direct Commons URL - CORS blocked
+const directUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/...';
+
+// Proxied URL - same-origin, no CORS issues
+const proxiedUrl = '/cache/abc123.jpg';
+document.getElementById('img').src = proxiedUrl;  // Works!
+```
+
+### When You Don't Need a Proxy
+
+- **Server-side code** (Python, Node.js) — no CORS restrictions, fetch directly
+- **Simple `<img>` display** — use `Special:FilePath/` redirect URLs
+- **Metadata-only APIs** — Action API, REST API, SPARQL all work from browsers
+
+### Related Documentation
+
+For detailed thumbnail/media CORS handling, see **[wikimedia-commons-thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** Section 10.
+
+---
