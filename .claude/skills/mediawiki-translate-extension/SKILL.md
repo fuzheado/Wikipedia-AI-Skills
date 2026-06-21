@@ -3,6 +3,10 @@ name: mediawiki-translate-extension
 description: Work with the Translate extension for multilingual wiki content — marking pages for translation, writing translatable templates, using #timef for locale-aware dates, managing language subpages, and building i18n-aware navigation
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access, wikipedia-templates]
+skill_discovery_hints:
+  - keywords: ["Translate extension", "page translation", "translatable", "<translate>", "translation unit", "language subpage"]
+  - keywords: ["Special:MyLanguage", "#timef", "translation memory", "message group", "fuzzy translation"]
 last_verified: 2026-06-10
 ---
 

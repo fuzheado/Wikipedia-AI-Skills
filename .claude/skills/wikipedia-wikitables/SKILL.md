@@ -4,6 +4,9 @@ description: Create, parse, style, and fix MediaWiki wikitable syntax — delimi
 depends_on: [wikimedia-wikitext]
 license: MIT
 compatibility: opencode
+skill_discovery_hints:
+  - keywords: ["wikitable", "table", "sortable", "colspan", "rowspan", "data table", "table syntax"]
+  - keywords: ["table generation", "CSV to wikitable", "wikitable styling", "mw-collapsible"]
 last_verified: 2026-06-10
 ---
 
@@ -11,6 +14,8 @@ last_verified: 2026-06-10
 > See **[wikipedia-templates](../wikipedia-templates/SKILL.md)** for template syntax,
 > and **[wikimedia-wikitext](../wikimedia-wikitext/SKILL.md)** for AST parsing with
 > `mwparserfromhell`.
+>
+> ⚠️ **User-Agent required:** API calls to fetch wikitext or render tables need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
 
 ---
 

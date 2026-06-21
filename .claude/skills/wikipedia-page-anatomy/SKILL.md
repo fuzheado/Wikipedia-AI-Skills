@@ -3,6 +3,7 @@ name: wikipedia-page-anatomy
 description: Navigate and understand the structure of a Wikipedia article — infoboxes, categories, references, templates, navboxes, redirects, disambiguation, and protection levels
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access]
 skill_discovery_hints:
   - keywords: ["page structure", "article anatomy", "lead section", "first paragraph", "infobox", "categories", "navbox", "references", "templates"]
   - keywords: ["disambiguation", "disambiguation page", "DAB page", "ambiguous title", "disambig", "page type", "redirect"]

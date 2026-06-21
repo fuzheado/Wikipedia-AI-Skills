@@ -3,6 +3,10 @@ name: wikipedia-en-article-audit
 description: Audit an English Wikipedia article for structural issues, factual errors, and NPOV violations, then produce a machine-readable task graph (DAG) that another agent can execute to fix all identified problems
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access, wikipedia-page-anatomy, wikimedia-wikitext, wikimedia-page-assessment, wikimedia-database]
+skill_discovery_hints:
+  - keywords: ["article audit", "audit", "NPOV check", "factual verification", "taskgraph"]
+  - keywords: ["article diagnosis", "structural audit", "sentence verification", "DAG"]
 last_verified: 2026-06-10
 ---
 

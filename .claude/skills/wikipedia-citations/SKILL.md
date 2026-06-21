@@ -4,6 +4,9 @@ description: Master Wikipedia citations — CS1/CS2 templates, Wayback Machine a
 depends_on: [wikimedia-api-access]
 license: MIT
 compatibility: opencode
+skill_discovery_hints:
+  - keywords: ["citation", "reference", "cite web", "cite book", "CS1", "Wayback Machine"]
+  - keywords: ["dead link", "archive URL", "bare URL", "Citoid", "DOI", "ISBN"]
 last_verified: 2026-06-10
 ---
 

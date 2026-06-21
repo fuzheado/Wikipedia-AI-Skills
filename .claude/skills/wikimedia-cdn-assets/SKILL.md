@@ -2,9 +2,15 @@
 name: wikimedia-cdn-assets
 description: Load JavaScript, CSS, and fonts for Toolforge tools from Wikimedia's privacy-preserving cdnjs mirror, ensuring user privacy and policy compliance
 license: MIT
-compatibility: all
+compatibility: opencode
+depends_on: [wikimedia-toolforge]
+skill_discovery_hints:
+  - keywords: ["CDN", "cdnjs", "Toolforge assets", "JavaScript CDN", "CSS CDN", "font loading"]
+  - keywords: ["tools-static", "cdnjs mirror", "privacy CDN", "Wikimedia CDN"]
 last_verified: 2026-06-10
 ---
+
+> ⚠️ **User-Agent required:** The cdnjs API search and URL verification checks below make HTTP requests. Include a descriptive `User-Agent` header for all automated requests. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
 
 ## SOP: Load Web Assets from Wikimedia's CDN
 
@@ -158,3 +164,13 @@ loadCDNScript('jquery', '3.6.0', 'jquery.min.js')
     .then(() => console.log('jQuery loaded'))
     .catch(err => console.error('Failed:', err));
 ```
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** | Toolforge is where CDN mirror assets are served from |
+| **[wikimedia-security-and-privacy](../wikimedia-security-and-privacy/SKILL.md)** | Privacy rationale: external CDNs can track users |
+| **[wikimedia-commons-thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** | CORS proxy pattern — similar privacy/security concerns for browser apps |

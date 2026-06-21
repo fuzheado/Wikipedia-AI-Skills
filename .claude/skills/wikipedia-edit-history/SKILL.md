@@ -3,6 +3,10 @@ name: wikipedia-edit-history
 description: Read and analyze Wikipedia's page revision history — diffs, edit summaries, user contributions, byte changes, rollback, and understanding the evolution of a page over time
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access, wikimedia-diffs]
+skill_discovery_hints:
+  - keywords: ["edit history", "revision history", "page history", "user contributions", "rollback"]
+  - keywords: ["revision ID", "undo", "edit summary", "minor edit", "mw-reverted"]
 last_verified: 2026-06-10
 ---
 

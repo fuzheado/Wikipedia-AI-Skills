@@ -3,6 +3,10 @@ name: wikipedia-categories
 description: Understand and work with Wikipedia's category system — category trees, the three tests for valid categories (Verifiable/Neutral/Defining), topic vs set categories, sort keys and DEFAULTSORT, querying via API, overcategorization rules, and category maintenance workflows
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access, wikipedia-page-anatomy]
+skill_discovery_hints:
+  - keywords: ["category", "categorization", "category tree", "WP:CATDEF", "WP:CATV"]
+  - keywords: ["sort key", "DEFAULTSORT", "hidden category", "category redirect", "PetScan"]
 last_verified: 2026-06-10
 ---
 

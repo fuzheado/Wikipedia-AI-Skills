@@ -3,6 +3,7 @@ name: wikimedia-commons
 description: Search, upload, and understand Wikimedia Commons — the free media repository of images, video, sound, 3D files, PDFs, and other media used across Wikipedia and its sister projects. Browse categories, find reusable media, and retrieve file metadata
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access]
 skill_discovery_hints:
   - keywords: ["Commons", "Commons file", "Commons upload", "image", "photo", "file", "media", "free media"]
   - keywords: ["search Commons", "find image", "media search", "find file", "category"]

@@ -3,6 +3,10 @@ name: wikipedia-en-biography-writing
 description: Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and biographies of living persons (BLP) policies
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access]
+skill_discovery_hints:
+  - keywords: ["biography", "BLP", "living persons", "article creation", "drafting"]
+  - keywords: ["NPOV", "biography writing", "infobox person", "WP:NOR", "verifiability"]
 last_verified: 2026-06-10
 ---
 
@@ -222,3 +226,15 @@ Subject-specific infobox variants:
 | `artist.md` | Visual artists, sculptors, photographers |
 | `athlete.md` | Athletes, coaches, sports figures |
 | `officeholder.md` | Politicians, government officials, diplomats, judges |
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikipedia-notability-assessment](../wikipedia-notability-assessment/SKILL.md)** | Full notability evaluation (GNG, all 13 SNGs, source quality) — use for detailed assessment beyond the summary here |
+| **[wikipedia-page-anatomy](../wikipedia-page-anatomy/SKILL.md)** | Article structure understanding — infoboxes, sections, categories |
+| **[wikipedia-citations](../wikipedia-citations/SKILL.md)** | Citation formatting and validation for inline references |
+| **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent and API patterns for source verification |
+| **[wikipedia-talk-page](../wikipedia-talk-page/SKILL.md)** | Talk page etiquette — where to discuss article improvements |

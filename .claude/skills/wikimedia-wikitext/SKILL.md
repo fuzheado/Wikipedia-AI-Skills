@@ -3,6 +3,7 @@ name: wikimedia-wikitext
 description: Parse, extract, and manipulate Wikipedia and MediaWiki wikitext (wiki markup, templates, infoboxes, citations, links) using proper AST-based tooling instead of fragile regex patterns
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access]
 skill_discovery_hints:
   - keywords: ["wikitext", "wiki markup", "parse", "mwparserfromhell", "wikitext parsing", "template parsing"]
   - keywords: ["wikitext AST", "syntax tree", "section parsing", "link extraction", "template expansion"]

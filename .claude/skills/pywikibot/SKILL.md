@@ -3,6 +3,10 @@ name: pywikibot
 description: Use Pywikibot — the Python library and CLI tool suite for automating work on MediaWiki sites (Wikipedia, Wikidata, Commons, and any other MediaWiki wiki). Covers installation, configuration, the core object model, page generators, the bot framework, built-in scripts, and Wikidata/Commons integration
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access, wikidata]
+skill_discovery_hints:
+  - keywords: ["Pywikibot", "bot", "automated editing", "page generator", "pwb.py", "MediaWiki bot"]
+  - keywords: ["bulk edit", "category operations", "template harvesting", "archive bot", "replace.py"]
 last_verified: 2026-06-10
 ---
 

@@ -3,6 +3,10 @@ name: mediawiki-page-navigation
 description: Build navigation systems in MediaWiki — menu bars, subpage hierarchies, breadcrumbs, tabs, and the template logic that powers them. Covers #titleparts, #ifexist, dynamic sub-navigation loading, menu bars, and page-hierarchy-aware link generation
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access, wikipedia-templates]
+skill_discovery_hints:
+  - keywords: ["navigation", "menu bar", "breadcrumbs", "subpage", "tab navigation", "#titleparts"]
+  - keywords: ["page hierarchy", "sub-navigation", "dynamic menu"]
 last_verified: 2026-06-10
 ---
 

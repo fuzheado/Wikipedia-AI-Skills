@@ -4,6 +4,9 @@ description: Work with the PageTriage extension (New Pages Feed / Page Curation)
 depends_on: [wikimedia-api-access]
 license: MIT
 compatibility: opencode
+skill_discovery_hints:
+  - keywords: ["PageTriage", "NPP", "new page patrol", "unreviewed", "page curation"]
+  - keywords: ["pagetriagelist", "patrol", "new pages feed", "review status"]
 last_verified: 2026-06-10
 ---
 
@@ -243,5 +246,16 @@ print(f"Reviewed: {status['reviewed']}, by: {status['reviewer']}")
 
 Demonstrates the two-pass pipeline from the npp-finder tool: fetch new pages →
 run reference analysis → enrich matches. Useful as a template for custom
-patrol agents.
-Grea
+patrol agents and NPP workflows.
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikipedia-reference-verifiability](../wikipedia-reference-verifiability/SKILL.md)** | Reference URL analysis for triaging new pages |
+| **[wikipedia-notability-assessment](../wikipedia-notability-assessment/SKILL.md)** | Notability evaluation of unreviewed pages |
+| **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent and authentication for PageTriage API calls |
+| **[wikimedia-database](../wikimedia-database/SKILL.md)** | SQL queries against `pagetriage_page` table for bulk analysis |
+| **[wikimedia-eventstreams](../wikimedia-eventstreams/SKILL.md)** | Real-time new page detection via `page-create` stream |

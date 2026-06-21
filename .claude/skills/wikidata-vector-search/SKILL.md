@@ -3,6 +3,10 @@ name: wikidata-vector-search
 description: Query Wikidata by meaning, concept, or natural-language description — not just by exact label match. Uses semantic embeddings to find items (QIDs) and properties (PIDs) via vector similarity, keyword search, and Reciprocal Rank Fusion. Covers fuzzy semantic search, concept matching, similarity lookups, cross-lingual queries, and "find like this" when you do not know the exact QID or label
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access, wikidata]
+skill_discovery_hints:
+  - keywords: ["vector search", "semantic search", "embedding", "similarity score", "find QID", "fuzzy match"]
+  - keywords: ["wd-vectordb", "concept search", "meaning search", "RRF", "cross-lingual search"]
 last_verified: 2026-06-10
 ---
 

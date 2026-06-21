@@ -3,6 +3,10 @@ name: wikipedia-templates
 description: Create, design, and understand Wikipedia and MediaWiki templates — template syntax, parser functions, magic words, transclusion vs substitution, Lua modules, template types taxonomy, API detection, and maintenance workflows
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access]
+skill_discovery_hints:
+  - keywords: ["template", "wikitext template", "parser function", "transclusion", "Lua module"]
+  - keywords: ["#if", "#switch", "#invoke", "TemplateData", "infobox template"]
 last_verified: 2026-06-10
 ---
 

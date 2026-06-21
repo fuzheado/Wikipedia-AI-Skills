@@ -3,6 +3,7 @@ name: wikimedia-phabricator
 description: Navigate Wikimedia's Phabricator instance — search tasks, track project status, file bug reports, and understand why something might not work or what's in development
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access]
 last_verified: 2026-06-12
 skill_discovery_hints:
   - keywords: ["Phabricator", "Phab", "bug report", "bug tracker", "known issue", "known bug", "feature request", "task"]
@@ -10,6 +11,8 @@ skill_discovery_hints:
   - keywords: ["why doesn't", "why won't", "broken", "not working", "regression", "reported", "submit a bug"]
   - keywords: ["phab:", "tracking ticket", "development tracking", "task status"]
 ---
+
+> ℹ️ **No User-Agent needed for browser access.** Phabricator tasks are accessed via standard web URLs. For programmatic access via the Conduit API, include a descriptive `User-Agent` header as described in the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill.
 
 > **When to use this skill:** A user asks why a Wikipedia feature behaves a certain way, whether a bug is known, whether something is being worked on, or wants to report a problem. **Phabricator is the canonical place to check** — it is the WMF's centralized task tracker for all software bugs, feature requests, and project planning across MediaWiki, Wikimedia apps, and Toolforge.
 
@@ -217,27 +220,3 @@ Goal: Find out if section-level watchlisting is deployed
 ---
 
 ## Quick Reference Card
-
-```
-╔══════════════════════════════════════════════════════════════╗
-║              Phabricator Quick Reference                     ║
-╠══════════════════════════════════════════════════════════════╣
-║ URL:         https://phabricator.wikimedia.org               ║
-║ Task format: T12345                                          ║
-║                                                              ║
-║ SEARCH                                                        ║
-║   project:(Editing-Talk) is:open      — open tasks in project ║
-║   #DiscussionTools                    — hashtag search        ║
-║   @username                           — user-related tasks   ║
-║   subtype:epic                        — epic/umbrella tasks  ║
-║   priority:high                       — priority filter      ║
-║                                                              ║
-║ TASK STATUSES                                                 ║
-║   Needs Triage  →  Open  →  Resolved (work complete)          ║
-║                        →  Stalled (blocked)                   ║
-║                        →  Declined (won't do)                 ║
-║                                                              ║
-║ DO: search first, subscribe instead of +1                    ║
-║ DON'T: file security bugs publicly, create duplicates        ║
-╚══════════════════════════════════════════════════════════════╝
-```

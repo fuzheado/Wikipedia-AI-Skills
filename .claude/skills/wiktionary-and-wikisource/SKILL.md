@@ -4,6 +4,9 @@ description: Work with Wiktionary (dictionary entries, translation tables, etymo
 depends_on: [wikimedia-api-access, wikimedia-commons, pywikibot]
 license: MIT
 compatibility: opencode
+skill_discovery_hints:
+  - keywords: ["Wiktionary", "Wikisource", "dictionary", "proofread", "OCR", "translation table"]
+  - keywords: ["Wiktionary entry", "lexeme", "etymology", "IPA", "pronunciation", "ProofreadPage"]
 last_verified: 2026-06-11
 ---
 
@@ -537,3 +540,15 @@ page the same as a "Validated" page defeats the purpose.
 | [`references/wiktionary-entry-structure.md`](./references/wiktionary-entry-structure.md) | Full entry anatomy: heading hierarchy, section types, template families, language codes |
 | [`references/wikisource-proofread-workflow.md`](./references/wikisource-proofread-workflow.md) | Three-namespace system, quality levels, proofreading lifecycle, API modules |
 | [`references/sister-project-api.md`](./references/sister-project-api.md) | API differences between Wikipedia, Wiktionary, and Wikisource — endpoint URLs, prop modules, list modules |
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-commons](../wikimedia-commons/SKILL.md)** | Commons hosts audio pronunciations and scanned documents used by both projects |
+| **[wikimedia-commons-pdf](../wikimedia-commons-pdf/SKILL.md)** | PDF/DjVu handling for Wikisource OCR and proofreading |
+| **[pywikibot](../pywikibot/SKILL.md)** | Bot operations for bulk Wiktionary/Wikisource tasks |
+| **[wikimedia-wikitext](../wikimedia-wikitext/SKILL.md)** | Parsing entry/page wikitext with mwparserfromhell |
+| **[wikimedia-i18n-l10n-for-tools](../wikimedia-i18n-l10n-for-tools/SKILL.md)** | Language detection and fallback for multilingual entries |

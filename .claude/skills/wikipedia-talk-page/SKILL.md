@@ -3,6 +3,10 @@ name: wikipedia-talk-page
 description: Navigate, participate in, and understand Wikipedia talk pages — includes modern DiscussionTools (Reply Tool, Topic Subscriptions, Permalinks), Usability Improvements, community gadgets, wikitext conventions, WikiProject banners, archives, and talk page etiquette
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access]
+skill_discovery_hints:
+  - keywords: ["talk page", "DiscussionTools", "Reply Tool", "topic subscription", "WikiProject banner"]
+  - keywords: ["talk page archive", "discussion", "indentation", "ping", "@-mention"]
 last_verified: 2026-06-12
 ---
 

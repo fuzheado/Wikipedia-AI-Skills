@@ -3,8 +3,14 @@ name: wikimedia-database
 description: Execute SQL queries against Wikipedia database replicas (enwiki, wikidata, commonswiki) via an SSH tunnel to Toolforge, with connection management and data handling guardrails
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-toolforge]
+skill_discovery_hints:
+  - keywords: ["SQL", "database", "replica", "Toolforge database", "enwiki_p", "MySQL"]
+  - keywords: ["SSH tunnel", "pymysql", "query Wikipedia", "schema", "page table", "revision table"]
 last_verified: 2026-06-10
 ---
+
+> ⚠️ **User-Agent required:** While this skill primarily uses SQL via SSH tunnel, any direct API calls (e.g., for verification via `curl` or `requests`) must include a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
 
 Enables the agent to execute dynamic SQL queries against Wikimedia production replicas (e.g., `enwiki`, `enwiki_p`, `wikidata`, `commonswiki`) by leveraging a local SSH tunnel and specific environment variables for multi-layer authentication.
 
@@ -174,3 +180,14 @@ cp assets/.env.example .env
 
 50+ pre-built SQL queries organized by category (page info, stats, categories,
 pageviews, Wikidata, revisions, links, cross-refs, user activity).
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** | SSH tunnel setup and Toolforge access |
+| **[wikimedia-page-assessment](../wikimedia-page-assessment/SKILL.md)** | PageAssessments queries use the same database connection pattern |
+| **[wikimedia-pageviews](../wikimedia-pageviews/SKILL.md)** | Pageview SQL queries via `page_props` table |
+| **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent format for any follow-up API calls |

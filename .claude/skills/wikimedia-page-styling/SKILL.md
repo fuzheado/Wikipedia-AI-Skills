@@ -3,6 +3,10 @@ name: wikimedia-page-styling
 description: Use TemplateStyles to load custom CSS on wiki pages, then build responsive grid/flexbox layouts, card-based tile systems, color themes, button systems, and full visual design systems — transforming plain MediaWiki pages into rich, interactive-looking interfaces
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access, wikipedia-templates]
+skill_discovery_hints:
+  - keywords: ["TemplateStyles", "CSS", "styling", "grid layout", "flexbox", "design system"]
+  - keywords: ["wiki design", "custom CSS", "templatestyles", "card layout", "button styling"]
 last_verified: 2026-06-10
 ---
 

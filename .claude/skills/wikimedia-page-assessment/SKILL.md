@@ -3,11 +3,14 @@ name: wikimedia-page-assessment
 description: Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners on any Wikimedia wiki with the PageAssessments extension
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-database]
 last_verified: 2026-06-10
 skill_discovery_hints:
   - keywords: ["WikiProject", "WikiProject assessment", "article quality", "GA", "FA", "page assessment", "content assessment"]
   - keywords: ["popular pages", "WikiProject popular pages", "Assessment subpage", "quality matrix", "importance rating"]
 ---
+
+> ⚠️ **User-Agent required:** While this skill primarily uses SQL via SSH tunnel, any direct API calls (e.g., for checking WikiProject subpages via the Action API) must include a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
 
 Enables the agent to retrieve quality and importance ratings for Wikipedia
 articles. This data is derived from WikiProject banners on talk pages and is
@@ -364,3 +367,14 @@ multi-project intersections, and maintenance workflows.
 cp assets/.env.example .env
 # Edit .env with your credentials
 ```
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-database](../wikimedia-database/SKILL.md)** | Database connection and pymysql patterns |
+| **[wikipedia-page-anatomy](../wikipedia-page-anatomy/SKILL.md)** | Article structure context for assessment ratings |
+| **[wikipedia-talk-page](../wikipedia-talk-page/SKILL.md)** | Assessment banners appear on talk pages |
+| **[wikimedia-ml-services](../wikimedia-ml-services/SKILL.md)** | ML-based quality scoring (complementary to human assessments) |

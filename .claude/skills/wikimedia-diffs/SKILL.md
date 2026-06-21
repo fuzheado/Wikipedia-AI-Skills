@@ -3,6 +3,10 @@ name: wikimedia-diffs
 description: Fetch, compare, and interpret diffs between Wikipedia page revisions — wikitext changes, visual differences, and diff statistics via the Action API and REST API
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access]
+skill_discovery_hints:
+  - keywords: ["diff", "compare revisions", "edit comparison", "action=compare", "diffsize"]
+  - keywords: ["visual diff", "rendered comparison", "change detection", "byte change"]
 last_verified: 2026-06-10
 ---
 

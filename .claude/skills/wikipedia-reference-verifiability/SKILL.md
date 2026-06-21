@@ -4,6 +4,9 @@ description: Analyze whether a Wikipedia page's references contain URLs — dete
 depends_on: [wikimedia-api-access, wikimedia-wikitext]
 license: MIT
 compatibility: opencode
+skill_discovery_hints:
+  - keywords: ["reference URLs", "citation URLs", "bare ref", "URL detection", "verifiability check"]
+  - keywords: ["named ref", "shortened footnote", "url= parameter", "reference analysis"]
 last_verified: 2026-06-10
 ---
 

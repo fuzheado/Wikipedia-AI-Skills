@@ -3,6 +3,7 @@ name: wikidata
 description: Understand and query Wikidata — the free, collaborative, multilingual knowledge graph that underpins Wikipedia's inter-language links, Commons structured data, and semantic facts across all Wikimedia projects. Covers SPARQL, the Wikibase REST/Action APIs, RDF data dumps, and semantic web concepts
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access]
 skill_discovery_hints:
   - keywords: ["SPARQL", "Wikidata", "knowledge graph", "semantic query", "QID", "Q number", "P number", "entity"]
   - keywords: ["cross-wiki", "interlanguage", "sitelink", "language link", "gap analysis"]

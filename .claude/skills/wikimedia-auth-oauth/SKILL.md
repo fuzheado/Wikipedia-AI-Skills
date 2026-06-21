@@ -4,6 +4,9 @@ description: Authenticate Wikimedia API clients for editing, patrol, upload, and
 depends_on: [wikimedia-api-access, wikimedia-error-handling, wikimedia-toolforge]
 license: MIT
 compatibility: opencode
+skill_discovery_hints:
+  - keywords: ["authentication", "OAuth", "bot password", "login", "CSRF token", "credential"]
+  - keywords: ["authorization", "access token", "refresh token", "consumer registration", "Special:BotPasswords"]
 last_verified: 2026-06-11
 ---
 

@@ -3,6 +3,10 @@ name: wikimedia-toolforge
 description: Manage Toolforge accounts, web services, Kubernetes pods, cron jobs, and file deployment for Wikimedia tools
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access]
+skill_discovery_hints:
+  - keywords: ["Toolforge", "tool hosting", "Kubernetes", "web service", "cron job", "deploy"]
+  - keywords: ["toolforge tools create", "become", "webservice", "toolforge jobs"]
 last_verified: 2026-06-10
 ---
 

@@ -3,8 +3,14 @@ name: wikimedia-pageviews
 description: Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties (sorting/filtering) or the REST API (precise historical data)
 license: MIT
 compatibility: opencode
+depends_on: [wikimedia-api-access]
+skill_discovery_hints:
+  - keywords: ["pageviews", "traffic", "popularity", "article views", "views per article"]
+  - keywords: ["top pages", "pageview API", "daily views", "analytics"]
 last_verified: 2026-06-10
 ---
+
+> ⚠️ **User-Agent required:** The REST API examples below require a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
 
 Enables the agent to retrieve traffic and popularity statistics for Wikipedia articles. Since historical pageview logs are not stored in the SQL replicas, the agent must distinguish between using a **cached SQL property** for sorting and the **REST API** for precise historical data.
 
