@@ -7,7 +7,8 @@ digraph Skills {
   "mediawiki-page-navigation" [label="mw-page-navigation", fillcolor="#c8e6c9", style="filled,rounded", fontsize=11];
   "mediawiki-translate-extension" [label="mw-translate-extension", fillcolor="#c8e6c9", style="filled,rounded", fontsize=11];
   "pywikibot" [label="pywikibot", fillcolor="#c8e6c9", style="filled,rounded", fontsize=15];
-  "toolforge-nodejs" [label="toolforge-nodejs", fillcolor="#fce4ec", style="filled,rounded", fontsize=10];
+  "toolforge-nodejs" [label="tf-nodejs", fillcolor="#fce4ec", style="filled,rounded", fontsize=11];
+  "toolforge-python" [label="tf-python", fillcolor="#fce4ec", style="filled,rounded", fontsize=11];
   "wikidata" [label="wikidata", fillcolor="#e8f5e9", style="filled,rounded", fontsize=13];
   "wikidata-vector-search" [label="wikidata-vector-search", fillcolor="#e8f5e9", style="filled,rounded", fontsize=10];
   "wikimedia-api-access" [label="wm-api-access", fillcolor="#e3f2fd", style="filled,rounded", fontsize=16];
@@ -20,20 +21,20 @@ digraph Skills {
   "wikimedia-commons-sparql" [label="wm-cm-sparql", fillcolor="#fff3e0", style="filled,rounded", fontsize=12];
   "wikimedia-commons-svg" [label="wm-cm-svg", fillcolor="#fff3e0", style="filled,rounded", fontsize=11];
   "wikimedia-commons-thumbnails" [label="wm-cm-thumbnails", fillcolor="#fff3e0", style="filled,rounded", fontsize=13];
-  "wikimedia-database" [label="wm-database", fillcolor="#fce4ec", style="filled,rounded", fontsize=12];
+  "wikimedia-database" [label="wm-database", fillcolor="#fce4ec", style="filled,rounded", fontsize=13];
   "wikimedia-diffs" [label="wm-diffs", fillcolor="#e3f2fd", style="filled,rounded", fontsize=11];
   "wikimedia-eventstreams" [label="wm-eventstreams", fillcolor="#fce4ec", style="filled,rounded", fontsize=13];
   "wikimedia-i18n-l10n-for-tools" [label="wm-i18n-l10n-for-tools", fillcolor="#fce4ec", style="filled,rounded", fontsize=12];
   "wikimedia-ml-services" [label="wm-ml-services", fillcolor="#fce4ec", style="filled,rounded", fontsize=12];
-  "wikimedia-page-assessment" [label="wm-page-assessment", fillcolor="#e8f5e9", style="filled,rounded", fontsize=12];
+  "wikimedia-page-assessment" [label="wm-page-assessment", fillcolor="#e8f5e9", style="filled,rounded", fontsize=13];
   "wikimedia-page-styling" [label="wm-page-styling", fillcolor="#c8e6c9", style="filled,rounded", fontsize=11];
   "wikimedia-pageviews" [label="wm-pageviews", fillcolor="#e8f5e9", style="filled,rounded", fontsize=11];
   "wikimedia-phabricator" [label="wm-phabricator", fillcolor="#fce4ec", style="filled,rounded", fontsize=9];
   "wikimedia-search-cirrussearch" [label="wm-search-cirrussearch", fillcolor="#e8f5e9", style="filled,rounded", fontsize=13];
   "wikimedia-security-and-privacy" [label="wm-security-and-privacy", fillcolor="#e3f2fd", style="filled,rounded", fontsize=10];
-  "wikimedia-toolforge" [label="wm-toolforge", fillcolor="#fce4ec", style="filled,rounded", fontsize=13];
+  "wikimedia-toolforge" [label="wm-toolforge", fillcolor="#fce4ec", style="filled,rounded", fontsize=14];
   "wikimedia-wikitext" [label="wm-wikitext", fillcolor="#c8e6c9", style="filled,rounded", fontsize=14];
-  "wikipedia-categories" [label="wp-categories", fillcolor="#e1bee7", style="filled,rounded", fontsize=12];
+  "wikipedia-categories" [label="wp-categories", fillcolor="#e1bee7", style="filled,rounded", fontsize=13];
   "wikipedia-citations" [label="wp-citations", fillcolor="#e1bee7", style="filled,rounded", fontsize=13];
   "wikipedia-edit-history" [label="wp-edit-history", fillcolor="#c8e6c9", style="filled,rounded", fontsize=11];
   "wikipedia-en-article-audit" [label="wp-en-article-audit", fillcolor="#e1bee7", style="filled,rounded", fontsize=11];
@@ -42,8 +43,9 @@ digraph Skills {
   "wikipedia-notability-assessment" [label="wp-notability-assessment", fillcolor="#e1bee7", style="filled,rounded", fontsize=11];
   "wikipedia-page-anatomy" [label="wp-page-anatomy", fillcolor="#e1bee7", style="filled,rounded", fontsize=14];
   "wikipedia-reference-verifiability" [label="wp-reference-verifiability", fillcolor="#e1bee7", style="filled,rounded", fontsize=12];
-  "wikipedia-talk-page" [label="wp-talk-page", fillcolor="#e1bee7", style="filled,rounded", fontsize=10];
+  "wikipedia-talk-page" [label="wp-talk-page", fillcolor="#e1bee7", style="filled,rounded", fontsize=11];
   "wikipedia-templates" [label="wp-templates", fillcolor="#e1bee7", style="filled,rounded", fontsize=13];
+  "wikipedia-wikiprojects" [label="wp-wikiprojects", fillcolor="#e1bee7", style="filled,rounded", fontsize=11];
   "wikipedia-wikitables" [label="wp-wikitables", fillcolor="#e1bee7", style="filled,rounded", fontsize=11];
   "wiktionary-and-wikisource" [label="wiktionary-and-wikisource", fillcolor="#c8e6c9", style="filled,rounded", fontsize=11];
 
@@ -69,6 +71,11 @@ digraph Skills {
   "toolforge-nodejs" -> "wikimedia-api-access";
   "toolforge-nodejs" -> "wikimedia-commons-thumbnails";
   "toolforge-nodejs" -> "wikimedia-toolforge";
+  "toolforge-python" -> "pywikibot";
+  "toolforge-python" -> "toolforge-nodejs";
+  "toolforge-python" -> "wikimedia-api-access";
+  "toolforge-python" -> "wikimedia-database";
+  "toolforge-python" -> "wikimedia-toolforge";
   "wikidata" -> "wikimedia-api-access";
   "wikidata" -> "wikimedia-commons";
   "wikidata" -> "wikimedia-ml-services";
@@ -187,6 +194,7 @@ digraph Skills {
   "wikimedia-security-and-privacy" -> "wikimedia-auth-oauth";
   "wikimedia-toolforge" -> "pywikibot";
   "wikimedia-toolforge" -> "toolforge-nodejs";
+  "wikimedia-toolforge" -> "toolforge-python";
   "wikimedia-toolforge" -> "wikimedia-api-access";
   "wikimedia-toolforge" -> "wikimedia-database";
   "wikimedia-toolforge" -> "wikimedia-eventstreams";
@@ -256,6 +264,12 @@ digraph Skills {
   "wikipedia-templates" -> "wikipedia-page-anatomy";
   "wikipedia-templates" -> "wikipedia-talk-page";
   "wikipedia-templates" -> "wikipedia-wikitables";
+  "wikipedia-wikiprojects" -> "wikimedia-api-access";
+  "wikipedia-wikiprojects" -> "wikimedia-page-assessment";
+  "wikipedia-wikiprojects" -> "wikimedia-pageviews";
+  "wikipedia-wikiprojects" -> "wikipedia-categories";
+  "wikipedia-wikiprojects" -> "wikipedia-page-anatomy";
+  "wikipedia-wikiprojects" -> "wikipedia-talk-page";
   "wikipedia-wikitables" -> "wikimedia-api-access";
   "wikipedia-wikitables" -> "wikimedia-wikitext";
   "wikipedia-wikitables" -> "wikipedia-page-anatomy";

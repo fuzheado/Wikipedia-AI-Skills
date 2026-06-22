@@ -685,6 +685,7 @@ The full CDN mirror guide with troubleshooting is at **[references/cdn-mirror-gu
 |--------------|-----|
 | **[wikimedia-database](../wikimedia-database/SKILL.md)** | SQL replicas — SSH tunnel setup shared with Toolforge |
 | **[toolforge-nodejs](../toolforge-nodejs/SKILL.md)** | Node.js web services on Toolforge Kubernetes |
+| **[toolforge-python](../toolforge-python/SKILL.md)** | Python web services on Toolforge Kubernetes (Flask + gunicorn) |
 | **[wikimedia-eventstreams](../wikimedia-eventstreams/SKILL.md)** | Real-time streams for monitoring tool events |
 | **[wikimedia-i18n-l10n-for-tools](../wikimedia-i18n-l10n-for-tools/SKILL.md)** | Multilingual design for Toolforge tools |
 | **[wikimedia-ml-services](../wikimedia-ml-services/SKILL.md)** | ML inference (Lift Wing) — often deployed as Toolforge services |

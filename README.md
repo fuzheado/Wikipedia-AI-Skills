@@ -50,6 +50,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [wikipedia-edit-history](.claude/skills/wikipedia-edit-history/SKILL.md) | Read and analyze Wikipedia's page revision history — diffs, edit summaries, user contributions, byte changes, rollback, and understanding how a page evolved over time |
 | [wikimedia-diffs](.claude/skills/wikimedia-diffs/SKILL.md) | Fetch, compare, and interpret diffs between Wikipedia page revisions — wikitext changes, visual differences, and diff statistics via the Action API and REST API |
 | [wikipedia-talk-page](.claude/skills/wikipedia-talk-page/SKILL.md) | Navigate and participate in Wikipedia talk pages — modern DiscussionTools (Reply Tool, Topic Subscriptions, Permalinks), Usability Improvements, community gadgets, wikitext conventions, WikiProject banners, archives, and talk page etiquette |
+| [wikipedia-wikiprojects](.claude/skills/wikipedia-wikiprojects/SKILL.md) | Understand and work with English Wikipedia's WikiProject system — finding relevant projects, interpreting assessment tables, using Popular pages and work lists, and navigating project directories |
 | | **▸ Working with Content** |
 | [wikimedia-wikitext](.claude/skills/wikimedia-wikitext/SKILL.md) | Parse, extract, and manipulate Wikipedia and MediaWiki wikitext (templates, infoboxes, citations, links) using proper AST-based tooling instead of fragile regex patterns |
 | [wikidata](.claude/skills/wikidata/SKILL.md) | Understand and query Wikidata — the free, collaborative, multilingual knowledge graph that underpins Wikipedia's inter-language links, Commons structured data, and semantic facts across all Wikimedia projects. Covers SPARQL, the Wikibase REST/Action APIs, RDF data dumps, and semantic web concepts |
@@ -93,6 +94,7 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | [wikimedia-database](.claude/skills/wikimedia-database/SKILL.md) | Execute SQL queries against Wikipedia database replicas (enwiki, wikidata, commonswiki) via an SSH tunnel to Toolforge, with connection management and data handling guardrails |
 | [wikimedia-toolforge](.claude/skills/wikimedia-toolforge/SKILL.md) | Manage Toolforge accounts, web services, Kubernetes pods, cron jobs, file deployment, and privacy-preserving CDN assets for Wikimedia tools |
 | [toolforge-nodejs](.claude/skills/toolforge-nodejs/SKILL.md) | Deploy and manage Node.js web services on Wikimedia Toolforge Kubernetes — zero-dependency server patterns, webservice commands, PORT configuration, static file serving with caching headers, npm on NFS, environment variables, logging, and common pitfalls |
+| [toolforge-python](.claude/skills/toolforge-python/SKILL.md) | Deploy and manage Python web services on Wikimedia Toolforge Kubernetes — Flask and gunicorn setup, webservice commands, virtual environments on NFS, pip caching, PORT configuration, static file serving, logging, and cron jobs |
 | [wikimedia-phabricator](.claude/skills/wikimedia-phabricator/SKILL.md) | Navigate Wikimedia's Phabricator instance — search tasks, interpret task status and project tags, file bug reports, and track WMF development priorities |
 | [wikimedia-i18n-l10n-for-tools](.claude/skills/wikimedia-i18n-l10n-for-tools/SKILL.md) | Design multilingual Toolforge tools — message files and ICU plurals, language detection and fallback chains, RTL/bidi layout, Unicode normalization, cross-wiki domain mapping, batch Wikidata label fetching, and avoiding English Wikipedia assumptions |
 | | **▸ Search & Data** |
@@ -124,6 +126,7 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | Analyze page revision history, diffs, user contributions, and detect vandalism | [wikipedia-edit-history](.claude/skills/wikipedia-edit-history/SKILL.md) |
 | Compare two revisions and understand what changed | [wikimedia-diffs](.claude/skills/wikimedia-diffs/SKILL.md) |
 | Participate in talk page discussions, sign comments, and find WikiProject assessments | [wikipedia-talk-page](.claude/skills/wikipedia-talk-page/SKILL.md) |
+| Find the right WikiProject for an article topic | [wikipedia-wikiprojects](.claude/skills/wikipedia-wikiprojects/SKILL.md) |
 | | **▸ Working with Content** |
 | Extract infobox data, citations, or internal links from an article's wikitext | [wikimedia-wikitext](.claude/skills/wikimedia-wikitext/SKILL.md) |
 | Query Wikidata with SPARQL — find items, traverse properties, filter by value | [wikidata](.claude/skills/wikidata/SKILL.md) |
@@ -163,7 +166,8 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | Handle API errors gracefully with retry and backoff | [wikipedia-error-handling](.claude/skills/wikipedia-error-handling/SKILL.md) |
 | Query Wikipedia SQL replicas from Toolforge | [wikimedia-database](.claude/skills/wikimedia-database/SKILL.md) |
 | Deploy a web service, cron job, or bot on Toolforge | [wikimedia-toolforge](.claude/skills/wikimedia-toolforge/SKILL.md) |
-| Deploy a Node.js app on Toolforge (zero-dependency or with npm) | [toolforge-nodejs](.claude/skills/toolforge-nodejs/SKILL.md) |
+| Deploy a Node.js app on Toolforge | [toolforge-nodejs](.claude/skills/toolforge-nodejs/SKILL.md) |
+| Deploy a Python app on Toolforge (Flask + gunicorn) | [toolforge-python](.claude/skills/toolforge-python/SKILL.md) |
 | Run Python bots at scale (edit 10K pages, harvest templates, transfer files) | [pywikibot](.claude/skills/pywikibot/SKILL.md) |
 | Watch Wikipedia edits in real time and build live dashboards | [wikimedia-eventstreams](.claude/skills/wikimedia-eventstreams/SKILL.md) |
 | Search wikis with advanced CirrusSearch syntax | [wikimedia-search-cirrussearch](.claude/skills/wikimedia-search-cirrussearch/SKILL.md) |
