@@ -2,7 +2,7 @@
 """Convert skills-network.dot to an interactive HTML force-directed graph."""
 import re, json
 
-with open("skills-network.dot") as f:
+with open("docs/skills-network.dot") as f:
     dot = f.read()
 
 # Parse nodes
@@ -152,7 +152,7 @@ sim.on("tick", () => {{
 </body>
 </html>"""
 
-with open("skills-network.html", "w") as f:
+with open("docs/skills-network.html", "w") as f:
     f.write(html)
 
 print(f"Generated skills-network.html — {len(nodes)} nodes, {len(edges)} edges")
