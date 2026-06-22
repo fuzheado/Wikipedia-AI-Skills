@@ -345,6 +345,7 @@ action=query&titles=Title&format=json
 - **wikipedia-edit-history** — Complements this skill by covering the revision history side of a page.
 - **wikimedia-wikitext** — For programmatic parsing and manipulation of infoboxes, templates, and other page components.
 - **wikimedia-api-access** — The page anatomy operations rely on the Action API; defer to this skill for User-Agent, rate limiting, and error handling.
+- **wikipedia-wikiprojects** — WikiProjects assess articles and organize topic-area work; their banners appear on talk pages.
 
 ---
 
