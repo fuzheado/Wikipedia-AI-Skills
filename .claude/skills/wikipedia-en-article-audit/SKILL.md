@@ -32,7 +32,7 @@ below, stopping at Phase 2 for human review and resuming after the reviewer
 returns their findings.
 
 ```
-User:  "Audit the article on Pyrrhus Concer."
+User:  "Audit the English Wikipedia article on Pyrrhus Concer."
 
 Agent: ▶ Runs Phase 1 (diagnosis)
        ▶ Presents diagnosis + sentences.jsonl to human reviewer

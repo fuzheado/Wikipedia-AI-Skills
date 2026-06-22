@@ -30,66 +30,79 @@ These skills are designed to **help you research, understand, and prepare conten
 
 ## Skills
 
+This repository contains **45 skills** organized into two groups.
+
 ### 📝 For editors and contributors
 
-Skills are arranged from **foundational** (understanding how Wikipedia works) to **specialized** (analyzing and creating content).
+Skills are arranged from **foundational** (understanding how Wikipedia works) to
+**specialized** (analyzing and creating content).
 
 | Skill | What it helps with |
 |-------|-------------------|
 | | **▸ Understanding Wikipedia** |
 | [wikipedia-page-anatomy](.claude/skills/wikipedia-page-anatomy/SKILL.md) | Navigate and understand the structure of a Wikipedia article — infoboxes, categories, references, templates, navboxes, redirects, disambiguation, and protection levels |
 | [wikipedia-templates](.claude/skills/wikipedia-templates/SKILL.md) | Create, design, and understand MediaWiki templates — template syntax, parser functions, magic words, transclusion vs substitution, Lua modules, template types taxonomy, API detection, and maintenance workflows |
-| [wikipedia-categories](.claude/skills/wikipedia-categories/SKILL.md) | Understand and work with Wikipedia's category system — category trees, the three tests for valid categories (Verifiable/Neutral/Defining), topic vs. set categories, sort keys and DEFAULTSORT, all API query patterns, Pywikibot generators, PetScan/WDQS/Special pages, overcategorization rules, category maintenance, and a full comparison of all access methods |
-| [wikipedia-edit-history](.claude/skills/wikipedia-edit-history/SKILL.md) | Read and analyze Wikipedia's page revision history — diffs, edit summaries, user contributions, byte changes, and vandalism detection |
-| [wikimedia-diffs](.claude/skills/wikimedia-diffs/SKILL.md) | Fetch, compare, and interpret diffs between Wikipedia page revisions — byte changes, HTML diff tables, and edit statistics |
+| [wikipedia-categories](.claude/skills/wikipedia-categories/SKILL.md) | Understand and work with Wikipedia's category system — category trees, the three tests for valid categories (Verifiable/Neutral/Defining), topic vs. set categories, sort keys and DEFAULTSORT, API query patterns, Pywikibot generators, PetScan, overcategorization rules, and category maintenance |
+| [wikipedia-edit-history](.claude/skills/wikipedia-edit-history/SKILL.md) | Read and analyze Wikipedia's page revision history — diffs, edit summaries, user contributions, byte changes, rollback, and understanding how a page evolved over time |
+| [wikimedia-diffs](.claude/skills/wikimedia-diffs/SKILL.md) | Fetch, compare, and interpret diffs between Wikipedia page revisions — wikitext changes, visual differences, and diff statistics via the Action API and REST API |
 | [wikipedia-talk-page](.claude/skills/wikipedia-talk-page/SKILL.md) | Navigate and participate in Wikipedia talk pages — modern DiscussionTools (Reply Tool, Topic Subscriptions, Permalinks), Usability Improvements, community gadgets, wikitext conventions, WikiProject banners, archives, and talk page etiquette |
 | | **▸ Working with Content** |
-| [wikimedia-wikitext](.claude/skills/wikimedia-wikitext/SKILL.md) | Parse, extract, and manipulate Wikipedia and MediaWiki wikitext (templates, infoboxes, citations, links) using proper AST-based tooling or the Parsoid HTML REST API |
+| [wikimedia-wikitext](.claude/skills/wikimedia-wikitext/SKILL.md) | Parse, extract, and manipulate Wikipedia and MediaWiki wikitext (templates, infoboxes, citations, links) using proper AST-based tooling instead of fragile regex patterns |
 | [wikidata](.claude/skills/wikidata/SKILL.md) | Understand and query Wikidata — the free, collaborative, multilingual knowledge graph that underpins Wikipedia's inter-language links, Commons structured data, and semantic facts across all Wikimedia projects. Covers SPARQL, the Wikibase REST/Action APIs, RDF data dumps, and semantic web concepts |
-| [wikidata-vector-search](.claude/skills/wikidata-vector-search/SKILL.md) | Query Wikidata by meaning, concept, or natural-language description using the Wikidata Vector Database's semantic embeddings — fuzzy semantic search, "find like this", cross-lingual retrieval, and similarity scoring when you don't know the exact QID or label |
-| [wikimedia-commons-sparql](.claude/skills/wikimedia-commons-sparql/SKILL.md) | Query Wikimedia Commons structured data via SPARQL — MediaInfo entities (M IDs), depicts/copyright/licensing graph, Schema.org media metadata, and federated queries with Wikidata. Covers both the official WCQS endpoint (OAuth-authenticated) and the QLever third-party endpoint (no auth required) |
-| [wikimedia-commons-sdc](.claude/skills/wikimedia-commons-sdc/SKILL.md) | Add, edit, and manage Structured Data on Commons (SDC) — MediaInfo captions, depicts statements, copyright and license metadata, qualifiers, references, and batch/GLAM workflows via the Wikibase Action API, web UI, and community tools (ISA Tool, OpenRefine, AC/DC, QuickStatements) |
-| [wikipedia-citations](.claude/skills/wikipedia-citations/SKILL.md) | Master Wikipedia citations — CS1/CS2 templates, Wayback Machine archiving, dead link detection, bare URL expansion, citation validation, and maintenance templates |
+| [wikidata-vector-search](.claude/skills/wikidata-vector-search/SKILL.md) | Query Wikidata by meaning, concept, or natural-language description using semantic embeddings — fuzzy semantic search, concept matching, similarity lookups, cross-lingual retrieval, and "find like this" when you don't know the exact QID or label |
+| [wikipedia-citations](.claude/skills/wikipedia-citations/SKILL.md) | Master Wikipedia citations — CS1/CS2 templates, Wayback Machine archiving, dead link detection, bare URL expansion, citation maintenance, and reference validation |
+| [wikipedia-wikitables](.claude/skills/wikipedia-wikitables/SKILL.md) | Create, parse, style, and fix MediaWiki wikitable syntax — delimiters, header/data cells, CSS classes, inline styling, rowspan/colspan, accessibility attributes, sortable and collapsible tables, and programmatic table generation from data |
+| [wikimedia-page-styling](.claude/skills/wikimedia-page-styling/SKILL.md) | Use TemplateStyles to load custom CSS on wiki pages — build responsive grid/flexbox layouts, card-based tile systems, color themes, button systems, and full visual design systems that transform plain MediaWiki pages into rich, interactive-looking interfaces |
+| [mediawiki-page-navigation](.claude/skills/mediawiki-page-navigation/SKILL.md) | Build navigation systems in MediaWiki — menu bars, subpage hierarchies, breadcrumbs, tabs, and the template logic that powers them |
+| [mediawiki-translate-extension](.claude/skills/mediawiki-translate-extension/SKILL.md) | Work with the Translate extension for multilingual wiki content — marking pages for translation, writing translatable templates, and building i18n-aware navigation |
+| | **▸ Commons & Media** |
 | [wikimedia-commons](.claude/skills/wikimedia-commons/SKILL.md) | Search, upload, and understand Wikimedia Commons — the free media repository of images, video, sound, 3D files, PDFs, and other media used across Wikipedia and its sister projects. Browse categories, find reusable media, and retrieve file metadata |
-| [wikimedia-commons-sdc](.claude/skills/wikimedia-commons-sdc/SKILL.md) | Add, edit, and manage Structured Data on Commons (SDC) — MediaInfo captions, depicts statements, copyright and license metadata, qualifiers, references, and batch/GLAM workflows via the Wikibase Action API, web UI, and community tools (ISA Tool, OpenRefine, AC/DC, QuickStatements) |
-| [wikimedia-commons-sparql](.claude/skills/wikimedia-commons-sparql/SKILL.md) | Query Wikimedia Commons structured data via SPARQL — MediaInfo entities (M IDs), depicts/copyright/licensing graph, Schema.org media metadata, and federated queries with Wikidata. Covers both the official WCQS endpoint (OAuth-authenticated) and the QLever third-party endpoint (no auth required) |
-| [wikipedia-wikitables](.claude/skills/wikipedia-wikitables/SKILL.md) | Create, parse, style, and fix MediaWiki wikitable syntax — delimiters, header/data cells, CSS classes, inline CSS styling (alignment, colors, backgrounds), rowspan/colspan, accessibility `scope` attributes, sortable and collapsible tables, and programmatic table generation from Python/CSV data |
-| [wikimedia-page-styling](.claude/skills/wikimedia-page-styling/SKILL.md) | Use TemplateStyles to load custom CSS on wiki pages — build responsive grid/flexbox layouts, card-based tile systems, color themes, button systems, and full visual design systems that transform plain wiki pages into rich, interactive-looking interfaces |
-| [mediawiki-page-navigation](.claude/skills/mediawiki-page-navigation/SKILL.md) | Build navigation systems in MediaWiki — menu bars, subpage hierarchies, breadcrumbs, tabs, and the template logic that powers them. Covers `#titleparts`, `#ifexist`, dynamic sub-navigation loading, and page-hierarchy-aware link generation |
-| [mediawiki-translate-extension](.claude/skills/mediawiki-translate-extension/SKILL.md) | Work with the Translate extension for multilingual wiki content — marking pages for translation, writing translatable templates, using `#timef` for locale-aware dates, managing language subpages, and building i18n-aware navigation |
+| [commons-file-resolution](.claude/skills/commons-file-resolution/SKILL.md) | Resolve Wikimedia Commons file references to browser-usable HTTP URLs — direct origin URLs, thumbnails, Special:FilePath redirects, cache-busting with timestamps, Action API imageinfo queries, and CORS-aware serving patterns for web applications |
+| [wikimedia-commons-thumbnails](.claude/skills/wikimedia-commons-thumbnails/SKILL.md) | Generate, construct, and retrieve raster thumbnail previews for any Wikimedia Commons file — thumb URL scheme, iiurlwidth/iiurlheight API pattern, thumbmime format conversion matrix, responsive/retina URLs, REST API thumbnails, and SPARQL thumbnailUrl |
+| [wikimedia-commons-svg](.claude/skills/wikimedia-commons-svg/SKILL.md) | Work with SVG files on Wikimedia Commons — viewing and retrieving raw SVG source vs PNG preview, W3C validation badges, creation tools (Inkscape, Illustrator), optimization (scour, SVGO), versioning and diffing SVG revisions, and SVG-specific templates and categories |
+| [wikimedia-commons-pdf](.claude/skills/wikimedia-commons-pdf/SKILL.md) | Work with PDF and DjVu documents on Wikimedia Commons — multi-page document model, page selection for thumbnails, page dimensions, uploading large documents, Wikisource proofread integration, OCR text extraction, and document metadata |
+| [wikimedia-commons-audio-video](.claude/skills/wikimedia-commons-audio-video/SKILL.md) | Work with audio and video files on Wikimedia Commons — format policies and patent restrictions, uploading and transcoding, metadata via the Action API, keyframe thumbnails for video, the TimedMediaHandler player widget, TimedText subtitles, and creating derivative clips |
+| [wikimedia-commons-sdc](.claude/skills/wikimedia-commons-sdc/SKILL.md) | Add, edit, and manage Structured Data on Commons (SDC) — MediaInfo captions, depicts statements, copyright and license metadata, qualifiers, references, and batch/GLAM workflows via the Wikibase Action API, web UI, and community tooling |
+| [wikimedia-commons-sparql](.claude/skills/wikimedia-commons-sparql/SKILL.md) | Query Wikimedia Commons structured data via SPARQL — MediaInfo entities (M IDs), the depicts/copyright/licensing graph, Schema.org media metadata, and federated queries with Wikidata. Covers both the official WCQS endpoint and the QLever third-party endpoint |
 | | **▸ Analyzing Articles** |
-| [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties or the REST API |
+| [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties (sorting/filtering) or the REST API (precise historical data) |
 | [wikimedia-page-assessment](.claude/skills/wikimedia-page-assessment/SKILL.md) | Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners on any Wikimedia wiki with the PageAssessments extension |
 | [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) | Score article quality, revert risk, edit quality (goodfaith/damaging), readability, topic classification, reference quality, language identification, content translation recommendations, article descriptions, and article country using Wikimedia ML inference APIs (Lift Wing and legacy ORES) |
-| [wikipedia-reference-verifiability](.claude/skills/wikipedia-reference-verifiability/SKILL.md) | Analyze whether a page's references contain URLs — detect bare plain-text citations, template-based citations without `url=` parameters, shortened footnotes (harvsp/sfn), and named ref reuse. Useful for article quality assessment, NPP review triage, and citation maintenance |
+| [wikipedia-reference-verifiability](.claude/skills/wikipedia-reference-verifiability/SKILL.md) | Analyze whether a Wikipedia page's references contain URLs — detect bare plain-text citations, template-based citations without url= parameters, shortened footnotes, and named ref reuse. Useful for article quality assessment, NPP triage, and citation maintenance |
 | | **▸ Writing & Improving** |
 | [wikipedia-en-biography-writing](.claude/skills/wikipedia-en-biography-writing/SKILL.md) | Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and biographies of living persons (BLP) policies |
-| [wikipedia-en-article-audit](.claude/skills/wikipedia-en-article-audit/SKILL.md) | Audit a Wikipedia article for structural issues, factual errors, and NPOV violations, then produce a machine-readable task graph (DAG) that another agent can execute to fix all identified problems |
+| [wikipedia-en-article-audit](.claude/skills/wikipedia-en-article-audit/SKILL.md) | Audit an English Wikipedia article for structural issues, factual errors, and NPOV violations, then produce a machine-readable task graph (DAG) that another agent can execute to fix all identified problems |
+| [wikipedia-notability-assessment](.claude/skills/wikipedia-notability-assessment/SKILL.md) | Evaluate whether a subject meets Wikipedia notability guidelines — the General Notability Guideline (GNG), all 13 subject-specific SNGs with decision trees, source quality evaluation, structured report generation, AfD-ready summaries, and common invalid arguments |
+| [wiktionary-and-wikisource](.claude/skills/wiktionary-and-wikisource/SKILL.md) | Work with Wiktionary (dictionary entries, translation tables, etymologies, audio pronunciations, lexemes) and Wikisource (proofread page workflow, OCR text extraction, quality validation, compiled works) — the two largest Wikimedia content projects after Wikipedia |
 
+### 🛠 For tool developers
 
-### 🛠️ For tool developers
+Skills for building bots, web apps, and data pipelines on Wikimedia infrastructure.
 
 | Skill | What it helps with |
 |-------|-------------------|
 | [wikimedia-api-access](.claude/skills/wikimedia-api-access/SKILL.md) | Access Wikipedia and Wikimedia APIs (REST, Action, SPARQL) with correct User-Agent headers, rate limiting, and 429/403 error handling |
-| [wikipedia-error-handling](.claude/skills/wikipedia-error-handling/SKILL.md) | Handle HTTP errors, rate limits, and API failures across all Wikimedia services — retry strategies, backoff patterns, error response formats, and recovery procedures for the Action API, REST API, SPARQL, Lift Wing ML, and EventStreams. Ships with an `api_client.py` reusable Python client and a `check-api-status.sh` connectivity checker. |
-| [wikimedia-api-strategy](.claude/skills/wikimedia-api-strategy/SKILL.md) | Choose the right Wikimedia API or tool for the task — decision framework covering REST API, Action API, SPARQL, SQL database replicas, EventStreams, and Pywikibot, with latency/complexity/authentication trade-offs. Ships with an `api_selector.py` importable module and an `api-strategy.sh` interactive CLI. |
-| [wikimedia-auth-oauth](.claude/skills/wikimedia-auth-oauth/SKILL.md) | Authenticate Wikimedia API clients for editing, patrol, upload, and user-specific operations — OAuth 1.0a/2.0 flows, bot passwords, CSRF tokens, permission checks, and secure credential storage for standalone tools and web apps. Ships with an importable OAuth 2.0 Python library, a Flask demo app, and a CLI bot-password editor. |
-| [wikimedia-database](.claude/skills/wikimedia-database/SKILL.md) | Execute SQL queries against Wikipedia database replicas (enwiki, wikidata, commonswiki) via an SSH tunnel to Toolforge |
+| [wikimedia-api-strategy](.claude/skills/wikimedia-api-strategy/SKILL.md) | Choose the right Wikimedia API or tool for the task — decision framework covering REST API, Action API, SPARQL, SQL replicas, EventStreams, and Pywikibot, with latency/complexity/authentication trade-offs |
+| [wikimedia-auth-oauth](.claude/skills/wikimedia-auth-oauth/SKILL.md) | Authenticate Wikimedia API clients for editing, patrol, upload, and user-specific operations — OAuth 1.0a/2.0 flows, bot passwords, CSRF tokens, and permission checks |
+| [wikipedia-error-handling](.claude/skills/wikipedia-error-handling/SKILL.md) | Handle HTTP errors, rate limits, and API failures across all Wikimedia services — retry strategies, backoff patterns, error response formats, and recovery procedures for the Action API, REST API, SPARQL, Lift Wing ML, and EventStreams |
+| [wikimedia-security-and-privacy](.claude/skills/wikimedia-security-and-privacy/SKILL.md) | Build tools that respect Wikimedia user privacy and security — data minimization, suppressed/deleted revision handling, deanonymization risks, AbuseFilter and block awareness, XSS prevention, and data retention policies for Toolforge tools |
+| [wikimedia-database](.claude/skills/wikimedia-database/SKILL.md) | Execute SQL queries against Wikipedia database replicas (enwiki, wikidata, commonswiki) via an SSH tunnel to Toolforge, with connection management and data handling guardrails |
 | [wikimedia-toolforge](.claude/skills/wikimedia-toolforge/SKILL.md) | Manage Toolforge accounts, web services, Kubernetes pods, cron jobs, and file deployment for Wikimedia tools |
+| [toolforge-nodejs](.claude/skills/toolforge-nodejs/SKILL.md) | Deploy and manage Node.js web services on Wikimedia Toolforge Kubernetes — zero-dependency server patterns, webservice commands, PORT configuration, static file serving with caching headers, npm on NFS, environment variables, logging, and common pitfalls |
 | [wikimedia-phabricator](.claude/skills/wikimedia-phabricator/SKILL.md) | Navigate Wikimedia's Phabricator instance — search tasks, interpret task status and project tags, file bug reports, and track WMF development priorities |
 | [wikimedia-cdn-assets](.claude/skills/wikimedia-cdn-assets/SKILL.md) | Load JavaScript, CSS, and fonts for Toolforge tools from Wikimedia's privacy-preserving cdnjs mirror, ensuring user privacy and policy compliance |
-| [wikimedia-security-and-privacy](.claude/skills/wikimedia-security-and-privacy/SKILL.md) | Build tools that respect Wikimedia user privacy and security — data minimization, suppressed/deleted revision handling, deanonymization risks, AbuseFilter and block awareness, XSS prevention in gadgets/apps, and data retention policies. Ships with a safe editing library with permission/block checks, a PII-safe auto-expiring cache, and a privacy audit scanner. |
-| [wikimedia-search-cirrussearch](.claude/skills/wikimedia-search-cirrussearch/SKILL.md) | Search Wikimedia wikis using CirrusSearch — syntax cheat sheet (insource, hastemplate, linksto, deepcategory, haswbstatement), API parameters, prefix vs full-text vs title search, ranking caveats, maintenance queries, and combining search with PetScan, SPARQL, and categories. Ships with a Python search client, maintenance query library, CLI search tool, and pre-built query runner |
-| [wikimedia-i18n-l10n-for-tools](.claude/skills/wikimedia-i18n-l10n-for-tools/SKILL.md) | Design multilingual Toolforge tools — message files and ICU plurals, language detection and fallback chains, RTL/bidi layout, Unicode normalization and pitfalls, cross-wiki domain mapping, batch Wikidata label fetching, and avoiding English Wikipedia assumptions. Ships with a Python i18n utils library, message file loader with fallback, batch Wikidata label fetcher, and a language fallback CLI tool |
-| [wikipedia-notability-assessment](.claude/skills/wikipedia-notability-assessment/SKILL.md) | Evaluate whether a subject meets Wikipedia notability guidelines — the GNG four-element test, all 13 subject-specific SNGs with decision trees, WP:BIO sub-criteria (8 paths), source quality assessment, structured report generation with AfD-ready summaries, common invalid argument reference, and a 15-item guardrails checklist. Ships with a Python notability checker (auto-classification, SNG decision trees, GNG scoring), a source evaluator (domain reliability checking, churnalism detection, significance classification), a notability report template system (full/afd/short/tag formats), and a CLI assessment tool |
-| [pywikibot](.claude/skills/pywikibot/SKILL.md) | Use Pywikibot - the Python library and CLI tool suite for automating work on MediaWiki sites. Covers installation, the core object model (Site, Page, Category, User, ItemPage), page generators, the bot framework, built-in scripts (archivebot, replace, harvest_template, claimit, and 50+ more), Wikidata/Wikibase integration, Commons file operations, and Toolforge/PAWS deployment |
-| [wikimedia-eventstreams](.claude/skills/wikimedia-eventstreams/SKILL.md) | Consume real-time streams of Wikimedia events (edits, page creations, deletions, moves, log entries) via Server-Sent Events (SSE). Covers all available streams, event schemas, client libraries (Python/JS/curl), client-side filtering, historical replay, canary event handling, and building live dashboards, patrol monitors, and cross-wiki trackers |
-| [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) | Score revisions and articles using Lift Wing ML models — revert risk, article quality, topic classification, readability, reference quality, language identification, and more. Includes ORES migration guidance |
-| [wikipedia-citations](.claude/skills/wikipedia-citations/SKILL.md) | Master Wikipedia citations — CS1/CS2 templates, Wayback Machine archiving, dead link detection, bare URL expansion, citation validation, and maintenance templates |
-| [wikipedia-pagetriage-api](.claude/skills/wikipedia-pagetriage-api/SKILL.md) | Work with the PageTriage extension (New Pages Feed / Page Curation) — list unreviewed pages, check patrol status, tag pages, and patrol new content on wikis where PageTriage is deployed (primarily enwiki) |
-| [wikipedia-reference-verifiability](.claude/skills/wikipedia-reference-verifiability/SKILL.md) | Analyze whether a page's references contain URLs — detect bare plain-text citations, template-based citations without `url=` parameters, shortened footnotes, and named ref reuse |
-| [wiktionary-and-wikisource](.claude/skills/wiktionary-and-wikisource/SKILL.md) | Work with Wiktionary (dictionary entries, translation tables, etymologies, audio pronunciations, lexemes) and Wikisource (proofread page workflow, OCR text extraction, quality validation, compiled works). Ships with a Wiktionary entry parser, Wikisource proofread checker, and text extractor |
+| [wikimedia-i18n-l10n-for-tools](.claude/skills/wikimedia-i18n-l10n-for-tools/SKILL.md) | Design multilingual Toolforge tools — message files and ICU plurals, language detection and fallback chains, RTL/bidi layout, Unicode normalization, cross-wiki domain mapping, batch Wikidata label fetching, and avoiding English Wikipedia assumptions |
+| | **▸ Search & Data** |
+| [wikimedia-search-cirrussearch](.claude/skills/wikimedia-search-cirrussearch/SKILL.md) | Search Wikimedia wikis using CirrusSearch — syntax cheat sheet (insource, hastemplate, linksto, deepcategory, haswbstatement), API parameters, prefix vs full-text vs title search, ranking caveats, maintenance queries, and combining search with PetScan, SPARQL, and categories |
+| [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties (sorting/filtering) or the REST API (precise historical data) |
+| [wikimedia-page-assessment](.claude/skills/wikimedia-page-assessment/SKILL.md) | Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners |
+| [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) | Score articles and revisions using Lift Wing ML models — revert risk, article quality, topic classification, readability, language identification, and more. Includes ORES migration guidance |
+| [wikipedia-pagetriage-api](.claude/skills/wikipedia-pagetriage-api/SKILL.md) | Work with the PageTriage extension (New Pages Feed / Page Curation) — list unreviewed pages, check patrol status, tag pages, and patrol new content |
+| | **▸ Automation** |
+| [pywikibot](.claude/skills/pywikibot/SKILL.md) | Use Pywikibot — the Python library and CLI tool suite for automating work on MediaWiki sites. Covers installation, the core object model, page generators, the bot framework, built-in scripts, and Wikidata/Commons integration |
+| [wikimedia-eventstreams](.claude/skills/wikimedia-eventstreams/SKILL.md) | Consume real-time streams of Wikimedia events (edits, page creations, deletions, moves, log entries) via Server-Sent Events (SSE). Covers stream schemas, client libraries, filtering, historical replay, and building live dashboards |
+| [wikipedia-pagetriage-api](.claude/skills/wikipedia-pagetriage-api/SKILL.md) | Work with the PageTriage extension (New Pages Feed / Page Curation) — list unreviewed pages, check patrol status, tag pages, and patrol new content |
+
 
 ---
 
@@ -98,109 +111,63 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | If you want to... | Use this skill |
 |---|---|
 | | **▸ Understanding Wikipedia** |
-| Understand the structure of a Wikipedia article (infobox, categories, templates, navboxes) | `wikipedia-page-anatomy` |
-| Understand how MediaWiki templates work — syntax, parser functions, magic words, Lua modules | `wikipedia-templates` |
-| Create, inspect, or design a new template for a Wikipedia article | `wikipedia-templates` |
-| Understand the category system — valid categories, sort keys, tree structure, and querying | `wikipedia-categories` |
-| Evaluate whether a proposed category is valid (Verifiable/Neutral/Defining test) | `wikipedia-categories` |
-| Find all pages in a category or category tree via API | `wikipedia-categories` |
+| Understand the structure of a Wikipedia article (infobox, categories, templates, navboxes) | [wikipedia-page-anatomy](.claude/skills/wikipedia-page-anatomy/SKILL.md) |
+| Understand how MediaWiki templates work — syntax, parser functions, magic words, Lua modules | [wikipedia-templates](.claude/skills/wikipedia-templates/SKILL.md) |
+| Create, inspect, or design a new template for a Wikipedia article | [wikipedia-templates](.claude/skills/wikipedia-templates/SKILL.md) |
+| Understand the category system — valid categories, sort keys, tree structure, and querying | [wikipedia-categories](.claude/skills/wikipedia-categories/SKILL.md) |
+| Evaluate whether a proposed category is valid (Verifiable/Neutral/Defining test) | [wikipedia-categories](.claude/skills/wikipedia-categories/SKILL.md) |
+| Find all pages in a category or category tree via API | [wikipedia-categories](.claude/skills/wikipedia-categories/SKILL.md) |
 | Find the intersection of two categories | `bash .claude/skills/wikipedia-categories/assets/category-intersect.py "Physicists" "German scientists"` |
 | Inspect all categories assigned to an article with metadata | `python3 .claude/skills/wikipedia-categories/assets/category-inspector.py Albert_Einstein` |
 | Explore a category hierarchy interactively from the CLI | `bash .claude/skills/wikipedia-categories/scripts/category-tree.sh Physics 3 pages` |
-| Analyze page revision history, diffs, user contributions, and detect vandalism | `wikipedia-edit-history` |
-| Compare two revisions and understand what changed | `wikimedia-diffs` |
-| Participate in talk page discussions, sign comments, and find WikiProject assessments | `wikipedia-talk-page` |
+| Analyze page revision history, diffs, user contributions, and detect vandalism | [wikipedia-edit-history](.claude/skills/wikipedia-edit-history/SKILL.md) |
+| Compare two revisions and understand what changed | [wikimedia-diffs](.claude/skills/wikimedia-diffs/SKILL.md) |
+| Participate in talk page discussions, sign comments, and find WikiProject assessments | [wikipedia-talk-page](.claude/skills/wikipedia-talk-page/SKILL.md) |
 | | **▸ Working with Content** |
-| Extract infobox data, citations, or internal links from an article's wikitext | `wikimedia-wikitext` |
-| Create, style, or parse a MediaWiki table from scratch | `wikipedia-wikitables` |
-| Add custom CSS styling to a wiki page using TemplateStyles | `wikimedia-page-styling` |
-| Build navigation bars, breadcrumbs, or subpage hierarchies | `mediawiki-page-navigation` |
-| Set up a page for translation into multiple languages | `mediawiki-translate-extension` |
-| Query Wikidata for structured facts (e.g., "all museums in Paris with coordinates") | `wikidata` |
-| Classify Wikipedia articles by entity type (person, place, film, organization) | `wikidata` (batch entity classification SOP) |
-| Search Wikidata by meaning, description, or concept when you don't know the exact label | `wikidata-vector-search` |
-| Find Wikidata items semantically similar to a free-text query, across 100+ languages | `wikidata-vector-search` |
-| Disambiguate which QID a piece of text refers to by comparing similarity scores | `wikidata-vector-search` |
-| Auto-generate a full citation template from any URL, DOI, or ISBN | `python3 .claude/skills/wikipedia-citations/assets/citoid_fetcher.py https://example.com` |
-| Auto-generate a citation from a DOI | `python3 .claude/skills/wikipedia-citations/assets/citoid_fetcher.py 10.7554/eLife.32259` |
-| Generate proper citation templates manually (cite web, cite news, cite book, cite journal) | `python3 .claude/skills/wikipedia-citations/assets/citation_generator.py` |
-| Check a Wikipedia page for dead links and suggest Wayback Machine replacements | `python3 .claude/skills/wikipedia-citations/assets/dead_link_scanner.py Albert_Einstein` |
-| Lint all citations on a page for missing required parameters and issues | `python3 .claude/skills/wikipedia-citations/assets/citation_linter.py Albert_Einstein` |
+| Extract infobox data, citations, or internal links from an article's wikitext | [wikimedia-wikitext](.claude/skills/wikimedia-wikitext/SKILL.md) |
+| Query Wikidata with SPARQL — find items, traverse properties, filter by value | [wikidata](.claude/skills/wikidata/SKILL.md) |
+| Find Wikipedia articles that lack a Wikidata item | [wikidata](.claude/skills/wikidata/SKILL.md) |
+| Search Wikidata by meaning (not exact name) — fuzzy cross-lingual concept search | [wikidata-vector-search](.claude/skills/wikidata-vector-search/SKILL.md) |
 | Check if a URL is archived on the Wayback Machine | `bash .claude/skills/wikipedia-citations/scripts/archive-check.sh https://example.com` |
 | Inspect a summary of all citations on a Wikipedia page | `bash .claude/skills/wikipedia-citations/scripts/citation-inspector.sh Albert_Einstein` |
-| Expand a bare URL into a {{cite web}} template | `bash .claude/skills/wikipedia-citations/scripts/expand-bare-url.sh https://example.com` |
-| Find reusable images on Commons for a Wikipedia article | `wikimedia-commons` |
-| Set file captions and depicts statements on Commons files | `wikimedia-commons-sdc` |
-| Batch-add structured data to all files in a Commons category | `bash .claude/skills/wikimedia-commons-sdc/scripts/sdc-stats.sh "Category:Name"` |
-| Query Commons structured data via SPARQL (depicts, copyright, dimensions) | `wikimedia-commons-sparql` |
-| Run a SPARQL query against the Commons QLever endpoint | `bash .claude/skills/wikimedia-commons-sparql/scripts/commons-sparql-query.sh "SELECT ..."` |
+| Expand a bare URL into a proper citation template | `bash .claude/skills/wikipedia-citations/scripts/expand-bare-url.sh https://example.com` |
+| Auto-generate a full citation from a URL, DOI, or ISBN | `bash .claude/skills/wikipedia-citations/scripts/citoid-expand.sh 10.7554/eLife.32259` |
+| Check a Wikipedia page for dead links and suggest archives | `bash .claude/skills/wikipedia-citations/scripts/check-dead-links.sh Albert_Einstein` |
+| Create a wikitable from Python data | `python3 .claude/skills/wikipedia-wikitables/assets/wikitable_tools.py` |
+| | **▸ Commons & Media** |
+| Search Commons for freely licensed images, audio, video, and documents | [wikimedia-commons](.claude/skills/wikimedia-commons/SKILL.md) |
+| Generate thumbnail URLs for any Commons file at any size | [wikimedia-commons-thumbnails](.claude/skills/wikimedia-commons-thumbnails/SKILL.md) |
+| Create responsive/retina image URLs from Commons files | [wikimedia-commons-thumbnails](.claude/skills/wikimedia-commons-thumbnails/SKILL.md) |
+| Serve Commons images in a browser app (handle CORS issues) | [commons-file-resolution](.claude/skills/commons-file-resolution/SKILL.md) |
+| Query Commons structured data via SPARQL (find files by license, depicts, camera) | [wikimedia-commons-sparql](.claude/skills/wikimedia-commons-sparql/SKILL.md) |
+| Add depicts/captions/copyright statements to Commons files | [wikimedia-commons-sdc](.claude/skills/wikimedia-commons-sdc/SKILL.md) |
 | | **▸ Analyzing Articles** |
-| Check how popular an article is and see its traffic trends | `wikimedia-pageviews` |
-| Find article quality ratings (FA/GA/B/C/Start/Stub) and WikiProject assessments | `wikimedia-page-assessment` |
-| Check whether a page's references have any clickable URLs | `wikipedia-reference-verifiability` |
-| Find new Wikipedia pages with suspicious (URL-free) references | `wikipedia-pagetriage-api` (two-pass pipeline) or `wikipedia-reference-verifiability` |
-| Score the latest edit to a page and get a patrol verdict (revert risk + goodfaith + damaging) | `python3 .claude/skills/wikimedia-ml-services/assets/patrol_simulator.py Albert_Einstein` |
+| Get pageview statistics — how many people read an article? | [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) |
+| Check article quality and WikiProject ratings (FA, GA, B, C, Start, Stub) | [wikimedia-page-assessment](.claude/skills/wikimedia-page-assessment/SKILL.md) |
+| Score an article for quality and readability with ML | [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) |
 | Get a full article quality report (quality + readability + topics + reference risk) | `python3 .claude/skills/wikimedia-ml-services/assets/article_quality_report.py Albert_Einstein en` |
-| Score a single revision against multiple models in parallel with caching | `python3 .claude/skills/wikimedia-ml-services/assets/liftwing_multi_model.py enwiki 123456789 --all` |
-| Batch score hundreds of revision IDs from a file | `cat revids.txt \| bash .claude/skills/wikimedia-ml-services/scripts/batch-score.sh enwiki revertrisk-multilingual --output csv` |
-| Interactively explore all ML models with a guided menu — no arguments to memorize | `bash .claude/skills/wikimedia-ml-services/scripts/playground.sh` |
-| Type any text and detect what language it's written in, with confidence scores | `python3 .claude/skills/wikimedia-ml-services/assets/language_explorer.py` |
+| Check if a Wikipedia page has URL-based references | [wikipedia-reference-verifiability](.claude/skills/wikipedia-reference-verifiability/SKILL.md) |
 | | **▸ Writing & Improving** |
-| Draft a well-structured Wikipedia biography with proper citations and section ordering | `wikipedia-en-biography-writing` (see ⚠️ warning above) |
-| Audit an article for factual errors, NPOV violations, and structural problems | `wikipedia-en-article-audit` (read-only — never edits live articles) |
-| | **▸ Building Tools** |
-| Figure out which API or tool to use for a given task | `wikimedia-api-strategy` |
-| Authenticate a tool to edit Wikipedia on behalf of a user | `wikimedia-auth-oauth` |
-| Build a multi-user web app with OAuth 2.0 login (Wikimedia account) | `wikimedia-auth-oauth` (Flask demo app template) |
-| Write a bot that edits pages using a bot password | `wikimedia-auth-oauth` (CLI bot-password editor) |
-| Check a user's permissions before attempting a wiki action | `wikimedia-auth-oauth` (`oauth2_client.py` library) |
-| Securely store OAuth tokens and bot passwords on Toolforge | `wikimedia-auth-oauth` (credential storage SOP) |
-| Build a bot or script that fetches data from Wikipedia | `wikimedia-api-access` |
-| Handle HTTP 429/403/422 errors and retry failed API calls | `wikipedia-error-handling` |
-| Test which Wikimedia APIs are reachable from your environment | `bash .claude/skills/wikipedia-error-handling/scripts/check-api-status.sh` |
-| Use a reusable Python client with built-in retry and rate limiting | `python3 .claude/skills/wikipedia-error-handling/assets/api_client.py --help` |
-| Chain multiple APIs (Pageviews → Wikidata → content analysis) with correct title normalization | `wikimedia-api-access` (cross-API pipeline script) |
-| Run SQL queries on the Wikipedia database to analyze page data at scale | `wikimedia-database` |
-| Deploy a web tool to Toolforge and manage its services | `wikimedia-toolforge` |
-| Load jQuery, Bootstrap, or fonts in a Toolforge tool without breaking privacy policy | `wikimedia-cdn-assets` |
-| Audit your tool for privacy issues (hardcoded secrets, IP logging, XSS) | `bash .claude/skills/wikimedia-security-and-privacy/scripts/check-tool-privacy.sh .` |
-| Check if a user can edit a page (block, protection, rights) before acting | `python3 -c "from safe_editor import SafeEditor; ..."` |
-| Cache user data with automatic expiry and PII-safe logging | `python3 .claude/skills/wikimedia-security-and-privacy/assets/privacy_cache.py` |
-| Handle suppressed/deleted revisions safely in tool output | `wikimedia-security-and-privacy` (suppressed revision SOP) |
-| Find pages matching complex criteria (by template, category, link, wikitext, or structured data) | `wikimedia-search-cirrussearch` |
-| Run a CirrusSearch query from the command line against any Wikimedia wiki | `bash .claude/skills/wikimedia-search-cirrussearch/scripts/cirrus-search.sh "hastemplate:Infobox scientist"` |
-| Run common maintenance queries (unsourced BLPs, dead links, missing images, etc.) | `bash .claude/skills/wikimedia-search-cirrussearch/scripts/maintenance-queries.sh unsourced-blp` |
-| Programmatically search with full CirrusSearch syntax in Python | `python3 .claude/skills/wikimedia-search-cirrussearch/assets/search_client.py --help` |
-| List all available maintenance query types | `bash .claude/skills/wikimedia-search-cirrussearch/scripts/maintenance-queries.sh list` |
-| Build a multilingual Toolforge tool with proper i18n | `wikimedia-i18n-l10n-for-tools` |
-| Detect the user's language from browser Accept-Language header | `python3 .claude/skills/wikimedia-i18n-l10n-for-tools/assets/i18n_utils.py detect "fr-CH, fr;q=0.9, en;q=0.8"` |
-| Resolve a language's fallback chain (e.g., pt-br → pt → es → en) | `python3 .claude/skills/wikimedia-i18n-l10n-for-tools/assets/i18n_utils.py fallback pt-br` |
-| Load translated messages with automatic fallback in Python | `python3 .claude/skills/wikimedia-i18n-l10n-for-tools/assets/message_loader.py` |
-| Fetch Wikidata labels in multiple languages with fallback | `python3 .claude/skills/wikimedia-i18n-l10n-for-tools/assets/wikidata_labels.py Q937 --lang ar` |
-| Look up a language's fallback chain from the CLI | `bash .claude/skills/wikimedia-i18n-l10n-for-tools/scripts/language-fallback.sh fr` |
-| Check if a language is right-to-left | `python3 .claude/skills/wikimedia-i18n-l10n-for-tools/assets/i18n_utils.py rtl ar` |
-| Look up a word's definitions across all languages on Wiktionary | `bash .claude/skills/wiktionary-and-wikisource/scripts/wt-entry-summary.sh word en` |
-| Check proofreading progress for a Wikisource work | `bash .claude/skills/wiktionary-and-wikisource/scripts/ws-page-status.sh en "Index:Pride and Prejudice"` |
-| Extract OCR text from a Wikisource page for proofreading | `bash .claude/skills/wiktionary-and-wikisource/scripts/ws-text-extract.sh en "Page:Pride and Prejudice/1"` |
-| Assess whether a subject is notable enough for a Wikipedia article | `python3 .claude/skills/wikipedia-notability-assessment/assets/notability_checker.py "Jane Smith" --description "Professor at MIT, Nobel Prize winner"` |
-| Classify which SNG applies to a subject and check criteria | `python3 .claude/skills/wikipedia-notability-assessment/assets/notability_checker.py "Smith" --type academic --description "Named chair at MIT"` |
-| Evaluate a source URL for notability (reliable, independent, significant) | `python3 .claude/skills/wikipedia-notability-assessment/assets/source_evaluator.py --url "https://nature.com/article" --type academic_journal` |
+| Draft a biography article with proper structure, citations, and NPOV | [wikipedia-en-biography-writing](.claude/skills/wikipedia-en-biography-writing/SKILL.md) |
+| Audit an article for structural issues and generate a fix-it task plan | [wikipedia-en-article-audit](.claude/skills/wikipedia-en-article-audit/SKILL.md) |
+| Evaluate whether a subject is notable enough for Wikipedia | [wikipedia-notability-assessment](.claude/skills/wikipedia-notability-assessment/SKILL.md) |
+| Assess notability from the CLI | `python3 .claude/skills/wikipedia-notability-assessment/assets/notability_checker.py "Jane Smith" --description "Professor at MIT, Nobel Prize winner"` |
 | Generate an AfD-ready notability summary | `python3 .claude/skills/wikipedia-notability-assessment/assets/notability_checker.py "Test" --description "desc" --json` |
-| Quick notability check from the command line | `bash .claude/skills/wikipedia-notability-assessment/scripts/notability-check.sh "Jane Smith" --type academic --desc "Nobel laureate in physics"` |
-| Run bulk bot operations (edit 10K pages, scrape templates into Wikidata, archive talk pages, move categories) | `pywikibot` |
-| Write a custom Wikipedia bot in a few lines of Python | `pywikibot` |
-| Harvest infobox data from Wikipedia into Wikidata statements | `pywikibot` (harvest_template script) |
-| Fix redirected categories across an entire wiki | `pywikibot` (category_redirect script) |
-| Transfer images from a local wiki to Wikimedia Commons with full attribution history | `pywikibot` (image_transfer script) |
-| List unreviewed pages in the New Pages Feed queue | `wikipedia-pagetriage-api` (requires patrol right) |
-| Check a page's review/patrol status | `wikipedia-pagetriage-api` |
-| Watch Wikipedia edits happen in real time as a live feed | `wikimedia-eventstreams` |
-| Build a live dashboard showing edits per minute or active editors | `wikimedia-eventstreams` |
-| Monitor cross-wiki activity by the same user across multiple projects simultaneously | `wikimedia-eventstreams` |
-| Detect vandalism or automated imports on Wikidata in real time | `wikimedia-eventstreams` |
-| Replay past events from a stream (up to 31 days of history) | `wikimedia-eventstreams` (historical replay) |
-
----
+| Parse a Wiktionary entry for definitions, translations, and pronunciations | [wiktionary-and-wikisource](.claude/skills/wiktionary-and-wikisource/SKILL.md) |
+| Check proofreading progress for a Wikisource work | `bash .claude/skills/wiktionary-and-wikisource/scripts/ws-page-status.sh en "Index:Pride and Prejudice"` |
+| | **▸ Building Tools** |
+| Call any Wikimedia API with correct User-Agent and rate limiting | [wikimedia-api-access](.claude/skills/wikimedia-api-access/SKILL.md) |
+| Choose the right API for the task (REST vs Action vs SPARQL vs SQL vs EventStreams) | [wikimedia-api-strategy](.claude/skills/wikimedia-api-strategy/SKILL.md) |
+| Authenticate tool users with OAuth or bot passwords for editing/uploading | [wikimedia-auth-oauth](.claude/skills/wikimedia-auth-oauth/SKILL.md) |
+| Handle API errors gracefully with retry and backoff | [wikipedia-error-handling](.claude/skills/wikipedia-error-handling/SKILL.md) |
+| Query Wikipedia SQL replicas from Toolforge | [wikimedia-database](.claude/skills/wikimedia-database/SKILL.md) |
+| Deploy a web service, cron job, or bot on Toolforge | [wikimedia-toolforge](.claude/skills/wikimedia-toolforge/SKILL.md) |
+| Deploy a Node.js app on Toolforge (zero-dependency or with npm) | [toolforge-nodejs](.claude/skills/toolforge-nodejs/SKILL.md) |
+| Run Python bots at scale (edit 10K pages, harvest templates, transfer files) | [pywikibot](.claude/skills/pywikibot/SKILL.md) |
+| Watch Wikipedia edits in real time and build live dashboards | [wikimedia-eventstreams](.claude/skills/wikimedia-eventstreams/SKILL.md) |
+| Search wikis with advanced CirrusSearch syntax | [wikimedia-search-cirrussearch](.claude/skills/wikimedia-search-cirrussearch/SKILL.md) |
+| Build a multilingual Toolforge tool with i18n support | [wikimedia-i18n-l10n-for-tools](.claude/skills/wikimedia-i18n-l10n-for-tools/SKILL.md) |
+| Build custom wiki pages with CSS layouts (grid, flexbox, cards) | [wikimedia-page-styling](.claude/skills/wikimedia-page-styling/SKILL.md) |
 
 ## Quick start
 

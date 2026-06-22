@@ -720,3 +720,18 @@ python3 assets/template-scanner.py "Python (programming language)" --format json
 # Show Lua module usage
 python3 assets/template-scanner.py "Berlin" --modules
 ```
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent and API patterns for template detection |
+| **[wikipedia-page-anatomy](../wikipedia-page-anatomy/SKILL.md)** | Article structure — where templates appear (infoboxes, navboxes, citations) |
+| **[wikimedia-wikitext](../wikimedia-wikitext/SKILL.md)** | AST-based template parsing with `mwparserfromhell` |
+| **[wikipedia-citations](../wikipedia-citations/SKILL.md)** | Citation templates — the most common template type on Wikipedia |
+| **[wikipedia-talk-page](../wikipedia-talk-page/SKILL.md)** | WikiProject banners on talk pages are templates |
+| **[wikipedia-wikitables](../wikipedia-wikitables/SKILL.md)** | Table templates and wikitable generation |
+| **[pywikibot](../pywikibot/SKILL.md)** | Bulk template operations (mass replacement, infobox harvesting) |
+

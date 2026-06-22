@@ -381,3 +381,15 @@ python3 assets/compare-revisions.py --page "Marie Curie" --report
 # Compare across different projects
 python3 assets/compare-revisions.py --page "Paris" --project fr.wikipedia
 ```
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent and API patterns for diff requests |
+| **[wikipedia-edit-history](../wikipedia-edit-history/SKILL.md)** | Page revision history — diffs are the natural next step after viewing history |
+| **[wikimedia-eventstreams](../wikimedia-eventstreams/SKILL.md)** | Real-time edit detection → fetch diff → classify change |
+| **[wikimedia-ml-services](../wikimedia-ml-services/SKILL.md)** | ML revert-risk scores combined with diff classification for vandalism detection |
+

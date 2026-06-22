@@ -681,3 +681,16 @@ URL in a browser before relying on it.
 | [`references/tools-decision-guide.md`](./references/tools-decision-guide.md) | When to use each tool — flowchart, pipelines, strengths/weaknesses of all 10+ methods |
 | [`references/fetch-contexts.md`](./references/fetch-contexts.md) | Where metadata fetching happens (your machine vs WMF servers vs Toolforge vs IA) and how it affects success rates |
 | [`references/perennial-sources.md`](./references/perennial-sources.md) | Community consensus on 200+ frequently discussed sources — generally reliable, no consensus, generally unreliable, deprecated, and blacklisted, organized by category with cross-references to maintenance templates |
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent and API patterns |
+| **[wikipedia-page-anatomy](../wikipedia-page-anatomy/SKILL.md)** | Article structure — where citations appear |
+| **[wikipedia-en-biography-writing](../wikipedia-en-biography-writing/SKILL.md)** | Biographies use citations extensively for BLP verification |
+| **[wikipedia-reference-verifiability](../wikipedia-reference-verifiability/SKILL.md)** | Complementary URL detection — find bare URLs and missing URL parameters |
+| **[wikipedia-categories](../wikipedia-categories/SKILL.md)** | Citation tracking categories for maintenance |
+

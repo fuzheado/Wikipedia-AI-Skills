@@ -91,7 +91,7 @@
 - GitHub repository initialized at `fuzheado/Wikipedia-AI-Skills`
 - `.claude.json` project configuration for agent discovery
 - `CONTRIBUTING.md` with skill authoring guidelines, accuracy checklist, and PR process
-- Test suite with **250+ tests across 8 modules**: YAML frontmatter validation for all 21 skills (deduplicated),
+- Test suite with **250+ tests across 8 modules**: YAML frontmatter validation for all 45 skills (deduplicated),
   mock-based unit tests for the cross-API pipeline script, content-accuracy checks for key SOPs,
   mock-based tests for the Lift Wing multi-model scorer and article quality report,
   citation tool tests (wayback, dead link scanner, linter, generator), category skill tests,

@@ -10,9 +10,9 @@
 
 ## What This Is
 
-This repo has **8 skills** in `.claude/skills/<name>/SKILL.md`. Initially, each
-was just a single `SKILL.md` file with instructions. The goal is to **enhance
-each skill** with the full agent-skills structure:
+This repo has **45 skills** in `.claude/skills/<name>/SKILL.md`. Initially, each
+was just a single `SKILL.md` file with instructions. The goal was to **enhance
+every skill** with the full agent-skills structure — completed June 2026.
 
 ```
 my-skill/
@@ -108,7 +108,11 @@ Run every script. Import/test every template. Verify SKILL.md renders correctly.
 
 ---
 
-## ✅ Completed: All 8 Skills
+## ✅ Completed: All 45 Skills
+
+The enhancement project is complete. Every skill in the repository now has
+scripts, reference docs, and/or assets. The 8 skills below were the first to
+receive full treatment and served as the reference implementation.
 
 ### 1. `wikimedia-database`
 | File | Type | Purpose |

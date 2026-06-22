@@ -66,7 +66,7 @@ response = requests.get('https://en.wikipedia.org/w/api.php', headers=headers)
 | Lift Wing ML | `https://api.wikimedia.org/service/lw/inference/v1/models/` | ML predictions (revert risk, article quality, topics) |
 | Site Matrix | `https://en.wikipedia.org/w/api.php?action=sitematrix` | Get correct domains for all Wikimedia wikis (handles code/domain mismatches like `yue`→`zh-yue`) |
 | Wikidata Query (SPARQL) | `https://query.wikidata.org/sparql` | Structured data queries |
-| Toolforge | `https://tools.wmflabs.org/` | Community tool hosting |
+| Toolforge | `https://*.toolforge.org/` | Community tool hosting |
 
 > 💡 **These APIs are project-agnostic.** The Action API and REST API shown above with `en.wikipedia.org` are MediaWiki APIs that work on **any** Wikimedia project — just swap the domain. For example:
 > - **Commons:** `https://commons.wikimedia.org/w/api.php` — search media files, fetch EXIF metadata, inspect categories
@@ -494,5 +494,17 @@ document.getElementById('img').src = proxiedUrl;  // Works!
 ### Related Documentation
 
 For detailed thumbnail/media CORS handling, see **[wikimedia-commons-thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** Section 10.
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-api-strategy](../wikimedia-api-strategy/SKILL.md)** | Decision framework for choosing the right API |
+| **[wikimedia-auth-oauth](../wikimedia-auth-oauth/SKILL.md)** | OAuth 1.0a/2.0 and bot passwords for authenticated requests |
+| **[wikipedia-error-handling](../wikipedia-error-handling/SKILL.md)** | Retry strategies and backoff patterns for 403/429/5xx responses |
+| **[wikimedia-commons-thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** | CORS proxy patterns for serving Commons media in browser apps |
+| **[pywikibot](../pywikibot/SKILL.md)** | Python bot framework with built-in User-Agent and rate limiting |
 
 ---

@@ -464,3 +464,15 @@ python3 -m pytest assets/test_wikitable_tools.py -v
 Tests cover: generation from dicts, parsing, styling, edge cases (empty
 tables, colspan, rowspan, nested tables, multi-word headers, numeric
 auto-alignment).
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-wikitext](../wikimedia-wikitext/SKILL.md)** | AST-based wikitext parsing — never parse tables with regex |
+| **[wikipedia-templates](../wikipedia-templates/SKILL.md)** | Table-generating templates and template-based table styling |
+| **[wikipedia-page-anatomy](../wikipedia-page-anatomy/SKILL.md)** | Tables as article body elements — structure and placement |
+| **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent and API patterns |
+

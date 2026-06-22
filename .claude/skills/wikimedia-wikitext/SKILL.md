@@ -317,3 +317,17 @@ python3 assets/parsoid-extractor.py "Berlin" --infobox
 ### 🧩 Table to DataFrame Template (`assets/table-extractor.py`)
 
 Example script for converting wikitext tables to pandas DataFrames via the Parsoid HTML pipeline, with CSV/JSON export.
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent and API patterns — the foundation all API calls build on |
+| **[wikipedia-templates](../wikipedia-templates/SKILL.md)** | Template syntax — `mwparserfromhell` is the primary parsing tool |
+| **[wikipedia-wikitables](../wikipedia-wikitables/SKILL.md)** | Table parsing — always use Parsoid HTML + `pandas.read_html()`, never regex |
+| **[wikipedia-citations](../wikipedia-citations/SKILL.md)** | Citation/reference extraction from wikitext |
+| **[wikipedia-page-anatomy](../wikipedia-page-anatomy/SKILL.md)** | Page structure — sections, infoboxes, navboxes parsed from wikitext |
+| **[pywikibot](../pywikibot/SKILL.md)** | Bot framework — uses `mwparserfromhell` for template manipulation |
+| **[wiktionary-and-wikisource](../wiktionary-and-wikisource/SKILL.md)** | Dictionary/text extraction patterns using AST-based parsing |

@@ -68,7 +68,7 @@ Create a single-file server that uses only Node.js built-in modules. The key det
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { join, extname } from 'node:path';
+import { join, extname, resolve as pathResolve, sep as pathSep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -101,8 +101,11 @@ const server = createServer(async (req, res) => {
     // Static files
     try {
         const filePath = join(__dirname, 'public', pathname === '/' ? 'index.html' : pathname);
-        // Security: prevent directory traversal
-        if (!filePath.startsWith(__dirname)) {
+        // Security: prevent directory traversal — resolve and verify containment
+        // startsWith without trailing sep matches sibling dirs (e.g. my-tool2)
+        const safeDir = __dirname + path.sep;
+        const resolved = path.resolve(filePath);
+        if (!resolved.startsWith(safeDir)) {
             res.writeHead(403); res.end('Forbidden');
             return;
         }
@@ -587,7 +590,7 @@ become my-tool
 | **Cached 404 pages** | 404 served with `Cache-Control: public` | Use `no-store` for error responses |
 | **Slow npm install** | NFS metadata operations are slow | Minimize dependencies; use `.npmrc` to skip audit |
 | **Missing MIME type** | `Content-Type` not set, browser refuses to load | Explicit MIME map for all file extensions |
-| **Traversal vulnerability** | `join(dir, pathname)` can escape the root | Always check `filePath.startsWith(dir)` |
+| **Traversal vulnerability** | `join(dir, pathname)` can escape the root | Always `path.resolve()` and check `startsWith(dir + path.sep)` |
 | **Crash on startup** | Unhandled promise rejection in `createServer` | Wrap async handlers in try/catch |
 | **Stale image cache** | Commons file overwritten, old URL still cached | Append `?v={timestamp}` to cached image URLs |
 | **CORS errors** | `upload.wikimedia.org` has no CORS headers | Proxy images through your own server |

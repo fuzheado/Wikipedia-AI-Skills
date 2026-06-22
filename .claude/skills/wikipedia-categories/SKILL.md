@@ -630,3 +630,16 @@ GET /w/api.php?action=query&prop=categoryinfo&titles=Category:Physics&format=jso
 ```
 
 See `scripts/category-tree.sh` for an interactive CLI explorer, and `assets/` for Python utilities.
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent and API patterns for category queries |
+| **[wikipedia-page-anatomy](../wikipedia-page-anatomy/SKILL.md)** | Article structure — categories as page elements |
+| **[wikipedia-citations](../wikipedia-citations/SKILL.md)** | Citation-related tracking categories (e.g., Articles with unsourced statements) |
+| **[pywikibot](../pywikibot/SKILL.md)** | Bulk category operations via Pywikibot generators |
+| **[wikimedia-search-cirrussearch](../wikimedia-search-cirrussearch/SKILL.md)** | `incategory:` and `deepcategory:` search operators |
+

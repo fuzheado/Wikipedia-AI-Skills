@@ -615,3 +615,19 @@ cp assets/app-template.py server.py
 web: gunicorn --bind=0.0.0.0 --workers=4 --forwarded-allow-ips=* app:app
 ```
 Then push to a public Git repo and run `toolforge build start`.
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-database](../wikimedia-database/SKILL.md)** | SQL replicas — SSH tunnel setup shared with Toolforge |
+| **[toolforge-nodejs](../toolforge-nodejs/SKILL.md)** | Node.js web services on Toolforge Kubernetes |
+| **[wikimedia-eventstreams](../wikimedia-eventstreams/SKILL.md)** | Real-time streams for monitoring tool events |
+| **[wikimedia-i18n-l10n-for-tools](../wikimedia-i18n-l10n-for-tools/SKILL.md)** | Multilingual design for Toolforge tools |
+| **[wikimedia-ml-services](../wikimedia-ml-services/SKILL.md)** | ML inference (Lift Wing) — often deployed as Toolforge services |
+| **[wikimedia-cdn-assets](../wikimedia-cdn-assets/SKILL.md)** | Privacy-preserving CDN for frontend assets in Toolforge tools |
+| **[wikimedia-phabricator](../wikimedia-phabricator/SKILL.md)** | Report Toolforge bugs and track feature requests |
+| **[wikimedia-security-and-privacy](../wikimedia-security-and-privacy/SKILL.md)** | Secrets management and data minimization for Toolforge tools |
+| **[pywikibot](../pywikibot/SKILL.md)** | Bot framework — often deployed on Toolforge |

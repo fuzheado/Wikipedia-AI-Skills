@@ -378,3 +378,4 @@ cp assets/.env.example .env
 | **[wikipedia-page-anatomy](../wikipedia-page-anatomy/SKILL.md)** | Article structure context for assessment ratings |
 | **[wikipedia-talk-page](../wikipedia-talk-page/SKILL.md)** | Assessment banners appear on talk pages |
 | **[wikimedia-ml-services](../wikimedia-ml-services/SKILL.md)** | ML-based quality scoring (complementary to human assessments) |
+| **[wikimedia-pageviews](../wikimedia-pageviews/SKILL.md)** | Article traffic data — Popular_pages bot combines pageviews with assessments |

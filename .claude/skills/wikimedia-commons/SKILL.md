@@ -31,6 +31,7 @@ This skill covers the **generic** Commons workflow (search, upload, licensing, c
 | **[wikimedia-commons-svg](../wikimedia-commons-svg/SKILL.md)** | SVG source access and editing, W3C validation, creation/optimization tools, versioning/diffing, vector-specific categories and SDC |
 | **[wikimedia-commons-pdf](../wikimedia-commons-pdf/SKILL.md)** | Multi-page PDF/DjVu model, page selection for thumbnails, Wikisource proofread integration, OCR, document metadata |
 | **[wikimedia-commons-audio-video](../wikimedia-commons-audio-video/SKILL.md)** | Audio/video format policy (patent restrictions), upload + transcoding, metadata (duration, codecs, resolution), player widget, TimedText subtitles, derivatives |
+| **[commons-file-resolution](../commons-file-resolution/SKILL.md)** | Resolve `File:` references to browser-usable HTTP URLs — origin URLs, thumbnails, `Special:FilePath`, cache-busting, CORS-aware serving |
 | **[wikimedia-commons-sdc](../wikimedia-commons-sdc/SKILL.md)** | Structured Data on Commons — captions, depicts, copyright/license statements, batch editing |
 | **[wikimedia-commons-sparql](../wikimedia-commons-sparql/SKILL.md)** | Commons SPARQL queries via QLever and WCQS — MediaInfo entities, depicts/copyright/license graph, federated queries with Wikidata |
 

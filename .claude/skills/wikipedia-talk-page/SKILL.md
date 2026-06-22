@@ -287,6 +287,7 @@ For historical context on why Flow was abandoned, see `references/discussion-too
 - **wikimedia-api-access** — Same Action API; handles User-Agent and rate limiting.
 - **wikimedia-eventstreams** — Can monitor talk page events (new topics, replies) in real time.
 - **wikimedia-search-cirrussearch** — Can search talk namespaces with `talk:` prefix.
+- **wikipedia-notability-assessment** — WikiProject banner assessment data and notability evaluation.
 
 ---
 

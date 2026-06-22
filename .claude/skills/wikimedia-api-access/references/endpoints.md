@@ -429,7 +429,7 @@ Wikipedia lives on many subdomains, but the API patterns are the same:
 
 | Base URL | Description |
 |---|---|
-| `https://tools.wmflabs.org/` | Community tool hosting |
+| `https://*.toolforge.org/` | Community tool hosting (legacy `tools.wmflabs.org` redirects) |
 | `https://admin.toolforge.org/` | Admin console |
 | `https://wikitech.wikimedia.org/wiki/Help:Toolforge/Web` | Web hosting docs |
 

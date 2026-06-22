@@ -205,3 +205,14 @@ SQL queries for working with pageview data in the `page_props` table:
 - Pages without pageview data
 - Cross-reference views vs editor interest
 - Stubs with unexpectedly high traffic
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent and API patterns for REST API calls |
+| **[wikidata](../wikidata/SKILL.md)** | Batch entity classification pipeline — resolve article titles to QIDs |
+| **[wikimedia-page-assessment](../wikimedia-page-assessment/SKILL.md)** | Quality and importance ratings — Popular_pages bot bridges pageviews and assessments |
+| **[wikipedia-categories](../wikipedia-categories/SKILL.md)** | Most-viewed-in-category workflows |

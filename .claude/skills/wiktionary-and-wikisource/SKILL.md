@@ -1,6 +1,6 @@
 ---
 name: wiktionary-and-wikisource
-description: Work with Wiktionary (dictionary entries, translation tables, etymologies, audio pronunciations, lexemes) and Wikisource (proofread page workflow, OCR text extraction, quality validation, compiled works) — the two largest Wikimedia content projects after Wikipedia
+description: Work with Wiktionary (dictionary entries, translation tables, etymologies, audio pronunciations, lexemes) and Wikisource (proofread page workflow, OCR text extraction, quality validation, compiled works) - the two largest Wikimedia content projects after Wikipedia
 depends_on: [wikimedia-api-access, wikimedia-commons, pywikibot]
 license: MIT
 compatibility: opencode
@@ -22,16 +22,16 @@ last_verified: 2026-06-11
 Wiktionary (dictionary) and Wikisource (library) are Wikimedia's second- and
 third-largest content projects. They run on the same MediaWiki platform as
 Wikipedia but have **fundamentally different content structures**. This skill
-covers both in two independent sections — jump to the one you need.
+covers both in two independent sections - jump to the one you need.
 
 | Section | Project | Key Skill |
 |---------|---------|-----------|
-| [Part 1 — Wiktionary](#part-1--wiktionary) | `*.wiktionary.org` | Parsing entry structure, translation tables, lexemes |
-| [Part 2 — Wikisource](#part-2--wikisource) | `*.wikisource.org` | ProofreadPage workflow, text extraction, quality |
+| [Part 1 - Wiktionary](#part-1--wiktionary) | `*.wiktionary.org` | Parsing entry structure, translation tables, lexemes |
+| [Part 2 - Wikisource](#part-2--wikisource) | `*.wikisource.org` | ProofreadPage workflow, text extraction, quality |
 
 ---
 
-## Part 1 — Wiktionary
+## Part 1 - Wiktionary
 
 ### Reference: Entry Anatomy
 
@@ -88,20 +88,20 @@ import mwparserfromhell
 
 def extract_language_section(wikitext: str, target_lang: str) -> str | None:
     """Extract a single language section from a Wiktionary entry.
-    
+
     Wiktionary entries are delimited by '----' (5 hyphens). Each section
     starts with '==Language name==' and runs until the next '----' or EOF.
-    
+
     Args:
         wikitext: Raw page content
         target_lang: e.g. 'English', 'French', 'Spanish'
-    
+
     Returns:
         The language section wikitext, or None if not found.
     """
     parsed = mwparserfromhell.parse(wikitext)
-    
-    # The '----' is not a heading — we need to split by top-level headings
+
+    # The '----' is not a heading - we need to split by top-level headings
     # that match '==Language=='
     for section in parsed.get_sections(flat=True):
         # Filter to top-level headings only (level 2 = ==Heading==)
@@ -112,7 +112,7 @@ def extract_language_section(wikitext: str, target_lang: str) -> str | None:
         first_heading = str(headings[0].title).strip()
         if first_heading == target_lang:
             return str(section)
-    
+
     return None
 ```
 
@@ -123,14 +123,14 @@ Once you have a language section, extract definitions with their examples:
 ```python
 def extract_definitions(lang_section: str) -> list[dict]:
     """Extract numbered definitions and examples from a language section.
-    
+
     Returns:
         [{"definition": "...", "examples": ["...", ...]}, ...]
     """
     import re
     definitions = []
     current_def = None
-    
+
     for line in lang_section.split("\n"):
         # Definition line: "# text" or "#; text" for sub-definitions
         def_match = re.match(r"^#(?:;)?\s*(.*)", line)
@@ -139,17 +139,17 @@ def extract_definitions(lang_section: str) -> list[dict]:
                 definitions.append(current_def)
             current_def = {"definition": def_match.group(1).strip(), "examples": []}
             continue
-        
+
         # Example line: "#: text"
         example_match = re.match(r"^#:\s*(.*)", line)
         if example_match and current_def is not None:
             current_def["examples"].append(example_match.group(1).strip())
             continue
-        
+
         # Definition continues if it's a clear continuation (no other marker)
     if current_def is not None:
         definitions.append(current_def)
-    
+
     return definitions
 ```
 
@@ -158,12 +158,12 @@ def extract_definitions(lang_section: str) -> list[dict]:
 ```python
 def fetch_entry(word: str, lang: str = "en") -> dict | None:
     """Fetch a Wiktionary entry via the Action API.
-    
+
     The Wiktionary Action API is at en.wiktionary.org, fr.wiktionary.org, etc.
     """
     import requests
     WIKTIONARY = f"https://{lang}.wiktionary.org/w/api.php"
-    
+
     resp = requests.get(WIKTIONARY, params={
         "action": "parse",
         "page": word,
@@ -184,7 +184,7 @@ template family. Extract them with a template parser:
 ```python
 def extract_translations(wikitext: str) -> dict[str, list[str]]:
     """Extract translation tables from a Wiktionary entry.
-    
+
     Returns:
         {"French": ["mot"], "Spanish": ["palabra"], ...}
     """
@@ -192,27 +192,26 @@ def extract_translations(wikitext: str) -> dict[str, list[str]]:
     parsed = mwparserfromhell.parse(wikitext)
     translations = {}
     current_lang = None
-    
+
     for template in parsed.filter_templates():
         name = str(template.name).strip().lower()
-        
+
         if name == "trans-top":
             current_lang = str(template.get(1).value).strip()
-            translations[current_lang] = []
+            if current_lang not in translations:
+                translations[current_lang] = []
         elif name == "trans-mid":
             pass  # Separator between LTR and RTL languages
         elif name in ("trans-bottom",):
             current_lang = None
-        elif current_lang and name.startswith("t") or name.startswith("t+"):
-            # {{t|fr|mot}}, {{t+|es|palabra}}
+        elif name in ("t", "t+", "tt", "tt+") and current_lang:
+            # {{t|fr|mot}}, {{t+|es|palabra}}, {{tt|en|small}}, {{tt+|en|tiny}}
             try:
-                lang_code = str(template.get(1).value).strip()
                 word = str(template.get(2).value).strip()
-                if lang_code not in translations.get(current_lang, []):
-                    pass  # Stored by language code
+                translations[current_lang].append(word)
             except (IndexError, ValueError):
                 pass
-    
+
     return translations
 ```
 
@@ -227,14 +226,14 @@ Pronunciation audio files are stored on Commons and referenced via `{{audio}}`:
 ```python
 def get_pronunciation_files(lang_section: str) -> list[dict]:
     """Extract audio pronunciation file references.
-    
+
     Returns:
         [{"lang": "en", "file": "en-uk-word.ogg", "label": "Audio (UK)"}, ...]
     """
     import mwparserfromhell, re
     parsed = mwparserfromhell.parse(lang_section)
     files = []
-    
+
     for template in parsed.filter_templates():
         name = str(template.name).strip().lower()
         if name == "audio":
@@ -245,7 +244,7 @@ def get_pronunciation_files(lang_section: str) -> list[dict]:
                 files.append({"lang": lang, "file": file, "label": label})
             except (IndexError, ValueError):
                 pass
-    
+
     return files
 ```
 
@@ -257,7 +256,7 @@ structured data about the word (part of speech, gender, inflections, etc.):
 ```python
 def fetch_lexeme(lexeme_id: str) -> dict:
     """Fetch a Wikidata lexeme by L-ID.
-    
+
     Lexemes are Wikidata entities with ID format L12345.
     They contain: lemma, language, lexical category, forms, senses.
     """
@@ -281,7 +280,7 @@ def fetch_lexeme(lexeme_id: str) -> dict:
 
 ---
 
-## Part 2 — Wikisource
+## Part 2 - Wikisource
 
 ### Reference: ProofreadPage Workflow
 
@@ -299,7 +298,7 @@ Page:Work Title/3               - 0 = Without text
     │                           - 1 = Problematic
     │                           - 2 = Proofread
     ▼                           - 3 = Validated
-Work Title                  # Compiled text — transcludes Page: pages
+Work Title                  # Compiled text - transcludes Page: pages
 ```
 
 The main namespace page (e.g., `Work Title`) is built by transcluding
@@ -318,25 +317,25 @@ This single tag transcludes all pages 1-100 with their headers.
 | 0 | Without text | Raw image only | OCR or manual transcription |
 | 1 | Problematic | Text has issues | Needs human review |
 | 2 | Proofread | Read by one person | Second reader validation |
-| 3 | Validated | Read by two people | Complete — ready for inclusion |
+| 3 | Validated | Read by two people | Complete - ready for inclusion |
 
 ### SOP: Check Proofreading Progress
 
 ```python
 def get_work_stats(wiki: str, index_title: str) -> dict:
     """Get proofreading statistics for a work on Wikisource.
-    
+
     Args:
         wiki: Language code (e.g., 'en', 'fr', 'de')
         index_title: Index page title (e.g., 'Index:Example Book.pdf')
-    
+
     Returns:
         {"total": N, "without_text": N, "problematic": N,
          "proofread": N, "validated": N, "percent_done": 0-100}
     """
     import requests
     API = f"https://{wiki}.wikisource.org/w/api.php"
-    
+
     # Step 1: Get the list of pages in the Index
     resp = requests.get(API, params={
         "action": "query",
@@ -349,13 +348,13 @@ def get_work_stats(wiki: str, index_title: str) -> dict:
     })
     resp.raise_for_status()
     data = resp.json()
-    
+
     # Step 2: Count pages by quality level
     # The proofreadinfo API returns quality data per page
     pages = data.get("query", {}).get("pages", {})
     stats = {"without_text": 0, "problematic": 0,
              "proofread": 0, "validated": 0, "total": 0}
-    
+
     for page_id, page_data in pages.items():
         if page_id == "-1":
             continue
@@ -366,11 +365,11 @@ def get_work_stats(wiki: str, index_title: str) -> dict:
         if key:
             stats[key] += 1
         stats["total"] += 1
-    
+
     if stats["total"] > 0:
         done = stats["proofread"] + stats["validated"]
         stats["percent_done"] = round(done / stats["total"] * 100)
-    
+
     return stats
 ```
 
@@ -379,14 +378,14 @@ def get_work_stats(wiki: str, index_title: str) -> dict:
 ```python
 def get_page_text(wiki: str, page_title: str) -> str | None:
     """Get the raw OCR text from a Wikisource Page: namespace page.
-    
+
     The text layer is stored as the wikitext of the Page: page.
     An empty page (or one with only {{blank}} template) means
     no text has been entered yet.
     """
     import requests
     API = f"https://{wiki}.wikisource.org/w/api.php"
-    
+
     resp = requests.get(API, params={
         "action": "parse",
         "page": page_title,
@@ -397,7 +396,7 @@ def get_page_text(wiki: str, page_title: str) -> str | None:
     })
     resp.raise_for_status()
     data = resp.json()
-    
+
     if "parse" in data and "wikitext" in data["parse"]:
         wikitext = data["parse"]["wikitext"]["*"]
         # Strip out header/footer templates to get just the text layer
@@ -418,7 +417,7 @@ def get_page_status(wiki: str, page_title: str) -> dict:
     """Get the proofread status of a specific Page: page."""
     import requests
     API = f"https://{wiki}.wikisource.org/w/api.php"
-    
+
     resp = requests.get(API, params={
         "action": "query",
         "titles": page_title,
@@ -429,7 +428,7 @@ def get_page_status(wiki: str, page_title: str) -> dict:
     })
     resp.raise_for_status()
     data = resp.json()
-    
+
     pages = data.get("query", {}).get("pages", {})
     for pid, pdata in pages.items():
         if pid != "-1":
@@ -465,14 +464,14 @@ Author pages live in the `Author:` namespace and use the `{{author}}` template:
 ```python
 def get_author_works(wiki: str, author_name: str) -> list[str]:
     """Get a list of works by an author on Wikisource.
-    
+
     Args:
         wiki: Language code (e.g., 'en')
         author_name: Author page title (without 'Author:' prefix)
     """
     import requests
     API = f"https://{wiki}.wikisource.org/w/api.php"
-    
+
     resp = requests.get(API, params={
         "action": "query",
         "list": "embeddedin",
@@ -484,7 +483,7 @@ def get_author_works(wiki: str, author_name: str) -> list[str]:
     })
     resp.raise_for_status()
     data = resp.json()
-    
+
     return [p["title"] for p in data.get("query", {}).get("embeddedin", [])]
 ```
 
@@ -497,7 +496,7 @@ Both projects have 150+ language editions with different template conventions.
 Always specify the language code when querying.
 
 ### ❌ Don't Confuse `----` with Section Headings
-In Wiktionary, `----` (4 hyphens) is NOT a heading — it's a raw divider between
+In Wiktionary, `----` (4 hyphens) is NOT a heading - it's a raw divider between
 language sections. Parsing by headings alone will miss this.
 
 ### ❌ Don't Try to Edit Page: Pages on Wikisource Directly
@@ -539,7 +538,7 @@ page the same as a "Validated" page defeats the purpose.
 |----------|----------|
 | [`references/wiktionary-entry-structure.md`](./references/wiktionary-entry-structure.md) | Full entry anatomy: heading hierarchy, section types, template families, language codes |
 | [`references/wikisource-proofread-workflow.md`](./references/wikisource-proofread-workflow.md) | Three-namespace system, quality levels, proofreading lifecycle, API modules |
-| [`references/sister-project-api.md`](./references/sister-project-api.md) | API differences between Wikipedia, Wiktionary, and Wikisource — endpoint URLs, prop modules, list modules |
+| [`references/sister-project-api.md`](./references/sister-project-api.md) | API differences between Wikipedia, Wiktionary, and Wikisource - endpoint URLs, prop modules, list modules |
 
 ---
 

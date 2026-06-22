@@ -349,3 +349,17 @@ python3 -m pytest assets/test_ref_checker.py -v
 Tests cover: raw URLs, citation templates with/without URL, named ref
 resolution, shortened footnotes, nested templates, empty pages, self-closing
 tags, and reused named refs.
+
+---
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent and API patterns |
+| **[wikimedia-wikitext](../wikimedia-wikitext/SKILL.md)** | AST-based parsing for extracting references from wikitext |
+| **[wikipedia-citations](../wikipedia-citations/SKILL.md)** | Citation formatting — complementary: ref-check finds URLs, citations formats them |
+| **[wikipedia-categories](../wikipedia-categories/SKILL.md)** | Bare-URL tracking categories for citation maintenance |
+| **[wikipedia-page-anatomy](../wikipedia-page-anatomy/SKILL.md)** | Reference section structure in articles |
+| **[wikipedia-pagetriage-api](../wikipedia-pagetriage-api/SKILL.md)** | NPP workflows — reference checking during new page patrol |
+
