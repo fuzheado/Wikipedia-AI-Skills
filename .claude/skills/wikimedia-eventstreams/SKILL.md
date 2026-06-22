@@ -18,7 +18,7 @@ last_verified: 2026-06-10
 > 💡 **Related skills for common workflows:**
 > - **[wikimedia-ml-services](../wikimedia-ml-services/SKILL.md)** — Score events from the stream (revert risk, goodfaith, damaging) for real-time patrol and vandalism detection
 > - **[wikimedia-diffs](../wikimedia-diffs/SKILL.md)** — Fetch and classify diffs for edits detected in the stream (addition-heavy, deletion-heavy, replacement patterns)
-> - **[wikipedia-pagetriage-api](../wikipedia-pagetriage-api/SKILL.md)** — Check PageTriage review status for new pages detected in the stream
+> - **[wikipedia-reference-verifiability](../wikipedia-reference-verifiability/SKILL.md)** — Check PageTriage review status for new pages detected in the stream
 > - **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** — Required User-Agent headers and rate limiting for any follow-up API calls
 
 ---

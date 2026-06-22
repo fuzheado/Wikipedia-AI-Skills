@@ -14,7 +14,7 @@ depends_on: [wikimedia-api-access]
 
 > ⚠️ **User-Agent required:** API examples in this skill access Wikipedia. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for User-Agent format and rate limiting.
 
-> 💡 **Related skills:** For *how to write* an article once notability is confirmed, see **[wikipedia-en-biography-writing](../wikipedia-en-biography-writing/SKILL.md)** and the general article drafting guidance. For *how to delete* a non-notable article, see the proposed deletion-processes skill. For *how to patrol* new pages, see **[wikipedia-pagetriage-api](../wikipedia-pagetriage-api/SKILL.md)**.
+> 💡 **Related skills:** For *how to write* an article once notability is confirmed, see **[wikipedia-en-biography-writing](../wikipedia-en-biography-writing/SKILL.md)** and the general article drafting guidance. For *how to delete* a non-notable article, see the proposed deletion-processes skill. For *how to patrol* new pages, see **[wikipedia-reference-verifiability](../wikipedia-reference-verifiability/SKILL.md)** (includes PageTriage API documentation).
 
 ---
 
@@ -564,7 +564,7 @@ If notability is unclear:
 | Related Skill | Why |
 |--------------|-----|
 | **[wikipedia-en-biography-writing](../wikipedia-en-biography-writing/SKILL.md)** | Drafting an article AFTER notability is confirmed |
-| **[wikipedia-pagetriage-api](../wikipedia-pagetriage-api/SKILL.md)** | New page patrol — assessing notability of recently created pages |
+| **[wikipedia-reference-verifiability](../wikipedia-reference-verifiability/SKILL.md)** | New page patrol — assessing notability of recently created pages (includes PageTriage API) |
 | **[wikipedia-citations](../wikipedia-citations/SKILL.md)** | Formatting the sources that demonstrate notability |
 | **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | Searching for sources to evaluate notability |
 | **[wikimedia-search-cirrussearch](../wikimedia-search-cirrussearch/SKILL.md)** | Finding sources using CirrusSearch (`hastemplate:"notability"`) |

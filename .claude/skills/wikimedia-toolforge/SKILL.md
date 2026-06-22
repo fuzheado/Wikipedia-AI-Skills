@@ -618,6 +618,67 @@ Then push to a public Git repo and run `toolforge build start`.
 
 ---
 
+## SOP 9: Frontend Assets (Privacy-Preserving CDN)
+
+Toolforge tools must load JavaScript, CSS, and fonts from Wikimedia's internal
+cdnjs mirror — never from external CDNs that track users.
+
+### Rationale
+
+External CDNs (cdnjs.cloudflare.com, unpkg.com, Google Fonts) can log IPs and
+track users. Wikimedia's **Toolforge Web Hosting Policy** requires the internal
+mirror for privacy compliance.
+
+### CDN URLs
+
+Only one hostname works reliably:
+
+```
+https://tools-static.wmflabs.org/cdnjs/ajax/libs/<library>/<version>/<file>
+```
+
+**Examples:**
+
+```html
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<link rel="stylesheet" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+```
+
+### Finding Libraries
+
+Search the cdnjs API to find versions, then construct the mirror URL:
+
+```bash
+# Search for a library
+curl -s "https://api.cdnjs.com/libraries?search=d3&fields=version,latest"
+# → {"name":"d3","version":"7.9.0",...}
+
+# Construct mirror URL by replacing cdnjs.cloudflare.com/ajax/libs
+# with tools-static.wmflabs.org/cdnjs/ajax/libs
+```
+
+### Guardrails
+
+| Do | Don't |
+|----|-------|
+| Use `tools-static.wmflabs.org/cdnjs/` | Use `cdnjs.cloudflare.com`, `unpkg.com`, `jsdelivr.net` |
+| Pin exact versions (`7.9.0`) | Use `latest` or version-agnostic URLs |
+| Verify availability before deploying | Assume all cdnjs libraries are mirrored |
+
+The full CDN mirror guide with troubleshooting is at **[references/cdn-mirror-guide.md](./references/cdn-mirror-guide.md)**.
+
+### Tooling
+
+| File | Purpose |
+|------|---------|
+| [`scripts/check-cdn.sh`](./scripts/check-cdn.sh) | Verify a library is on the mirror (by name or full URL) |
+| [`scripts/list-available.sh`](./scripts/list-available.sh) | Search available libraries |
+| [`assets/load-template.html`](./assets/load-template.html) | HTML page loading jQuery, Bootstrap, Font Awesome from CDN |
+| [`assets/load-template.js`](./assets/load-template.js) | Dynamic JS loader for programmatic use |
+
+---
+
 ## Cross-References
 
 | Related Skill | Why |
@@ -627,7 +688,6 @@ Then push to a public Git repo and run `toolforge build start`.
 | **[wikimedia-eventstreams](../wikimedia-eventstreams/SKILL.md)** | Real-time streams for monitoring tool events |
 | **[wikimedia-i18n-l10n-for-tools](../wikimedia-i18n-l10n-for-tools/SKILL.md)** | Multilingual design for Toolforge tools |
 | **[wikimedia-ml-services](../wikimedia-ml-services/SKILL.md)** | ML inference (Lift Wing) — often deployed as Toolforge services |
-| **[wikimedia-cdn-assets](../wikimedia-cdn-assets/SKILL.md)** | Privacy-preserving CDN for frontend assets in Toolforge tools |
 | **[wikimedia-phabricator](../wikimedia-phabricator/SKILL.md)** | Report Toolforge bugs and track feature requests |
 | **[wikimedia-security-and-privacy](../wikimedia-security-and-privacy/SKILL.md)** | Secrets management and data minimization for Toolforge tools |
 | **[pywikibot](../pywikibot/SKILL.md)** | Bot framework — often deployed on Toolforge |

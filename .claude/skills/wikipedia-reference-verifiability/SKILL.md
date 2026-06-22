@@ -352,6 +352,71 @@ tags, and reused named refs.
 
 ---
 
+## SOP: New Page Patrol with PageTriage
+
+> ⚠️ **Deployment:** PageTriage is in active production on **enwiki** and **testwiki** only
+> (ruwiki in progress). Requires the `patrol` right for write operations.
+> Verify availability: check `Special:Version` or the API sandbox for `pagetriagelist`.
+
+### Review Status Codes
+
+The `pagetriage_page` SQL table stores review status:
+
+| Value | Meaning |
+|-------|---------|
+| `0` | Unreviewed — needs NPP review |
+| `1` | Reviewed |
+| `2` | Patrolled (admin) |
+| `3` | Autopatrolled (creator has the right) |
+
+### API Endpoints
+
+**List unreviewed pages** (requires `patrol` right):
+```
+GET /w/api.php?action=pagetriagelist&showunreviewed=1&limit=50&format=json
+```
+
+**Check review status** (no auth needed):
+```
+GET /w/api.php?action=query&prop=info&inprop=protection&titles=Page_Title&format=json
+```
+
+**Mark reviewed** (POST, requires CSRF token):
+```
+POST /w/api.php?action=pagetriageaction&pageid=12345&reviewed=1&token=...
+```
+
+**Legacy API** (no patrol right required for reading):
+```
+GET /w/api.php?action=query&list=unreviewedpages&filterlevel=0&namespace=0&limit=50&format=json
+```
+
+### Database Access (for bulk analysis)
+
+When you have Toolforge SQL access, query the `pagetriage_page` table directly:
+
+```sql
+SELECT ptrp_page_id, ptrp_reviewed, ptrp_created
+FROM pagetriage_page
+WHERE ptrp_reviewed = 0 AND ptrp_deleted = 0
+  AND ptrp_created >= NOW() - INTERVAL 7 DAY
+ORDER BY ptrp_created DESC LIMIT 100;
+```
+
+### Tooling
+
+| File | Purpose |
+|------|---------|
+| [`scripts/list-unreviewed.sh`](./scripts/list-unreviewed.sh) | List last N unreviewed mainspace pages |
+| [`scripts/check-status.sh`](./scripts/check-status.sh) | Check patrol status for specific pages |
+| [`assets/pagetriage_client.py`](./assets/pagetriage_client.py) | Python client wrapping the PageTriage API |
+| [`assets/patrol_simulator.py`](./assets/patrol_simulator.py) | Two-pass pipeline: fetch new pages → reference analysis → enrich matches |
+
+See also: **[wikimedia-database](../wikimedia-database/SKILL.md)** for SQL access,
+**[wikimedia-eventstreams](../wikimedia-eventstreams/SKILL.md)** for real-time page-create detection.
+
+---
+
 ## Cross-References
 
 | Related Skill | Why |
@@ -361,5 +426,4 @@ tags, and reused named refs.
 | **[wikipedia-citations](../wikipedia-citations/SKILL.md)** | Citation formatting — complementary: ref-check finds URLs, citations formats them |
 | **[wikipedia-categories](../wikipedia-categories/SKILL.md)** | Bare-URL tracking categories for citation maintenance |
 | **[wikipedia-page-anatomy](../wikipedia-page-anatomy/SKILL.md)** | Reference section structure in articles |
-| **[wikipedia-pagetriage-api](../wikipedia-pagetriage-api/SKILL.md)** | NPP workflows — reference checking during new page patrol |
 
