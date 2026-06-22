@@ -288,7 +288,7 @@ For historical context on why Flow was abandoned, see `references/discussion-too
 - **wikimedia-eventstreams** — Can monitor talk page events (new topics, replies) in real time.
 - **wikimedia-search-cirrussearch** — Can search talk namespaces with `talk:` prefix.
 - **wikipedia-notability-assessment** — WikiProject banner assessment data and notability evaluation.
-- **wikipedia-wikiprojects** — Finding projects, interpreting assessment tables, and navigating the WikiProject directory.
+- **[wikipedia-wikiprojects](../wikipedia-wikiprojects/SKILL.md)** — Finding projects, interpreting assessment tables, and navigating the WikiProject directory.
 
 ---
 
