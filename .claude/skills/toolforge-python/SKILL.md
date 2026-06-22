@@ -17,7 +17,24 @@ last_verified: 2026-06-22
 
 > ⚠️ **Prerequisites:** This skill assumes you have a Toolforge account and can SSH in. See **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** for account setup, tool creation, and basic SSH configuration.
 
-> 💡 **Python is the dominant language on Toolforge.** Most existing tools use Python, and the platform has first-class support for Python runtimes. This skill covers the standard Flask + gunicorn stack, which powers the vast majority of Toolforge Python web services.
+> 💡 **Python is the dominant language on Toolforge.** Most existing tools use Python, and the platform has first-class support for Python runtimes. This skill covers the standard Flask + gunicorn stack and FastAPI + uvicorn, which power the vast majority of Toolforge Python web services.
+
+> 📖 **Official documentation is spread across 7 pages on Wikitech** with no clear
+> "start here" signal. The table below maps each official page to this skill's
+> SOPs so you know which to follow:
+>
+> | Wikitech Page | Path | Maps To |
+> |--------------|------|----------|
+> | [Help:Toolforge/Python](https://wikitech.wikimedia.org/wiki/Help:Toolforge/Python) | Landing page | All SOPs — this skill is the curated replacement |
+> | [Web/Python](https://wikitech.wikimedia.org/wiki/Help:Toolforge/Web/Python) | Traditional uWSGI | SOP 1 (Flask) + SOP 1-D (conventions) |
+> | [My first Flask OAuth tool](https://wikitech.wikimedia.org/wiki/Help:Toolforge/My_first_Flask_OAuth_tool) | Traditional | SOP 1 + **[wikimedia-auth-oauth](../wikimedia-auth-oauth/SKILL.md)** |
+> | [Buildpack Python (Flask)](https://wikitech.wikimedia.org/wiki/Help:Toolforge/Building_container_images/My_first_Buildpack_Python_tool) | Build Service | SOP 1-C |
+> | [My first Python ASGI tool](https://wikitech.wikimedia.org/wiki/Help:Toolforge/My_first_Python_ASGI_tool) | Build Service | SOP 1-B (FastAPI) + SOP 1-C |
+> | [Buildpack Django](https://wikitech.wikimedia.org/wiki/Help:Toolforge/Building_container_images/My_first_Buildpack_Django_tool) | Build Service | SOP 1-D (Django notes) + SOP 1-C |
+>
+> **Recommendation for new tools:** Use Build Service (SOP 1-C). It's the modern
+> path, supports all Python versions, and avoids the fixed file layout of the
+> traditional backend.
 
 ---
 
@@ -440,17 +457,71 @@ log-maxsize = 10485760
 static-map = /static=/data/project/<tool>/www/python/src/static
 ```
 
-### Django Static Files
+### Django Production Setup
 
-Django apps need `collectstatic` to populate the static directory:
+Building on the uWSGI wrapper above, a production Django deployment needs
+several additional configurations:
+
+**Static files:** Django doesn't serve static files in production. Use
+[WhiteNoise](https://whitenoise.readthedocs.io/en/stable/django.html):
 
 ```bash
-# In settings.py
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+pip install whitenoise
+```
 
-# After deploying code
-python manage.py collectstatic
+```python
+# settings.py
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
+MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # ... other middleware
+]
+```
+
+**CSRF protection:** Add your tool's domain to trusted origins:
+
+```python
+# settings.py
+CSRF_TRUSTED_ORIGINS = ['https://your-tool.toolforge.org']
+```
+
+**Database (ToolsDB):** For production, use ToolsDB instead of SQLite:
+
+```bash
+pip install mysqlclient
+```
+
+```bash
+# Set these env vars via `toolforge env set`
+DB_NAME=<name-of-db-in-toolsdb>
+DJANGO_CONFIGURATION=Production
+DJANGO_SETTINGS_MODULE=mysite.settings
+```
+
+Use [django-configurations](https://django-configurations.readthedocs.io/) to
+manage separate dev/prod settings:
+
+```bash
+pip install django-configurations
+pip freeze > requirements.txt
+```
+
+**Database migrations:** Run as one-off jobs on Toolforge:
+
+```bash
+# Build Service path (after toolforge build start)
+toolforge jobs run \
+    --image tool-<tool>/tool-<tool>:latest \
+    --command "python manage.py migrate" \
+    --wait migrate
+```
+
+**Procfile for Django:**
+
+```
+web: gunicorn mysite.wsgi --bind 0.0.0.0 --forwarded-allow-ips=*
+migrate: python manage.py migrate
 ```
 
 ### Logs
