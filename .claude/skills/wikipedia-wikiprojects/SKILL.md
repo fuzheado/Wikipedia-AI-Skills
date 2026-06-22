@@ -16,9 +16,13 @@ last_verified: 2026-06-22
 > **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the
 > correct format.
 >
-> 📖 **This skill covers the English Wikipedia WikiProject system.** Other
-> language editions have their own WikiProject structures with different
-> conventions. This skill documents enwiki patterns specifically.
+> 📖 **This skill covers the English Wikipedia WikiProject system.** English Wikipedia
+> has the largest WikiProject infrastructure (2,000+ projects, ~1,000 active).
+> German Wikipedia (WikiProjekte/Redaktionen) and French Wikipedia (Projets) have
+> active systems with their own conventions. Other language editions use WikiProjects
+> to varying degrees. The concepts covered here (assessment tables, project directories,
+> banner templates) are applicable across languages, but specific URLs, template names,
+> and conventions are enwiki-specific.
 
 ---
 
