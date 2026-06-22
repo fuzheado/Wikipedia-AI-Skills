@@ -840,7 +840,7 @@ become my-python-tool job schedule python3.11 \
 | **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent, rate limiting, error handling |
 | **[wikimedia-database](../wikimedia-database/SKILL.md)** | SQL replicas — database access from Python tools |
 | **[pywikibot](../pywikibot/SKILL.md)** | Bot framework — often deployed on Toolforge with Python |
-| **[wikimedia-cdn-assets](SKILL.md)** | CDN assets for frontend — privacy-preserving, same Toolforge infrastructure |
+| **[wikimedia-auth-oauth](../wikimedia-auth-oauth/SKILL.md)** | OAuth 1.0a/2.0 — authenticate users of your Python web app via Wikimedia accounts |
 
 ---
 
