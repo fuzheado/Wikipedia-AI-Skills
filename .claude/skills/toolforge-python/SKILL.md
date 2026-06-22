@@ -194,7 +194,7 @@ pip install fastapi httpx "uvicorn[standard]" gunicorn
 
 ```
 web: gunicorn app:app -k uvicorn.workers.UvicornWorker --workers=4 \
-     --timeout 60 --bind 0.0.0.0
+     --timeout 60 --bind 0.0.0.0 --forwarded-allow-ips=*
 ```
 
 **How this works:** Gunicorn manages multiple uvicorn worker processes.
@@ -265,6 +265,11 @@ pip install flask gunicorn
 pip freeze > requirements.txt
 ```
 
+> ⚠️ **License requirement:** All code on Toolforge must be under an
+> [OSI-approved open-source license](https://opensource.org/licenses).
+> Include a license header in your source files and a `LICENSE` file in your
+> repository. See the [Right to fork policy](https://wikitech.wikimedia.org/wiki/Help:Toolforge/Right_to_fork_policy).
+
 **3. Specify Python version (optional)**
 
 Create `runtime.txt` to pin a specific Python version:
@@ -281,13 +286,13 @@ If omitted, the latest available Python is used.
 The `Procfile` tells Toolforge how to start your server:
 
 ```
-web: gunicorn app:app -k uvicorn.workers.UvicornWorker --workers=4 --timeout 60 --bind 0.0.0.0
+web: gunicorn app:app -k uvicorn.workers.UvicornWorker --workers=4 --timeout 60 --bind 0.0.0.0 --forwarded-allow-ips=*
 ```
 
 For Flask (WSGI, no uvicorn worker):
 
 ```
-web: gunicorn app:app --workers=4 --timeout 60 --bind 0.0.0.0
+web: gunicorn app:app --workers=4 --timeout 60 --bind 0.0.0.0 --forwarded-allow-ips=*
 ```
 
 The PORT environment variable is handled automatically — gunicorn reads it.
