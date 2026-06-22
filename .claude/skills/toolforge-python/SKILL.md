@@ -354,6 +354,129 @@ toolforge build start https://gitlab.wikimedia.org/toolforge-repos/my-python-too
 
 ---
 
+## SOP 1-D: Traditional Backend Conventions (uWSGI)
+
+The **traditional Kubernetes backend** (not Build Service) uses uWSGI under the
+hood and expects specific file locations. If you're deploying via
+`webservice --backend=kubernetes python3.11 start`, these conventions apply.
+
+### Required File Layout
+
+```
+$HOME/www/python/
+├── src/
+│   └── app.py          # Entry point — must be named app.py
+├── venv/                # Virtual environment — must be here
+└── uwsgi.ini            # Optional uWSGI configuration
+```
+
+> ⚠️ **These paths are non-negotiable for the traditional backend.** Build Service
+> (SOP 1-C) has no such restrictions — use whatever layout you prefer.
+
+### Entry Point Convention
+
+The entry point **must** be `$HOME/www/python/src/app.py` and must expose a
+variable named `app`:
+
+```python
+# $HOME/www/python/src/app.py
+from flask import Flask
+app = Flask(__name__)
+```
+
+For Django, create a wrapper that imports the WSGI application:
+
+```python
+import os
+from django.core.wsgi import get_wsgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', '<tool-name>.settings')
+app = get_wsgi_application()
+```
+
+> 💡 **ModuleNotFoundError?** Try importing `os` and setting the env var *before*
+> importing Django — the settings module must be set before Django loads.
+
+### Virtual Environment
+
+```bash
+# Open a shell in the target Python runtime
+become my-tool
+webservice --backend=kubernetes python3.11 shell
+
+# Create the venv at the expected location
+mkdir -p $HOME/www/python
+python3 -m venv $HOME/www/python/venv
+source $HOME/www/python/venv/bin/activate
+
+# Upgrade pip (required for wheel support)
+pip install --upgrade pip wheel
+
+# Install dependencies
+pip install -r $HOME/www/python/src/requirements.txt
+
+# Exit and start
+exit
+toolforge webservice --backend=kubernetes python3.11 start
+```
+
+> 💡 **Shortcut:** Use `webservice-python-bootstrap` inside the shell to automate
+> steps 2-6. For a fresh venv (e.g., switching Python versions):
+> `webservice-python-bootstrap --fresh`
+
+### uWSGI Configuration (Optional)
+
+Create `$HOME/www/python/uwsgi.ini` for additional configuration:
+
+```ini
+[uwsgi]
+# CORS headers
+route = .* addheader:Access-Control-Allow-Origin: *
+
+# Log rotation (10 MiB)
+log-maxsize = 10485760
+
+# Static file mapping (for Django)
+static-map = /static=/data/project/<tool>/www/python/src/static
+```
+
+### Django Static Files
+
+Django apps need `collectstatic` to populate the static directory:
+
+```bash
+# In settings.py
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# After deploying code
+python manage.py collectstatic
+```
+
+### Logs
+
+Traditional backend logs go to `$HOME/uwsgi.log` (not stdout/kubectl).
+
+### Troubleshooting: python_plugin.so Error
+
+If you see this in logs:
+
+```
+open("/usr/lib/uwsgi/plugins/python_plugin.so"): No such file or directory
+!!! UNABLE to load uWSGI plugin
+```
+
+It means your app is crashing on startup and the container is falling back to
+a Python 2 uWSGI plugin. Debug by opening a shell and running the app directly:
+
+```bash
+webservice --backend=kubernetes python3.11 shell
+source $HOME/www/python/venv/bin/activate
+python $HOME/www/python/src/app.py  # See the actual error
+```
+
+---
+
 ## SOP 2: The `PORT` Environment Variable
 
 Toolforge's Kubernetes proxy routes incoming requests to your container. It
