@@ -347,6 +347,9 @@ Test that the agent respects each guardrail. For example, if a skill says "never
 - Wikimedia docs: `[User-Agent Policy](https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy)`
 - Code references: use inline code backticks for variable names, file paths, and commands
 
+For the rationale behind skill sizing, tier assignments, and the split-vs-merge
+philosophy, see **[docs/design-philosophy.md](docs/design-philosophy.md)**.
+
 ---
 
 Thank you for contributing to make Wikipedia AI Skills better for everyone!

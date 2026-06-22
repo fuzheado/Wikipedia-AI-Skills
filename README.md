@@ -359,6 +359,8 @@ suggest about designing an AI-assisted editing facility for the Wikimedia commun
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on adding new skills, improving existing ones, and the pull request process. All skills must follow the YAML frontmatter format and pass the content accuracy checklist.
 
+For the rationale behind skill sizing, tier assignments, and the split-vs-merge philosophy, see **[docs/design-philosophy.md](docs/design-philosophy.md)**.
+
 ## License
 
 MIT
