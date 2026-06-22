@@ -1,12 +1,14 @@
 ---
 name: toolforge-python
-description: Deploy and manage Python web services on Wikimedia Toolforge Kubernetes — Flask and gunicorn setup, webservice commands, virtual environments on NFS, pip caching, PORT configuration, static file serving, logging, cron jobs, and common pitfalls
+description: Deploy Python web services on Wikimedia Toolforge — Flask (WSGI) and FastAPI (ASGI), gunicorn/uvicorn, Build Service and traditional Kubernetes backends, virtual environments, pip caching, PORT configuration, static files, logging, and common pitfalls
 license: MIT
 compatibility: opencode
 depends_on: [wikimedia-toolforge, wikimedia-api-access]
 skill_discovery_hints:
   - keywords: ["Toolforge Python", "Flask", "gunicorn", "Python webservice", "python3.11", "WSGI"]
-  - keywords: ["Toolforge venv", "virtual environment", "pip install", "Toolforge pip", "requirements.txt"]
+  - keywords: ["Toolforge FastAPI", "ASGI", "uvicorn", "Python ASGI", "FastAPI toolforge"]
+  - keywords: ["Toolforge build service", "Procfile", "buildpack", "toolforge build start"]
+  - keywords: ["Toolforge venv", "virtual environment", "pip install", "Toolforge pip", "requirements.txt", "runtime.txt"]
   - keywords: ["Toolforge PORT", "gunicorn bind", "Toolforge static", "Python http server"]
   - keywords: ["Toolforge flask", "flask app", "Toolforge deploy python", "toolforge python"]
   - keywords: ["Toolforge cron python", "python job", "scheduled python", "Toolforge batch"]
@@ -145,6 +147,205 @@ become my-python-tool kubectl logs -f deployment/my-python-tool
 curl https://my-python-tool.toolforge.org/
 curl https://my-python-tool.toolforge.org/api/hello
 ```
+
+---
+
+## SOP 1-B: FastAPI / ASGI (Alternative Framework)
+
+[FastAPI](https://fastapi.tiangolo.com/) is a modern ASGI framework with automatic
+OpenAPI docs, async support, and built-in data validation. It runs on uvicorn —
+an ASGI server — rather than gunicorn directly.
+
+### Key Differences from Flask
+
+| | Flask (WSGI) | FastAPI (ASGI) |
+|---|-------------|----------------|
+| Server | gunicorn directly | gunicorn **with uvicorn workers** |
+| Async | Limited | Native `async/await` |
+| Docs | Manual | Auto-generated at `/docs` |
+| Validation | Manual or extensions | Built-in via Pydantic |
+
+### Minimal FastAPI App
+
+```python
+# app.py — FastAPI ASGI application for Toolforge
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.get("/")
+async def home():
+    return {"Hello": "World"}
+
+
+@app.get("/api/hello")
+async def hello():
+    return {"message": "Hello from Toolforge!", "status": "ok"}
+```
+
+### Installing Dependencies
+
+```bash
+pip install fastapi httpx "uvicorn[standard]" gunicorn
+```
+
+### Procfile (Required for Build Service)
+
+```
+web: gunicorn app:app -k uvicorn.workers.UvicornWorker --workers=4 \
+     --timeout 60 --bind 0.0.0.0
+```
+
+**How this works:** Gunicorn manages multiple uvicorn worker processes.
+Each worker runs an instance of the uvicorn ASGI server. Gunicorn handles
+process management and scaling; uvicorn handles async request processing.
+
+### Local Testing
+
+```bash
+# FastAPI dev server (auto-reload, great for development)
+uvicorn app:app --reload
+
+# Open http://127.0.0.1:8000 to see the JSON response
+# Open http://127.0.0.1:8000/docs for auto-generated API docs
+```
+
+### Production Deploy (With Build Service)
+
+FastAPI apps typically use the Build Service deployment path (see SOP 1-C).
+The key differences from Flask:
+- Prodfile uses `-k uvicorn.workers.UvicornWorker`
+- gunicorn wraps uvicorn, not the app directly
+- The app must be ASGI-compatible (FastAPI, Starlette, Quart, etc.)
+
+---
+
+## SOP 1-C: Build Service Deployment (Container-Based)
+
+The **Build Service** is the recommended path for new tools. Instead of
+`scp`-ing files and running `webservice start`, you push code to a Git
+repository and Toolforge builds a container image from it.
+
+### Benefits Over Traditional Deployment
+
+| Traditional (Kubernetes) | Build Service (Container) |
+|--------------------------|---------------------------|
+| Manual `scp` uploads | `git push` triggers deploy |
+| Venv lives on NFS | Dependencies baked into image |
+| Runtime tied to Toolforge images | Any Python version via `runtime.txt` |
+| ASGI/WSGI both work but manual | Native support for both |
+
+### Step-by-Step
+
+**1. Create a Git repo for your tool**
+
+Go to [toolsadmin.wikimedia.org](https://toolsadmin.wikimedia.org/tools/) →
+select your tool → `Git repositories` → `create repository`. Clone the
+resulting URL (use the public HTTPS URL for Build Service):
+
+```bash
+git clone https://gitlab.wikimedia.org/toolforge-repos/my-python-tool.git
+cd my-python-tool
+```
+
+**2. Set up your project**
+
+```bash
+# Create a virtual environment for local dev
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install fastapi httpx "uvicorn[standard]" gunicorn
+# Or for Flask:
+pip install flask gunicorn
+
+# Freeze dependencies
+pip freeze > requirements.txt
+```
+
+**3. Specify Python version (optional)**
+
+Create `runtime.txt` to pin a specific Python version:
+
+```bash
+echo "python-3.12.1" > runtime.txt
+```
+
+Format: `python-<major>.<minor>.<patch>` — case-sensitive, no spaces.
+If omitted, the latest available Python is used.
+
+**4. Create a Procfile**
+
+The `Procfile` tells Toolforge how to start your server:
+
+```
+web: gunicorn app:app -k uvicorn.workers.UvicornWorker --workers=4 --timeout 60 --bind 0.0.0.0
+```
+
+For Flask (WSGI, no uvicorn worker):
+
+```
+web: gunicorn app:app --workers=4 --timeout 60 --bind 0.0.0.0
+```
+
+The PORT environment variable is handled automatically — gunicorn reads it.
+
+**5. Commit and push**
+
+```bash
+git add .
+git commit -m "Initial commit"
+git push origin main
+```
+
+**6. Build and start on Toolforge**
+
+```bash
+ssh <user>@login.toolforge.org
+become my-python-tool
+
+# Start the build (use the PUBLIC HTTPS URL)
+toolforge build start https://gitlab.wikimedia.org/toolforge-repos/my-python-tool.git
+
+# Check build status — wait for "ok (Succeeded)"
+toolforge build show
+
+# Start the webservice
+toolforge webservice buildservice start --mount=none
+```
+
+**7. Verify**
+
+```bash
+curl https://my-python-tool.toolforge.org/
+# FastAPI docs: https://my-python-tool.toolforge.org/docs
+```
+
+### Updating Your App
+
+```bash
+# Make changes locally, push, then rebuild
+git add .
+git commit -m "Update"
+git push origin main
+
+# SSH in and rebuild
+ssh <user>@login.toolforge.org
+become my-python-tool
+toolforge build start https://gitlab.wikimedia.org/toolforge-repos/my-python-tool.git
+```
+
+### Which Path to Choose?
+
+| Scenario | Use |
+|----------|-----|
+| New Python tool (2024+) | Build Service (SOP 1-C) |
+| FastAPI / ASGI app | Build Service required |
+| Existing Flask app already on NFS | Traditional (SOP 1) |
+| Quick prototype, no Git setup | Traditional (SOP 1) |
+| Need to pin exact Python version | Build Service with `runtime.txt` |
 
 ---
 
