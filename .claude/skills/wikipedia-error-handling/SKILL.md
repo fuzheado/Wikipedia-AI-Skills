@@ -255,7 +255,7 @@ Lift Wing models have model-specific error responses that are not covered by sta
 
 **Detection:**
 ```python
-resp = requests.post(url, json=data, headers=headers)
+resp = requests.post(url, json=data, headers=headers, timeout=30)
 if resp.status_code == 422:
     error = resp.json()
     if "parent_revision_missing" in str(error):

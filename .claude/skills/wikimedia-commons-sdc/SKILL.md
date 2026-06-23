@@ -81,7 +81,7 @@ resp = requests.get(
         "titles": "File:Albert Einstein Head.jpg",
         "format": "json",
     },
-    headers={"User-Agent": "MyBot/1.0 (https://example.com; user@example.com)"},
+    timeout=30, headers={"User-Agent": "MyBot/1.0 (https://example.com; user@example.com)"},
 )
 data = resp.json()
 pages = data["query"]["pages"]

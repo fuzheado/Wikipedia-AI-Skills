@@ -45,7 +45,7 @@ headers = {
     'User-Agent': 'my-wiki-bot/1.0 (https://example.com; user@example.com) ContentGapResearch'
 }
 
-response = requests.get('https://en.wikipedia.org/w/api.php', headers=headers)
+response = requests.get('https://en.wikipedia.org/w/api.php', headers=headers, timeout=30)
 ```
 
 ## **Why This Matters**

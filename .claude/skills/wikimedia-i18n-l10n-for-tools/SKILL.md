@@ -83,7 +83,7 @@ label = fetch_label("Q937", user_lang="fr")
 
 # Make an API call to the user's wiki
 wiki = language_to_domain(user_lang)
-resp = requests.get(f"https://{wiki}/w/api.php?action=query&...")
+resp = requests.get(f"https://{wiki}/w/api.php?action=query&...", timeout=30)
 ```
 
 Both layers are needed for a truly multilingual tool. Most tools focus only on Layer 1 and forget Layer 2.
@@ -834,7 +834,7 @@ for page_id, page in pages.items():
 
 ```python
 # ❌ BAD: Hardcoded English Wikipedia
-resp = requests.get("https://en.wikipedia.org/w/api.php?...")
+resp = requests.get("https://en.wikipedia.org/w/api.php?...", timeout=30)
 
 # ✅ GOOD: Parameterized wiki domain
 def fetch_wiki(title: str, lang: str = "en"):

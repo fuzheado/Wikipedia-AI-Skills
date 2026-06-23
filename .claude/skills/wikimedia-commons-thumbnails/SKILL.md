@@ -94,7 +94,7 @@ resp = requests.get("https://commons.wikimedia.org/w/api.php", params={
     "iiprop": "url",
     "titles": "File:Example.jpg",
     "format": "json",
-}, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
+}, timeout=30, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
 
 url = resp.json()["query"]["pages"]["pageid"]["imageinfo"][0]["url"]
 # url = "https://upload.wikimedia.org/wikipedia/commons/a/ab/Example.jpg"

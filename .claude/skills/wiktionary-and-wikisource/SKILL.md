@@ -169,7 +169,7 @@ def fetch_entry(word: str, lang: str = "en") -> dict | None:
         "page": word,
         "prop": "wikitext|text|categories",
         "format": "json",
-    }, headers={
+    }, timeout=30, headers={
         "User-Agent": "WiktTool/1.0 (https://example.com; user@example.com)"
     })
     resp.raise_for_status()
@@ -343,7 +343,7 @@ def get_work_stats(wiki: str, index_title: str) -> dict:
         "prop": "proofreadinfo",
         "piprop": "quality",
         "format": "json",
-    }, headers={
+    }, timeout=30, headers={
         "User-Agent": "WskTool/1.0 (https://example.com; user@example.com)"
     })
     resp.raise_for_status()
@@ -391,7 +391,7 @@ def get_page_text(wiki: str, page_title: str) -> str | None:
         "page": page_title,
         "prop": "wikitext",
         "format": "json",
-    }, headers={
+    }, timeout=30, headers={
         "User-Agent": "WskTool/1.0 (https://example.com; user@example.com)"
     })
     resp.raise_for_status()
@@ -423,7 +423,7 @@ def get_page_status(wiki: str, page_title: str) -> dict:
         "titles": page_title,
         "prop": "proofread",
         "format": "json",
-    }, headers={
+    }, timeout=30, headers={
         "User-Agent": "WskTool/1.0 (https://example.com; user@example.com)"
     })
     resp.raise_for_status()

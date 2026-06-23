@@ -192,7 +192,7 @@ resp = requests.get("https://commons.wikimedia.org/w/api.php", params={
     "iiprop": "size|mime|metadata|mediatype",
     "titles": "File:My_Audio.ogg",
     "format": "json",
-}, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
+}, timeout=30, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
 
 page = next(iter(resp.json()["query"]["pages"].values()))
 info = page.get("imageinfo", [{}])[0]
@@ -233,7 +233,7 @@ resp = requests.get("https://commons.wikimedia.org/w/api.php", params={
     "iiprop": "size|mime|metadata|mediatype",
     "titles": "File:My_Video.webm",
     "format": "json",
-}, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
+}, timeout=30, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
 
 page = next(iter(resp.json()["query"]["pages"].values()))
 info = page.get("imageinfo", [{}])[0]
@@ -431,7 +431,7 @@ resp = requests.get("https://commons.wikimedia.org/w/api.php", params={
     "pssearch": "TimedText:My_Video.webm",
     "psnamespace": 102,
     "format": "json",
-}, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
+}, timeout=30, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
 
 for result in resp.json()["query"]["prefixsearch"]:
     print(f"Subtitle: {result['title']}")
@@ -483,7 +483,7 @@ resp = requests.get("https://commons.wikimedia.org/w/api.php", params={
     "prop": "transcodestatus",
     "titles": "File:My_Video.webm",
     "format": "json",
-}, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
+}, timeout=30, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
 
 transcodes = next(iter(resp.json()["query"]["pages"].values())).get("transcodestatus", {})
 for key, status in transcodes.items():

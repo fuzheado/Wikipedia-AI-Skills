@@ -138,7 +138,7 @@ import requests
 url = "https://en.wikipedia.org/w/rest.php/v1/page/Python_(programming_language)/html"
 headers = {"User-Agent": "MyTool/1.0 (user@example.com)"}
 
-response = requests.get(url, headers=headers)
+response = requests.get(url, headers=headers, timeout=30)
 if response.status_code == 200:
     html = response.text
     # Parse with BeautifulSoup or lxml

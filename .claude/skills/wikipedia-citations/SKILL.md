@@ -134,7 +134,7 @@ headers = {"User-Agent": "MyBot/1.0 (user@example.com) ContentGapResearch"}
 url = "https://archive.org/wayback/available"
 params = {"url": "https://example.com/article"}
 
-resp = requests.get(url, params=params, headers=headers)
+resp = requests.get(url, params=params, headers=headers, timeout=30)
 data = resp.json()
 # data["archived_snapshots"]["closest"]["url"] is the archive URL if one exists
 # data["archived_snapshots"]["closest"]["timestamp"] is the snapshot date
@@ -154,7 +154,7 @@ import requests
 
 headers = {"User-Agent": "MyBot/1.0 (user@example.com) ContentGapResearch"}
 save_url = f"https://web.archive.org/save/{target_url}"
-resp = requests.post(save_url, headers=headers)
+resp = requests.post(save_url, headers=headers, timeout=30)
 
 if resp.status_code == 200:
     print("Page archived successfully")
@@ -216,7 +216,7 @@ params = {
     "format": "json",
 }
 
-resp = requests.get("https://en.wikipedia.org/w/api.php", params=params, headers=headers)
+resp = requests.get("https://en.wikipedia.org/w/api.php", params=params, headers=headers, timeout=30)
 data = resp.json()
 pages = [p["title"] for p in data["query"]["categorymembers"]]
 ```
@@ -352,7 +352,7 @@ def extract_citations(page_title: str, lang: str = "en") -> list[dict]:
         "prop": "wikitext",
         "format": "json",
     }
-    resp = requests.get(f"https://{domain}/w/api.php", params=params, headers=headers)
+    resp = requests.get(f"https://{domain}/w/api.php", params=params, headers=headers, timeout=30)
     data = resp.json()
     wikitext = data["parse"]["wikitext"]["*"]
 
@@ -416,7 +416,7 @@ import requests
 headers = {"User-Agent": "MyBot/1.0 (user@example.com) ContentGapResearch"}
 url = "https://en.wikipedia.org/api/rest_v1/data/citation/mediawiki/https://example.com/article"
 
-resp = requests.get(url, headers=headers)
+resp = requests.get(url, headers=headers, timeout=30)
 citations = resp.json()  # Returns array of citation objects
 
 if citations:

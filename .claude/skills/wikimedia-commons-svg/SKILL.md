@@ -57,7 +57,7 @@ resp = requests.get("https://commons.wikimedia.org/w/api.php", params={
     "iiprop": "url|mime",
     "titles": "File:Wikipedia-logo-v2.svg",
     "format": "json",
-}, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
+}, timeout=30, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
 
 info = resp.json()["query"]["pages"]["10337301"]["imageinfo"][0]
 raw_svg_url = info["url"]  # → "https://upload.wikimedia.org/wikipedia/commons/8/80/Wikipedia-logo-v2.svg"
@@ -109,7 +109,7 @@ resp = requests.get("https://commons.wikimedia.org/w/api.php", params={
     "prop": "categories",
     "titles": "File:Wikipedia-logo-v2.svg",
     "format": "json",
-}, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
+}, timeout=30, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
 
 pages = resp.json()["query"]["pages"]
 categories = [cat["title"] for cat in next(iter(pages.values())).get("categories", [])]
@@ -281,8 +281,8 @@ import difflib
 v1_url = "https://upload.wikimedia.org/wikipedia/commons/archive/8/80/20220101120000%21Foo.svg"
 v2_url = "https://upload.wikimedia.org/wikipedia/commons/8/80/Foo.svg"
 
-v1 = requests.get(v1_url, headers={"User-Agent": "MyBot/1.0"}).text
-v2 = requests.get(v2_url, headers={"User-Agent": "MyBot/1.0"}).text
+v1 = requests.get(v1_url, timeout=30, headers={"User-Agent": "MyBot/1.0"}).text
+v2 = requests.get(v2_url, timeout=30, headers={"User-Agent": "MyBot/1.0"}).text
 
 diff = difflib.unified_diff(v1.splitlines(), v2.splitlines(), lineterm="")
 print("\n".join(diff))

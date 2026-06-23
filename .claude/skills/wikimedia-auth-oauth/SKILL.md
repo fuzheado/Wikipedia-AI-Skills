@@ -454,7 +454,7 @@ def oauth_api_call(params: dict) -> dict:
     """Make an authenticated API call using OAuth 1.0a."""
     api_url = "https://en.wikipedia.org/w/api.php"
     request = handshaker.sign_request(access_token, api_url, params)
-    resp = requests.get(request.url, headers=request.headers)
+    resp = requests.get(request.url, headers=request.headers, timeout=30)
     return resp.json()
 ```
 

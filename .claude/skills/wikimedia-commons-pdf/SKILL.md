@@ -99,7 +99,7 @@ resp = requests.get("https://commons.wikimedia.org/w/api.php", params={
     "iiurlwidth": 800,
     "titles": "File:PDF_metadata.pdf",
     "format": "json",
-}, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
+}, timeout=30, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
 
 info = next(iter(resp.json()["query"]["pages"].values()))["imageinfo"][0]
 print(f"Page 1 thumb: {info['thumburl']}")     # → .../page1-960px-....jpg
@@ -120,7 +120,7 @@ resp = requests.get("https://commons.wikimedia.org/w/api.php", params={
     "iiurlparam": "page3",          # request page 3
     "titles": "File:100-page-document.pdf",
     "format": "json",
-}, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
+}, timeout=30, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
 ```
 
 > 💡 **`iiurlparam` syntax:** `page{N}` where N is the 1-indexed page number. This works for both PDF and DjVu.
@@ -173,7 +173,7 @@ for page_num in range(1, pagecount + 1):
         "iiurlparam": f"page{page_num}",
         "titles": "File:Doc.pdf",
         "format": "json",
-    }, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
+    }, timeout=30, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
     info = next(iter(resp.json()["query"]["pages"].values()))["imageinfo"][0]
     print(f"Page {page_num}: {info['thumbwidth']}×{info['thumbheight']}")
 ```
@@ -281,7 +281,7 @@ resp = requests.get("https://commons.wikimedia.org/w/api.php", params={
     "prop": "globalusage",
     "titles": "File:My_Document.pdf",
     "format": "json",
-}, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
+}, timeout=30, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
 
 usage = next(iter(resp.json()["query"]["pages"].values())).get("globalusage", [])
 wikisource_usage = [u for u in usage if "wikisource" in u.get("wiki", "")]
@@ -314,7 +314,7 @@ resp = requests.get("https://commons.wikimedia.org/w/api.php", params={
     "iiprop": "metadata",
     "titles": "File:Document.pdf",
     "format": "json",
-}, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
+}, timeout=30, headers={"User-Agent": "MyBot/1.0 (user@example.com)"})
 
 info = next(iter(resp.json()["query"]["pages"].values()))["imageinfo"][0]
 for meta in info.get("metadata", []):
