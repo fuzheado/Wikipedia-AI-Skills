@@ -701,8 +701,8 @@ Store configuration and secrets via Toolforge's environment variable system:
 ```bash
 # Set (from a become shell)
 become my-python-tool
-toolforge env set SECRET_KEY my-secret-value
-toolforge env set OAUTH_CLIENT_ID abc123
+toolforge env set SECRET_KEY your-secret-key-here
+toolforge env set OAUTH_CLIENT_ID your-oauth-client-id
 toolforge env set FLASK_ENV production
 
 # List

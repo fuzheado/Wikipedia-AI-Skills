@@ -489,7 +489,7 @@ ssh user@login.toolforge.org toolforge tools create my-web-tool
 rsync -avz ./my-web-app/ user@login.toolforge.org:/data/project/my-web-tool/
 
 # 3. Set environment variables
-ssh user@login.toolforge.org "become my-web-tool; toolforge env set API_KEY my-secret-key"
+ssh user@login.toolforge.org "become my-web-tool; toolforge env set API_KEY your-api-key-here"
 
 # 4. Start web service
 ssh user@login.toolforge.org "become my-web-tool; webservice --backend=kubernetes python3.11 start"
