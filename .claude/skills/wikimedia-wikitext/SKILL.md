@@ -331,3 +331,4 @@ Example script for converting wikitext tables to pandas DataFrames via the Parso
 | **[wikipedia-page-anatomy](../wikipedia-page-anatomy/SKILL.md)** | Page structure — sections, infoboxes, navboxes parsed from wikitext |
 | **[pywikibot](../pywikibot/SKILL.md)** | Bot framework — uses `mwparserfromhell` for template manipulation |
 | **[wiktionary-and-wikisource](../wiktionary-and-wikisource/SKILL.md)** | Dictionary/text extraction patterns using AST-based parsing |
+| **[wikivoyage](../wikivoyage/SKILL.md)** | Wikivoyage listing templates (`{{see}}`, `{{eat}}`, etc.) are structured wikitext templates parsed with `mwparserfromhell` |

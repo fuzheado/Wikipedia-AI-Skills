@@ -30,9 +30,9 @@ These skills are designed to **help you research, understand, and prepare conten
 
 ## Skills
 
-This repository contains **45 skills** organized into two groups.
+This repository contains **46 skills** organized into two groups.
 
-> 💡 **[Explore the interactive skills network →](docs/skills-network.html)** — see how all 45
+> 💡 **[Explore the interactive skills network →](docs/skills-network.html)** — see how all 46
 > skills connect to each other in a force-directed graph. Drag nodes, zoom, and hover
 > to discover cross-references between skills.
 
@@ -78,7 +78,9 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [wikipedia-en-biography-writing](.claude/skills/wikipedia-en-biography-writing/SKILL.md) | Draft and edit English Wikipedia biographies following NPOV, verifiability, no original research, and biographies of living persons (BLP) policies |
 | [wikipedia-en-article-audit](.claude/skills/wikipedia-en-article-audit/SKILL.md) | Audit an English Wikipedia article for structural issues, factual errors, and NPOV violations, then produce a machine-readable task graph (DAG) that another agent can execute to fix all identified problems |
 | [wikipedia-notability-assessment](.claude/skills/wikipedia-notability-assessment/SKILL.md) | Evaluate whether a subject meets Wikipedia notability guidelines — the General Notability Guideline (GNG), all 13 subject-specific SNGs with decision trees, source quality evaluation, structured report generation, AfD-ready summaries, and common invalid arguments |
+| | **▸ Other Wikimedia Projects** |
 | [wiktionary-and-wikisource](.claude/skills/wiktionary-and-wikisource/SKILL.md) | Work with Wiktionary (dictionary entries, translation tables, etymologies, audio pronunciations, lexemes) and Wikisource (proofread page workflow, OCR text extraction, quality validation, compiled works) — the two largest Wikimedia content projects after Wikipedia |
+| [wikivoyage](.claude/skills/wikivoyage/SKILL.md) | Work with Wikivoyage — the free, collaborative, multilingual travel guide. Covers listing templates (See/Do/Buy/Eat/Drink/Sleep), the geographical hierarchy (continent → country → region → city), dynamic OSM maps via Kartographer, article status (stub/outline/usable/guide/star), the mobile-friendly image policy, Wikidata integration for coordinates, and batch operations |
 
 ### 🛠 For tool developers
 
@@ -159,6 +161,9 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | Generate an AfD-ready notability summary | `python3 .claude/skills/wikipedia-notability-assessment/assets/notability_checker.py "Test" --description "desc" --json` |
 | Parse a Wiktionary entry for definitions, translations, and pronunciations | [wiktionary-and-wikisource](.claude/skills/wiktionary-and-wikisource/SKILL.md) |
 | Check proofreading progress for a Wikisource work | `bash .claude/skills/wiktionary-and-wikisource/scripts/ws-page-status.sh en "Index:Pride and Prejudice"` |
+| Extract listings from a Wikivoyage travel guide article | [wikivoyage](.claude/skills/wikivoyage/SKILL.md) |
+| Check the quality status of a Wikivoyage article (stub/outline/usable/guide/star) | [wikivoyage](.claude/skills/wikivoyage/SKILL.md) |
+| Extract all POI listings from a Wikivoyage article as JSON | `bash .claude/skills/wikivoyage/scripts/extract-listings.sh "Tokyo"` |
 | | **▸ Building Tools** |
 | Call any Wikimedia API with correct User-Agent and rate limiting | [wikimedia-api-access](.claude/skills/wikimedia-api-access/SKILL.md) |
 | Choose the right API for the task (REST vs Action vs SPARQL vs SQL vs EventStreams) | [wikimedia-api-strategy](.claude/skills/wikimedia-api-strategy/SKILL.md) |
