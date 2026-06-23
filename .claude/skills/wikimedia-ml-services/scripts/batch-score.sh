@@ -87,7 +87,7 @@ while IFS= read -r line; do
 
     echo "→ ($((count+1))) Scoring: $line" >&2
 
-    RESPONSE=$(eval curl -s -X POST "$URL" \
+    RESPONSE=$(curl -s -X POST "$URL" \
         -H "Content-Type: application/json" \
         $AUTH_FLAGS \
         -H "User-Agent: $USER_AGENT" \
