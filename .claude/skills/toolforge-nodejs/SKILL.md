@@ -600,6 +600,8 @@ become my-tool
 ## See Also
 
 - **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** — Account setup, tool creation, SSH, Kubernetes pods, cron jobs, database access
+  - **SOP 9: Frontend Assets (Privacy-Preserving CDN)** — Must-load JS/CSS from `tools-static.wmflabs.org/cdnjs/` instead of external CDNs
 - **[commons-file-resolution](../commons-file-resolution/SKILL.md)** — Resolving `File:` references to HTTP URLs, caching images for same-origin serving
 - **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** — User-Agent, rate limiting, error handling
 - **[wikimedia-commons-thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** — Thumbnail URL generation and format conversion
+- **[wikimedia-security-and-privacy](../wikimedia-security-and-privacy/SKILL.md)** — CDN privacy risks, data minimization, and third-party script policies

@@ -140,6 +140,29 @@ def safe_log_response(response: dict) -> None:
 
 ---
 
+### CDN and Third-Party Scripts
+
+Loading JavaScript, CSS, or fonts from external CDNs (cdnjs.cloudflare.com,
+unpkg.com, jsdelivr.net, Google Fonts) leaks users' IP addresses, referrer
+headers, and user-agent strings to the CDN provider — a form of data
+egress that violates the **data minimization** principle.
+
+**For Toolforge tools**, Wikimedia's privacy policy requires using the
+internal cdnjs mirror instead:
+
+```
+https://tools-static.wmflabs.org/cdnjs/ajax/libs/<library>/<version>/<file>
+```
+
+See the **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** skill's
+**SOP 9: Frontend Assets (Privacy-Preserving CDN)** for the full policy,
+search commands, and troubleshooting.
+
+**For any Wikimedia tool**, prefer self-hosting static assets or using the
+WMF mirror over third-party CDNs.
+
+---
+
 ## SOP: Deanonymization Risks
 
 ### What Not To Do

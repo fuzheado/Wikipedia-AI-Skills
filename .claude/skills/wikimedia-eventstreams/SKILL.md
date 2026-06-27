@@ -246,9 +246,11 @@ const eventSource = new EventSource(url);
 
 eventSource.onmessage = (event) => {
     const data = JSON.parse(event.data);
+    // ⚠️ data.timestamp is Unix seconds — multiply by 1000 for JS Date
+    const eventTime = new Date(data.timestamp * 1000);
     if (data.meta.domain === 'canary') return;
     if (data.server_name === 'en.wikipedia.org') {
-        console.log(`${data.user} edited ${data.title}`);
+        console.log(`${data.user} edited ${data.title} @ ${eventTime.toISOString()}`);
     }
 };
 ```
@@ -307,7 +309,7 @@ This is the most commonly consumed stream. All fields from `Manual:RCFeed` are p
   "server_name": "en.wikipedia.org",    // $wgServerName
   "server_script_path": "/w",           // $wgScriptPath
   "server_url": "https://en.wikipedia.org",  // $wgCanonicalServer
-  "timestamp": 1717540800,              // Unix timestamp (derived from rc_timestamp)
+  "timestamp": 1717540800,              // Unix timestamp in SECONDS (not ms; derived from rc_timestamp)
   "user": "ExampleEditor",              // rc_user_text
   "wiki": "enwiki",                     // wfWikiID ($wgDBprefix, $wgDBname)
   "parsedcomment": "<p>comment</p>",    // Parsed HTML of comment (optional)
@@ -823,17 +825,43 @@ stream.on('error', (err) => console.error('Error:', err));
 npm install eventsource
 ```
 
+> ⚠️ **Import note:** `eventsource` v3+ exports `EventSource` as a **named export**,
+> not a default export. Use destructured import in both ESM and CommonJS.
+> The constructor accepts a second argument `{ headers, rejectUnauthorized }`
+> for configuration — always pass a `User-Agent` header.
+
+**ESM:**
+
 ```javascript
 import { EventSource } from 'eventsource';
+```
+
+**CommonJS:**
+
+```javascript
+const { EventSource } = require('eventsource');
+```
+
+**Full example with User-Agent (both ESM and CJS):**
+
+```javascript
+import { EventSource } from 'eventsource';
+// CJS: const { EventSource } = require('eventsource');
 
 const url = 'https://stream.wikimedia.org/v2/stream/recentchange';
-const es = new EventSource(url);
+const es = new EventSource(url, {
+    headers: {
+        'User-Agent': 'MyBot/1.0 (me@example.com) EventStreamsExample'
+    }
+});
 
 es.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    if (data.meta.domain === 'canary') return;
+    if (data.meta?.domain === 'canary') return;
+    // ⚠️ data.timestamp is Unix seconds — multiply by 1000 for JS Date
+    const eventTime = new Date(data.timestamp * 1000);
     if (data.wiki === 'enwiki') {
-        console.log(`${data.user} edited ${data.title}`);
+        console.log(`${data.user} edited ${data.title} @ ${eventTime.toISOString()}`);
     }
 };
 ```
@@ -985,6 +1013,80 @@ for change in stream:
     if any(fnmatch(title, f'{pattern}*') for pattern in physics_pages):
         print(f"🔬 {change['user']} edited {title}")
 ```
+
+### Commons File Upload Monitor
+
+Watch new files as they're uploaded to Wikimedia Commons — useful for patrol,
+gallery curation, and batch-upload monitoring. This requires a distinct filter
+combo (`type=log`, `log_type=upload`, `log_action=upload`) not used in other
+real-time examples:
+
+```python
+from pywikibot.comms.eventstreams import EventStreams
+
+stream = EventStreams(streams='recentchange')
+
+for change in stream:
+    # Commons new file uploads: type=log, log_type=upload, log_action=upload
+    if (change.get('wiki') == 'commonswiki'
+        and change.get('type') == 'log'
+        and change.get('log_type') == 'upload'
+        and change.get('log_action') == 'upload'):
+
+        title = change.get('title', '')  # "File:Example.jpg"
+        user = change.get('user', '')
+        print(f"📤 {user} uploaded {title}")
+```
+
+> **Note:** `log_action` distinguishes new uploads (`'upload'`) from overwrites
+> (`'overwrite'`). Filter for `log_action='upload'` to only see brand-new files.
+> The `title` field includes the `File:` prefix namespace.
+
+For a real-time gallery that displays the uploaded images, combine this event
+stream with the thumbnail methods from the
+**[wikimedia-commons-thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** skill
+— specifically the `Special:FilePath` approach which needs only the filename
+and no extra API calls.
+
+### SSE Relay: EventStreams → Your Server → Browser Clients
+
+The most common architecture for production real-time web apps: a single
+server-side connection to EventStreams fans out filtered events to many
+browser SSE clients. This avoids direct browser connections to
+`stream.wikimedia.org` (CORS concerns) and centralizes filtering/transformation.
+
+Ready-to-run implementations are provided in this skill's `scripts/` directory:
+
+| Language | File | Dependencies |
+|---|---|---|
+| Node.js | [`scripts/sse-relay-server.js`](scripts/sse-relay-server.js) | `express`, `eventsource` |
+| Python | [`scripts/sse-relay-server.py`](scripts/sse-relay-server.py) | `fastapi`, `uvicorn`, `aiohttp`, `aiohttp-sse-client` |
+
+**Node.js quick start:**
+
+```bash
+cd scripts
+npm install express eventsource
+node sse-relay-server.js
+# → SSE relay running at http://localhost:3000
+# → SSE endpoint: http://localhost:3000/events
+```
+
+**Python quick start:**
+
+```bash
+cd scripts
+pip install fastapi uvicorn aiohttp aiohttp-sse-client
+python sse-relay-server.py
+# → SSE endpoint: http://localhost:8000/events
+```
+
+**Key benefits of the relay pattern:**
+- One upstream EventStreams connection serves many browser clients
+- Filter, transform, and enrich events before forwarding
+- No direct browser dependency on `stream.wikimedia.org`
+- Reconnection logic is centralized (handled by the `eventsource` library)
+- Can add authentication, rate-limiting, or event persistence at the relay
 
 ### Real-Time Dashboard Widget (HTML/JS)
 

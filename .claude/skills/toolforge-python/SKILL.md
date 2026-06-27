@@ -959,3 +959,13 @@ flask==3.1.0
 gunicorn==23.0.0
 requests==2.32.3
 ```
+
+---
+
+## See Also
+
+- **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** — Account setup, tool creation, SSH, Kubernetes pods, cron jobs, database access
+  - **SOP 9: Frontend Assets (Privacy-Preserving CDN)** — Load JS/CSS/fonts from `tools-static.wmflabs.org/cdnjs/` instead of external CDNs
+- **[toolforge-nodejs](../toolforge-nodejs/SKILL.md)** — Node.js-specific deployment patterns
+- **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** — User-Agent, rate limiting, error handling
+- **[wikimedia-security-and-privacy](../wikimedia-security-and-privacy/SKILL.md)** — CDN privacy risks and third-party script policies

@@ -16,6 +16,9 @@ last_verified: 2026-06-16
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
 >
 > ⚡ **This skill is about the rendering pipeline only.** For file-type-specific concerns (SVG editing, PDF Wikisource integration, audio/video transcoding), see the dedicated skills cross-referenced below.
+>
+> 💡 **Quickest thumbnail from just a filename:** Skip hash-path computation and
+> extra API calls — use `Special:FilePath` instead. See [Section 0](#0-the-easiest-way-special-filepath).
 
 
 
@@ -60,6 +63,52 @@ The system spans four access methods: the **Action API**, **direct URL construct
 > - SVG rasterization → **[wikimedia-commons-svg](../wikimedia-commons-svg/SKILL.md)**
 > - PDF/DjVu page rendering → **[wikimedia-commons-pdf](../wikimedia-commons-pdf/SKILL.md)**
 > - Video keyframe extraction → **[wikimedia-commons-audio-video](../wikimedia-commons-audio-video/SKILL.md)**
+
+---
+
+## 0. The Easiest Way: `Special:FilePath`
+
+If you have a filename (e.g., `File:Sunset_over_the_ocean.jpg`) and need a
+thumbnail without computing the hash path or making an API call, use the
+`Special:FilePath` endpoint:
+
+```
+https://commons.wikimedia.org/wiki/Special:FilePath/File:Sunset_over_the_ocean.jpg?width=320
+```
+
+This endpoint:
+- Accepts the full title (with `File:` prefix), URL-encoded
+- Redirects transparently to the actual thumbnail (browser handles the redirect)
+- Sets appropriate CORS headers for `<img>` tags
+- Works with any file type (JPEG, PNG, SVG, PDF, video keyframes)
+- Requires **no** hash-path computation, **no** MD5 hashing, **no** extra API calls
+
+**From JavaScript (browser):**
+
+```javascript
+const filename = 'File:Example.jpg';
+const thumbUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(filename)}?width=320`;
+document.getElementById('preview').src = thumbUrl;
+```
+
+**From Python:**
+
+```python
+import urllib.parse
+
+filename = 'File:Example.jpg'
+url = f'https://commons.wikimedia.org/wiki/Special:FilePath/{urllib.parse.quote(filename)}?width=320'
+```
+
+### When to Use vs. the Action API
+
+| Scenario | Recommended | Why |
+|---|---|---|
+| You have a filename and need an `<img>` src | ✅ `Special:FilePath` | Zero extra API calls, simplest code |
+| You already have file metadata from an API call | ✅ Action API `iiurlwidth` | Thumbnail URL is already in the response |
+| You need exact dimensions or responsive 2× URLs | ✅ Action API `iiurlwidth` | Returns `responsiveUrls` and exact `thumbwidth`/`thumbheight` |
+| You're building a URL without browser redirects (server-side) | ⚠️ Either approach | `Special:FilePath` requires following a redirect; direct URL is one-hop |
+| You don't want to URL-encode special characters | ✅ Action API | Returns pre-built, correctly-encoded URLs |
 
 ---
 

@@ -7,6 +7,7 @@ depends_on: [wikimedia-api-access]
 skill_discovery_hints:
   - keywords: ["Toolforge", "tool hosting", "Kubernetes", "web service", "cron job", "deploy"]
   - keywords: ["toolforge tools create", "become", "webservice", "toolforge jobs"]
+  - keywords: ["CDN", "cdnjs", "tools-static", "privacy-preserving CDN", "content delivery", "third-party script", "external CDN tracking"]
 last_verified: 2026-06-10
 ---
 

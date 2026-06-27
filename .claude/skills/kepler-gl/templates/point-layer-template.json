@@ -1,0 +1,29 @@
+{
+  "type": "scatterplot",
+  "config": {
+    "label": "Point Layer",
+    "colorField": { "field": "category", "type": "ordinal" },
+    "colorScale": "quantize",
+    "colorRange": [
+      "#4c78a8",
+      "#f58518",
+      "#e15759",
+      "#76b7b2",
+      "#59a14f",
+      "#edc948",
+      "#b07aa1",
+      "#ff9da7",
+      "#9c755f",
+      "#bab0ac"
+    ],
+    "sizeField": { "field": "value", "type": "quantitative" },
+    "sizeScale": "linear",
+    "sizeRange": [2, 20],
+    "isVisible": true,
+    "pointRadius": 8,
+    "pointRadiusMinPixels": 2,
+    "pointRadiusMaxPixels": 20,
+    "highlightPoint": true,
+    "pointLighting": true
+  }
+}

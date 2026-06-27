@@ -1,0 +1,87 @@
+{
+  "version": "v1",
+  "config": {
+    "mapState": {
+      "center": [0, 20],
+      "zoom": 2,
+      "bearing": 0,
+      "pitch": 0
+    },
+    "visState": {
+      "filters": [],
+      "layers": [
+        {
+          "type": "scatterplot",
+          "config": {
+            "label": "Wikipedia Articles",
+            "colorField": { "field": "country", "type": "ordinal" },
+            "colorScale": "quantize",
+            "colorRange": [
+              "#4c78a8",
+              "#f58518",
+              "#e15759",
+              "#76b7b2",
+              "#59a14f",
+              "#edc948",
+              "#b07aa1",
+              "#ff9da7",
+              "#9c755f",
+              "#bab0ac"
+            ],
+            "sizeField": { "field": "population", "type": "quantitative" },
+            "sizeScale": "linear",
+            "sizeRange": [2, 10],
+            "isVisible": true,
+            "pointRadius": 8,
+            "pointRadiusMinPixels": 2,
+            "pointRadiusMaxPixels": 20,
+            "highlightPoint": true,
+            "pointLighting": true
+          }
+        }
+      ],
+      "interactionConfig": {
+        "brush": {
+          "size": 10,
+          "isActive": false
+        },
+        "zoom": {
+          "isActive": true
+        }
+      },
+      "layoutConfig": {
+        "isSplit": false,
+        "hasSplitControl": false,
+        "split": {
+          "show3D": false,
+          "showFlyTo": false
+        }
+      }
+    },
+    "uiState": {
+      "isVisible": true,
+      "dock": {
+        "isVisible": true,
+        "position": "left",
+        "width": 300
+      },
+      "isSideDockOpen": true,
+      "sideDock": {
+        "isVisible": true,
+        "position": "right",
+        "width": 400
+      },
+      "isBottomDockOpen": true,
+      "bottomDock": {
+        "isVisible": true,
+        "position": "bottom",
+        "height": 300
+      },
+      "mapControls": {
+        "isVisible": true,
+        "position": "bottom-right"
+      }
+    }
+  },
+  "datasets": []
+}

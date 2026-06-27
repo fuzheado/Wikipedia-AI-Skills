@@ -1,0 +1,27 @@
+{
+  "type": "hexagon",
+  "config": {
+    "label": "Hexagon Density Layer",
+    "colorField": { "field": "count", "type": "quantitative" },
+    "colorScale": "quantize",
+    "colorRange": [
+      "#4c78a8",
+      "#f58518",
+      "#e15759",
+      "#76b7b2",
+      "#59a14f",
+      "#edc948",
+      "#b07aa1",
+      "#ff9da7",
+      "#9c755f",
+      "#bab0ac"
+    ],
+    "sizeScale": "linear",
+    "sizeRange": [10, 50],
+    "isVisible": true,
+    "hexagonResolution": 6,
+    "hexagonCellPadding": 1,
+    "elevationScale": 1,
+    "elevationField": { "field": "count", "type": "quantitative" }
+  }
+}
