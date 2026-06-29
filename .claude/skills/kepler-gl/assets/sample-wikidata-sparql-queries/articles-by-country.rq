@@ -1,9 +1,0 @@
-SELECT ?item ?itemLabel ?itemDescription ?countryLabel ?latitude ?longitude WHERE {
-  ?item wdt:P31 wd:Q5 .  # Instance of human/person
-  ?item wdt:P27 ?country . # Country of citizenship
-  ?country wdt:P17 wd:Q6656 . # Country is a sovereign state
-  OPTIONAL { ?item wdt:P625 ?location . }
-  OPTIONAL { ?item wdt:P18 ?image . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-}
-LIMIT 100

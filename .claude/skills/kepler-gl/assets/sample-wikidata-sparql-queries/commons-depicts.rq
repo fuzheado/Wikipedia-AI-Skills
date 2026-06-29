@@ -1,7 +1,0 @@
-SELECT ?item ?itemLabel ?itemDescription ?depictsCoordinates ?latitude ?longitude WHERE {
-  ?item wdt:P31 wd:Q13406463 .  # Instance of Wikimedia Commons file
-  OPTIONAL { ?item wdt:P9149 ?depictsCoordinates . }
-  OPTIONAL { ?item wdt:P625 ?location . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-}
-LIMIT 100
