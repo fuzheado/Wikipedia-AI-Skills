@@ -36,6 +36,8 @@ This repository contains **47 skills** organized into two groups.
 > skills connect to each other in a force-directed graph. Drag nodes, zoom, and hover
 > to discover cross-references between skills.
 
+![Skills network preview](docs/skills-network.png)
+
 ### 📝 For editors and contributors
 
 Skills are arranged from **foundational** (understanding how Wikipedia works) to
