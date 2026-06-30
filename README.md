@@ -30,9 +30,9 @@ These skills are designed to **help you research, understand, and prepare conten
 
 ## Skills
 
-This repository contains **46 skills** organized into two groups.
+This repository contains **47 skills** organized into two groups.
 
-> 💡 **[Explore the interactive skills network →](docs/skills-network.html)** — see how all 46
+> 💡 **[Explore the interactive skills network →](docs/skills-network.html)** — see how all 47
 > skills connect to each other in a force-directed graph. Drag nodes, zoom, and hover
 > to discover cross-references between skills.
 
@@ -101,6 +101,7 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | [wikimedia-i18n-l10n-for-tools](.claude/skills/wikimedia-i18n-l10n-for-tools/SKILL.md) | Design multilingual Toolforge tools — message files and ICU plurals, language detection and fallback chains, RTL/bidi layout, Unicode normalization, cross-wiki domain mapping, batch Wikidata label fetching, and avoiding English Wikipedia assumptions |
 | | **▸ Search & Data** |
 | [wikimedia-search-cirrussearch](.claude/skills/wikimedia-search-cirrussearch/SKILL.md) | Search Wikimedia wikis using CirrusSearch — syntax cheat sheet (insource, hastemplate, linksto, deepcategory, haswbstatement), API parameters, prefix vs full-text vs title search, ranking caveats, maintenance queries, and combining search with PetScan, SPARQL, and categories |
+| [wikimedia-petscan](.claude/skills/wikimedia-petscan/SKILL.md) | Query Wikimedia projects with PetScan — multi-source category intersections, template filtering, SPARQL integration, Wikidata item filters, bulk data export, and the PSID stable query ID system |
 | [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties (sorting/filtering) or the REST API (precise historical data) |
 | [wikimedia-page-assessment](.claude/skills/wikimedia-page-assessment/SKILL.md) | Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners |
 | [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) | Score articles and revisions using Lift Wing ML models — revert risk, article quality, topic classification, readability, language identification, and more. Includes ORES migration guidance |
@@ -176,6 +177,7 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | Run Python bots at scale (edit 10K pages, harvest templates, transfer files) | [pywikibot](.claude/skills/pywikibot/SKILL.md) |
 | Watch Wikipedia edits in real time and build live dashboards | [wikimedia-eventstreams](.claude/skills/wikimedia-eventstreams/SKILL.md) |
 | Search wikis with advanced CirrusSearch syntax | [wikimedia-search-cirrussearch](.claude/skills/wikimedia-search-cirrussearch/SKILL.md) |
+| Run complex multi-source queries (categories + SPARQL + templates + Wikidata) | [wikimedia-petscan](.claude/skills/wikimedia-petscan/SKILL.md) |
 | Build a multilingual Toolforge tool with i18n support | [wikimedia-i18n-l10n-for-tools](.claude/skills/wikimedia-i18n-l10n-for-tools/SKILL.md) |
 | Build custom wiki pages with CSS layouts (grid, flexbox, cards) | [wikimedia-page-styling](.claude/skills/wikimedia-page-styling/SKILL.md) |
 

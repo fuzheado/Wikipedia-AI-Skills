@@ -29,6 +29,7 @@ digraph Skills {
   "wikimedia-page-assessment" [label="wm-page-assessment", fillcolor="#e8f5e9", style="filled,rounded", fontsize=13];
   "wikimedia-page-styling" [label="wm-page-styling", fillcolor="#c8e6c9", style="filled,rounded", fontsize=11];
   "wikimedia-pageviews" [label="wm-pageviews", fillcolor="#e8f5e9", style="filled,rounded", fontsize=11];
+  "wikimedia-petscan" [label="wm-petscan", fillcolor="#e8f5e9", style="filled,rounded", fontsize=10];
   "wikimedia-phabricator" [label="wm-phabricator", fillcolor="#fce4ec", style="filled,rounded", fontsize=9];
   "wikimedia-search-cirrussearch" [label="wm-search-cirrussearch", fillcolor="#e8f5e9", style="filled,rounded", fontsize=13];
   "wikimedia-security-and-privacy" [label="wm-security-and-privacy", fillcolor="#e3f2fd", style="filled,rounded", fontsize=10];
@@ -47,6 +48,7 @@ digraph Skills {
   "wikipedia-templates" [label="wp-templates", fillcolor="#e1bee7", style="filled,rounded", fontsize=13];
   "wikipedia-wikiprojects" [label="wp-wikiprojects", fillcolor="#e1bee7", style="filled,rounded", fontsize=11];
   "wikipedia-wikitables" [label="wp-wikitables", fillcolor="#e1bee7", style="filled,rounded", fontsize=11];
+  "wikivoyage" [label="wikivoyage", fillcolor="#c8e6c9", style="filled,rounded", fontsize=11];
   "wiktionary-and-wikisource" [label="wiktionary-and-wikisource", fillcolor="#c8e6c9", style="filled,rounded", fontsize=11];
 
   "commons-file-resolution" -> "wikimedia-api-access";
@@ -190,6 +192,13 @@ digraph Skills {
   "wikimedia-search-cirrussearch" -> "wikipedia-categories";
   "wikimedia-search-cirrussearch" -> "wikipedia-error-handling";
   "wikimedia-search-cirrussearch" -> "wikipedia-page-anatomy";
+  "wikimedia-petscan" -> "wikidata";
+  "wikimedia-petscan" -> "wikimedia-api-access";
+  "wikimedia-petscan" -> "wikimedia-commons-sparql";
+  "wikimedia-petscan" -> "wikimedia-search-cirrussearch";
+  "wikimedia-petscan" -> "wikimedia-toolforge";
+  "wikimedia-petscan" -> "wikipedia-categories";
+  "wikimedia-search-cirrussearch" -> "wikimedia-petscan";
   "wikimedia-security-and-privacy" -> "wikimedia-api-access";
   "wikimedia-security-and-privacy" -> "wikimedia-auth-oauth";
   "wikimedia-toolforge" -> "pywikibot";
@@ -279,4 +288,7 @@ digraph Skills {
   "wiktionary-and-wikisource" -> "wikimedia-commons-pdf";
   "wiktionary-and-wikisource" -> "wikimedia-i18n-l10n-for-tools";
   "wiktionary-and-wikisource" -> "wikimedia-wikitext";
+  "wikivoyage" -> "wikidata";
+  "wikivoyage" -> "wikimedia-api-access";
+  "wikivoyage" -> "wikimedia-wikitext";
 }

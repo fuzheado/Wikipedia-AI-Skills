@@ -5,7 +5,7 @@
 **Context:** These A/B tests were run on an early version of the skills (roughly
 25-30 skills existed at the time, using Claude Code as the agent harness). The
 findings were instrumental in validating the skill structure and guiding
-subsequent enhancements. As of June 2026, the repo has grown to 45 skills and
+subsequent enhancements. As of June 2026, the repo has grown to 47 skills and
 switched to Pi as the primary agent harness. Some specific findings may not apply
 to the current skill set, but the methodology and lessons learned remain relevant.
 

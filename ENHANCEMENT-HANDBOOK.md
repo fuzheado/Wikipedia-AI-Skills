@@ -10,7 +10,7 @@
 
 ## What This Is
 
-This repo has **45 skills** in `.claude/skills/<name>/SKILL.md`. Initially, each
+This repo has **47 skills** in `.claude/skills/<name>/SKILL.md`. Initially, each
 was just a single `SKILL.md` file with instructions. The goal was to **enhance
 every skill** with the full agent-skills structure — completed June 2026.
 

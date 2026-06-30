@@ -22,7 +22,7 @@ for name in nodes:
     # Extract domain for grouping
     if name.startswith("wikimedia-api") or name.startswith("wikimedia-auth") or name.startswith("wikimedia-security") or name.startswith("wikipedia-error") or name.startswith("wikimedia-diffs"):
         d = "APIs & Auth"
-    elif name.startswith("wikidata") or name.startswith("wikimedia-search") or name.startswith("wikimedia-pageviews") or name.startswith("wikimedia-page-assessment"):
+    elif name.startswith("wikidata") or name.startswith("wikimedia-search") or name.startswith("wikimedia-pageviews") or name.startswith("wikimedia-page-assessment") or name.startswith("wikimedia-petscan"):
         d = "Wikidata & Search"
     elif name.startswith("wikimedia-commons") or name.startswith("commons-file"):
         d = "Commons"
@@ -36,12 +36,15 @@ for name in nodes:
         d = "Other"
     domains[name] = d
 
+SKILL_COUNT = len(nodes)
+EDGE_COUNT = len(edges)
+
 html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wikipedia AI Skills — Interactive Network (45 skills, 227 edges)</title>
+<title>Wikipedia AI Skills — Interactive Network ({SKILL_COUNT} skills, {EDGE_COUNT} edges)</title>
 <style>
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
 body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif; background: #1a1a2e; overflow: hidden; }}
@@ -74,7 +77,7 @@ svg {{ width: 100vw; height: 100vh; }}
   <div class="legend-item"><span class="legend-dot" style="background:#e1bee7"></span> Content & Editing</div>
   <div class="legend-item"><span class="legend-dot" style="background:#c8e6c9"></span> Tools & Special</div>
 </div>
-<div class="stats">45 skills · 227 cross-references · Drag to explore · Scroll to zoom</div>
+<div class="stats">{SKILL_COUNT} skills · {EDGE_COUNT} cross-references · Drag to explore · Scroll to zoom</div>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
 const data = {{
