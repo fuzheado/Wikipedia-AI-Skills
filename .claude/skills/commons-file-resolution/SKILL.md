@@ -11,10 +11,16 @@ skill_discovery_hints:
   - keywords: ["imageinfo", "prop=imageinfo", "iiprop=url", "thumburl", "file metadata", "file info"]
   - keywords: ["cache bust", "timestamp", "v parameter", "image version", "file history", "purge file"]
   - keywords: ["browser app", "WebGL", "Canvas", "Pannellum", "360 photo", "photosphere", "panorama viewer"]
+  - keywords: ["download", "download image", "photo download", "batch download", "gallery", "local host", "self host", "serve locally"]
+  - keywords: ["Commons page", "Commons URL", "wiki/File", "get image from", "pull from Commons"]
 last_verified: 2026-06-20
 ---
 
-> ⚠️ **User-Agent required:** All curl and code examples access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill.
+> ⚠️ **Prefer `Special:FilePath?width=` over computed hash URLs.** Direct `upload.wikimedia.org/wikipedia/commons/{hash}/{file}` URLs can
+> return "File not found" for newer Commons uploads (post-2023 storage backend changes).
+> The `Special:FilePath` redirect always resolves correctly and supports `?width=` for
+> on-the-fly resizing — no MD5 computation, no hash prefix guessing. Only use direct
+> hash URLs if you specifically need the origin URL for archival purposes.
 
 > 💡 **Already know which endpoint you need?** See the **Quick Reference** table below. Otherwise, the **SOPs** walk through each approach step by step.
 
@@ -32,6 +38,7 @@ This skill covers every method for resolving a `File:` reference to a working UR
 
 | Goal | Method | Code / URL | Complexity |
 |------|--------|------------|------------|
+| **Download image to disk** | `Special:FilePath/?width=` | `curl -L "https://commons.wikimedia.org/wiki/Special:FilePath/File:Example.jpg?width=800" -o example.jpg` | ⭐ |
 | One-off URL, server-side | `Special:FilePath/` redirect | `https://commons.wikimedia.org/wiki/Special:FilePath/File:Example.jpg` | ⭐ |
 | One-off URL, browser `<img>` | `Special:FilePath/` redirect | Same URL, browser follows 302 redirect | ⭐ |
 | Full metadata + URL | Action API `prop=imageinfo` | `action=query&prop=imageinfo&titles=File:Example.jpg&iiprop=url\|timestamp\|size\|mime` | ⭐⭐ |
