@@ -46,6 +46,13 @@ ssh ${TOOLFORGE_USER:-your-username}@login.toolforge.org toolforge tools create 
 
 After creation, the tool's home directory is at `/data/project/my-tool-name/`.
 
+> ⚠️ **Toolforge Rule #2 — Open Source License Required:** All code in the Tools
+> project must be published under an [OSI-approved](https://opensource.org/licenses)
+> open source license. Add a `LICENSE` file to your repository before deploying.
+> The absence of a license means default copyright laws apply, which is counter to
+> the principles of the Wikimedia movement. See the
+> [full rules](https://wikitech.wikimedia.org/wiki/Help:Toolforge/Rules).
+
 ### 1.3 Configure Tool Permissions
 
 ```bash
@@ -83,6 +90,21 @@ Then update with `git pull` on subsequent deployments. This provides version his
 ```bash
 ssh ${TOOLFORGE_USER:-your-username}@login.toolforge.org chmod +x /data/project/my-tool-name/my-script.py
 ```
+
+### 2.4 Fix File Ownership (the `take` command)
+
+Files copied via `scp` or `rsync` arrive owned by your shell user, not the tool user.
+Many tool commands require tool-user ownership:
+
+```bash
+# File landed as wrong user after scp/rsync
+ssh ${TOOLFORGE_USER:-your-username}@login.toolforge.org
+become my-tool-name
+take /data/project/my-tool-name/my-script.py
+```
+
+The `take` command changes ownership to the current tool user. It requires
+that the calling user is the current owner (prevents abuse).
 
 ## SOP 3: Web Services
 
@@ -183,6 +205,25 @@ toolforge jobs logs my-job-name
 become my-tool-name
 toolforge jobs delete my-job-name
 ```
+
+### NFS Writes from Inside Pods (Non-Root Caveats)
+
+Kubernetes job containers run as the tool user, not root. The NFS home at
+`/data/project/<tool>/` is writable, but system directories are not:
+
+| Can write to | Cannot write to |
+|--------------|----------------|
+| `/data/project/<tool>/` (NFS home) | `/usr/local/` (root owned) |
+| `/tmp/` (world-writable) | `/var/lib/dpkg/` (root owned) |
+| `$HOME` (on NFS) | `/etc/` (root owned) |
+| `$TOOL_DATA_DIR` | `/data/` (root-owned) |
+
+**Consequences:**
+- Cannot `apt-get install` anything
+- Cannot `npm install -g` without setting `NPM_CONFIG_PREFIX` to a writable dir
+- Cannot write to `/data/` — use `/data/project/<tool>/` or `$TOOL_DATA_DIR` instead
+- `kubectl cp` may fail with permission errors on the kubeconfig file
+  (use `kubectl exec -i ... -- sh -c 'cat > /path' < localfile` instead)
 
 ## SOP 5: Cron Jobs
 
@@ -459,11 +500,27 @@ https://packages.ubuntu.com/noble/.
 
 ## Guardrails & Common Pitfalls
 
-1. **Always use `become`** before running tool-specific commands. Running `webservice` or `crontab -e` without `become` will execute under your user account, not the tool's service account, resulting in permission errors.
+1. **Use `become` for interactive sessions, `sudo -niu` for SSH one-liners.**
+   Running `become my-tool-name` interactively (SSH in, then `become`, then commands)
+   works correctly. But `become` uses `exec` internally, which **replaces the shell** —
+   so command chaining over SSH fails:
+
+   ```bash
+   # ❌ BROKEN — second command runs as YOUR user, not the tool
+   ssh user@login.toolforge.org "become my-tool-name; webservice restart"
+
+   # ✅ CORRECT — use sudo -niu for chained SSH commands
+   ssh user@login.toolforge.org "sudo -niu tools.my-tool-name webservice restart"
+   ```
+
 2. **SSH key expiry** — Toolforge SSH keys expire after a period. If you get permission denied, regenerate your key in the admin console and re-add it to `ssh-agent`.
+
 3. **NFS latency** — `/data/project/` is on NFS. File operations can be slow. Avoid frequent small writes. Use local `/tmp/` for temporary files and move results to NFS only when needed.
+
 4. **Resource limits** — Kubernetes pods have 1 CPU and 1Gi RAM by default. Use toolforge jobs with `--mem` and `--cpu` flags for larger tasks. Do not run resource-intensive tasks on bastion or login nodes.
+
 5. **Do not run long processes on login** — The login shell is for administration only. Long-running processes should be jobs or web services. Processes running for more than 30 minutes on login may be killed without warning.
+
 6. **Database connections** — For replica database access, see the `wikimedia-database` skill. For tool-owned databases (MariaDB), use `become my-tool-name` and run `sql my-tool-name` to access the tool's database. If you need the actual MySQL username and password (e.g., for an external client or connection string), find them in the tool's home directory after `become`:
 
    ```bash
@@ -472,11 +529,36 @@ https://packages.ubuntu.com/noble/.
    ```
 
    This prints `[client]` with `user` and `password` fields. The `sql` command is still the recommended way to connect interactively, but `replica.my.cnf` is useful when configuring ORM connection strings or database drivers in application code.
+
 7. **Static file caching** — Static web services (`--backend=kubernetes static`) serve from `/data/project/my-tool-name/`. Files are cached; wait a few minutes after deployment or use a versioned URL pattern (`style.v2.css`).
+
 8. **Test locally first** — Deploying broken code to Toolforge wastes time. Test scripts locally with representative data before deploying.
+
 9. **Clean up old jobs** — Kubernetes job history accumulates. Delete completed jobs that are no longer needed using `toolforge jobs delete`.
+
 10. **Build Service: Git repo required** — The Build Service requires a **public** Git repository. Private repos are not supported. The `Procfile` must be at the repository root and named exactly `Procfile` (no extension). After a build, you must restart the web service to pick up the new image — `toolforge build start` alone does not restart running services.
+
 11. **Build Service: NFS and $HOME** — Build Service containers do not have NFS mounted by default. Use `--mount=all` to mount it. Inside the container, `$HOME` does not point to `/data/project/<tool>/` — use the `$TOOL_DATA_DIR` environment variable instead for tool home directory paths.
+
+12. **Wait ~1 minute after tool creation** before `become` works. Use `sudo -u` as an immediate workaround.
+
+13. **Refs vary between browser sessions** — When using Playwright or browser automation for toolsadmin, always snapshot to read the current accessibility tree instead of hardcoding element refs.
+
+### Common Toolforge Mistakes
+
+| Mistake | Symptom | Fix |
+|---------|---------|-----|
+| `become <tool>; cmd1; cmd2` | Subsequent commands run as original user | Use `sudo -niu tools.<tool> cmd1; cmd2` instead |
+| `become <tool>; webservice restart` | TLS cert errors or commands run as wrong user | Use `sudo -niu tools.<tool> webservice restart` |
+| `--kubeconfig=PATH` | `stat .kubeconfig: no such file` | Use `--kubeconfig PATH` (space, not `=`) |
+| `toolforge env set` | `No such command 'env'` | Use `toolforge envvars create` |
+| Nested `"` inside `"` over SSH | `unexpected EOF` | Use heredoc or alternate quote layers |
+| `scp` to `/data/project/` | `Permission denied` (lands as wrong user) | Pipe through `sudo`; use `take` |
+| `kubectl exec -it` in non-tty | `the input device is not a TTY` | Use `-i` without `-t`, or add `-t` to the outer SSH command |
+| `kubectl cp` to a running pod | Permission errors reading kubeconfig | Use `kubectl exec -i ... -- sh -c 'cat > /path' < localfile` instead |
+| Writing to `/data/` from inside a pod | Permission denied | Use `/data/project/<tool>/` or `$TOOL_DATA_DIR` instead |
+| `printf '\\e'` for escape sequences | `\e` becomes literal escape char (0x1B) | Use `printf '%s' '\\e'` with `%s` format to output literally |
+| `become <tool> sh -c "\$VAR"` | Variable empty on bastion | Escaped `$` passes through to the tool shell; unescaped expands on bastion |
 
 ## Example Workflows
 
@@ -677,6 +759,138 @@ The full CDN mirror guide with troubleshooting is at **[references/cdn-mirror-gu
 | [`scripts/list-available.sh`](./scripts/list-available.sh) | Search available libraries |
 | [`assets/load-template.html`](./assets/load-template.html) | HTML page loading jQuery, Bootstrap, Font Awesome from CDN |
 | [`assets/load-template.js`](./assets/load-template.js) | Dynamic JS loader for programmatic use |
+
+---
+
+## Scripting Guide: Multi-Layer SSH Commands
+
+Running commands on Toolforge involves nested shells: local → SSH → bastion → `become`/`sudo` → command. Each layer adds quoting complexity.
+
+### The Shell Stack
+
+```
+Local machine ──▶ SSH ──▶ Bastion shell ──▶ sudo -niu tools.<tool> ──▶ Command
+```
+
+Every `"`, `$`, `\\`, `` ` ``, and `'` must survive all layers.
+
+### Pattern 1: Simple Commands
+
+```bash
+# No special characters — works directly
+ssh user@login.toolforge.org "sudo -niu tools.mytool toolforge jobs list"
+
+# Single-quoted arguments inside the remote string
+ssh user@login.toolforge.org "sudo -niu tools.mytool toolforge jobs run myjob --command 'python3 script.py'"
+```
+
+### Pattern 2: The `take` Command Alternative for File Transfer
+
+You can't `scp` directly to `/data/project/<tool>/` as your shell user
+(it's owned by `tools.<toolname>`). Two approaches:
+
+**A) Staging area + `take`:**
+```bash
+scp file.txt user@login.toolforge.org:/home/user/
+ssh user@login.toolforge.org \
+  "sudo -niu tools.mytool sh -c 'cp /home/user/file.txt /data/project/mytool/ && take /data/project/mytool/file.txt'"
+```
+
+**B) Pipe through SSH:**
+```bash
+cat localfile | ssh user@login.toolforge.org \
+  "sudo -niu tools.mytool sh -c 'cat > /data/project/mytool/localfile'"
+```
+
+### Pattern 3: Passing stdin to a Remote Command
+
+```bash
+# Pipe a local file into a remote command as the tool user
+cat my-script.sh | ssh user@login.toolforge.org \
+  "sudo -niu tools.mytool sh -c 'cat > /data/project/mytool/my-script.sh'"
+
+# Heredoc piped through SSH
+cat << 'EOF' | ssh user@login.toolforge.org \
+  "sudo -niu tools.mytool sh -c 'cat > /data/project/mytool/config.json'"
+{
+  "key": "value"
+}
+EOF
+```
+
+**Key insight for heredocs:** If you quote the delimiter (`<< 'EOF'`), the content is treated as a literal string — no variable expansion happens locally. This is usually what you want when writing to remote files.
+
+### Pattern 4: Writing Files Inside a Pod (kubectl exec)
+
+More reliable than `kubectl cp` (avoids kubeconfig permission issues):
+
+```bash
+# Pipe local content into a file inside a pod
+cat config.json | kubectl exec -i my-pod -n tool-mytool -- sh -c 'cat > /tmp/config.json'
+
+# Heredoc works the same way
+cat << 'EOF' | kubectl exec -i my-pod -n tool-mytool -- sh -c 'cat > /tmp/.env'
+API_KEY=sk-...
+EOF
+```
+
+### Pattern 5: Commands with Internal Quotes
+
+```bash
+# Outer single quotes let you use double quotes inside for the remote command
+ssh user@login.toolforge.org \
+  'sudo -niu tools.mytool kubectl exec pod -n tool-mytool -- sh -c "echo hello"'
+```
+
+### The Bash Quoting Idiom Trap
+
+The idiom `'single'\''quote'` embeds a single quote inside a single-quoted string:
+
+```bash
+# IDIOM: 'text1'\''text2' produces: text1'text2
+#         ^^^^^^  ^^ ^^^^^^
+#         quoted  \'  quoted
+#                 (escaped single quote between two quoted parts)
+```
+
+**Common mistake — space after `\'`:**
+```bash
+# WRONG: 'text1'\'' text2'
+# The space after \' STARTS a new argument
+# Same for 'text1\' 'text2'
+
+# RIGHT: 'text1'\''text2' — no space, all one argument
+```
+
+**Safer alternative:** build strings in multiple steps:
+```bash
+printf '%s' 'PS1=' >> /tmp/file      # PS1=
+printf '%s' '\\[\\e...' >> /tmp/file  # the actual PS1 value
+printf '%s' "'" >> /tmp/file          # closing single quote
+echo "" >> /tmp/file                  # newline
+```
+
+### Writing Scripts That Run on the Bastion (No Local SSH Layer)
+
+When you write a script that runs on the bastion itself (not from your local machine),
+there's one fewer shell layer, which is much simpler:
+
+```bash
+# /data/project/mytool/myscript.sh (runs as tools.mytool)
+
+# Simple: direct kubectl with --kubeconfig (use SPACE, not =)
+kubectl --kubeconfig /data/project/mytool/.kube/config get pods -n tool-mytool
+
+# Multi-line script inside pod (escape $ for variables you want expanded IN the pod)
+kubectl exec my-pod -n tool-mytool -- sh -c "
+    export PATH=/tmp/npm/bin:\$PATH
+    node --version
+"
+```
+
+**Critical rule for bastion scripts:**
+- Variables you want expanded ON THE BASTION use `${VAR}` (no escaping)
+- Variables you want expanded INSIDE THE POD use `\${VAR}` or `\$VAR` (escaped `$`)
 
 ---
 

@@ -36,6 +36,13 @@ last_verified: 2026-06-22
 > path, supports all Python versions, and avoids the fixed file layout of the
 > traditional backend.
 
+> ⚠️ **Toolforge Rule #2 — Open Source License Required:** All code in the Tools
+> project must be published under an [OSI-approved](https://opensource.org/licenses)
+> open source license. Add a `LICENSE` file to your repository before deploying.
+> The absence of a license means default copyright laws apply, which is counter to
+> the principles of the Wikimedia movement. See the
+> [full rules](https://wikitech.wikimedia.org/wiki/Help:Toolforge/Rules).
+
 ---
 
 ## Quick Reference

@@ -20,6 +20,13 @@ last_verified: 2026-06-20
 
 > 💡 **Zero dependencies by default:** Toolforge's NFS filesystem has slow metadata operations — `npm install` can take minutes. The patterns in this skill use **only Node.js built-in modules** by default, which means zero `npm install`, zero `package.json`, and instant deployment. Add dependencies only when you must.
 
+> ⚠️ **Toolforge Rule #2 — Open Source License Required:** All code in the Tools
+> project must be published under an [OSI-approved](https://opensource.org/licenses)
+> open source license. Add a `LICENSE` file to your repository before deploying.
+> The absence of a license means default copyright laws apply, which is counter to
+> the principles of the Wikimedia movement. See the
+> [full rules](https://wikitech.wikimedia.org/wiki/Help:Toolforge/Rules).
+
 ---
 
 ## Quick Reference
