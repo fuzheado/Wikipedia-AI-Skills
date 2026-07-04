@@ -28,7 +28,7 @@ echo "=== Wikidata Lookup: $ID ==="
 echo ""
 
 API="https://www.wikidata.org/w/api.php"
-PARAMS="action=wbgetentities&ids=$ID&props=labels|descriptions|aliases|claims|sitelinks&languages=en&format=json"
+PARAMS="action=wbgetentities&ids=$ID&props=labels|descriptions|aliases|claims|sitelinks&languages=en|mul&format=json"
 
 TMPFILE=$(mktemp /tmp/wikidata-lookup.XXXXXX)
 trap 'rm -f "$TMPFILE"' EXIT

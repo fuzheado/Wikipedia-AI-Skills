@@ -330,7 +330,7 @@ try:
         '?action=wbgetentities'
         f'&ids={\"|\".join(ids_to_fetch)}'
         '&props=labels|descriptions'
-        f'&languages={label_lang}|en'
+        f'&languages={label_lang}|mul|en'
         '&format=json'
     )
     req = urllib.request.Request(batch_url, headers={'User-Agent': user_agent})

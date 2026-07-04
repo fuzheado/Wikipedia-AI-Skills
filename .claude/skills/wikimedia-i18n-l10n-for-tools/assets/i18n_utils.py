@@ -335,14 +335,19 @@ def resolve_fallback(lang: str) -> List[str]:
     """
     Resolve the full fallback chain for a language.
 
+    The chain always ends with ``"mul"`` (multilingual label) followed by
+    ``"en"``.  Many Wikidata entities use ``mul`` labels (especially proper
+    names that don't need translation: "Larry Sanger" instead of per-language
+    labels).  Without ``mul`` in the chain, those entities appear label-less.
+
     Args:
         lang: Language code (e.g., "pt-br", "zh-cn", "fr")
 
     Returns:
-        Ordered list: [lang, fallback1, fallback2, ..., "en"]
+        Ordered list: [lang, fallback1, fallback2, ..., "mul", "en"]
     """
     if lang == "en":
-        return ["en"]
+        return ["en", "mul"]
 
     chain = [lang]
     seen = {lang}
@@ -365,6 +370,15 @@ def resolve_fallback(lang: str) -> List[str]:
         if not found:
             chain.append("en")
             break
+
+    # Insert "mul" before "en" in the chain (if not already present)
+    if "mul" not in seen:
+        # Find the position of "en" and insert "mul" right before it
+        try:
+            en_idx = chain.index("en")
+            chain.insert(en_idx, "mul")
+        except ValueError:
+            chain.append("mul")
 
     return chain
 

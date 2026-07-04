@@ -6,8 +6,15 @@ Base: `https://www.wikidata.org/w/api.php`
 
 ### Get entities by ID
 ```
-action=wbgetentities&ids=Q937|Q5|Q5&props=labels|descriptions|claims|sitelinks&languages=en&format=json
+action=wbgetentities&ids=Q937|Q5|Q5&props=labels|descriptions|claims|sitelinks&languages=en|mul&format=json
 ```
+
+> ⚠️ **Always include `mul` in the `languages` parameter.** Many Wikidata items
+> (especially proper names that don't need translation) only have a "multilingual"
+> label (`language: mul`). If you request `languages=en` and a QID has no English
+> label, the API returns an empty labels object — the `mul` label is excluded
+> because it wasn't in the filter. Pass `languages=en|mul` (or `{lang}|mul` for
+> any language) so the response includes both and you can fall back client-side.
 
 ### Search entities
 ```

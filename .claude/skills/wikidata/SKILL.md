@@ -120,6 +120,15 @@ Wikidata is built on the **Wikibase** software, which is a **MediaWiki extension
 https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q937&props=labels|descriptions|claims&format=json
 ```
 
+> ⚠️ **`languages` parameter and `mul` (multilingual) labels.**
+> When fetching labels, always include `mul` in the `languages` filter:
+> `languages=en|mul`. Many Wikidata items (especially proper names like
+> "Larry Sanger" at Q185) have **no per-language label** — only a single
+> `mul` label that works for all languages. If you request `languages=en`,
+> the API filters `mul` out of the response entirely, and you get an empty
+> labels object. Pass both (`en|mul` / `{lang}|mul`) and check client-side:
+> `labels[lang] || labels["mul"] || labels["en"]`.
+
 ---
 
 ## **SPARQL Query Service**

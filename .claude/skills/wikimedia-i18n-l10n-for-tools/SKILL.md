@@ -507,13 +507,27 @@ resp = requests.get(
         "action": "wbgetentities",
         "ids": "Q937|Q5|P31",
         "props": "labels|descriptions",
-        "languages": "en|fr|de|ar",
+        "languages": "en|fr|de|ar|mul",
         "format": "json",
     },
     headers={"User-Agent": "MyTool/1.0 (contact) ContentGapResearch"},
     timeout=30,
 )
 ```
+
+> ⚠️ **Always include `mul` (multilingual) in the language list.** Many
+> Wikidata entities — especially proper names that don't need translation —
+> have only a `language: mul` label instead of per-language labels. If you
+> request `languages=en` and a QID has no English label, the API filters
+> `mul` out of the response and you get an empty result. Always pass
+> `{lang}|mul` (e.g. `fr|mul`, `en|mul`) and resolve client-side:
+> `labels[lang] || labels["mul"] || labels["en"]`.
+>
+> The `resolve_fallback()` function in
+> [i18n_utils.py](assets/i18n_utils.py) now includes `"mul"` in every
+> fallback chain automatically (inserted before `"en"`). If you use
+> `resolve_fallback()` to build your `languages` parameter, `mul` is
+> already handled.
 
 ### 3. Commons Multilingual File Descriptions
 

@@ -380,7 +380,15 @@ Each row shows an icon: 🧠 (vector similarity), 🔤 (keyword match), or 🧠�
 
 1. After the Vector DB returns its top K results, the script calls the **Wikidata Action API** with one batch request per phase:
    - **Phase 2 (sitelink check):** `action=wbgetentities&props=sitelinks&sitefilter={SITE_CODE}` — checks all K QIDs in one call
-   - **Phase 3 (labels):** `action=wbgetentities&props=labels|descriptions&languages={lang}|en` — fetches labels and descriptions in one call
+   - **Phase 3 (labels):** `action=wbgetentities&props=labels|descriptions&languages={lang}|mul|en` — fetches labels and descriptions in one call
+
+   > ⚠️ **Always include `mul` in the `languages` parameter.** Many Wikidata
+   > entities (especially proper names like Q185 "Larry Sanger") have **no
+   > per-language label** — only a single multilingual label (`language: mul`).
+   > If you request only `languages={lang}|en`, the API filters `mul` out of the
+   > response. You'll get an empty labels object and the entity will appear
+   > label-less. Always pass `{lang}|mul|en` and resolve client-side:
+   > `labels[lang] || labels["mul"] || labels["en"]`.
 
 2. **For language Wikipedias** (`enwiki`, `frwiki`, `dewiki`, etc.): only **main-namespace articles** pass (pages whose sitelink title doesn't start with `Category:`, `Template:`, `Portal:`, `File:`, `Module:`, etc.)
 
