@@ -1,0 +1,126 @@
+#!/usr/bin/env python3
+"""Pre-push hook: ensure every tooling file referenced in SKILL.md exists.
+
+A "tooling reference" is any path matching scripts/*, assets/*, or references/*
+that appears in the SKILL.md **Tooling section** (between "## Tooling" and the
+next "## " heading or end of file). Cross-references to other skills (paths
+starting with "../") are excluded. Explicitly planned/stub entries in sections
+that declare "No scripts/assets/docs shipped yet" are excluded.
+"""
+
+import os, re, sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SKILLS_DIR = os.path.join(ROOT, ".claude", "skills")
+
+EXIT_OK = 0
+EXIT_FAIL = 1
+
+
+def find_tooling_references(skill_dir: str) -> list[tuple[str, str]]:
+    """Parse SKILL.md for genuinely-missing tooling files.
+
+    Returns list of (relative_path, description_context).
+    Only examines the ## Tooling section(s).
+    """
+    skill_md = os.path.join(skill_dir, "SKILL.md")
+    if not os.path.isfile(skill_md):
+        return []
+
+    content = open(skill_md).read()
+    skill_name = os.path.basename(skill_dir)
+    missing = []
+
+    # Extract the Tooling section(s)
+    # Find all "## Tooling" headers and extract until next "## " or EOF
+    tooling_sections = []
+    for m in re.finditer(r"^## Tooling\b", content, re.MULTILINE):
+        start = m.start()
+        # Find the next ## header at the same level (starts with "## ")
+        next_h2 = re.search(r"^## ", content[m.end():], re.MULTILINE)
+        end = m.end() + next_h2.start() if next_h2 else len(content)
+        tooling_sections.append((start, end))
+
+    if not tooling_sections:
+        return []
+
+    # Check if sections declare explicit "no files shipped yet"
+    has_planned_marker = any(
+        "no scripts shipped yet" in content[s:e].lower()
+        or "no assets shipped yet" in content[s:e].lower()
+        or "no reference" in content[s:e].lower()
+        for s, e in tooling_sections
+    )
+
+    for s, e in tooling_sections:
+        section = content[s:e]
+
+        # Find all file references: scripts/..., assets/..., references/...
+        refs = set(re.findall(
+            r'(?:scripts|assets|references)/[\w./-]+',
+            section
+        ))
+
+        for ref in sorted(refs):
+            # Skip cross-references to other skills
+            if ref.startswith("../") or ".." in ref:
+                continue
+
+            # Skip if the file exists
+            full_path = os.path.join(skill_dir, ref)
+            if os.path.isfile(full_path):
+                continue
+
+            # Skip if this is a directory reference (trailing slash in doc)
+            if ref.endswith("/"):
+                if os.path.isdir(full_path):
+                    # Directory exists — check it has content
+                    if os.listdir(full_path):
+                        continue
+                continue
+
+            # If in a "planned" section, skip — intentional gap
+            if has_planned_marker:
+                continue
+
+            # Find context — the line mentioning this ref
+            context = ""
+            for line in section.split("\n"):
+                if os.path.basename(ref) in line:
+                    context = line.strip()
+                    break
+
+            missing.append((ref, context))
+
+    return missing
+
+
+def main():
+    errors = 0
+    for name in sorted(os.listdir(SKILLS_DIR)):
+        skill_dir = os.path.join(SKILLS_DIR, name)
+        if not os.path.isdir(skill_dir):
+            continue
+
+        missing = find_tooling_references(skill_dir)
+        if missing:
+            print(f"\n❌ {name}/SKILL.md references {len(missing)} missing tooling file(s):")
+            for ref, ctx in missing:
+                print(f"   📄 {ref}")
+                if ctx:
+                    print(f"      ↳ {ctx[:100]}")
+            errors += 1
+
+    if errors:
+        print(f"\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        print(f"⛔ {errors} skill(s) have missing tooling files.")
+        print(f"   Either create the files, or remove references from SKILL.md.")
+        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        return EXIT_FAIL
+
+    print("✅ All tooling references verified — no missing files.")
+    return EXIT_OK
+
+
+if __name__ == "__main__":
+    sys.exit(main())

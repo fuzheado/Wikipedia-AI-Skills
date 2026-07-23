@@ -1,0 +1,18 @@
+name: Validate Tooling References
+
+on:
+  push:
+    paths:
+      - '.claude/skills/**/SKILL.md'
+  pull_request:
+    paths:
+      - '.claude/skills/**/SKILL.md'
+
+jobs:
+  validate-tooling:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tooling reference check
+        run: python3 .githooks/pre-push
