@@ -101,7 +101,7 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | [toolforge-python](.claude/skills/toolforge-python/SKILL.md) | Deploy and manage Python web services on Wikimedia Toolforge Kubernetes — Flask and gunicorn setup, webservice commands, virtual environments on NFS, pip caching, PORT configuration, static file serving, logging, and cron jobs |
 | [wikimedia-phabricator](.claude/skills/wikimedia-phabricator/SKILL.md) | Navigate Wikimedia's Phabricator instance — search tasks, interpret task status and project tags, file bug reports, and track WMF development priorities |
 | [wikimedia-i18n-l10n-for-tools](.claude/skills/wikimedia-i18n-l10n-for-tools/SKILL.md) | Design multilingual Toolforge tools — message files and ICU plurals, language detection and fallback chains, RTL/bidi layout, Unicode normalization, cross-wiki domain mapping, batch Wikidata label fetching, and avoiding English Wikipedia assumptions |
-| [codex](.claude/skills/codex/SKILL.md) | Build Wikimedia-consistent web interfaces with the Codex design system — Vue 3 components, CSS-only components, design tokens, icons, and composables. For Toolforge tools, MediaWiki gadgets, and Wikimedia-adjacent frontends |
+| [wikimedia-codex](.claude/skills/wikimedia-codex/SKILL.md) | Build Wikimedia-consistent web interfaces with the Codex design system — Vue 3 components, CSS-only components, design tokens, icons, and composables. For Toolforge tools, MediaWiki gadgets, and Wikimedia-adjacent frontends |
 | | **▸ Search & Data** |
 | [wikimedia-search-cirrussearch](.claude/skills/wikimedia-search-cirrussearch/SKILL.md) | Search Wikimedia wikis using CirrusSearch — syntax cheat sheet (insource, hastemplate, linksto, deepcategory, haswbstatement), API parameters, prefix vs full-text vs title search, ranking caveats, maintenance queries, and combining search with PetScan, SPARQL, and categories |
 | [wikimedia-petscan](.claude/skills/wikimedia-petscan/SKILL.md) | Query Wikimedia projects with PetScan — multi-source category intersections, template filtering, SPARQL integration, Wikidata item filters, bulk data export, and the PSID stable query ID system |
@@ -183,7 +183,7 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | Run complex multi-source queries (categories + SPARQL + templates + Wikidata) | [wikimedia-petscan](.claude/skills/wikimedia-petscan/SKILL.md) |
 | Build a multilingual Toolforge tool with i18n support | [wikimedia-i18n-l10n-for-tools](.claude/skills/wikimedia-i18n-l10n-for-tools/SKILL.md) |
 | Build custom wiki pages with CSS layouts (grid, flexbox, cards) | [wikimedia-page-styling](.claude/skills/wikimedia-page-styling/SKILL.md) |
-| Build a Wikimedia-consistent UI for your tool with the Codex design system | [codex](.claude/skills/codex/SKILL.md) |
+| Build a Wikimedia-consistent UI for your tool with the Codex design system | [wikimedia-codex](.claude/skills/wikimedia-codex/SKILL.md) |
 
 ## Quick start
 

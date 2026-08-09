@@ -1,11 +1,11 @@
 ---
-name: codex
+name: wikimedia-codex
 description: "Build Wikimedia-consistent UIs with the Codex design system: Vue 3 and CSS-only components, design tokens, icons, composables. For Toolforge tools and MediaWiki frontends."
 license: MIT
 compatibility: opencode
 last_verified: 2026-06-24
 skill_discovery_hints:
-  - keywords: ["codex", "design system", "wikimedia", "vue", "components"]
+  - keywords: ["codex", "wikimedia-codex", "design system", "wikimedia", "vue", "components"]
   - keywords: ["toolforge", "mediawiki", "frontend", "ui", "design tokens"]
 ---
 
