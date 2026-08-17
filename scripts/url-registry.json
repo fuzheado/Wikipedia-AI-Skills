@@ -488,6 +488,10 @@
   "https://toolsadmin.wikimedia.org/tools": "2026-08-10T12:57:50Z",
   "https://toolsadmin.wikimedia.org/tools/": "2026-08-10T12:57:50Z",
   "https://toolsadmin.wikimedia.org/tools/create": "2026-08-10T12:57:50Z",
+  "https://translate.wmcloud.org": "2026-08-17T23:14:57Z",
+  "https://translate.wmcloud.org/api": "2026-08-17T23:14:59Z",
+  "https://translate.wmcloud.org/api/languages": "2026-08-17T23:15:00Z",
+  "https://translate.wmcloud.org/api/translate": "2026-08-17T23:15:01Z",
   "https://translatewiki.net": "2026-08-10T13:07:16Z",
   "https://upload.wikimedia.org/": "2026-08-10T12:57:50Z",
   "https://upload.wikimedia.org/.../200px-": "2026-08-10T12:57:50Z",
@@ -603,6 +607,7 @@
   "https://www.mediawiki.org/wiki/Codex#Using_Codex_icons": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Codex#Using_design_tokens_directly": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Codex/Planned_Components": "2026-08-10T12:57:50Z",
+  "https://www.mediawiki.org/wiki/Content_translation/Machine_Translation/MinT": "2026-08-17T23:15:02Z",
   "https://www.mediawiki.org/wiki/Extension:AbuseFilter": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Extension:GlobalUsage": "2026-08-14T14:42:12Z",
   "https://www.mediawiki.org/wiki/Extension:PageAssessments": "2026-08-10T12:57:50Z",
@@ -624,6 +629,7 @@
   "https://www.mediawiki.org/wiki/Manual:Pywikibot/Cookbook": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Manual:RCFeed": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Manual:RevisionDelete": "2026-08-10T12:57:50Z",
+  "https://www.mediawiki.org/wiki/MinT#Disclaimer": "2026-08-17T23:15:03Z",
   "https://www.mediawiki.org/wiki/Specs/HTML/2.1.0": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Structured_Discussions/Deprecation": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Structured_Discussions/Deprecation/Report": "2026-08-10T12:57:50Z",
@@ -685,7 +691,7 @@
   "https://your-tool.toolforge.org": "2026-08-10T12:57:50Z",
   "https://\u0440\u0443.wikipedia.org": "2026-08-10T13:07:28Z"
  },
- "generated_at": "2026-08-17T14:17:40Z",
+ "generated_at": "2026-08-17T23:14:57Z",
  "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
@@ -1185,6 +1191,10 @@
   "https://toolsadmin.wikimedia.org/tools": 200,
   "https://toolsadmin.wikimedia.org/tools/": 200,
   "https://toolsadmin.wikimedia.org/tools/create": 200,
+  "https://translate.wmcloud.org": 200,
+  "https://translate.wmcloud.org/api": 404,
+  "https://translate.wmcloud.org/api/languages": 200,
+  "https://translate.wmcloud.org/api/translate": 405,
   "https://translatewiki.net": 403,
   "https://upload.wikimedia.org/": 200,
   "https://upload.wikimedia.org/.../200px-": -1,
@@ -1305,6 +1315,7 @@
   "https://www.mediawiki.org/wiki/Codex#Using_Codex_icons": 200,
   "https://www.mediawiki.org/wiki/Codex#Using_design_tokens_directly": 200,
   "https://www.mediawiki.org/wiki/Codex/Planned_Components": 200,
+  "https://www.mediawiki.org/wiki/Content_translation/Machine_Translation/MinT": 200,
   "https://www.mediawiki.org/wiki/Extension:AbuseFilter": 200,
   "https://www.mediawiki.org/wiki/Extension:GlobalUsage": 200,
   "https://www.mediawiki.org/wiki/Extension:PageAssessments": 200,
@@ -1326,6 +1337,7 @@
   "https://www.mediawiki.org/wiki/Manual:Pywikibot/Cookbook": 200,
   "https://www.mediawiki.org/wiki/Manual:RCFeed": 200,
   "https://www.mediawiki.org/wiki/Manual:RevisionDelete": 200,
+  "https://www.mediawiki.org/wiki/MinT#Disclaimer": 200,
   "https://www.mediawiki.org/wiki/Specs/HTML/2.1.0": 200,
   "https://www.mediawiki.org/wiki/Structured_Discussions/Deprecation": 200,
   "https://www.mediawiki.org/wiki/Structured_Discussions/Deprecation/Report": 200,
@@ -1387,5 +1399,5 @@
   "https://your-tool.toolforge.org": -1,
   "https://\u0440\u0443.wikipedia.org": 0
  },
- "user_agent": "WikipediaSkill/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills; andrew.lih@gmail.com) ContentGapResearch"
+ "user_agent": "wikipedia-ai-skills-url-registry/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills)"
 }

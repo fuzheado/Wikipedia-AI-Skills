@@ -65,6 +65,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [wikimedia-page-styling](.claude/skills/wikimedia-page-styling/SKILL.md) | Use TemplateStyles to load custom CSS on wiki pages — build responsive grid/flexbox layouts, card-based tile systems, color themes, button systems, and full visual design systems that transform plain MediaWiki pages into rich, interactive-looking interfaces |
 | [mediawiki-page-navigation](.claude/skills/mediawiki-page-navigation/SKILL.md) | Build navigation systems in MediaWiki — menu bars, subpage hierarchies, breadcrumbs, tabs, and the template logic that powers them |
 | [mediawiki-translate-extension](.claude/skills/mediawiki-translate-extension/SKILL.md) | Work with the Translate extension for multilingual wiki content — marking pages for translation, writing translatable templates, and building i18n-aware navigation |
+| [mint](.claude/skills/mint/SKILL.md) | Translate text and rich content via MinT — the Wikimedia machine translation service: 200+ languages, open NMT models (NLLB-200, OpusMT, IndicTrans2), plain/HTML/JSON/markdown formats |
 | | **▸ Commons & Media** |
 | [wikimedia-commons](.claude/skills/wikimedia-commons/SKILL.md) | Search, upload, and understand Wikimedia Commons — the free media repository of images, video, sound, 3D files, PDFs, and other media used across Wikipedia and its sister projects. Browse categories, find reusable media, and retrieve file metadata |
 | [commons-file-resolution](.claude/skills/commons-file-resolution/SKILL.md) | Resolve Wikimedia Commons file references to browser-usable HTTP URLs — direct origin URLs, thumbnails, Special:FilePath redirects, cache-busting with timestamps, Action API imageinfo queries, and CORS-aware serving patterns for web applications |
@@ -146,6 +147,8 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | Participate in talk page discussions, sign comments, and find WikiProject assessments | [wikipedia-talk-page](.claude/skills/wikipedia-talk-page/SKILL.md) |
 | Find the right WikiProject for an article topic | [wikipedia-wikiprojects](.claude/skills/wikipedia-wikiprojects/SKILL.md) |
 | | **▸ Working with Content** |
+| Translate text or article content between languages (200+ languages, open NMT models) | [mint](.claude/skills/mint/SKILL.md) |
+| Translate rich content while preserving HTML/JSON/markdown markup | [mint](.claude/skills/mint/SKILL.md) |
 | Extract infobox data, citations, or internal links from an article's wikitext | [wikimedia-wikitext](.claude/skills/wikimedia-wikitext/SKILL.md) |
 | Query Wikidata with SPARQL — find items, traverse properties, filter by value | [wikidata](.claude/skills/wikidata/SKILL.md) |
 | Find Wikipedia articles that lack a Wikidata item | [wikidata](.claude/skills/wikidata/SKILL.md) |
