@@ -24,7 +24,8 @@ enriching such a set, learned from the **Internetdagarna** (`Q10536300`) and
 | `P31` instance of | `Q108095628` conference edition / `Q27787439` film festival edition | use the edition class matching the event type |
 | `P179` part of the series | the series QID (`Q10536300`, `Q1666554`) | |
 | `P393` edition number | `1`, `14`, `43`, ... | datatype is **string**; verify official numbering |
-| `P585` point in time | the year, precision `year` | carry a reference |
+| `P585` point in time | one-day event: the exact date (day precision); multi-day event: the year (precision `year`) as the anchor | carry a reference |
+| `P580` start time / `P582` end time | multi-day events only: exact start/end dates (day precision) | e.g. `Q61654036` 47th IFFR: `P580` 2018-01-24, `P582` 2018-02-04 |
 | `P276` location | venue city (`Q1754` Stockholm, `Q34370` Rotterdam) | |
 | `P17` country | `Q34` Sweden, `Q55` Netherlands | |
 | `P155` follows / `P156` followed by | previous / next edition QID | build the full chain |
@@ -55,8 +56,22 @@ Labels/aliases/descriptions follow the series convention (e.g. `Internetdagarna 
    neighbours agree (`A.P156` must equal `B.P155`).
 4. **Verify with SPARQL** — query editions ordered by `P393`; look for gaps and
    "no sequence claims" errors.
-5. **Idempotency** — add only missing claims; run scripts in simulate/dry-run mode first;
+5. **Partial modeling — open ends are OK.** P155/P156 must only connect
+   *directly consecutive* editions (nothing held in between). If a run of
+   held editions is not yet modeled (e.g. only 1989/1996/2006/2007 of an
+   annual festival exist), do **not** link across the gap (no 1996→2006):
+   that would falsely claim the missing years had no edition. Leave the
+   chain open at the gap boundaries and extend it when the intermediate
+   items are created.
+6. **Idempotency** — add only missing claims; run scripts in simulate/dry-run mode first;
    prefer add-if-missing over remove-and-replace.
-6. **Retries** — wrap edits with retry-on-`maxlag`/transient-failure logic, small delay
+7. **Retries** — wrap edits with retry-on-`maxlag`/transient-failure logic, small delay
    between edits.
-7. **Don't trust live sites blindly** — probe candidate URLs (status 200) before recording.
+8. **Don't trust live sites blindly** — probe candidate URLs (status 200) before recording.
+9. **Navbox year links vanish when the separator space is missing.** In
+   `{{Decade years navbox}}` the affix params are whitespace-trimmed and an
+   empty `|padding=` suppresses the default space (it does not fall back), so
+   `#ifexist` checks a title like `Event2007` and nothing renders. Omit
+   `padding` (default = space) or pass `|padding=&#32;`, and set
+   `decade = year//10` (the template checks `decade*10 + 0..9`, so `190`
+   means 1900-1909, not the 1990s).

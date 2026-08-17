@@ -25,8 +25,11 @@ Each edition item (Q140965327 = 2004 ... Q140965125 = 2026) carries:
 
 - label (en) `Crossing Europe <YYYY>`, description (en) `film festival edition`
 - P31 = Q27787439, P179 = Q1141279, P276 = Q41329, P17 = Q40,
-  P393 = <edition number>, P585 = <year> (precision 9),
+  P393 = <edition number>, P585 = <year> (precision 9) as the anchor,
   P373 = `Crossing Europe <YYYY>`
+- one-day editions set `P585` to the exact date (day precision); multi-day
+  editions add `P580` start time + `P582` end time (day precision) and keep
+  the year on P585 (pattern used by `Q61654036` 47th IFFR)
 - sitelink `commonswiki` → `Category:Crossing Europe <YYYY>`
 - P155/P156 chaining consecutive editions; **2019 ↔ 2021 bridge the cancelled
   2020** (2019.P156 = 2021 item, 2021.P155 = 2019 item). No 2020 item exists.
@@ -83,6 +86,16 @@ because `May 2004 in Linz` does not exist - always probe before linking.
 6. **Wikidata replication lag (maxlag)** can reject rapid edits; retry with
    backoff. pywikibot's built-in handling gives up after a while - wrap edits
    in an explicit retry loop for batch work.
+7. **The navbox breaks silently when the separator space is missing.**
+   `{{Decade years navbox}}` builds titles as `cat_prefix + padding + year +
+   padding + cat_suffix`. MediaWiki trims trailing whitespace from
+   `cat_prefix`/`cat_suffix`, and an **empty `|padding=` is honored as "no
+   separator"** (it does NOT fall back to the template default), so with
+   `displayredlinks=no` the navbox checks `Event2007` and renders blank. Omit
+   `padding` (default = space) or pass `|padding=&#32;` for an explicit space;
+   empty `padding=` is only for tight affixes like `Collision (2014)`. Also
+   set `decade = year//10` (199 for the 1990s) - `decade=190` probes
+   1900-1909. (Riverwalk Blues Festival 1996/2006/2007 hit exactly this.)
 
 ## Naming and renames
 
@@ -108,6 +121,13 @@ because `May 2004 in Linz` does not exist - always probe before linking.
 - **First edition**: no P155 (nothing precedes it).
 - **Cancelled editions**: no item, the chain bridges the gap, and P393 still
   counts the slot.
+- **Unmodeled held editions - leave the chain open.** A link means "directly
+  consecutive editions, nothing held in between". If the series is modeled only
+  at some years (e.g. 1989, 1996, 2006, 2007 of an annual festival) and the
+  in-between editions were held but have no items yet, do **not** link
+  1996→2006 or 2006→1996; that would falsely claim 1997-2005 never happened.
+  Chain only truly adjacent editions. Backfill the intermediate items later
+  and then extend the chain.
 - **Parallel series** (international series plus a national edition): chain
   within each series only, never across.
 - **Biennials**: `edition = (year - Y0) / 2 + 1`; still one category/item per
@@ -128,4 +148,6 @@ SELECT ?item ?itemLabel ?prev ?prevLabel ?next ?nextLabel WHERE {
 ```
 
 Check that every P155 has a matching reverse P156 (and vice versa) and that
-the ordering matches the years.
+the ordering matches the years. A partially modeled series legitimately has
+open chain ends at the boundaries of an unmodeled run of held editions - those
+are expected, not errors; do not bridge them.

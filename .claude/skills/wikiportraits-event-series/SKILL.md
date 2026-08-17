@@ -46,7 +46,9 @@ Each year-edition item gets this claim set:
 | description (en) | `<YYYY> edition of ...` or `film festival edition` | use the style already established in the series |
 | P31 | `<type> edition` | `Q27787439` film festival edition, `Q108095628` conference edition, `Q41582469` music festival edition |
 | P179 | series item | the parent event item |
-| P585 | year (precision 9) | the year, not the exact date; carry a reference when sourced |
+| P585 | point in time | **one-day event:** the exact date (day precision). **Multi-day event:** keep the year (precision 9) as the anchor - see P580/P582 |
+| P580 | start time | multi-day events only: exact start date (day precision) |
+| P582 | end time | multi-day events only: exact end date (day precision) |
 | P276 | location item | the city where it is held |
 | P17 | country item | |
 | P393 | edition number | datatype **string**; see numbering section |
@@ -57,6 +59,8 @@ Each year-edition item gets this claim set:
 | P156 | next edition item | chain, see below |
 | P18 / P10 | representative image / video | optional, when media exist |
 | sitelink | `commonswiki` → `<Event> <YYYY>` | |
+
+**Dates.** A one-day edition carries `P585` = the exact date (day precision). A multi-day edition keeps `P585` = the year as the anchor and adds `P580` start time + `P582` end time at day precision - e.g. `Q61654036` 47th International Film Festival Rotterdam has `P585` 2018, `P580` 2018-01-24, `P582` 2018-02-04. In `scripts/create_edition.py` pass `--date YYYY-MM-DD` for one-day events or `--start/--end` for multi-day events; with neither, `P585` falls back to the year.
 
 **Labels, aliases and descriptions** follow the series convention: `Internetdagarna 2013`, `43rd International Film Festival Rotterdam`, alias `IFFR 2014`. Reuse the series item's existing conventions (P31 class, P276, P17, P373).
 
@@ -81,8 +85,9 @@ P155 (follows) on an edition points to the **immediately preceding** edition's i
 - **Backfilling a missing edition** between two existing items (prev = P, next = X): create N with `P155 = P` and `P156 = X`; update P with `P156 = N`; update X with `P155 = N`.
 - **First edition**: no P155 (nothing precedes it).
 - **Cancelled years** get **no item and no chain links** - the chain jumps directly from the last real edition to the next real one (e.g. 2019 → 2021 for Crossing Europe). Do not invent placeholder items.
+- **Unmodeled held editions - do NOT bridge the gap.** A P155/P156 link means "the **directly consecutive** editions of this series, with **no held edition in between**". If intermediate editions *were held* but their items do not exist yet (partially modeled series, e.g. editions 1996 and 2006 both exist but 1997-2005 have no items), **leave the chain open**: do not set `1996.P156 = 2006` or `2006.P155 = 1996`. A direct link would falsely imply those years never had an edition. Only connect two items when the event genuinely did not run in between (cancelled) OR the two are truly adjacent years of an annual series. This is distinct from a cancelled year, where bridging is correct.
 - **Parallel series** (e.g. an international series plus a national edition): chain within each series only, never across.
-- **Verify** the whole chain afterwards with SPARQL over `wdt:P179 wd:<series>` plus `wdt:P155`/`wdt:P156`, checking that every P155 has a matching reverse P156.
+- **Verify** the whole chain afterwards with SPARQL over `wdt:P179 wd:<series>` plus `wdt:P155`/`wdt:P156`, checking that every P155 has a matching reverse P156. A **partially modeled series is allowed to have open chain ends** at the boundaries of an unmodeled run of editions - those ends are not errors and must not be "fixed" by linking across the gap.
 
 ## Commons year categories (memorize)
 
@@ -94,9 +99,10 @@ The `<Event> <YYYY>` year category (the standard shape):
 {{Wikidata Infobox}}
 {{Decade years navbox
 |header={{C|<Event>}}
-|decade=<decade number, e.g. 200>
+|decade=<YYYY // 10, e.g. 199 for 1996, 200 for 2006>
 |cat_prefix=<Event>
 |cat_suffix=
+|displayredlinks=no
 }}
 
 {{en|'''<Event> <YYYY>''', <one-line description>.}}
@@ -115,6 +121,7 @@ The `<Event> <YYYY>` year category (the standard shape):
 - **Skip the decade navbox** when there is only one year category, or when the year series is spread over multiple cities.
 - **The infobox needs the sitelink to propagate**: right after adding the sitelink, the category shows "Uses of Wikidata Infobox with no item" until the Commons pageprops job runs. Touch the category page (null edit) to force it.
 - **Renames** leave `{{Category redirect|NewName}}` on the old title (no `Category:` prefix in the parameter); search the category tree first so you update the existing page instead of creating a duplicate.
+- **Navbox generation (memorize the traps)** - `{{Decade years navbox}}` builds titles as `cat_prefix + padding + year + padding + cat_suffix`. (1) MediaWiki **trims trailing whitespace** from `cat_prefix`/`cat_suffix`, so never try to smuggle the separator into an affix. (2) An **empty `|padding=` suppresses the default** space - empty is honored as "no separator" and does NOT fall back to the default - so the navbox probes `Event2007` and (with `displayredlinks=no`) renders blank. Omit `padding` (default is a space) or pass `|padding=&#32;` for an explicit one; empty `padding=` is only for tight affixes like `Collision (2014)`. (3) `decade` must be the **first 3 digits of the year** (`year//10`): the template checks `decade*10 + 0..9`, so `decade=190` targets 1900-1909, not the 1990s. (4) Prefer `displayredlinks=no` so an event series shows only existing year categories. `scripts/create_edition.py` now does all of this automatically.
 
 ## Reference patterns
 
@@ -124,7 +131,7 @@ The `<Event> <YYYY>` year category (the standard shape):
 
 ## Verify the chain
 
-After editing, re-verify with **SPARQL**: list all editions ordered by `P393` and confirm each item's `P155` equals its predecessor's `P156`, with no gaps and no "no sequence claims" errors. Idempotency matters: add only missing claims and run scripts in a dry-run/simulate mode before the real edit.
+After editing, re-verify with **SPARQL**: list all editions ordered by `P393` and confirm that **where links exist**, each item's `P155` equals its predecessor's `P156` (bidirectional consistency). A fully modeled series has no gaps; a **partially modeled series legitimately has open chain ends** at unmodeled held editions - those open ends are expected and are not "no sequence claims" errors. Do not "fix" them by linking across a gap (see chaining rules above). Idempotency matters: add only missing claims and run scripts in a dry-run/simulate mode before the real edit.
 
 ## Workflow (SOP)
 
@@ -132,8 +139,10 @@ After editing, re-verify with **SPARQL**: list all editions ordered by `P393` an
 2. **Inventory**: list the existing year categories and edition items (SPARQL over `P179`/`P393`/`P155`/`P156`); identify missing years and missing claims.
 3. **Create the Commons year categories** for the missing years (pattern above; probe candidate names and parents).
 4. **Create/update the Wikidata edition items** (claim set above, matching the series conventions; add references and official URLs).
-5. **Chain P155/P156** across the series (append/backfill rules above).
-6. **Verify**: sitelinks resolve both ways, pageprops updated (touch when lagging), P155/P156 chain consistent via SPARQL, P393 values match the organizer's numbering.
+5. **Chain P155/P156** across the series (append/backfill rules above). Only
+   link editions that are directly consecutive - never bridge across a run of
+   held-but-unmodeled editions.
+6. **Verify**: sitelinks resolve both ways, pageprops updated (touch when lagging), P155/P156 chain consistent via SPARQL (open ends allowed at unmodeled gaps), P393 values match the organizer's numbering.
 
 ## Automating with the shipped script
 
@@ -142,14 +151,19 @@ After editing, re-verify with **SPARQL**: list all editions ordered by `P393` an
 ```text
 python create_edition.py --event "Crossing Europe" --year 2027 \
   --series Q1141279 --edition-type Q27787439 --location Q41329 --country Q40 \
-  --edition-no 23 --decade 200 \
+  --edition-no 23 \
   --parents "2027 film festivals" "2027 events in Linz" \
   --desc "annual film festival held in Linz, Austria, since 2004" \
   --prev Q140965123 --next Q140965125 \
   --dry            # preview without editing
 ```
 
-See the script header for all flags. Already-linked categories and items are detected and skipped, so reruns are safe.
+The navbox `decade` is derived automatically as `--year // 10` (200 for 2027);
+the generated navbox uses no `padding` and `displayredlinks=no` - see the
+"Navbox generation (memorize the traps)" bullet above. Override with `--decade`
+only for an unusual decade bucket.
+
+See the script header for all flags. Already-linked categories and items are detected and skipped, so reruns are safe. The script warns when the year gap to `--prev`/`--next` is > 1 - a warning means those editions are probably **not** directly consecutive, so you should omit the chain flag and leave the chain open unless the gap is a cancelled edition.
 
 ## Additional Resources
 

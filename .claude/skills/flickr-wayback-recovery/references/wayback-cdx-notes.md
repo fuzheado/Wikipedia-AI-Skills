@@ -47,6 +47,35 @@ form wraps responses in the Wayback page chrome.
    The largest size key in the photo model is `o` (fall back `k, h, l, c, z`).
 5. **HTTP 200 ≠ success.** Wayback replays error pages with HTTP 200; validate
    downloads by magic bytes.
+6. **Wildcards: `*` must be a plain trailing glob, never `matchType=prefix`.**
+   `url=live.staticflickr.com/65535/<id>_*` returns every size capture for that
+   ID (all secrets, all sizes) *only with no matchType*. Adding
+   `matchType=prefix` makes the `*` a **literal** character → zero rows.
+   Leading-domain wildcards (`*.staticflickr.com/*<id>_*`) return generic
+   staticflickr.com root captures, not the image — useless. To prove an image
+   is *not* archived, query the trailing-wildcard form first.
+7. **Image discovery independent of the page.** For modern accounts the crawler
+   follows `<img>`/og:image URLs even when the page is an SPA shell, so image
+   captures exist at `live.staticflickr.com/65535/<id>_*` for photos whose pages
+   have **no metadata at all**. Scan the image host separately (see
+   `scan-cdx-images.py`) — "shell page" does not mean "image lost".
+8. **One photo, several secrets.** CDX can show different secrets for the same
+   ID (`<id>_<secretA>_b.jpg` and `<id>_<secretB>_n.jpg`) from different crawls;
+   the wildcard scan surfaces them all.
+9. **429 captures are not images.** Flickr rate-limits the crawler; such rows
+   are `429` / `text/html`. Keep only `statuscode=200` with an image mimetype
+   when picking the best size.
+
+## Image host patterns to scan
+
+| host+server path | when | wildcard form |
+|---|---|---|
+| `live.staticflickr.com/65535` | uploads from ~2019 onward | `live.staticflickr.com/65535/<id>_*` |
+| `live.staticflickr.com` | server path unknown (rare) | try `/65535/` first, then other numeric servers |
+| `farm<N>.staticflickr.com/<server>` | pre-~2019 uploads | `farm8.staticflickr.com/<server>/<id>_*` (farm number + server vary) |
+
+Size suffix → largest first: `_o k h b c z w m n s t q sq` (`l` maps to `_b`,
+`m` has no suffix).
 
 ## Common queries
 

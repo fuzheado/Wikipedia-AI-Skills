@@ -26,6 +26,8 @@ def extract_model(html):
     """
     idx = html.find('<script class="modelExport"')
     if idx == -1:
+        idx = html.find("<script class='modelExport'")
+    if idx == -1:
         return None
     seg = html[idx:]
     m = re.search(r"modelExport:\s*(\{)", seg)
@@ -137,6 +139,14 @@ def photo_metadata(data):
         }
     keywords = meta.get("keywords") or ""
     tags = [t.strip() for t in url_decode(keywords).split(",") if t.strip()]
+    sizes = p.get("sizes") or {}
+    # Normalize older-page shape (displayUrl) to the {url: ...} shape the
+    # downloader expects.
+    if isinstance(sizes, dict):
+        sizes = {
+            k: dict(v, url=v.get("url") or v.get("displayUrl"))
+            for k, v in sizes.items() if isinstance(v, dict)
+        }
     return {
         "id": p.get("id") or stats.get("id"),
         "title": url_decode(p.get("title") or ""),
@@ -149,7 +159,7 @@ def photo_metadata(data):
         "secret": p.get("secret"),
         "oWidth": p.get("oWidth"),
         "oHeight": p.get("oHeight"),
-        "sizes": (p.get("sizes") or {}),
+        "sizes": sizes,
     }
 
 

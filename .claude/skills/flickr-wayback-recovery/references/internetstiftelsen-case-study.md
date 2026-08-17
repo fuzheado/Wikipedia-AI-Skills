@@ -80,3 +80,33 @@ figures and the failures are the ones the guardrails exist for.
 5. `build-manifest.py` → `manifest.csv`.
 6. `validate-manifest.py` + `pattypan/scripts/build_pattypan_spreadsheet.py` → `.xls`.
 7. Pattypan: confirm "N files loaded, 0 errors", upload.
+
+## 2026 revisit — the slice that was "lost" is mostly recoverable
+
+Re-running the **image** discovery on the 6 IDs this rescue couldn't save
+(`LOST_SLICE_REVISIT.md`, `revisit_scan.py`) recovered **3 of 6**, all at full
+original resolution, with new lessons:
+
+1. **Scan images for every at-risk ID, even those with no metadata record.**
+   The first run never attempted image discovery for 4 IDs because their pages
+   were absent from `metadata.json` — a metadata-first pipeline blinds itself.
+   The CDX image scan (`scan-cdx-images.py` / `host/server/<id>_*`) is
+   independent of the page and would have found these immediately.
+2. **Originals hide under a different secret.** The page's `secret` field is not
+   the original's secret. A trailing-wildcard scan of `host/server/<id>_*`
+   returns every archived secret/size; rank by size suffix (`_o`>`_k`>`_h`…)
+   to land on the full-resolution original (e.g. 6720×4480, 25 MB).
+3. **`live.staticflickr.com` images are often never archived.** The 2020 crawl
+   stored the photo page (with a full `sizes` block pointing at
+   `live.staticflickr.com/4548/…`) but **not one image byte** — the CDX is empty
+   for those URLs and the `im_` replay 404s. If all size URLs point at
+   `live.staticflickr.com`, treat the image as probably lost (don't waste budget
+   on domain-wide scans — `matchType=domain&filter=…` on busy staticflickr
+   subdomains times out at 504).
+4. **Old farm-host photos (pre-2019) recover fully.** `c1.staticflickr.com/<n>/<server>/<id>_*`
+   and `farm<N>.staticflickr.com/<server>/<id>_*` wildcards return the archived
+   originals even when the modern page URL never was captured.
+5. **One miss was a pipeline gap, not an archival gap:** `8650940657` was
+   downloaded in run 1 but never reached the manifest/upload list. After
+   image recovery, diff recovered images against `manifest.csv` +
+   `upload_done.txt` + `earlier_uploads.txt` before concluding anything is lost.

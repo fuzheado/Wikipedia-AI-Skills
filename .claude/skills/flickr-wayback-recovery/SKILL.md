@@ -8,27 +8,36 @@ skill_discovery_hints:
   - keywords: ["Wayback Machine", "CDX", "deleted Flickr", "Flickr account gone", "404 photo page", "archived photos"]
   - keywords: ["Flickr rescue", "account recovery", "Internetstiftelsen", "Internetdagarna", "photo ID"]
   - keywords: ["batch upload", "pattypan", "Commons upload", "missing photos", "GLAM recovery"]
-last_verified: 2026-08-08
+  - keywords: ["deleted photos from live account", "Flickr trimmed", "photos removed from photostream"]
+last_verified: 2026-06-24
 ---
 
-> **Derived from the production Internetstiftelsen rescue (2026)** — a deleted
-> Flickr account (`44783532@N07` / alias `stiftelsen`, ~1,100 archived photos)
-> was recovered from the Wayback Machine and 675 of its photos were re-uploaded
-> to Commons in one pattypan batch. The pipeline, the CDX queries, the
-> `modelExport` parser, the manifest schema, and every guardrail below are what
-> that run actually used. A condensed worked example lives in
-> `references/internetstiftelsen-case-study.md`.
+> **Derived from two production rescues (2026)** — a deleted Flickr account
+> (`44783532@N07` / alias `stiftelsen`, ~1,100 archived photos) was recovered
+> from the Wayback Machine and 675 of its photos were re-uploaded to Commons in
+> one pattypan batch, and a **live** account (`184802432@N05` / alias
+> `stefan-mueller-climate`, 16,435 live photos, ~350 deleted) had its deleted
+> subset salvaged (4 fully recovered + 17 images preserved, 325 already safe on
+> Commons). The pipeline, the CDX queries, the `modelExport` parser, the
+> manifest schema, and every guardrail below are what those runs actually used.
+> Condensed worked examples live in
+> `references/internetstiftelsen-case-study.md` and
+> `references/184802432-case-study.md`.
 
 When a Flickr account is deleted (or made private), every photo page and the
 `flickr.com/photos/<nsid>/` people page return 404, but the **Wayback Machine
-usually still holds archived copies of the photo pages and their images**. This
-skill turns those archives into a clean pattypan upload of the photos that are
-**not yet on Commons** — matched by Flickr ID, never by filename.
+usually still holds archived copies of the photo pages and their images**. When
+the account is **still live**, the same pipeline recovers the photos the owner
+deleted from it (deleted set = archived IDs − live photostream). Either way
+this skill turns the archives into a clean pattypan upload of the photos that
+are **not yet on Commons** — matched by Flickr ID, never by filename.
 
 ## When to use this skill
 
 - "This Flickr account disappeared — can we recover the photos?"
 - "Flickr account X is deleted; upload the photos that aren't on Commons yet"
+- "This photographer deleted ~2k photos from their live account; which of those
+  are lost, and which can be recovered?"
 - Any task that mentions the Wayback CDX API, archived Flickr pages, or
   "rescue" of a deleted GLAM/institutional Flickr account (e.g. Internetstiftelsen).
 
@@ -39,11 +48,18 @@ API has nothing to offer (the account is gone, so `flickr.people.findByUsername`
 ## Pipeline at a glance
 
 1. **Enumerate** every archived photo ID via the CDX API (both URL forms).
-2. **Dedupe against Commons** — skip photos already uploaded (match by Flickr ID).
+   For a live account, diff against the full photostream → the deleted subset.
+2. **Dedupe against Commons** — skip photos already uploaded (match by Flickr ID;
+   back-fill the photographer's existing category first).
 3. **Scrape** per-photo metadata from archived photo pages (title, description,
-   date, license, tags, owner).
-4. **Download** the best archived image per photo.
-5. **Build** a pattypan manifest (13 columns, Commons-safe wikitext).
+   date, license, tags, owner). Photos whose pages are SPA shells yield nothing
+   here — that is **not** "lost".
+4. **Find + download** the best archived image per photo — from the model's
+   `sizes` when present, otherwise via a **CDX wildcard scan** of the image host
+   (works even for shell pages).
+5. **Build** a pattypan manifest (Commons-safe wikitext) from the photos that
+   have metadata + image + a free license; keep image-only recoveries for
+   license confirmation.
 6. **Validate** the manifest, then upload with pattypan.
 
 ---
@@ -126,6 +142,47 @@ photo_ids = sorted({int(m.group(1)) for r in rows
 
 ---
 
+## SOP: 1b — Find archived images via CDX (works even for shell pages)
+
+Image discovery is **separate** from page discovery. The Wayback crawler follows
+`<img>`/og:image URLs to the Flickr image host, so image bytes are archived even
+when the photo page is a bare SPA shell with no metadata (Flickr stopped
+server-rendering photo pages around **Feb 2023**; 2023+ captures are ~80–106 KB
+shells). Modern uploads live under **`live.staticflickr.com/65535/`**; pre-2019
+uploads use `farm<N>.staticflickr.com/<server>/`.
+
+The pattern that works — a **plain trailing wildcard, no `matchType`**:
+
+```
+https://web.archive.org/cdx/search/cdx?url=live.staticflickr.com/65535/<id>_*&output=json&fl=timestamp,original,statuscode,mimetype&limit=60
+```
+
+This returns **every size capture** for the ID (multiple secrets, multiple
+sizes, e.g. `_b.jpg`, `_n.jpg` with a different secret, sometimes `_k.jpg`/`_h.jpg`).
+
+**Two forms that return garbage — do not use them:**
+- `matchType=prefix` with a trailing `*` → the `*` is treated as a **literal**,
+  so the query matches nothing. ("No images archived" from this query is a lie.)
+- a leading-domain wildcard like `*.staticflickr.com/*<id>_*` → only generic
+  `staticflickr.com` root captures, not the image.
+
+Keep only rows with `statuscode=200` and an image mimetype (`429` rows are
+Flickr rate-limit responses). Pick the largest size by URL suffix
+(`_o k h b c z w m n s t q sq`, largest first; `l` maps to `_b`, `m` has no
+suffix). `scripts/scan-cdx-images.py` automates this and writes
+`rescue_out/image_scan.json`, which `download-images.py` reads as a fallback
+when the page model has no `sizes` block.
+
+```python
+# Minimal per-ID image scan (correct pattern)
+def image_captures(pid, hosts=("live.staticflickr.com/65535",)):
+    rows = cdx_rows(f"{hosts[0]}/{pid}_*")   # trailing wildcard, no matchType
+    return {r["original"]: r for r in rows
+            if r["statuscode"] == "200" and "image" in r.get("mimetype", "")}
+```
+
+---
+
 ## SOP: 2 — Find which photos are already on Commons
 
 Match by **Flickr ID**, not by Commons filename — uploaders rename files freely.
@@ -144,9 +201,33 @@ Aggregate into `commons_flickr_ids.txt` (one ID per line). The rescue run found
 **399** already-present IDs this way. Use the User-Agent/rate-limit rules from
 [wikimedia-api-access](../wikimedia-api-access/SKILL.md) — this is a Wikimedia API.
 
+### Back-fill the photographer's category first
+
+If the photographer maintains their own Commons category
+(`Category:Photographs by <Name>`), start there: pull the category's file titles
+(`list=categorymembers`, `cmtype=file`, paginated), extract the `(<id>)` from
+each title, and diff against the deleted set. In the second rescue run this
+found **315 of 350** deleted photos already safe on Commons in one API walk,
+before any per-photo search. Follow with `insource:"<id>"` full-text search for
+the remainder (found 10 more whose files don't put the ID in the title). Only
+the **25 leftover** IDs needed per-photo work — that reframes the whole job.
+
 ---
 
 ## SOP: 3 — Scrape metadata from archived photo pages
+
+### Shell pages: when there is no metadata
+
+Flickr stopped server-rendering photo pages around **Feb 2023**. Archived pages
+after that cutoff are ~80–106 KB **SPA shells** with **no `modelExport`** (and no
+`api.flickr.com` responses either — those XHR calls were not crawled). So for
+2023+ uploads there is **no title, description, license, or date in the
+archive**, even when the image bytes were captured. Detect a shell quickly by
+byte size + absence of `modelExport`; do **not** spend request budget fetching
+every capture of a shell. A shell page is **not** a lost photo — it just drops
+the photo into the "image-only, license unknown" bucket (see the License rule).
+The Internetstiftelsen run (pages server-rendered) is the good case; the
+`184802432@N05` run is the mixed case.
 
 ### The `modelExport` JSON blob
 
@@ -231,6 +312,11 @@ Try, in order:
    `/web/<ts>id_/...`.
 3. **Sizes in the page itself**: some archived pages embed `//web.archive.org/
    web/<ts>/<img-url>` URLs in `sizes` — parse and fetch the largest suffix.
+4. **CDX-discovered image URLs** (shell pages, no model): run
+   `scripts/scan-cdx-images.py` and read `rescue_out/image_scan.json` — the
+   wildcard-scan captures on the image host, independent of the page. The script
+   `download-images.py` already falls back to this file automatically when the
+   page model has no `sizes` block.
 
 Validate every download with magic bytes — Wayback sometimes returns an HTML
 error page with HTTP 200:
@@ -316,6 +402,12 @@ id → Commons-template map. Anything else (`0–3, 6`) is non-free: **skip the
 photo, never invent a license**. A missing or unreadable license in the archive
 is a skip reason too — do not guess.
 
+**Deleted photos.** When the Flickr page is gone, `{{FlickreviewR}}` cannot run
+(it checks the live URL). Cite the **Wayback capture** as the Information-block
+source (`[https://web.archive.org/web/<ts>/https://www.flickr.com/photos/<nsid>/<id>/ <title>]`)
+and note the deletion; the archived page's license id is the license evidence.
+Use `{{FlickreviewR|...}}` only when the live Flickr page still exists.
+
 ### Author / credit
 
 Credit the **account**. If the Flickr people page is not archived (common — the
@@ -369,7 +461,9 @@ spot-check a few rendered descriptions, and upload.
 2. **Query both CDX URL forms** (NSID + alias) and make the photo-ID regex
    tolerate the missing trailing slash, or you silently drop IDs.
 3. **Skip CC BY-NC (license 2)**; never fake a license. Only the free set
-   (4, 5, 7, 8, 9, 10, 11, 12) can go to Commons.
+   (4, 5, 7, 8, 9, 10, 11, 12) can go to Commons. A shell page with **no
+   license in the archive** is a skip reason — the photo becomes an
+   **image-only recovery** pending the owner's confirmation, not an upload.
 4. **A missing local file is not "excluded"** if `images.json` still holds an
    archived URL — the URL keeps the row alive. Use an explicit `skip_photos.txt`.
 5. **Wayback returns HTML error pages with HTTP 200** — always validate image
@@ -385,15 +479,42 @@ spot-check a few rendered descriptions, and upload.
    archived, credit the account by plain username.
 10. **Commons API calls need a proper User-Agent** and polite rate limits
     (see [wikimedia-api-access](../wikimedia-api-access/SKILL.md)).
+11. **A "no image" conclusion needs the right CDX query.** `matchType=prefix`
+    with a trailing `*` returns zero rows (the `*` is literal); a leading-domain
+    `*` returns generic root captures. Query `live.staticflickr.com/65535/<id>_*`
+    (or `farm<N>.staticflickr.com/<server>/<id>_*`) with **no matchType** before
+    declaring an image lost. See SOP 1b and `scan-cdx-images.py`.
+12. **Shell page ≠ lost photo.** Flickr stopped server-rendering pages ~Feb
+    2023; the crawler still stored the image bytes. Split recoveries into
+    "metadata+image+free license" (upload), "image-only, license unknown"
+    (preserve locally, ask the owner), and "nothing" (lost).
+13. **Back-fill the photographer's Commons category first** — category
+    title-IDs + `insource:"<id>"` often show most deleted photos are already
+    safe, shrinking the real work to a handful of IDs.
+14. **Deleted photos:** `{{FlickreviewR}}` cannot verify a live license when the
+    Flickr page is gone — cite the Wayback capture as source/license evidence.
+15. **Originals hide under a different secret.** The page's `secret` is not the
+    original's. Scan `host/server/<id>_*` (all secrets) and rank by size suffix
+    (`_o`>`_k`>`_h`…) — this recovers full-resolution originals the page model
+    never exposed (Internetstiftelsen revisit: 3 of 6 "lost" photos recovered).
+16. **`live.staticflickr.com` images are often never archived** (page saved, zero
+    image bytes). If every size URL points there, the image is probably lost;
+    don't chase it with `matchType=domain&filter=…` scans — busy staticflickr
+    subdomains return HTTP 504.
+17. **Scan images for every at-risk ID, even page-less ones**, and diff recovered
+    images against `manifest.csv`/upload lists before concluding a loss — a
+    missing photo is often a pipeline gap, not an archival gap.
 
 ## Tooling
 
 - `scripts/cdx-photo-ids.py` — CDX enumeration (both URL forms, dedupe, save `wayback_full.json` + `wayback_photo_ids.txt`).
 - `scripts/check-commons.py` — find which Flickr IDs already exist on Commons (title + wikitext + SDC) → `commons_flickr_ids.txt`.
 - `scripts/fetch-photo-metadata.py` — fetch archived photo pages, parse the `modelExport` blob → `rescue_out/metadata.json` (+ cached pages).
-- `scripts/download-images.py` — download the best archived image per photo → `images/<id>.<ext>` + `images.json`.
+- `scripts/scan-cdx-images.py` — CDX **image** discovery per ID (trailing-wildcard queries against the image host; works for SPA-shell pages with no model) → `rescue_out/image_scan.json`.
+- `scripts/download-images.py` — download the best archived image per photo → `images/<id>.<ext>` + `images.json` (falls back to `image_scan.json` when the page model has no `sizes`).
 - `scripts/build-manifest.py` — build the 13-column manifest from metadata + images + `skip_photos.txt` → `manifest.csv`.
 - `scripts/validate-manifest.py` — the non-negotiable checks above.
 - `assets/inspect_model.py` — `modelExport` extractor + `~N` resolver (imported by fetch/download scripts).
-- `references/wayback-cdx-notes.md` — CDX parameter reference and pitfalls.
-- `references/internetstiftelsen-case-study.md` — the production run: numbers, failures, lessons.
+- `references/wayback-cdx-notes.md` — CDX parameter reference and pitfalls (incl. the wildcard/matchType gotcha and image-host patterns).
+- `references/internetstiftelsen-case-study.md` — first production run (deleted account): numbers, failures, lessons.
+- `references/184802432-case-study.md` — second production run (live account, deleted subset): the CDX wildcard bug, SPA-shell pages, live.staticflickr.com image recovery, category back-fill.

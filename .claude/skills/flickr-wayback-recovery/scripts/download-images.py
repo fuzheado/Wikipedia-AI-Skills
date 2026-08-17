@@ -37,8 +37,11 @@ def looks_like_image(blob):
 
 
 def suffix_of(url):
-    m = re.search(r"_(\w+)\.(?:jpg|jpeg|png|gif)$", url)
-    return m.group(1) if m else ""
+    # Flickr m-size URLs have no suffix (…_<secret>.jpg); everything else ends
+    # in _<1-2 letters>.<ext> (s,q,t,n,w,m,z,c,b,h,k,o). Match only short
+    # suffix letters so the secret is not mistaken for a size suffix.
+    m = re.search(r"_([a-z]{1,2})\.(?:jpg|jpeg|png|gif)$", url)
+    return m.group(1) if m else "m"
 
 
 def http_get(url, retries=6, timeout=90):
@@ -82,6 +85,19 @@ def archived_image_urls(meta, page_dir="pages"):
                             key=lambda x: -SUFFIX_ORDER.index(suffix_of(x[1]))
                             if suffix_of(x[1]) in SUFFIX_ORDER else 0):
                 yield f"https://web.archive.org/web/{u[0]}id_/{u[1]}", suffix_of(u[1])
+
+    # Fallback: CDX-discovered image URLs (see scan-cdx-images.py) — the only
+    # source when the archived page is an SPA shell with no modelExport.
+    # Order best size first so the first successful download is the largest.
+    if os.path.exists("rescue_out/image_scan.json"):
+        with open("rescue_out/image_scan.json", encoding="utf-8") as f:
+            scan = json.load(f)
+        recs = [r for r in (scan.get(meta.get("id") or str(meta.get("flickr_id", "")), []) or [])
+                if len(r) >= 2 and r[0] and r[1]]
+        recs.sort(key=lambda r: SUFFIX_ORDER.index(suffix_of(r[1]))
+                  if suffix_of(r[1]) in SUFFIX_ORDER else len(SUFFIX_ORDER))
+        for ts, orig, *_ in recs:
+            yield f"https://web.archive.org/web/{ts}id_/{orig}", suffix_of(orig)
 
 
 def main():
