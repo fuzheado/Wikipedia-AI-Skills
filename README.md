@@ -30,9 +30,9 @@ These skills are designed to **help you research, understand, and prepare conten
 
 ## Skills
 
-This repository contains **57 skills** organized into two groups.
+This repository contains **58 skills** organized into two groups.
 
-> 💡 **[Explore the interactive skills network →](docs/skills-network.html)** — see how all 57
+> 💡 **[Explore the interactive skills network →](docs/skills-network.html)** — see how all 58
 > skills connect to each other in a force-directed graph. Drag nodes, zoom, and hover
 > to discover cross-references between skills.
 
@@ -80,6 +80,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [flickr-wayback-recovery](.claude/skills/flickr-wayback-recovery/SKILL.md) | Recover a deleted or offline Flickr account from the Wayback Machine (CDX enumeration, metadata scraping, image download) and batch-upload the photos missing from Wikimedia Commons via pattypan — matched by Flickr ID |
 | | **▸ Analyzing Articles** |
 | [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties (sorting/filtering) or the REST API (precise historical data) |
+| [xtools](.claude/skills/xtools/SKILL.md) | Query XTools — the canonical Wikimedia statistics API: page info, top editors, edit counts, prose stats, and admin/patroller metrics for any wiki |
 | [wikimedia-media-usage-metrics](.claude/skills/wikimedia-media-usage-metrics/SKILL.md) | Measure and count the use of Wikimedia media files — transfers (mediacounts/mediarequests), embeds (GlobalUsage), reach (pageviews/CIM), external reuse — with verified gotchas, a decision tree, and a live report pipeline |
 | [wikimedia-page-assessment](.claude/skills/wikimedia-page-assessment/SKILL.md) | Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners on any Wikimedia wiki with the PageAssessments extension |
 | [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) | Score article quality, revert risk, edit quality (goodfaith/damaging), readability, topic classification, reference quality, language identification, content translation recommendations, article descriptions, and article country using Wikimedia ML inference APIs (Lift Wing and legacy ORES) |
@@ -168,6 +169,8 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | Recover photos from a deleted Flickr account via the Wayback Machine and upload them to Commons | [flickr-wayback-recovery](.claude/skills/flickr-wayback-recovery/SKILL.md) — `python3 .claude/skills/flickr-wayback-recovery/scripts/cdx-photo-ids.py <nsid> <alias>` then the rest of the pipeline |
 | | **▸ Analyzing Articles** |
 | Get pageview statistics — how many people read an article? | [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) |
+| Get editor & page statistics — edit counts, top editors, article info, prose stats | [xtools](.claude/skills/xtools/SKILL.md) |
+| See admin/patroller activity or batch page assessments on a wiki | [xtools](.claude/skills/xtools/SKILL.md) |
 | Check article quality and WikiProject ratings (FA, GA, B, C, Start, Stub) | [wikimedia-page-assessment](.claude/skills/wikimedia-page-assessment/SKILL.md) |
 | Score an article for quality and readability with ML | [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) |
 | Get a full article quality report (quality + readability + topics + reference risk) | `python3 .claude/skills/wikimedia-ml-services/assets/article_quality_report.py Albert_Einstein en` |
