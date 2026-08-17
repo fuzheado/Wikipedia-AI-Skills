@@ -60,6 +60,7 @@ digraph Skills {
   "wikivoyage" [label="wikivoyage", fillcolor="#c8e6c9", style="filled,rounded", fontsize=11];
   "wikiwho" [label="wikiwho", fillcolor="#fce4ec", style="filled,rounded", fontsize=11];
   "wiktionary-and-wikisource" [label="wiktionary-and-wikisource", fillcolor="#c8e6c9", style="filled,rounded", fontsize=11];
+  "xtools" [label="xtools", fillcolor="#fce4ec", style="filled,rounded", fontsize=11];
 
   "commons-file-resolution" -> "wikimedia-api-access";
   "commons-file-resolution" -> "wikimedia-commons";
@@ -364,4 +365,10 @@ digraph Skills {
   "wiktionary-and-wikisource" -> "wikimedia-commons-pdf";
   "wiktionary-and-wikisource" -> "wikimedia-i18n-l10n-for-tools";
   "wiktionary-and-wikisource" -> "wikimedia-wikitext";
+  "xtools" -> "wikimedia-api-access";
+  "xtools" -> "wikimedia-api-strategy";
+  "xtools" -> "wikimedia-page-assessment";
+  "xtools" -> "wikimedia-pageviews";
+  "xtools" -> "wikipedia-edit-history";
+  "xtools" -> "wikiwho";
 }
