@@ -30,9 +30,9 @@ These skills are designed to **help you research, understand, and prepare conten
 
 ## Skills
 
-This repository contains **55 skills** organized into two groups.
+This repository contains **57 skills** organized into two groups.
 
-> 💡 **[Explore the interactive skills network →](docs/skills-network.html)** — see how all 55
+> 💡 **[Explore the interactive skills network →](docs/skills-network.html)** — see how all 57
 > skills connect to each other in a force-directed graph. Drag nodes, zoom, and hover
 > to discover cross-references between skills.
 
@@ -51,6 +51,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [wikipedia-categories](.claude/skills/wikipedia-categories/SKILL.md) | Understand and work with Wikipedia's category system — category trees, the three tests for valid categories (Verifiable/Neutral/Defining), topic vs. set categories, sort keys and DEFAULTSORT, API query patterns, Pywikibot generators, PetScan, overcategorization rules, and category maintenance |
 | [wikipedia-edit-history](.claude/skills/wikipedia-edit-history/SKILL.md) | Read and analyze Wikipedia's page revision history — diffs, edit summaries, user contributions, byte changes, rollback, and understanding how a page evolved over time |
 | [wikimedia-diffs](.claude/skills/wikimedia-diffs/SKILL.md) | Fetch, compare, and interpret diffs between Wikipedia page revisions — wikitext changes, visual differences, and diff statistics via the Action API and REST API |
+| [wikiwho](.claude/skills/wikiwho/SKILL.md) | Token-level authorship attribution via the WikiWho API — who wrote, removed, or reinserted each word, with content-persistence and editor attribution analysis |
 | [wikipedia-talk-page](.claude/skills/wikipedia-talk-page/SKILL.md) | Navigate and participate in Wikipedia talk pages — modern DiscussionTools (Reply Tool, Topic Subscriptions, Permalinks), Usability Improvements, community gadgets, wikitext conventions, WikiProject banners, archives, and talk page etiquette |
 | [wikipedia-wikiprojects](.claude/skills/wikipedia-wikiprojects/SKILL.md) | Understand and work with English Wikipedia's WikiProject system — finding relevant projects, interpreting assessment tables, using Popular pages and work lists, and navigating project directories |
 | | **▸ Working with Content** |
@@ -139,6 +140,8 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | Explore a category hierarchy interactively from the CLI | `bash .claude/skills/wikipedia-categories/scripts/category-tree.sh Physics 3 pages` |
 | Analyze page revision history, diffs, user contributions, and detect vandalism | [wikipedia-edit-history](.claude/skills/wikipedia-edit-history/SKILL.md) |
 | Compare two revisions and understand what changed | [wikimedia-diffs](.claude/skills/wikimedia-diffs/SKILL.md) |
+| Find out who wrote specific sentences or tokens in an article, and each editor's share | [wikiwho](.claude/skills/wikiwho/SKILL.md) |
+| Measure content persistence — which edits survived, or which text keeps getting reverted | [wikiwho](.claude/skills/wikiwho/SKILL.md) |
 | Participate in talk page discussions, sign comments, and find WikiProject assessments | [wikipedia-talk-page](.claude/skills/wikipedia-talk-page/SKILL.md) |
 | Find the right WikiProject for an article topic | [wikipedia-wikiprojects](.claude/skills/wikipedia-wikiprojects/SKILL.md) |
 | | **▸ Working with Content** |

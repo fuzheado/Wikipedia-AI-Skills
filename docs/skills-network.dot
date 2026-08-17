@@ -58,6 +58,7 @@ digraph Skills {
   "wikipedia-wikitables" [label="wikipedia-wikitables", fillcolor="#e1bee7", style="filled,rounded", fontsize=11];
   "wikiportraits-event-series" [label="wp-event-series", fillcolor="#fce4ec", style="filled,rounded", fontsize=11];
   "wikivoyage" [label="wikivoyage", fillcolor="#c8e6c9", style="filled,rounded", fontsize=11];
+  "wikiwho" [label="wikiwho", fillcolor="#fce4ec", style="filled,rounded", fontsize=11];
   "wiktionary-and-wikisource" [label="wiktionary-and-wikisource", fillcolor="#c8e6c9", style="filled,rounded", fontsize=11];
 
   "commons-file-resolution" -> "wikimedia-api-access";
@@ -201,6 +202,7 @@ digraph Skills {
   "wikimedia-media-usage-metrics" -> "wikimedia-commons-sparql";
   "wikimedia-media-usage-metrics" -> "wikimedia-database";
   "wikimedia-media-usage-metrics" -> "wikimedia-pageviews";
+  "wikimedia-media-usage-metrics" -> "wikimedia-petscan";
   "wikimedia-ml-services" -> "wikimedia-api-access";
   "wikimedia-ml-services" -> "wikimedia-eventstreams";
   "wikimedia-ml-services" -> "wikimedia-page-assessment";
@@ -351,6 +353,11 @@ digraph Skills {
   "wikivoyage" -> "wikipedia-categories";
   "wikivoyage" -> "wikipedia-error-handling";
   "wikivoyage" -> "wikipedia-templates";
+  "wikiwho" -> "wikimedia-api-access";
+  "wikiwho" -> "wikimedia-api-strategy";
+  "wikiwho" -> "wikimedia-diffs";
+  "wikiwho" -> "wikimedia-pageviews";
+  "wikiwho" -> "wikipedia-edit-history";
   "wiktionary-and-wikisource" -> "pywikibot";
   "wiktionary-and-wikisource" -> "wikimedia-api-access";
   "wiktionary-and-wikisource" -> "wikimedia-commons";
