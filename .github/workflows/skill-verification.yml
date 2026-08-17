@@ -2,13 +2,6 @@ name: Skill Verification
 
 on:
   pull_request:
-    paths:
-      - '.claude/skills/**'
-      - 'scripts/verify-*.py'
-      - 'scripts/refresh-*.py'
-      - 'scripts/command-registry.json'
-      - 'scripts/api-surface.json'
-      - 'scripts/url-registry.json'
   push:
     branches: [main]
     paths:

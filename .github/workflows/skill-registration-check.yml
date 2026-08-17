@@ -1,11 +1,6 @@
 name: Skill Registration Check
 on:
   pull_request:
-    paths:
-      - '.claude/skills/*/SKILL.md'
-      - 'README.md'
-      - 'ROADMAP.md'
-      - 'tests/conftest.py'
   push:
     branches: [main]
     paths:
