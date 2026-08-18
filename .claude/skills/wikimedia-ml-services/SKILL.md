@@ -13,7 +13,7 @@ skill_discovery_hints:
   - keywords: ["language detection", "langid", "identify language"]
   - keywords: ["translation", "content translation", "cross-language", "recommendation"]
   - keywords: ["LLM", "chat completions", "Qwen", "OpenAI-compatible", "text generation", "LiftWing Studio", "large language model"]
-last_verified: 2026-08-14
+last_verified: 2026-08-18
 ---
 
 > ⚠️ **User-Agent required:** All API calls below need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -688,6 +688,14 @@ def scored_revision(wiki, rev_id):
 ---
 
 ## Guardrails
+
+### ⚠️ Don't use an LLM to pre-summarize text that another LLM step will read
+Using LiftWing (or any LLM) to condense article text for downstream LLM context
+is a lossy, unverifiable transformation — hallucination risk on the input
+everything else trusts, plus double LLM cost. Prefer extraction (Parsoid HTML /
+TextExtracts) over generation; see
+[`wikimedia-api-strategy/references/lead-text-extraction.md`](../wikimedia-api-strategy/references/lead-text-extraction.md)
+for the full decision matrix.
 
 ### ❌ Don't use ORES for new tools
 ORES is **deprecated**. Always use Lift Wing. The ORES service could stop working at any time without notice.
