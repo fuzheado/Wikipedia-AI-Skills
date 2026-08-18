@@ -7,7 +7,7 @@ depends_on: [wikimedia-api-access]
 skill_discovery_hints:
   - keywords: ["wikitext", "wiki markup", "parse", "mwparserfromhell", "wikitext parsing", "template parsing"]
   - keywords: ["wikitext AST", "syntax tree", "section parsing", "link extraction", "template expansion"]
-last_verified: 2026-06-10
+last_verified: 2026-08-18
 ---
 
 > ⚠️ **User-Agent required:** The API examples below use the Action API and REST API. All requests must include a descriptive `User-Agent` header or they will be blocked. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
@@ -325,6 +325,7 @@ Example script for converting wikitext tables to pandas DataFrames via the Parso
 | Related Skill | Why |
 |--------------|-----|
 | **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent and API patterns — the foundation all API calls build on |
+| **[wikimedia-api-strategy](../wikimedia-api-strategy/SKILL.md)** | Choosing how to *read* a page: REST `/page/summary` vs TextExtracts vs Parsoid HTML — decision matrix + fidelity-test pattern in `references/lead-text-extraction.md` |
 | **[wikipedia-templates](../wikipedia-templates/SKILL.md)** | Template syntax — `mwparserfromhell` is the primary parsing tool |
 | **[wikipedia-wikitables](../wikipedia-wikitables/SKILL.md)** | Table parsing — always use Parsoid HTML + `pandas.read_html()`, never regex |
 | **[wikipedia-citations](../wikipedia-citations/SKILL.md)** | Citation/reference extraction from wikitext |
