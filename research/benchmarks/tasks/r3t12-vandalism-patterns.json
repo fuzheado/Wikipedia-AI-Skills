@@ -1,0 +1,76 @@
+{
+  "schema_version": "0.1.0",
+  "id": "r3t12-vandalism-patterns",
+  "title": "Real-time vandalism pattern analysis (90s EventStreams + ML + diffs)",
+  "round": 3,
+  "complexity": "hard",
+  "tier": "live",
+  "dimension": "real-time-streams",
+  "prompt": "Run a 90-second EventStreams analysis of enwiki edits: score revert risk via LiftWing, fetch diffs for high-risk edits, classify change types, and produce a vandalism-pattern report. Discard canary events.",
+  "skills": ["wikimedia-eventstreams", "wikimedia-ml-services", "wikimedia-diffs", "wikipedia-edit-history", "wikimedia-api-access"],
+  "apis": ["Wikimedia EventStreams (SSE)", "LiftWing revertrisk-language-agnostic", "MediaWiki Action API (action=compare)", "diff parsing (local)"],
+  "expected_output": {
+    "description": "Events analyzed, high-risk edits with revert probability, change-type classification, namespace breakdown, pattern summary.",
+    "fields": ["events_seen", "events_analyzed", "high_risk[]", "change_types{}", "namespace_breakdown{}", "pattern_summary"]
+  },
+  "canaries": [
+    {
+      "id": "c1",
+      "name": "Canary event filtering",
+      "description": "meta.domain == 'canary' events must be discarded; the no-skills variant processed test events as real.",
+      "detection": "No canary handling in code; canary-domain events in the analysis."
+    },
+    {
+      "id": "c2",
+      "name": "Diff fetching via action=compare",
+      "description": "action=compare with fromrev/torev; the no-skills variant failed to parse diffs and classified all changes as 'empty' - a silent failure.",
+      "detection": "All high-risk edits classified 'empty'; no action=compare usage in code."
+    },
+    {
+      "id": "c3",
+      "name": "Throughput",
+      "description": "The no-skills variant analyzed 92/3248 events (2.8%); the skills variant 100%. Low throughput silently degrades the report.",
+      "detection": "events_analyzed / events_seen < 50%."
+    },
+    {
+      "id": "c4",
+      "name": "Change-type classification",
+      "description": "Content replacements vs. additions vs. deletions vs. unknown - a structured breakdown.",
+      "detection": "No breakdown, or all items in one bucket."
+    }
+  ],
+  "verifier": {
+    "kind": "mixed",
+    "checks": [
+      {
+        "id": "v1",
+        "kind": "artifact_check",
+        "detail": "Canary filter present in code.",
+        "pass_condition": "'canary' appears in the produced script."
+      },
+      {
+        "id": "v2",
+        "kind": "artifact_check",
+        "detail": "action=compare (or equivalent diff API) used for high-risk edits.",
+        "pass_condition": "'compare' or 'action=compare' present in code."
+      },
+      {
+        "id": "v3",
+        "kind": "throughput_check",
+        "detail": "Analysis coverage of the stream.",
+        "pass_condition": "events_analyzed >= 50% of events_seen (excluding canary events)."
+      },
+      {
+        "id": "v4",
+        "kind": "schema_check",
+        "detail": "Report has high-risk list, change-type breakdown, namespace breakdown, pattern summary.",
+        "pass_condition": "All sections present; change types in >= 2 distinct buckets; high-risk edits carry revert probability."
+      }
+    ]
+  },
+  "safety": "read-only",
+  "time_budget_min": 25,
+  "source": "research/ab-testing/AB_TEST_REPORT_ROUND3.md",
+  "status": "ported",
+  "port_notes": "AB result: 3 structural silent failures in the no-skills variant (canary, diffs, throughput). Probabilistic live task - v1/v2 artifact checks carry most of the detection weight."
+}

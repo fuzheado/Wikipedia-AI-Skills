@@ -1,0 +1,70 @@
+{
+  "schema_version": "0.1.0",
+  "id": "r2t7-citation-quality",
+  "title": "Citation health vs. article quality correlation (15 Physics articles)",
+  "round": 2,
+  "complexity": "hard",
+  "tier": "live",
+  "dimension": "multi-step-orchestration",
+  "prompt": "Score 15 articles in Category:Physics for article quality via the LiftWing articlequality model, parse their citations (CS1/CS2 templates) with mwparserfromhell, and correlate citation health/verifiability with article quality.",
+  "skills": ["wikipedia-citations", "wikimedia-wikitext", "wikimedia-ml-services", "wikimedia-api-access"],
+  "apis": ["MediaWiki Action API (wikitext fetch)", "LiftWing articlequality", "mwparserfromhell (local)"],
+  "expected_output": {
+    "description": "Per-article quality score, citation count, and a correlation between verifiability and quality.",
+    "fields": ["articles[].title", "articles[].quality", "articles[].citation_count", "correlation"]
+  },
+  "canaries": [
+    {
+      "id": "c1",
+      "name": "ORES-compatible nested response envelope",
+      "description": "LiftWing articlequality returns {\"enwiki\": {\"scores\": {\"revid\": {\"articlequality\": {\"score\": {\"prediction\": ...}}}}}}. The no-skills variant guessed data['output']['prediction'] and burned ~10 min.",
+      "detection": "KeyError or wrong values from a flat response assumption."
+    },
+    {
+      "id": "c2",
+      "name": "CS1/CS2 template catalog",
+      "description": "25+ citation templates; the no-skills variant guessed ~15 from memory.",
+      "detection": "Citation counts lower than live counts for known citation-heavy articles."
+    },
+    {
+      "id": "c3",
+      "name": "Redirect exclusion",
+      "description": "Category members can be redirects; exclude them (AB: 15 vs 14 articles).",
+      "detection": "Redirect pages scored as articles."
+    }
+  ],
+  "verifier": {
+    "kind": "mixed",
+    "checks": [
+      {
+        "id": "v1",
+        "kind": "api_crosscheck",
+        "detail": "For up to 5 sampled articles, re-score via LiftWing articlequality on the same revision and compare predictions.",
+        "pass_condition": "Predictions identical (model is deterministic per revision)."
+      },
+      {
+        "id": "v2",
+        "kind": "artifact_check",
+        "detail": "Code navigates the nested ORES envelope.",
+        "pass_condition": "Code contains the 'scores' and 'articlequality' path (or equivalent explicit navigation)."
+      },
+      {
+        "id": "v3",
+        "kind": "schema_check",
+        "detail": "Per-article quality + citation count + a stated correlation.",
+        "pass_condition": "All fields present; correlation computed from the collected data (not asserted from memory)."
+      },
+      {
+        "id": "v4",
+        "kind": "count_check",
+        "detail": "15 articles scored (redirects excluded with explanation).",
+        "pass_condition": ">= 14 non-redirect articles with quality scores."
+      }
+    ]
+  },
+  "safety": "read-only",
+  "time_budget_min": 20,
+  "source": "research/ab-testing/AB_TEST_REPORT_ROUND2.md",
+  "status": "ported",
+  "port_notes": "AB result: the ML response envelope was the single biggest gotcha across all 12 tasks. v1 is deterministic (same revision, same prediction)."
+}

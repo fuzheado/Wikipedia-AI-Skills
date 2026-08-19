@@ -1,0 +1,70 @@
+{
+  "schema_version": "0.1.0",
+  "id": "r3t11-cross-language",
+  "title": "Cross-language article comparison (10 physicists, EN/FR/DE)",
+  "round": 3,
+  "complexity": "hard",
+  "tier": "live",
+  "dimension": "cross-project-orchestration",
+  "prompt": "Compare 10 physicists across English, French, and German Wikipedia: article quality (LiftWing articlequality per language), article length, revision count, and pageviews. Produce a comparison table.",
+  "skills": ["wikidata", "wikimedia-ml-services", "wikipedia-edit-history", "wikimedia-pageviews", "wikimedia-api-access"],
+  "apis": ["Wikidata wbgetentities (sitelinks)", "LiftWing articlequality (en/fr/de models)", "MediaWiki Action API (revisions)", "Wikimedia Pageviews REST API"],
+  "expected_output": {
+    "description": "10 physicists x 3 languages with quality (real ML scores), length, revision count, pageviews.",
+    "fields": ["rows[].physicist", "rows[].lang", "rows[].quality", "rows[].length_bytes", "rows[].revision_count", "rows[].pageviews"]
+  },
+  "canaries": [
+    {
+      "id": "c1",
+      "name": "Fabricated quality via length proxy",
+      "description": "The AB no-skills variant substituted length-based 'FA-like' labels for real ML scores - the table looked complete but the quality column was fake. THE signature silent failure of this task.",
+      "detection": "Quality values are not members of the valid label set (FA/GA/B/C/Start/Stub/List), or no ML API calls were made."
+    },
+    {
+      "id": "c2",
+      "name": "ORES envelope per language",
+      "description": "Each language model returns its own nested envelope (e.g., enwiki/frwiki/dewiki keys).",
+      "detection": "Parsing the wrong language key, or assuming a single envelope shape."
+    },
+    {
+      "id": "c3",
+      "name": "Sitelink resolution",
+      "description": "EN/FR/DE titles resolved via wbgetentities sitelinks (missing sitelinks must be reported, not guessed).",
+      "detection": "Invented titles for languages where the article doesn't exist."
+    }
+  ],
+  "verifier": {
+    "kind": "mixed",
+    "checks": [
+      {
+        "id": "v1",
+        "kind": "anti_fabrication",
+        "detail": "Every quality value must be a valid articlequality label.",
+        "pass_condition": "All quality values in {FA, GA, B, C, Start, Stub, List, ...} (the model's label set); no 'FA-like' or invented labels."
+      },
+      {
+        "id": "v2",
+        "kind": "artifact_check",
+        "detail": "Code calls the LiftWing/ORES API (not length heuristics).",
+        "pass_condition": "Code contains the articlequality endpoint or 'scores' envelope navigation."
+      },
+      {
+        "id": "v3",
+        "kind": "api_crosscheck",
+        "detail": "For up to 3 sampled physicists, re-score one language each via LiftWing and compare predictions.",
+        "pass_condition": "Predictions match."
+      },
+      {
+        "id": "v4",
+        "kind": "schema_check",
+        "detail": "Table covers 10 physicists x 3 languages with all four metrics.",
+        "pass_condition": ">= 28 rows populated (missing sitelinks allowed if flagged), all four metric columns present."
+      }
+    ]
+  },
+  "safety": "read-only",
+  "time_budget_min": 20,
+  "source": "research/ab-testing/AB_TEST_REPORT_ROUND3.md",
+  "status": "ported",
+  "port_notes": "AB result: no-skills produced a complete-looking table with fabricated quality data. v1 anti_fabrication is the headline check - this task exists to catch fake-ML-output behavior."
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": "0.1.0",
+  "id": "r1t3-revisions",
+  "title": "Last 10 revisions of 'Python (programming language)'",
+  "round": 1,
+  "complexity": "easy",
+  "tier": "live",
+  "dimension": "single-api-read",
+  "prompt": "Fetch the last 10 revisions of 'Python (programming language)' showing editor, timestamp, edit summary, and revision ID.",
+  "skills": ["wikimedia-api-access", "wikipedia-edit-history"],
+  "apis": ["MediaWiki Action API (prop=revisions)"],
+  "expected_output": {
+    "description": "10 revision entries, each with revision ID, editor, timestamp, and edit summary.",
+    "fields": ["revisions[].revid", "revisions[].user", "revisions[].timestamp", "revisions[].comment"]
+  },
+  "canaries": [
+    {
+      "id": "c1",
+      "name": "rvprop field selection",
+      "description": "rvprop=ids|timestamp|user|comment; requesting only needed fields cuts response size by ~85%.",
+      "detection": "Missing fields in output, or oversized responses from requesting everything."
+    },
+    {
+      "id": "c2",
+      "name": "Pagination/continue",
+      "description": "rvlimit=500 with continue token for >500 revisions.",
+      "detection": "Only 500 revisions returned with no continue handling."
+    }
+  ],
+  "verifier": {
+    "kind": "api_crosscheck",
+    "checks": [
+      {
+        "id": "v1",
+        "kind": "api_crosscheck",
+        "detail": "Re-fetch the last 10 revisions (revid-sorted desc) from the live Action API and compare the revision ID lists.",
+        "pass_condition": "Exact set match: the 10 highest revids are identical (revisions only grow; the top 10 are stable between calls)."
+      },
+      {
+        "id": "v2",
+        "kind": "count_check",
+        "detail": "Exactly 10 revisions reported.",
+        "pass_condition": "count == 10"
+      },
+      {
+        "id": "v3",
+        "kind": "schema_check",
+        "detail": "Each entry carries revid, user, timestamp, comment.",
+        "pass_condition": "All four fields present per entry."
+      },
+      {
+        "id": "v4",
+        "kind": "ordering_check",
+        "detail": "Revisions sorted newest-first.",
+        "pass_condition": "revids strictly descending."
+      }
+    ]
+  },
+  "safety": "read-only",
+  "time_budget_min": 10,
+  "source": "research/ab-testing/AB_TEST_REPORT_ROUND1.md",
+  "status": "ported",
+  "port_notes": "AB result: closest match between variants (2.0x speedup, identical output) - the MediaWiki Action API is well-known. Good baseline 'well-known API floor' reference task."
+}

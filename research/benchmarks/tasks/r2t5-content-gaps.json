@@ -1,0 +1,70 @@
+{
+  "schema_version": "0.1.0",
+  "id": "r2t5-content-gaps",
+  "title": "Cross-wiki content gap analyzer (EN-FR, Category:Physics)",
+  "round": 2,
+  "complexity": "hard",
+  "tier": "live",
+  "dimension": "multi-step-orchestration",
+  "prompt": "Find English Wikipedia articles in Category:Physics (including subcategories) that lack a French-language equivalent (no French sitelink on Wikidata). Sort the gaps by popularity (pageviews) and return a ranked table of the top gaps.",
+  "skills": ["wikidata", "wikimedia-pageviews", "wikipedia-categories", "wikimedia-api-access"],
+  "apis": ["MediaWiki Action API (list=categorymembers)", "Wikidata wbgetentities/pageprops", "Wikidata SPARQL (sitelink check)", "Wikimedia Pageviews REST API"],
+  "expected_output": {
+    "description": "Ranked table of EN articles without a French equivalent, with pageview popularity, covering the recursive category tree.",
+    "fields": ["gaps[].title", "gaps[].pageviews", "sample_size", "recursive_depth"]
+  },
+  "canaries": [
+    {
+      "id": "c1",
+      "name": "Recursive subcategory traversal",
+      "description": "Category:Physics has hundreds of articles in subcategories; a flat (direct-members-only) fetch captures only ~25. The AB no-skills variant missed 75% of the data silently.",
+      "detection": "Sample size ~25 instead of 100+; no cmtype=page|subcat, no CategoryTree, no recursion in the code."
+    },
+    {
+      "id": "c2",
+      "name": "Batch QID resolution",
+      "description": "Resolve titles to QIDs in batches via prop=pageprops&ppprop=wikibase_item, not one call per article.",
+      "detection": "Hundreds of individual API calls (rate-limit risk, slow)."
+    },
+    {
+      "id": "c3",
+      "name": "SPARQL sitelink checking in batches",
+      "description": "VALUES clause batch (single round-trip) instead of 50-at-a-time with 1s delays.",
+      "detection": "Long runtime or rate-limit failures on the SPARQL endpoint."
+    }
+  ],
+  "verifier": {
+    "kind": "mixed",
+    "checks": [
+      {
+        "id": "v1",
+        "kind": "artifact_check",
+        "detail": "Code must handle subcategories (cmtype=page|subcat, CategoryTree, or explicit recursion).",
+        "pass_condition": "Recursion or subcategory handling present in the produced script."
+      },
+      {
+        "id": "v2",
+        "kind": "count_check",
+        "detail": "Sample size from the recursive tree (AB observed 100).",
+        "pass_condition": "Sample size >= 80 articles."
+      },
+      {
+        "id": "v3",
+        "kind": "api_crosscheck",
+        "detail": "For up to 5 sampled 'gap' articles, verify via Wikidata wbgetentities that the item truly has no frwiki sitelink.",
+        "pass_condition": "All sampled gaps confirmed sitelink-free (or flagged with explanation)."
+      },
+      {
+        "id": "v4",
+        "kind": "schema_check",
+        "detail": "Ranked table with pageview values.",
+        "pass_condition": "Table present, sorted descending by pageviews, values within 1% of live recompute for sampled rows."
+      }
+    ]
+  },
+  "safety": "read-only",
+  "time_budget_min": 15,
+  "source": "research/ab-testing/AB_TEST_REPORT_ROUND2.md",
+  "status": "ported",
+  "port_notes": "AB result: the archetypal silent failure - no-skills variant produced a plausible ranked table of 20 articles while missing 75% of the data. v1 (artifact) + v2 (count) are the canary detectors."
+}

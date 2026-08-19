@@ -1,0 +1,70 @@
+{
+  "schema_version": "0.1.0",
+  "id": "r1t1-pageviews",
+  "title": "Daily pageviews for Albert Einstein (past 30 days)",
+  "round": 1,
+  "complexity": "medium",
+  "tier": "live",
+  "dimension": "single-api-read",
+  "prompt": "Fetch daily pageview counts for 'Albert Einstein' on English Wikipedia for the past 30 days. Print the total views, the top day, and the date range covered.",
+  "skills": ["wikimedia-pageviews", "wikimedia-api-access"],
+  "apis": ["Wikimedia Pageviews REST API v1"],
+  "expected_output": {
+    "description": "Total views, top day, and the date range covered, with daily data points for the 30-day window (minus data-lag days).",
+    "fields": ["total_views", "top_day", "date_range_start", "date_range_end", "daily_points_count"]
+  },
+  "canaries": [
+    {
+      "id": "c1",
+      "name": "48h data lag",
+      "description": "The Pageviews API does not return data for the most recent ~48 hours. Naive agents report 29 days of data as if the window were complete.",
+      "detection": "Daily data-point count is 29 instead of 30 with no explanation of the lag, OR the reported range silently ends before the request window."
+    },
+    {
+      "id": "c2",
+      "name": "Date format",
+      "description": "Dates must be YYYYMMDD (not YYYY/MM/DD), a known gotcha with the Top Pages endpoint.",
+      "detection": "HTTP 400/404 from the API when the agent uses slash-separated dates."
+    },
+    {
+      "id": "c3",
+      "name": "URL path segment order",
+      "description": "Path order is project/access/agent/article/granularity/start/end.",
+      "detection": "Non-200 response from misordered path segments."
+    }
+  ],
+  "verifier": {
+    "kind": "api_crosscheck",
+    "checks": [
+      {
+        "id": "v1",
+        "kind": "count_check",
+        "detail": "Re-fetch daily pageviews for the same 30-day window from the live API and compare data-point counts.",
+        "pass_condition": "Agent daily-points count equals the live count, OR differs only by the documented data-lag days and the report acknowledges the lag."
+      },
+      {
+        "id": "v2",
+        "kind": "schema_check",
+        "detail": "Report must contain total views, top day, and a date range.",
+        "pass_condition": "All required fields present and internally consistent (top day appears in the fetched data; range start/end within the requested window)."
+      },
+      {
+        "id": "v3",
+        "kind": "api_crosscheck",
+        "detail": "Compare agent's total against a live recomputation.",
+        "pass_condition": "Total within 1% of live recompute (pageview counters can tick between calls)."
+      },
+      {
+        "id": "v4",
+        "kind": "canary_detection",
+        "detail": "Check whether the report acknowledges the data lag or the range ends within 2 days of the request date.",
+        "pass_condition": "Range end <= 2 days before run date, or the report explicitly mentions the 48h lag."
+      }
+    ]
+  },
+  "safety": "read-only",
+  "time_budget_min": 10,
+  "source": "research/ab-testing/AB_TEST_REPORT_ROUND1.md",
+  "status": "ported",
+  "port_notes": "AB result: skills 3 min vs no-skills 5 min; no-skills counted 29 days silently. Live data drifts daily, so v1/v3 use tolerance-based checks, not exact equality."
+}
