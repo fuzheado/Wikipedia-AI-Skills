@@ -1,0 +1,76 @@
+{
+  "schema_version": "0.1.0",
+  "id": "r1t4-category-listing",
+  "title": "List all main-namespace pages in Category:Artificial intelligence",
+  "round": 1,
+  "complexity": "medium",
+  "tier": "live",
+  "dimension": "single-api-read",
+  "prompt": "List all main-namespace pages in the Wikipedia category 'Artificial intelligence', printing page title and page ID.",
+  "skills": ["wikipedia-categories", "wikimedia-api-access"],
+  "apis": ["MediaWiki Action API (list=categorymembers)"],
+  "expected_output": {
+    "description": "All main-namespace article titles with page IDs, paginated to completion.",
+    "fields": ["pages[].title", "pages[].pageid"]
+  },
+  "canaries": [
+    {
+      "id": "c1",
+      "name": "Namespace filter",
+      "description": "cmnamespace=0 required - otherwise subcategories, files, and talk pages leak in.",
+      "detection": "Output contains 'Category:', 'File:', or 'Talk:' prefixed titles."
+    },
+    {
+      "id": "c2",
+      "name": "cmtype filter",
+      "description": "cmtype=page excludes subcategories and files.",
+      "detection": "Subcategory entries appear in the page list."
+    },
+    {
+      "id": "c3",
+      "name": "Pagination token",
+      "description": "cmcontinue token required for categories with >500 members or with continuation.",
+      "detection": "Truncated list; no continue loop in code."
+    },
+    {
+      "id": "c4",
+      "name": "Category: prefix",
+      "description": "cmtitle requires the 'Category:' prefix.",
+      "detection": "Empty result set from a bare title."
+    }
+  ],
+  "verifier": {
+    "kind": "api_crosscheck",
+    "checks": [
+      {
+        "id": "v1",
+        "kind": "namespace_check",
+        "detail": "Every returned title must be a main-namespace article.",
+        "pass_condition": "No 'Category:', 'File:', 'Talk:', 'Template:', 'Wikipedia:' prefixed titles."
+      },
+      {
+        "id": "v2",
+        "kind": "api_crosscheck",
+        "detail": "Re-fetch the full membership (paginated, cmnamespace=0, cmtype=page) from the live API and compare.",
+        "pass_condition": "Agent's set is a subset of the live set with >= 90% overlap (category membership drifts; agents must not invent titles)."
+      },
+      {
+        "id": "v3",
+        "kind": "count_check",
+        "detail": "Live count observed ~243 in 2026-06; expected >= 200.",
+        "pass_condition": "Agent count >= 200."
+      },
+      {
+        "id": "v4",
+        "kind": "artifact_check",
+        "detail": "Code uses cmcontinue (or equivalent continuation) if the live count exceeds one API page.",
+        "pass_condition": "If live count > 500: continue handling present. Else: pagination pattern present or count matches live exactly."
+      }
+    ]
+  },
+  "safety": "read-only",
+  "time_budget_min": 10,
+  "source": "research/ab-testing/AB_TEST_REPORT_ROUND1.md",
+  "status": "ported",
+  "port_notes": "AB result: both variants found 243 pages identically; the skills advantage was speed and certainty, not correctness. Category membership drifts - v2/v3 use drift-tolerant checks."
+}

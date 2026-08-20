@@ -7,7 +7,7 @@ compatibility: opencode
 skill_discovery_hints:
   - keywords: ["wikitable", "table", "sortable", "colspan", "rowspan", "data table", "table syntax"]
   - keywords: ["table generation", "CSV to wikitable", "wikitable styling", "mw-collapsible"]
-last_verified: 2026-06-10
+last_verified: 2026-08-18
 ---
 
 > ⚠️ **Prerequisite:** This skill assumes basic familiarity with wikitext templates.
@@ -378,6 +378,71 @@ print(dicts_to_wikitable(data, caption="Scores"))
 
 ---
 
+## SOP: Failure Modes & Render Verification
+
+### ❌ Anti-pattern: single-line tables (common LLM generation bug)
+
+A table written entirely on one line does **not** render:
+
+```wikitext
+{| class="wikitable" ! Date !! Article !! Status |- | Jan 12 || [[X]] || start |- | Feb 2 || [[Y]] || start |}
+```
+
+MediaWiki table syntax is **line-based**: the markers `{|` (open), `!` (header
+row start), `|-` (row separator), `|` (first cell of a row) and `|}` (close)
+are only recognized **at the start of a line**. The only valid inline
+separators are `||` (between cells) and `!!` (between header cells).
+
+**Verified failure behavior (2026-08-18, enwiki):** a 5-table page with all
+tables single-line rendered as **one empty table** (`<tr><td></td></tr>`) with
+the other four silently lost — no error message, no leaked markup. The first
+`{|` opens a table that swallows content until a line-start `|}`, which never
+comes; the rest is dropped.
+
+✅ Correct structure — every marker at a line start:
+
+```wikitext
+{| class="wikitable"
+! Date !! Article !! Status
+|-
+| Jan 12 || [[X]] || start
+|-
+| Feb 2 || [[Y]] || start
+|}
+```
+
+### ✅ Render-test SOP — always verify with the real parser
+
+Client-side previews (including the rough script in Tooling below) are
+approximations; **MediaWiki's line-based parser is the authority**. Verify by
+parsing the wikitext through the API and asserting the structure:
+
+1. **POST the wikitext** to `action=parse` — GET overflows (HTTP 414) on
+   anything beyond a tiny table:
+   ```bash
+   curl -s -A "$WIKIMEDIA_USER_AGENT" -X POST "https://en.wikipedia.org/w/api.php" \
+     --data-urlencode "action=parse" --data-urlencode "prop=text" \
+     --data-urlencode "format=json" --data-urlencode "title=Sandbox" \
+     --data-urlencode "contentmodel=wikitext" --data-urlencode "text@wikitable.txt" \
+     | python3 -c "import json,sys; print(json.load(sys.stdin)['parse']['text']['*'])"
+   ```
+2. **Assert the structure** of the rendered HTML:
+   - `<table class="wikitable">` count == expected number of tables
+   - `<tr>` count == header rows + data rows (a mismatch means content was
+     swallowed or rows merged)
+   - `<th>` count == tables × columns
+   - **no empty table** — `<tr><td></td></tr>` signals the single-line trap
+   - **no escaped table-open** — `&#123;|` in the HTML means a `{|` was
+     treated as literal text, i.e. the table never opened
+3. Spot-check that key wikilinks (`<a href="/wiki/...">`) survived.
+
+### LLM-generation checklist
+
+- `{|` / `|}` / `|-` each on their own line
+- Header row and every data row start at a line start (`!` / `|`)
+- `||` / `!!` used only *within* a row
+- After generating, always run the render-test above before shipping the page
+
 ## Reference: Styling Quick Reference
 
 ### Color Palette (Wikimedia Standard)
@@ -425,6 +490,10 @@ These are the colors used by `class="wikitable"` and common in Wikipedia tables:
 ### 🔧 Wikitable to HTML Preview (`scripts/wikitable-to-html.sh`)
 
 Convert a wikitable to rough HTML for visual verification:
+
+> ⚠️ **Rough preview only** — it cannot reproduce MediaWiki's line-based
+> parsing quirks (single-line tables, swallowed content). Always confirm with
+> the render-test SOP above before publishing.
 
 ```bash
 echo '{| class="wikitable"|! A|! B|-|1|2|}' | ./scripts/wikitable-to-html.sh

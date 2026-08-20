@@ -4,12 +4,12 @@ description: Choose the right Wikimedia API or tool for the task — a decision 
 depends_on: [wikimedia-api-access]
 license: MIT
 compatibility: opencode
+last_verified: 2026-08-18
 skill_discovery_hints:
   - keywords: ["which API", "best tool", "how to access", "API strategy", "choose between"]
   - keywords: ["REST vs Action", "SPARQL vs API", "Pywikibot vs API", "SQL vs API"]
   - keywords: ["performance", "fastest", "rate limit", "batch", "bulk", "scale"]
   - keywords: ["read only", "read write", "analytics", "real time"]
-last_verified: 2026-06-10
 ---
 
 > ⚠️ **User-Agent required:** All API calls below need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format, rate limiting, and error handling. If you get HTTP 403 or 429, load that skill before debugging.
@@ -78,6 +78,15 @@ What do you want to do?
 | A single revision's content | **REST API** (`/revision/{id}/content`) | Direct by revision ID, no page lookup needed |
 
 **❌ Common mistake:** Using `action=parse` for a single page summary when the REST API's `/page/summary` returns cleaner JSON in one call.
+
+**⚠️ Extracting lead text for LLM context?** Four approaches exist (REST
+summary, TextExtracts, Parsoid HTML + DOM cleaning, LLM summarization) and none
+is universally correct — they differ on fidelity, date/parenthetical loss, and
+artifacts. `/page/summary` silently **strips parentheticals including dates**
+(John Williams loses "(born February 8, 1932)"). See
+[`references/lead-text-extraction.md`](references/lead-text-extraction.md) for
+the full decision matrix, the Parsoid noise contract, and the
+browser-render fidelity-test pattern.
 
 ### B. Querying Multiple Pages with Filters
 
