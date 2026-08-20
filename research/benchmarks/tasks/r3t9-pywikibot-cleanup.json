@@ -1,0 +1,76 @@
+{
+  "schema_version": "0.1.0",
+  "id": "r3t9-pywikibot-cleanup",
+  "title": "Pywikibot citation cleanup (dry run)",
+  "round": 3,
+  "complexity": "hard",
+  "tier": "live",
+  "dimension": "framework-usage",
+  "prompt": "Use the full Pywikibot framework (dry run only - no live edits) to find bare URLs in references of articles in a Physics category and propose {{cite web}} wrappers for them.",
+  "skills": ["pywikibot", "wikipedia-citations", "wikimedia-wikitext", "wikimedia-api-access"],
+  "apis": ["Pywikibot framework (CategorizedPageGenerator)", "mwparserfromhell (local)"],
+  "expected_output": {
+    "description": "List of articles scanned, bare URLs found, and proposed {{cite web}} replacements with url, title, access-date. Zero live edits.",
+    "fields": ["articles_scanned[]", "bare_urls[].url", "proposed_replacements[]", "live_edits_made"]
+  },
+  "canaries": [
+    {
+      "id": "c1",
+      "name": "Pywikibot v11.3 API rename",
+      "description": "CategoryPageGenerator was renamed to CategorizedPageGenerator; the deprecated name costs ~10 min of framework probing.",
+      "detection": "Code uses CategoryPageGenerator (deprecated) or spends multiple attempts discovering the generator."
+    },
+    {
+      "id": "c2",
+      "name": "CS1 catalog completeness",
+      "description": "22+ citation templates in the skill reference; guessing from memory covers ~15.",
+      "detection": "Proposed wrappers for templates that are already CS1/CS2 (double-wrapping), or missed bare URLs inside uncommon citation templates."
+    },
+    {
+      "id": "c3",
+      "name": "Bare-URL detection method",
+      "description": "AST-based via mwparserfromhell filter_tags + cite-template exclusion; regex findall has capture-group traps.",
+      "detection": "Regex capture-group bug producing wrong URL extraction."
+    },
+    {
+      "id": "c4",
+      "name": "Generator ordering",
+      "description": "CategorizedPageGenerator returns articles by page ID (oldest first); list=categorymembers returns lexicographic. Different article sets result.",
+      "detection": "Scanned set differs from the categorymembers order (not an error, but must be understood/reported)."
+    }
+  ],
+  "verifier": {
+    "kind": "mixed",
+    "checks": [
+      {
+        "id": "v1",
+        "kind": "artifact_check",
+        "detail": "Code uses CategorizedPageGenerator (the v11.3 name).",
+        "pass_condition": "'CategorizedPageGenerator' present in the produced script."
+      },
+      {
+        "id": "v2",
+        "kind": "safety_check",
+        "detail": "Dry run: no edits performed.",
+        "pass_condition": "No action=edit calls in code; live_edits_made == 0."
+      },
+      {
+        "id": "v3",
+        "kind": "schema_check",
+        "detail": "Proposed replacements carry url, title, access-date.",
+        "pass_condition": "All proposed {{cite web}} wrappers have the three fields (or none proposed, with scanned-articles list)."
+      },
+      {
+        "id": "v4",
+        "kind": "count_check",
+        "detail": "Articles scanned (AB: 5 per variant).",
+        "pass_condition": ">= 3 articles scanned and reported by title."
+      }
+    ]
+  },
+  "safety": "read-only",
+  "time_budget_min": 25,
+  "source": "research/ab-testing/AB_TEST_REPORT_ROUND3.md",
+  "status": "ported",
+  "port_notes": "AB result: the 9.0x speedup outlier (5 min vs 45 min) - framework version churn is the highest-value documentation target. Requires Pywikibot installed (local dependency); dry-run enforced."
+}

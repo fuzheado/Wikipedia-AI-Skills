@@ -1,0 +1,76 @@
+{
+  "schema_version": "0.1.0",
+  "id": "r2t6-patrol-monitor",
+  "title": "Real-time new-page patrol monitor (EventStreams + LiftWing + PageTriage)",
+  "round": 2,
+  "complexity": "hard",
+  "tier": "live",
+  "dimension": "real-time-streams",
+  "prompt": "Listen to the Wikimedia EventStreams recentchange stream for new enwiki pages for 30-180 seconds. For each new page: score revert risk via LiftWing, check PageTriage status. Report events collected, main-namespace articles, and any high-risk findings. Discard canary events.",
+  "skills": ["wikimedia-eventstreams", "wikimedia-ml-services", "wikimedia-api-access", "wikipedia-error-handling"],
+  "apis": ["Wikimedia EventStreams (SSE)", "LiftWing revertrisk-language-agnostic", "LiftWing articlequality", "MediaWiki Action API (pagetriagelist)"],
+  "expected_output": {
+    "description": "Report of new pages seen, main-namespace articles, high-risk findings; canary events discarded.",
+    "fields": ["events_seen", "main_ns_articles", "high_risk[]", "run_duration_s", "canary_events_discarded"]
+  },
+  "canaries": [
+    {
+      "id": "c1",
+      "name": "Canary event filtering",
+      "description": "WMF injects test events (meta.domain == 'canary') into the stream; processing them corrupts the analysis. The AB no-skills variant did not filter them.",
+      "detection": "No 'canary' handling in the produced code; canary-domain events appear in the analysis."
+    },
+    {
+      "id": "c2",
+      "name": "422 on brand-new pages",
+      "description": "revertrisk-language-agnostic returns HTTP 422 parent_revision_missing for revision 1 (new pages have no parent). Must be handled gracefully.",
+      "detection": "Script crashes on 422, or skips all new pages because of it."
+    },
+    {
+      "id": "c3",
+      "name": "articlequality latency",
+      "description": "The articlequality model has ~60s processing latency for brand-new revisions (empty scores).",
+      "detection": "Empty score responses treated as model failure instead of latency."
+    },
+    {
+      "id": "c4",
+      "name": "PageTriage endpoint",
+      "description": "action=pagetriagelist with page_id parameter; the no-skills variant spent ~5 min probing paraminfo. NOTE: as of 2026-08 the repo has NO pagetriage skill - this knowledge is a documented gap that both variants must discover or probe.",
+      "detection": "Wrong module names in code (pagetriageaction, etc.)."
+    }
+  ],
+  "verifier": {
+    "kind": "mixed",
+    "checks": [
+      {
+        "id": "v1",
+        "kind": "artifact_check",
+        "detail": "Produced code contains canary filtering (meta.domain == 'canary' or equivalent).",
+        "pass_condition": "'canary' appears in the script."
+      },
+      {
+        "id": "v2",
+        "kind": "artifact_check",
+        "detail": "Produced code handles the 422 parent_revision_missing case.",
+        "pass_condition": "'422' or 'parent_revision' handling present, or new-page scoring is skipped with explanation."
+      },
+      {
+        "id": "v3",
+        "kind": "schema_check",
+        "detail": "Report contains events_seen, main_ns_articles, high_risk findings, and run duration.",
+        "pass_condition": "All fields present; run duration >= 30s (stream actually listened)."
+      },
+      {
+        "id": "v4",
+        "kind": "sanity_check",
+        "detail": "Reported events should be plausible for the run duration (enwiki new-page rate is low; a 30-180s window yields a handful).",
+        "pass_condition": "events_seen >= 1 for runs >= 60s, or a documented reason for zero."
+      }
+    ]
+  },
+  "safety": "read-only",
+  "time_budget_min": 20,
+  "source": "research/ab-testing/AB_TEST_REPORT_ROUND2.md",
+  "status": "ported",
+  "port_notes": "Probabilistic by nature (live stream). Verifier leans on artifact checks for canary/422 handling plus schema sanity. EventStreams has a 15-min idle timeout - runs are bounded to 30-180s. REGISTRY FINDING: the AB round-2 report lists wikipedia-pagetriage-api as a loaded skill, but no such skill exists in this repo as of 2026-08 (59 skills); r2t6 now references only skills that resolve and flags the PageTriage knowledge gap in canary c4."
+}

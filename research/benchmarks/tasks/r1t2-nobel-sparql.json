@@ -1,0 +1,70 @@
+{
+  "schema_version": "0.1.0",
+  "id": "r1t2-nobel-sparql",
+  "title": "Wikidata SPARQL: Nobel Prize in Physics winners",
+  "round": 1,
+  "complexity": "hard",
+  "tier": "live",
+  "dimension": "single-api-read",
+  "prompt": "Write a Python script querying the Wikidata SPARQL endpoint for all Nobel Prize in Physics winners. Print each winner's label and date of birth.",
+  "skills": ["wikidata", "wikimedia-api-access"],
+  "apis": ["Wikidata SPARQL (WDQS)", "Wikidata wbgetentities (verifier)"],
+  "expected_output": {
+    "description": "List of winners with label and date of birth; humans only (no fictional characters).",
+    "fields": ["winners[].label", "winners[].date_of_birth"]
+  },
+  "canaries": [
+    {
+      "id": "c1",
+      "name": "Fictional-character contamination",
+      "description": "P166 (award received) = Q38104 (Nobel Prize in Physics) also matches fictional characters (e.g., Sheldon Cooper). Correct queries filter P31=Q5 (human).",
+      "detection": "Result set contains items that are not humans (P31 != Q5)."
+    },
+    {
+      "id": "c2",
+      "name": "WDQS rate limiting",
+      "description": "WDQS is aggressively rate-limited (observed ~1 request/min under load); scripts need retry/backoff on 429.",
+      "detection": "Script crashes on 429 without retry, or produces a partial result set."
+    },
+    {
+      "id": "c3",
+      "name": "Q/P-number semantics",
+      "description": "P166 = award received; Q38104 = Nobel Prize in Physics; label service pattern SERVICE wikibase:label.",
+      "detection": "Wrong property/entity ids produce empty or wrong result sets."
+    }
+  ],
+  "verifier": {
+    "kind": "sparql_match",
+    "checks": [
+      {
+        "id": "v1",
+        "kind": "sparql_match",
+        "detail": "Run the reference query (P31=Q5 human filter) against live WDQS and compare result sets.",
+        "pass_condition": "Count within 10% of reference (live data grows); every reference winner label present in the agent's set."
+      },
+      {
+        "id": "v2",
+        "kind": "membership_check",
+        "detail": "Resolve a fixed set of known winners (Albert Einstein, Marie Curie, Richard Feynman) by label via wbgetentities and check presence.",
+        "pass_condition": "All 3 known winners present in the agent's result set."
+      },
+      {
+        "id": "v3",
+        "kind": "anti_contamination",
+        "detail": "Resolve known fictional recipients (e.g., Sheldon Cooper) by label and check absence.",
+        "pass_condition": "Known fictional character absent from the agent's result set."
+      },
+      {
+        "id": "v4",
+        "kind": "schema_check",
+        "detail": "Each result has a label and a date of birth.",
+        "pass_condition": "No empty label or DOB fields in the printed output."
+      }
+    ]
+  },
+  "safety": "read-only",
+  "time_budget_min": 10,
+  "source": "research/ab-testing/AB_TEST_REPORT_ROUND1.md",
+  "status": "ported",
+  "port_notes": "AB result: skills 230 winners in 1.29s vs no-skills 229 after retry; skills variant DID include Sheldon Cooper (no P31 filter) - the report treats humans-only as correct. WDQS rate limits vary; v1 count tolerance absorbs live growth."
+}

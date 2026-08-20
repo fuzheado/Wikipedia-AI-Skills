@@ -1,0 +1,70 @@
+{
+  "schema_version": "0.1.0",
+  "id": "r2t8-structural-audit",
+  "title": "Article structural health check ('Python (programming language)')",
+  "round": 2,
+  "complexity": "hard",
+  "tier": "live",
+  "dimension": "multi-step-orchestration",
+  "prompt": "Deep structural audit of 'Python (programming language)': infobox, lead paragraphs, section structure, template taxonomy, navboxes, empty sections, and categories. Produce a health report.",
+  "skills": ["wikipedia-page-anatomy", "wikipedia-templates", "wikimedia-wikitext", "wikimedia-api-access"],
+  "apis": ["MediaWiki Action API (action=raw, prop=categories)", "mwparserfromhell (local)"],
+  "expected_output": {
+    "description": "Health report: infobox params, lead length, H2/H3 section counts, template taxonomy breakdown, navbox list, empty-section list, category list.",
+    "fields": ["infobox", "lead_paragraphs", "lead_words", "h2_count", "h3_count", "template_taxonomy", "navboxes[]", "empty_sections[]", "categories[]"]
+  },
+  "canaries": [
+    {
+      "id": "c1",
+      "name": "Navbox diversity",
+      "description": "Navboxes use diverse names ({{Portal}}, {{Authority control}}, {{Python sidebar}}) - not just templates containing 'navbox'. The no-skills variant found 0 (should be 2+).",
+      "detection": "navbox count == 0 while the wikitext contains Portal bar / Authority control."
+    },
+    {
+      "id": "c2",
+      "name": "Template-only sections are not empty",
+      "description": "References/Notes/Further reading contain only template calls ({{Reflist}}, {{Notelist}}) and are NOT empty. The no-skills variant flagged 5 false positives.",
+      "detection": "References/Notes/Further reading listed as empty sections."
+    },
+    {
+      "id": "c3",
+      "name": "action=raw key",
+      "description": "The wikitext response key is 'content' (not '*'); the no-skills variant burned ~3 min on this.",
+      "detection": "KeyError reading the raw wikitext response."
+    }
+  ],
+  "verifier": {
+    "kind": "api_crosscheck",
+    "checks": [
+      {
+        "id": "v1",
+        "kind": "api_crosscheck",
+        "detail": "Re-run the canonical audit on the same revision: parse wikitext with mwparserfromhell, count H2/H3, detect navbox-class templates, count categories via API.",
+        "pass_condition": "Agent's H2/H3 counts and category list match the live recompute; navbox list matches (Authority control / Portal present)."
+      },
+      {
+        "id": "v2",
+        "kind": "assertion_check",
+        "detail": "Template-only sections (References, Notes, Further reading) must not be reported empty.",
+        "pass_condition": "empty_sections does not include References/Notes/Further reading."
+      },
+      {
+        "id": "v3",
+        "kind": "assertion_check",
+        "detail": "Navbox detection must catch non-'navbox'-named templates.",
+        "pass_condition": "navboxes >= 1 and includes Authority control or Portal bar."
+      },
+      {
+        "id": "v4",
+        "kind": "schema_check",
+        "detail": "Health report has template taxonomy with >= 4 categories.",
+        "pass_condition": "Taxonomy breakdown present with >= 4 distinct template classes."
+      }
+    ]
+  },
+  "safety": "read-only",
+  "time_budget_min": 20,
+  "source": "research/ab-testing/AB_TEST_REPORT_ROUND2.md",
+  "status": "ported",
+  "port_notes": "AB result: no-skills produced a professional-looking health report with wrong numbers (0 navboxes, 5 false empty sections) - the canonical silent-failure example. Pin the revision for exact v1 comparison; the article is heavily edited."
+}

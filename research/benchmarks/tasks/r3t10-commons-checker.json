@@ -1,0 +1,70 @@
+{
+  "schema_version": "0.1.0",
+  "id": "r3t10-commons-checker",
+  "title": "Commons media completeness checker",
+  "round": 3,
+  "complexity": "medium",
+  "tier": "live",
+  "dimension": "cross-project-orchestration",
+  "prompt": "For 25 articles in a category: check Wikidata P18 (image) presence, search Commons for image candidates for the ones missing images, and rank the missing-image articles by pageviews.",
+  "skills": ["wikimedia-commons", "wikidata", "wikipedia-categories", "wikimedia-pageviews", "wikimedia-api-access"],
+  "apis": ["Wikidata wbgetentities (P18)", "Commons search (srnamespace=6)", "MediaWiki Action API (categorymembers)", "Wikimedia Pageviews REST API"],
+  "expected_output": {
+    "description": "Per-article image status (P18 present/missing), Commons candidate list for missing ones, ranked by pageviews.",
+    "fields": ["articles[].title", "articles[].has_p18", "articles[].commons_candidates[]", "articles[].pageviews", "ranking"]
+  },
+  "canaries": [
+    {
+      "id": "c1",
+      "name": "File namespace",
+      "description": "Commons search requires srnamespace=6 (File namespace).",
+      "detection": "Search returns main-namespace pages instead of files, or empty results."
+    },
+    {
+      "id": "c2",
+      "name": "MediaSearch backend",
+      "description": "srbackend=MediaSearch returns better visual-media-focused results than generic search.",
+      "detection": "Generic search used (not an error, but weaker candidates - the AB report flags it as a skills advantage)."
+    },
+    {
+      "id": "c3",
+      "name": "Structured-data search",
+      "description": "haswbstatement: queries on Commons search for depicted-subject queries.",
+      "detection": "No awareness of haswbstatement (not an error for this task, but a capability marker)."
+    }
+  ],
+  "verifier": {
+    "kind": "api_crosscheck",
+    "checks": [
+      {
+        "id": "v1",
+        "kind": "api_crosscheck",
+        "detail": "Re-check P18 presence for all 25 articles via wbgetentities.",
+        "pass_condition": "Agent's has_p18 flags match the live wbgetentities result for every article."
+      },
+      {
+        "id": "v2",
+        "kind": "count_check",
+        "detail": "25 articles checked.",
+        "pass_condition": ">= 20 articles with per-article status."
+      },
+      {
+        "id": "v3",
+        "kind": "schema_check",
+        "detail": "Commons candidates are File-namespace titles (srnamespace=6).",
+        "pass_condition": "All candidate titles resolve to File: prefixed titles on Commons."
+      },
+      {
+        "id": "v4",
+        "kind": "sanity_check",
+        "detail": "Ranking by pageviews present.",
+        "pass_condition": "Ranking column present and sorted descending."
+      }
+    ]
+  },
+  "safety": "read-only",
+  "time_budget_min": 15,
+  "source": "research/ab-testing/AB_TEST_REPORT_ROUND3.md",
+  "status": "ported",
+  "port_notes": "AB result: the 'well-known API floor' exemplar (1.7x, identical output) - most of this task's APIs are guessable. Kept as a control for the floor, not a skills-differentiator."
+}
