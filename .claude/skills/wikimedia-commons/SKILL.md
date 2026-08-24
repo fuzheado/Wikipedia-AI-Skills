@@ -379,7 +379,7 @@ Some formats are blocked from upload because of patent encumbrances, poor compre
 
 | Tool | Purpose | Best For |
 |------|---------|----------|
-| **[Pattypan](https://commons.wikimedia.org/wiki/Commons:Pattypan)** | Spreadsheet-based bulk uploader | Uploading many files with structured metadata from a `.xlsx` template; supports custom categories, descriptions, and licenses per row |
+| **[Pattypan](https://commons.wikimedia.org/wiki/Commons:Pattypan)** | Spreadsheet-based bulk uploader | Uploading many files with structured metadata from a `.xlsx` template; supports custom categories, descriptions, and licenses per row. See the **[pattypan](../pattypan/SKILL.md)** skill |
 | **[flickr2commons](https://commons.wikimedia.org/wiki/Commons:Flickr2Commons)** | Imports from Flickr | Transferring freely licensed (CC BY, CC BY-SA, CC0, PD) photos from Flickr to Commons with attribution preserved |
 | **[url2commons](https://url2commons.toolforge.org/)** | Uploads from a list of URLs | Supply a list of direct image URLs and upload them in batch; useful for migration from other open repositories |
 | **[video2commons](https://commons.wikimedia.org/wiki/Commons:Video2Commons)** | Uploads/converts video | Handles transcoding (e.g., MP4 → WebM) during upload; ideal for migrating video from YouTube or other sources under free licenses |
