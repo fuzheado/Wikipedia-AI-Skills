@@ -15,7 +15,7 @@ skill_discovery_hints:
   - keywords: ["Commons namespaces", "gallery", "Creator namespace"]
   - keywords: ["CORS", "cross-origin", "upload.wikimedia.org", "browser app", "Canvas", "WebGL"]
   - keywords: ["Commons Impact Metrics", "CIM", "category analytics", "Views from category", "impact metrics"]
-last_verified: 2026-08-10
+last_verified: 2026-08-24
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -383,6 +383,7 @@ Some formats are blocked from upload because of patent encumbrances, poor compre
 | **[flickr2commons](https://commons.wikimedia.org/wiki/Commons:Flickr2Commons)** | Imports from Flickr | Transferring freely licensed (CC BY, CC BY-SA, CC0, PD) photos from Flickr to Commons with attribution preserved |
 | **[url2commons](https://url2commons.toolforge.org/)** | Uploads from a list of URLs | Supply a list of direct image URLs and upload them in batch; useful for migration from other open repositories |
 | **[video2commons](https://commons.wikimedia.org/wiki/Commons:Video2Commons)** | Uploads/converts video | Handles transcoding (e.g., MP4 → WebM) during upload; ideal for migrating video from YouTube or other sources under free licenses |
+| **[Pywikibot](https://www.mediawiki.org/wiki/Manual:Pywikibot)** | Python bot framework for scripted uploads | Programmatic bulk uploads via `Site.upload()` or `pwb.py upload`; `pwb.py imagetransfer` moves files between wikis (e.g. enwiki → Commons) with attribution history. See the **[pywikibot](../pywikibot/SKILL.md)** skill |
 | **[Commonist](https://commons.wikimedia.org/wiki/Commons:Commonist)** | Desktop bulk uploader (Java) | Legacy tool for batch uploads with a GUI; lighter than Pattypan for simple batches |
 
 ### **Upload Checklist**
