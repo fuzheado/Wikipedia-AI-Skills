@@ -110,10 +110,26 @@ Commons↔Flickr matching stays possible. Follow the pattypan skill's filename r
 - **Flickypedia** (the Flickr Foundation's tool) takes the opposite approach:
   reject titles containing `:/\` client-side, and validate everything else via
   API round-trips rather than a local table: `action=titleblacklist&tbaction=create&
-  tbtitle=File:…` (catches blacklist + invalid titles), `action=query&titles=`
-  (exact duplicate), `action=opensearch` (case-insensitive duplicate — `Cat.JPG` vs
-  `Cat.jpg`). Good pattern for single-file flows; batch tools should aggregate the
-  same checks into a preview before uploading.
+  tbtitle=File:…`, `action=query&titles=`, `action=opensearch`. Good pattern for
+  single-file flows; batch tools should aggregate the same checks into a preview
+  before uploading.
+
+  **`action=titleblacklist` — what it actually catches (live-verified 2026-08-25):**
+  returns `{"result":"ok"}`, `{"result":"blacklisted","reason":…,"line":…}`
+  (with the matching blacklist entry, e.g. camera prefixes like `IMG_`), or an
+  `invalidtitle` API error. It catches the **per-wiki custom blacklist** (camera
+  prefixes, hidden chars — NBSP/BiDi/control, pattern blocks) and structurally
+  broken titles (>255 bytes, empty). It does **NOT** catch `# < > [ ] | { }`
+  (verified: `File:bad#title.jpg` → `ok`), nor `:` `/` `\` (those are upload-time
+  conversions, not legality). One call per title — not batchable.
+
+  **`action=query&titles=File:X` is the better batch check** (50 titles/call): the
+  response's `normalized[].to` shows what MediaWiki would *actually* store —
+  `under_score.jpg` → `Under score.jpg`, `  spaced  name.jpg` → `Spaced name.jpg`,
+  and `bad#title.jpg` → `Bad` (the `#` **truncates the title silently**!).
+  Comparing input vs normalized output catches normalization collisions AND
+  silent mangling in one batched call — use it as a pre-upload gate; keep a local
+  table only to render preview names offline.
 - **Dedupe index from SDC dumps**: Flickypedia builds a Commons-wide SQLite index
   from weekly SDC snapshots — `P7482 source of file` = file-available-on-internet +
   qualifier `P123 operator` = Flickr + `P973 described at URL` → parse the Flickr
