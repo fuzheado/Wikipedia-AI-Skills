@@ -267,6 +267,8 @@ notes. The robust pattern:
 3. **Filter non-free licenses** (anything outside `4,5,7,8,9,10,11,12`). Never map an NC/ND/ARR license to a Commons template.
 4. **Keep the photo id in the filename** (`Title (12345678901).jpg`) — the re:publica/UX Brighton coverage workflows rely on it for Commons↔Flickr matching.
 5. **Follow pattypan filename rules** (from the [pattypan](../pattypan/SKILL.md) skill): no `# < > [ ] | { }`, no `:` in names, avoid camera prefixes (`DSC_`, `IMG`, …), ≤ 240 bytes, allowed extensions. **Also no `/`** — MediaWiki's upload API rejects it with a `badfilename` warning (suggests `-` instead) and does NOT upload the file; sanitize `/`→`-` before uploading (verified 2026-08-10: `Homozygous/Heterozygous` → `Homozygous-Heterozygous`).
+
+   Beyond `/`: `:` and `\` are also in MediaWiki's `$wgIllegalFileChars` (default `':\/\\'`, 1.39+) — the upload API **auto-converts all three to `-`** at upload, so remap them to `-` in the manifest builder to know the final names before uploading. **Strip hidden characters** (control chars, NBSP/odd spaces, BiDi overrides, soft hyphen, BOM, private-use) — Commons' titleblacklist hard-blocks them (live-verified 2026-08-25). **Watch normalization collisions**: `_`→space, first-char case-insensitive (`foo` == `Foo`), whitespace collapse. Full table in the pattypan skill's filename rules.
 6. **Dates as text** in `YYYY-MM-DD HH:MM:SS` — don't let Excel/pattypan reinterpret them.
 7. **Categories come from the user/event**, not invented. Join with `;` for the pattypan `categories` column.
 8. **Escaping**: `| { }` in description/source text → `&#124;` / `&#123;` / `&#125;` so the `{{Information}}` template and FreeMarker don't break.

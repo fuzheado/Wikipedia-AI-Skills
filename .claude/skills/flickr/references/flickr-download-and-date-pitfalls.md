@@ -154,6 +154,13 @@ describes for direct downloads (section 1), except the victims are shared by
 everyone (UploadWizard's Flickr importer, flickr2commons, all URL-upload
 clients), so the block can persist for hours and is not under your control.
 
+> **Scale nuance (2026-08-25):** even Flickypedia — the Flickr Foundation's
+own uploader — uses `action=upload&url=` (60 s timeout, no retry logic beyond
+a raised timeout). It survives only because its volume is interactive (a user
+picks a handful of photos per session, far below the ~100-fetch window).
+Batch tools (100s–1000s of files) must not copy that pattern: download
+client-side, upload bytes (see section 1's download strategy).
+
 **How to confirm it's this and not your account being rate-limited:**
 
 1. The error envelope arrives inside an **HTTP 200** response — the API
