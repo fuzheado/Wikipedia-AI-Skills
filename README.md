@@ -57,6 +57,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | | **▸ Working with Content** |
 | [wikimedia-wikitext](.claude/skills/wikimedia-wikitext/SKILL.md) | Parse, extract, and manipulate Wikipedia and MediaWiki wikitext (templates, infoboxes, citations, links) using proper AST-based tooling instead of fragile regex patterns |
 | [wikidata](.claude/skills/wikidata/SKILL.md) | Understand and query Wikidata — the free, collaborative, multilingual knowledge graph that underpins Wikipedia's inter-language links, Commons structured data, and semantic facts across all Wikimedia projects. Covers SPARQL, the Wikibase REST/Action APIs, RDF data dumps, and semantic web concepts |
+| [wikidata-reconciliation](.claude/skills/wikidata-reconciliation/SKILL.md) | Resolve unstructured labels to verified Wikidata QIDs — OpenRefine reconciliation protocol, wbsearchentities fallback, candidate scoring, and LLM QID grounding guardrails |
 | [wikiportraits-event-series](.claude/skills/wikiportraits-event-series/SKILL.md) | Create Wikidata edition items and Commons year categories for recurring events — P155/P156 follows/followed-by chains, cancelled-year numbering, edition claims, and the <Event> <YYYY> category scheme |
 | [wikidata-vector-search](.claude/skills/wikidata-vector-search/SKILL.md) | Query Wikidata by meaning, concept, or natural-language description using semantic embeddings — fuzzy semantic search, concept matching, similarity lookups, cross-lingual retrieval, and "find like this" when you don't know the exact QID or label |
 | [quickstatements](.claude/skills/quickstatements/SKILL.md) | Build and run QuickStatements batches for Wikidata and Commons — the V1 command grammar (statements, qualifiers, references, ranks, item creation), value formatting, multilingual labels/descriptions/aliases, QS 2.0 vs 3.0, and a bundled validator/generator script |
@@ -153,6 +154,7 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | Query Wikidata with SPARQL — find items, traverse properties, filter by value | [wikidata](.claude/skills/wikidata/SKILL.md) |
 | Find Wikipedia articles that lack a Wikidata item | [wikidata](.claude/skills/wikidata/SKILL.md) |
 | Search Wikidata by meaning (not exact name) — fuzzy cross-lingual concept search | [wikidata-vector-search](.claude/skills/wikidata-vector-search/SKILL.md) |
+| Resolve a label to a verified QID (reconciliation) — with candidate scoring and hallucination guardrails | [wikidata-reconciliation](.claude/skills/wikidata-reconciliation/SKILL.md) |
 | Set up event series: Wikidata edition items, P155/P156 chains, and Commons <Event> <YYYY> year categories | [wikiportraits-event-series](.claude/skills/wikiportraits-event-series/SKILL.md) |
 | Check if a URL is archived on the Wayback Machine | `bash .claude/skills/wikipedia-citations/scripts/archive-check.sh https://example.com` |
 | Inspect a summary of all citations on a Wikipedia page | `bash .claude/skills/wikipedia-citations/scripts/citation-inspector.sh Albert_Einstein` |
