@@ -114,6 +114,7 @@
   "https://commons.wikimedia.org/wiki/Commons:Volunteer_Response_Team": "2026-08-10T12:57:50Z",
   "https://commons.wikimedia.org/wiki/Commons:WikiPortraits/Bento-demo.json": "2026-08-14T13:11:47Z",
   "https://commons.wikimedia.org/wiki/File:Example.jpg": "2026-08-10T12:57:50Z",
+  "https://commons.wikimedia.org/wiki/MediaWiki:Titleblacklist": "2026-09-03T22:46:59Z",
   "https://commons.wikimedia.org/wiki/Special:BotPasswords": "2026-08-10T12:57:50Z",
   "https://commons.wikimedia.org/wiki/Special:FilePath/Example.jpg?width=800": "2026-08-10T12:57:50Z",
   "https://commons.wikimedia.org/wiki/Special:FilePath/File:Example.jpg": "2026-08-10T12:57:50Z",
@@ -158,6 +159,7 @@
   "https://en.wikipedia.org/api/rest_v1/data/citation/mediawiki/https://example.com": "2026-08-10T12:57:50Z",
   "https://en.wikipedia.org/api/rest_v1/data/citation/mediawiki/https://example.com/article": "2026-08-10T12:57:50Z",
   "https://en.wikipedia.org/api/rest_v1/page/Albert_Einstein/html": "2026-08-10T12:57:50Z",
+  "https://en.wikipedia.org/api/rest_v1/page/summary/Ada_Lovelace": "2026-09-03T22:47:00Z",
   "https://en.wikipedia.org/api/rest_v1/page/summary/Python_(programming_language": "2026-08-10T12:57:50Z",
   "https://en.wikipedia.org/api/rest_v1/page/summary/Title": "2026-08-10T12:57:50Z",
   "https://en.wikipedia.org/api/rest_v1/search/page?q=quantum+mechanics&limit=10": "2026-08-10T12:57:50Z",
@@ -629,6 +631,7 @@
   "https://www.mediawiki.org/wiki/Help:Special_MyLanguage": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Help:Subpages": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Help:TemplateStyles": "2026-08-10T12:57:50Z",
+  "https://www.mediawiki.org/wiki/Manual:$wgIllegalFileChars": "2026-09-03T22:47:01Z",
   "https://www.mediawiki.org/wiki/Manual:Pywikibot": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Manual:Pywikibot/Cookbook": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Manual:RCFeed": "2026-08-10T12:57:50Z",
@@ -697,7 +700,7 @@
   "https://your-tool.toolforge.org": "2026-08-10T12:57:50Z",
   "https://\u0440\u0443.wikipedia.org": "2026-08-10T13:07:28Z"
  },
- "generated_at": "2026-08-26T10:25:28Z",
+ "generated_at": "2026-09-03T22:46:59Z",
  "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
@@ -819,6 +822,7 @@
   "https://commons.wikimedia.org/wiki/Commons:Volunteer_Response_Team": 200,
   "https://commons.wikimedia.org/wiki/Commons:WikiPortraits/Bento-demo.json": 200,
   "https://commons.wikimedia.org/wiki/File:Example.jpg": -1,
+  "https://commons.wikimedia.org/wiki/MediaWiki:Titleblacklist": 200,
   "https://commons.wikimedia.org/wiki/Special:BotPasswords": 200,
   "https://commons.wikimedia.org/wiki/Special:FilePath/Example.jpg?width=800": -1,
   "https://commons.wikimedia.org/wiki/Special:FilePath/File:Example.jpg": -1,
@@ -863,6 +867,7 @@
   "https://en.wikipedia.org/api/rest_v1/data/citation/mediawiki/https://example.com": -1,
   "https://en.wikipedia.org/api/rest_v1/data/citation/mediawiki/https://example.com/article": -1,
   "https://en.wikipedia.org/api/rest_v1/page/Albert_Einstein/html": -1,
+  "https://en.wikipedia.org/api/rest_v1/page/summary/Ada_Lovelace": 200,
   "https://en.wikipedia.org/api/rest_v1/page/summary/Python_(programming_language": -1,
   "https://en.wikipedia.org/api/rest_v1/page/summary/Title": 200,
   "https://en.wikipedia.org/api/rest_v1/search/page?q=quantum+mechanics&limit=10": -1,
@@ -1214,6 +1219,7 @@
   "https://upload.wikimedia.org/wikipedia/commons/a/ab/Example.jpg": -1,
   "https://upload.wikimedia.org/wikipedia/commons/archive/8/80/20220101120000%21Foo.svg": -1,
   "https://upload.wikimedia.org/wikipedia/commons/thumb/": -1,
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/.../600px-X.jpg": -1,
   "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Doc.pdf/page1-960px-Doc.pdf.jpg": -1,
   "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/PDF_metadata.pdf/page1-960px-PDF_metadata.pdf.jpg": 200,
   "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Example.jpg/800px-Example.jpg": -1,
@@ -1344,6 +1350,7 @@
   "https://www.mediawiki.org/wiki/Help:Special_MyLanguage": -1,
   "https://www.mediawiki.org/wiki/Help:Subpages": 200,
   "https://www.mediawiki.org/wiki/Help:TemplateStyles": 200,
+  "https://www.mediawiki.org/wiki/Manual:$wgIllegalFileChars": 200,
   "https://www.mediawiki.org/wiki/Manual:Pywikibot": 200,
   "https://www.mediawiki.org/wiki/Manual:Pywikibot/Cookbook": 200,
   "https://www.mediawiki.org/wiki/Manual:RCFeed": 200,
@@ -1408,9 +1415,10 @@
   "https://xtools.wmcloud.org/api/user/simple_editcount/en.wikipedia.org/24.49.192.8": 200,
   "https://xtools.wmcloud.org/api/user/simple_editcount/en.wikipedia.org/Fuzheado": 200,
   "https://xtools.wmcloud.org/api/user/top_edits/en.wikipedia.org/Fuzheado/0": 200,
+  "https://your-app.example": -1,
   "https://your-site.com": -1,
   "https://your-tool.toolforge.org": -1,
   "https://\u0440\u0443.wikipedia.org": 0
  },
- "user_agent": "wikipedia-ai-skills-url-registry/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills)"
+ "user_agent": "WikipediaSkill/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills; andrew.lih@gmail.com) ContentGapResearch"
 }
