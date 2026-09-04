@@ -7,7 +7,8 @@ skill_discovery_hints:
   - keywords: ["CirrusSearch", "search syntax", "find pages", "insource", "hastemplate", "linksto", "deepcategory", "haswbstatement"]
   - keywords: ["maintenance query", "search API", "prefix search", "full-text search", "title search"]
   - keywords: ["PetScan", "search results", "ranking", "search filter", "cross-wiki search"]
-last_verified: 2026-06-11
+  - keywords: ["escape quotes", "quoting", "special characters in search", "zero results", "empty search results", "search returns nothing"]
+last_verified: 2026-09-04
 depends_on: [wikimedia-api-access, wikipedia-categories]
 ---
 
