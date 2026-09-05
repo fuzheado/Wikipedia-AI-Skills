@@ -9,7 +9,7 @@ skill_discovery_hints:
   - keywords: ["mediacounts", "mediarequests", "GlobalUsage", "globalimagelinks", "imagelinks", "file transfer counts", "image serve counts"]
   - keywords: ["how many times was image served", "where is file used", "pageviews of articles using image", "GLAM impact", "GLAM metrics"]
   - keywords: ["BaGLAMa", "GLAMorgan", "GLAMorous", "external reuse", "hotlink", "referer", "media transfer counts"]
-last_verified: 2026-08-14
+last_verified: 2026-09-05
 ---
 
 # Media Usage Metrics — Measuring Use of Wikimedia Files
@@ -57,10 +57,12 @@ Daily TSV, one row per file. Columns: `total`, `original`, `transcoded_image` (w
 
 ### 3.2 Mediarequests AQS — `metrics/mediarequests/*`
 Endpoints (all verified 2026-08-14): `aggregate/{referer}/{media_type}/{agent_type}/{granularity}/{start}/{end}`, `top/{referer}/{media_type}/{year}/{month}/{day}`, `per-file/{referer}/{agent_type}/{file_path}/{granularity}/{start}/{end}`.
-- `referer` ∈ all-referers/internal/external/unknown; `media_type` ∈ image/audio/video/all-media-types; `agent_type` ∈ user/spider/automated/all-agents; `granularity` ∈ daily/monthly. Data since 2015.
+- `referer` ∈ all-referers/internal/external/unknown **or a project domain** (e.g. `en.wikipedia`); `media_type` ∈ image/audio/video/all-media-types; `agent_type` ∈ user/spider/all-agents — **`automated` returns HTTP 400 on every route** (verified 2026-09-05 across all referer values; the AQS surface has no `automated` class, dumps only); `granularity` ∈ daily/monthly. Data since 2015 (agent split 2019-05-17).
 - **GOTCHA (verified):** `per-file` `file_path` MUST be the upload path URL-encoded **with the leading slash** — e.g. `/wikipedia/commons/0/00/Crab_Nebula.jpg` → `%2Fwikipedia%2Fcommons%2F0%2F00%2FCrab_Nebula.jpg`. Omitting the leading slash returns 404.
-- Inherits mediacounts caveats; filters self-identified bots but not automated traffic; cannot break down per wiki page.
-- **Ideal:** quick per-file request counts, top-media leaderboards.
+- **Article attribution trick (verified 2026-09-05):** `per-file` with a **project-domain referer** (e.g. `en.wikipedia`) counts that file's requests served *to that wiki's pages*. Restrict to **single-host files** — `globalusage` exactly one page on the target wiki — and the series is attributable to that one article. Worked case: `Calvin-cycle4.svg` (1 en page: `Wikipedia:What Wikipedia is not`) → de-embedding it from that page collapsed its en series −85.4% in one month while a still-embedded control rose +22% (seasonality). Media requests are page-driven: ≈1.5 requests/pageview/image, ~86% of a single-host file's traffic attributable to its host article.
+- **GOTCHA (verified 2026-09-05):** `globalusage` caps at **500 entries and truncates BEFORE returning all wikis** — a high-embed file can report zero pages on the target wiki while still being on the page (Walnut.png: 500 results across 17 wikis, 0 en pages reported, embedded in en articles). Never read `here==0` as "unused"; paginate (`gucontinue`) or cross-check `prop=images`.
+- Inherits mediacounts caveats; filters self-identified bots but not automated traffic; cannot break down per wiki page (except via the single-host trick above).
+- **Ideal:** quick per-file request counts, top-media leaderboards, article-level media-request series for single-host files.
 
 ### 3.3 Raw `webrequest` (Data Lake)
 Source of #1/#2. Hive/Spark/Presto over `wmf.webrequest`. Needs WMF analytics cluster + Kerberos. Full control (status, referer, wiki, UA, geo=private, hourly), dedupe prefetch, custom bot filtering.

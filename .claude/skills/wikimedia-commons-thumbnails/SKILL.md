@@ -10,15 +10,15 @@ skill_discovery_hints:
   - keywords: ["thumb.php", "thumbhandler", "thumbnailUrl", "contentUrl", "rendering pipeline", "image thumbnail API"]
   - keywords: ["SVG rasterize", "PDF page render", "DjVu thumbnail", "keyframe", "video thumbnail", "page rendering"]
   - keywords: ["resize image", "downscale", "preview size", "Varnish cache", "thumb cache"]
-last_verified: 2026-09-03
+last_verified: 2026-09-05
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
 >
 ## ⚠️ 2026 thumbnail infrastructure change — READ FIRST
 
-**Verified 2026-09-03 against production.** Wikimedia moved thumbnail serving off
-`upload.wikimedia.org` and now **enforces a standard thumbnail-size ladder**
+**Verified 2026-09-03 against production.** Wikimedia moved thumbnail serving
+off `upload.wikimedia.org` and now **enforces a standard thumbnail-size ladder**
 (`$wgThumbnailSteps = [20, 40, 60, 120, 250, 330, 500, 960, 1280, 1920, 3840]`).
 Three consequences that break older guidance in this skill:
 
@@ -39,6 +39,26 @@ Three consequences that break older guidance in this skill:
 **Correct pattern (proven):** request the nearest standard size at or below your
 target with `iiurlwidth` (e.g. 480 → serves the 500px rendition), read `thumburl`,
 and use `responsiveUrls["2"]` as the sanctioned hiDPI/2× rendition.
+
+> ⚠️ **The host is domain-staged, not global (verified 2026-09-05).** Queries
+> against the **commons.wikimedia.org** API return `thumb.wikimedia.org`
+> `thumburl`s, but the **en.wikipedia.org** and **it.wikipedia.org** APIs still
+> return `upload.wikimedia.org` `thumburl`s — and rendered article HTML matches
+> the same per-domain split (en/it embed `upload` srcs; commons, fr, de, es, nl,
+> he, ca embed `thumb` srcs; identical split in Parsoid and legacy-parser
+> output). Consequences for code that touches rendered HTML:
+> - **Match BOTH hosts** when scraping `<img src>` from article markup — same
+>   canonical path on both; the host is a presentation detail. A script that
+>   matches only `upload.wikimedia.org` silently drops every image on migrated
+>   domains (and vice versa).
+> - **Original-size embeds always reference `upload.wikimedia.org`** — even on
+>   migrated domains. They carry no `/thumb/` segment and no size suffix
+>   (`.../commons/c/c7/Z-scheme.png?utm_source=...&utm_content=thumbnail_unscaled`).
+> - **Rendered srcs carry tagging params** — `utm_source=<project>` +
+>   `utm_campaign=parser` + `utm_content=thumbnail|thumbnail_unscaled`. Strip the
+>   query string before path normalization.
+> - The §2–3 JSON examples below show `upload.wikimedia.org` `thumburl`s: correct
+>   for en.wikipedia queries today, stale for commons queries.
 
 Byte impact example (`File:Dülmen, Umland, Sonnenaufgang -- 2012 -- 8084.jpg`,
 3456×5184): `iiurlwidth=600` → 960px/284KB served (2 buckets up); `iiurlwidth=480`
