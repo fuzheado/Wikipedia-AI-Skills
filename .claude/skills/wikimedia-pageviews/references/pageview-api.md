@@ -87,10 +87,12 @@ Sibling API for **media file loads**, not page views. Base:
 > (`/wikipedia/commons/0/00/Crab_Nebula.jpg` → `%2Fwikipedia%2Fcommons%2F0%2F00%2FCrab_Nebula.jpg`;
 > omit the slash or the `agent-type` segment and you get a 404 "invalid route",
 > which previously misled a note into claiming the endpoint was removed).
-> `referer` ∈ `all-referers|internal|external|unknown` or a project domain;
-> `agent-type` ∈ `user|spider|all-agents` — **`automated` returns HTTP 400 on
-> every route** (verified 2026-09-05 across all referer values); the AQS
-> surface has no `automated` class (dumps only).
+> `referer` ∈ `all-referers|internal|external|unknown|none|search-engine` or a project domain;
+> `agent-type` ∈ `user|spider|all-agents` — **`automated` returns HTTP 400 (no automated bin
+> exists: `all-agents` = `user` + `spider` exactly, verified); automated clients' image requests
+> are UA-counted as `user`** — pair media-user with pageviews(user+automated) for ratios.
+> Referer classes are not a partition (project-hostname values hold the bulk; `internal` is a
+> rump class); `none` (no Referer header) is where apps/date-keyed API clients appear.
 
 ```
 GET /top/{referer}/{media-type}/{year}/{month}/{day}

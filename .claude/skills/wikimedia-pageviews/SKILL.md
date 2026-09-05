@@ -127,12 +127,12 @@ media file was actually served. For the latter, use the **Media Requests API**
  (Corrected 2026-08-14: an earlier note claimed per-file was removed - that
  was a path-format error.)
  - ⚠️ **`agent-type=automated` returns HTTP 400 on every mediarequests route**
- (verified 2026-09-05: per-file and aggregate, referer = all-referers /
- external / internal / project domain). The AQS media-requests surface
- exposes only `user`, `spider`, and `all-agents`; the `automated` class
- (HTML-fetching crawlers) exists in the dumps dataset but not here. HTML-only
- fetchers request ~no images, so their absence understates nothing for image
- counts — but never expect an automated image-request series from this API.
+ (verified 2026-09-05: per-file and aggregate, all referer values). There is no
+ automated bin in the data: `all-agents` = `user` + `spider` exactly (diff 0),
+ so automated clients' image requests are **UA-counted as `user`** — media
+ "user" ≠ pageview "user". HTML-only fetchers request ~no images, but for any
+ request-per-pageview ratio pair media-user with pageviews(**user + automated**),
+ or you inflate by 1/(1 − automated share) on high-agent articles.
 - Per-day aggregate:
  `https://wikimedia.org/api/rest_v1/metrics/mediarequests/top/{referer}/{media-type}/{year}/{month}/{day}`
  - returns the day's top media files (`file_path`, `requests`, `rank`).
