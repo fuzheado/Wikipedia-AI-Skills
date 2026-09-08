@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["Site Matrix", "sitematrix", "domain mapping", "language code", "language domain", "yue wikipedia", "zh-yue", "interlanguage"]
   - keywords: ["page summary", "page extract", "extintro", "exintro", "page content", "fetch article", "get page"]
   - keywords: ["CORS preflight", "NetworkError", "Load failed", "browser fetch", "Firefox", "Safari", "WebKit", "forbidden header", "OPTIONS 405", "Api-User-Agent"]
-last_verified: 2026-09-03
+last_verified: 2026-09-08
 ---
 
 All requests to Wikimedia APIs **must** include a descriptive `User-Agent` header or they will be blocked (HTTP 403 or 429). This is enforced by the [Wikimedia Foundation User-Agent Policy](https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy).
@@ -140,7 +140,16 @@ fetch('https://en.wikipedia.org/w/api.php?action=query&format=json', {
 
 1. **Connection reuse** — Always use a `requests.Session()` (or equivalent) to reuse connections. Do not create a new connection per request.
 2. **Retry-After** — On 429, respect the `Retry-After` header value. Never retry immediately.
-3. **Pacing & Batching** — For batch operations, add a small delay (at least 0.5s) between requests. For the Action API, respect the `maxlag` parameter. **Always use the largest batch size the API supports** (e.g., `rvlimit=500`, `uclimit=500`) rather than fetching items one at a time. See the **SOP: Batching and Pagination for Efficiency** in the [`wikipedia-edit-history`](../wikipedia-edit-history/SKILL.md) skill for detailed patterns.
+3. **Pacing & Batching** — Pacing depends on where you run (see the tier table
+   below): outside Toolforge/WMCS, pace unauthenticated batch work at ≥1s
+   between requests (~60/min, safely under the 200/min UA-only gateway class);
+   inside Toolforge/WMCS you are exempt from rate limiting and no fixed delay
+   is required — keep concurrency modest and honor 429s instead. For the
+   Action API, respect the `maxlag` parameter. **Always use the largest batch
+   size the API supports** (e.g., `rvlimit=500`, `uclimit=500`) rather than
+   fetching items one at a time. See the **SOP: Batching and Pagination for
+   Efficiency** in the [`wikipedia-edit-history`](../wikipedia-edit-history/SKILL.md)
+   skill for detailed patterns.
 4. **403 handling** — A 403 almost always means a bad/missing UA. Check the UA string before debugging anything else.
 5. **User-Agent per project** — Parameterize the contact info so users can swap in their own details. Never hardcode someone else's email.
 6. **SPARQL queries** — For Wikidata Query Service, always set the UA and use `&format=json`. Consider using `SPARQLWrapper` with the `agent` parameter.
@@ -190,6 +199,26 @@ Practical consequences (verified 2026-08-10):
 - Retry-After may be absent; the docs recommend exponential backoff (min 5s)
   when it is. For per-IP CDN blocks (e.g. live.staticflickr.com) the window
   can be ~60 min — see the [flickr](../flickr/SKILL.md) skill.
+
+### Authoritative sources & per-surface guidance
+
+The two governing documents, both current as of 2026-09:
+
+- **[Wikitech Robot policy](https://wikitech.wikimedia.org/wiki/Robot_policy)** —
+  per-surface etiquette *guidance*: website reads <10 concurrent & <20 req/s
+  average; REST API unauth 3 concurrent / <5 req/s (auth: 10 req/s); Action
+  API unauth 1 concurrent / <5 req/s (auth: 3 concurrent / 10 req/s);
+  `upload.wikimedia.org` ≤2 concurrent / ≤25 Mbps; other resources
+  (gitlab/gerrit/Phab) 1 concurrent / ≥1s delay. **Rate limiting is not
+  enforced on bots running in Toolforge or any other WMCS offering** — they
+  are explicitly exempt, though WMF reserves the right to throttle clients
+  that threaten stability.
+- **[Wikimedia APIs / Rate limits](https://www.mediawiki.org/wiki/Wikimedia_APIs/Rate_limits)** —
+  the cross-API gateway classes (the 10/200/2000-per-min table above).
+  AQS metrics endpoints (`wikimedia.org/api/rest_v1/metrics/...`) are not
+  listed in either document's per-surface tables; the general read guidance
+  applies, WMCS exemption included — no fixed delay inside Toolforge, honor
+  429/`Retry-After` when it appears.
 
 ### Caching Strategy (Prevents Redundant Calls)
 

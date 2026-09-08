@@ -575,6 +575,7 @@
   "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/Large_Language_Models": "2026-08-16T03:45:27Z",
   "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/Large_Language_Models/Wikimania_2026": "2026-08-16T03:45:28Z",
   "https://wikitech.wikimedia.org/wiki/RCStream": "2026-08-10T12:57:50Z",
+  "https://wikitech.wikimedia.org/wiki/Robot_policy": "2026-09-08T21:42:33Z",
   "https://wikitech.wikimedia.org/wiki/Security": "2026-08-10T12:57:50Z",
   "https://wikiwho-api.wmcloud.org/en/api/v1.0.0-beta/": "2026-08-17T11:31:07Z",
   "https://wikiwho-api.wmcloud.org/en/api/v1.0.0-beta/all_content/Barack_Obama/?editor=true&in=true&out=true": "2026-08-17T11:36:25Z",
@@ -646,6 +647,7 @@
   "https://www.mediawiki.org/wiki/WikiWho": "2026-08-17T11:31:48Z",
   "https://www.mediawiki.org/wiki/WikiWho#Currently_supported_wikis": "2026-08-17T11:31:49Z",
   "https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual": "2026-08-10T12:57:50Z",
+  "https://www.mediawiki.org/wiki/Wikimedia_APIs/Rate_limits": "2026-09-08T21:42:34Z",
   "https://www.mediawiki.org/wiki/XTools/API": "2026-08-17T14:17:44Z",
   "https://www.mediawiki.org/wiki/XTools/API/Page": "2026-08-17T14:17:45Z",
   "https://www.mediawiki.org/wiki/XTools/API/Project": "2026-08-17T14:17:46Z",
@@ -700,7 +702,7 @@
   "https://your-tool.toolforge.org": "2026-08-10T12:57:50Z",
   "https://\u0440\u0443.wikipedia.org": "2026-08-10T13:07:28Z"
  },
- "generated_at": "2026-09-03T22:46:59Z",
+ "generated_at": "2026-09-08T21:42:32Z",
  "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
@@ -1293,6 +1295,7 @@
   "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/Large_Language_Models": 200,
   "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/Large_Language_Models/Wikimania_2026": 200,
   "https://wikitech.wikimedia.org/wiki/RCStream": 200,
+  "https://wikitech.wikimedia.org/wiki/Robot_policy": 200,
   "https://wikitech.wikimedia.org/wiki/Security": 200,
   "https://wikiwho-api.wmcloud.org/<lang": -1,
   "https://wikiwho-api.wmcloud.org/en/api/v1.0.0-beta/": 200,
@@ -1365,6 +1368,7 @@
   "https://www.mediawiki.org/wiki/WikiWho": 200,
   "https://www.mediawiki.org/wiki/WikiWho#Currently_supported_wikis": 200,
   "https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual": 200,
+  "https://www.mediawiki.org/wiki/Wikimedia_APIs/Rate_limits": 200,
   "https://www.mediawiki.org/wiki/XTools/API": 200,
   "https://www.mediawiki.org/wiki/XTools/API/Page": 200,
   "https://www.mediawiki.org/wiki/XTools/API/Project": 200,
@@ -1420,5 +1424,5 @@
   "https://your-tool.toolforge.org": -1,
   "https://\u0440\u0443.wikipedia.org": 0
  },
- "user_agent": "WikipediaSkill/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills; andrew.lih@gmail.com) ContentGapResearch"
+ "user_agent": "wikipedia-ai-skills-url-registry/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills)"
 }
