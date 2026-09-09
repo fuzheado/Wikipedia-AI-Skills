@@ -13,7 +13,8 @@ skill_discovery_hints:
   - keywords: ["language detection", "langid", "identify language"]
   - keywords: ["translation", "content translation", "cross-language", "recommendation"]
   - keywords: ["LLM", "chat completions", "Qwen", "OpenAI-compatible", "text generation", "LiftWing Studio", "large language model"]
-last_verified: 2026-08-18
+  - keywords: ["429", "rate limited", "rate limit", "Toolforge", "high-throughput", "burst", "LLM testing"]
+last_verified: 2026-09-09
 ---
 
 > ⚠️ **User-Agent required:** All API calls below need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -123,9 +124,57 @@ for chunk in resp:
   shared across all models; over the limit → HTTP 429 until the window
   resets. No API key required.
 - **From Toolforge: effectively unlimited** (automatic — no request
-  needed). The standard path for tools and hackathon apps.
+  needed, no API key). The standard path for tools, hackathon apps, and
+  any test loop that would burn through 100 requests — see
+  **[SOP: High-Throughput LLM Testing via Toolforge](#sop-high-throughput-llm-testing-via-toolforge)**.
 - Experimental platform: **no SLA**; models/endpoints can change without
   notice.
+
+### SOP: High-Throughput LLM Testing via Toolforge
+
+**Problem:** the public 100 req/hour cap is per client IP, so an agent or
+script test loop from your machine hits HTTP 429 after ~100 calls and
+stalls until the window resets.
+
+**Fix:** run the *same curl* from Toolforge. Toolforge egress IPs are
+automatically on the higher ("effectively unlimited") tier — no API key,
+no request, no code changes (same `api.wikimedia.org` endpoint).
+
+> ✅ **Verified 2026-09-09 from the `dev.toolforge.org` bastion:** a
+> 100-request burst — 3× the *entire* public hourly quota in one go —
+> returned **0×429 in ~14 s** (~140 ms/req on `llm-qwen3-14b`). One
+> transient non-200 in ~260 total requests (shared platform, no SLA —
+> just retry once). Streaming and `llm-qwen36-27b` both work from the
+> bastion.
+
+#### One-shot call (doesn't burn your local IP's quota)
+
+```bash
+ssh ${USER}@dev.toolforge.org "curl -sS -w '\n[HTTP %{http_code}]\n' \
+  -A \"$WIKIMEDIA_USER_AGENT\" -H 'Content-Type: application/json' \
+  -d '{\"model\": \"llm-qwen3-14b\", \"max_tokens\": 256, \"messages\": [{\"role\": \"user\", \"content\": \"Explain vLLM in one sentence.\"}]}' \
+  'https://api.wikimedia.org/service/lw/inference/v1/models/llm-qwen3-14b/openai/v1/chat/completions'"
+```
+
+For prompts containing quotes or special characters, prefer the bundled
+script below — it base64-encodes the payload so shell quoting can't break.
+
+#### Burst / rate-limit check
+
+```bash
+bash scripts/llm-toolforge.sh "Reply with exactly: OK" llm-qwen3-14b 8 50
+# → BURST via Toolforge: ok=50 429=0 other=0
+```
+
+#### Notes
+
+- The bastion is for quick interactive use. Sustained load (running
+  service, cron) → run as a tool-account **job or webservice**; that
+  egress is on the same tier.
+- `dev.toolforge.org` and `login.toolforge.org` (prod) are both
+  Toolforge bastions. Override the target: `TOOLFORGE_SSH=user@host`.
+- 429s can still appear under abnormal conditions — treat any 429 as
+  "back off and retry" per standard etiquette, not as a bug.
 
 ### LiftWing Studio (no-code chat UI)
 
@@ -767,6 +816,7 @@ Models in the "experimental" Kubernetes namespace are only accessible from WMF p
 | Script | Purpose | Usage Example |
 |--------|---------|---------------|
 | [`scripts/score-revision.sh`](./scripts/score-revision.sh) | Score a single revision or page via curl | `./score-revision.sh enwiki 123456789 revertrisk-language-agnostic en` |
+| [`scripts/llm-toolforge.sh`](./scripts/llm-toolforge.sh) | Run LLM chat completions **from the Toolforge bastion** (higher rate-limit tier, avoids the public 100 req/h cap) | `./llm-toolforge.sh "Explain vLLM in one sentence."` · burst: `./llm-toolforge.sh "OK" llm-qwen3-14b 8 50` |
 | [`scripts/batch-score.sh`](./scripts/batch-score.sh) | Batch score multiple revisions from stdin or a file | `cat revids.txt \| ./batch-score.sh enwiki revertrisk-multilingual --output csv` |
 | [`scripts/playground.sh`](./scripts/playground.sh) | **Interactive menu** — pick a model, enter input, see results. No arguments to memorize | `bash scripts/playground.sh` |
 
