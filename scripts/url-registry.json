@@ -434,6 +434,7 @@
   "https://phabricator.wikimedia.org/T346108": "2026-08-10T12:57:50Z",
   "https://phabricator.wikimedia.org/T376979": "2026-08-10T12:57:50Z",
   "https://phabricator.wikimedia.org/maniphest/": "2026-08-10T12:57:50Z",
+  "https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?projects=Commons-Impact-Metrics-Requests": "2026-09-10T15:53:10Z",
   "https://phabricator.wikimedia.org/project/profile/N/": "2026-08-10T12:57:50Z",
   "https://pypi.org/project/pywikibot/": "2026-08-10T12:57:50Z",
   "https://pypi.org/project/requests-sse/": "2026-08-10T12:57:50Z",
@@ -702,7 +703,7 @@
   "https://your-tool.toolforge.org": "2026-08-10T12:57:50Z",
   "https://\u0440\u0443.wikipedia.org": "2026-08-10T13:07:28Z"
  },
- "generated_at": "2026-09-08T21:42:32Z",
+ "generated_at": "2026-09-10T15:53:10Z",
  "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
@@ -1149,6 +1150,7 @@
   "https://phabricator.wikimedia.org/T346108": 200,
   "https://phabricator.wikimedia.org/T376979": 200,
   "https://phabricator.wikimedia.org/maniphest/": 200,
+  "https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?projects=Commons-Impact-Metrics-Requests": 200,
   "https://phabricator.wikimedia.org/project/profile/N/": 200,
   "https://pypi.org/project/pywikibot/": 200,
   "https://pypi.org/project/requests-sse/": 200,

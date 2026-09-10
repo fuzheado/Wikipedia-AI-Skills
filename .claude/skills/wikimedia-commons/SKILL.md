@@ -15,7 +15,7 @@ skill_discovery_hints:
   - keywords: ["Commons namespaces", "gallery", "Creator namespace"]
   - keywords: ["CORS", "cross-origin", "upload.wikimedia.org", "browser app", "Canvas", "WebGL"]
   - keywords: ["Commons Impact Metrics", "CIM", "category analytics", "Views from category", "impact metrics"]
-last_verified: 2026-08-24
+last_verified: 2026-09-10
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -174,8 +174,9 @@ Beyond the web interfaces, Commons can be searched and queried programmatically 
 
 The **Commons Impact Metrics** service (WMF Data Products team) precomputes
 monthly impact statistics for Commons category trees and exposes them via the
-Analytics Query Service (AQS) API. It powers the `{{Views from category}}`
-template on Commons category pages.
+Analytics Query Service (AQS) API. (The legacy `{{Views from category}}`
+template on category pages is a separate, older page-views system — it does
+not register or power CIM.)
 
 ### ⚠️ The allow-list gotcha (read this first)
 
@@ -192,14 +193,24 @@ this is the expected behavior, not an API bug.
    or campaign (files may live in its subcategories).
 2. Check the [allow-list TSV](https://gitlab.wikimedia.org/repos/data-engineering/airflow-dags/-/blob/main/main/dags/commons/commons_category_allow_list.tsv)
    to confirm it is not already tracked.
-3. Add **`{{Views from category}}`** to the category page — this adds it to the
-   hidden tracking category "Category requested for Commons Impact Metrics".
-4. Staff add qualifying requests to the allow-list at month-end (submit by the
-   **20th** for that month's processing; a Phabricator ticket is created
-   automatically — project `Commons-Impact-Metrics-Requests`, or file one
-   yourself via the pre-filled form).
+3. **Open a Phabricator request** — project `Commons-Impact-Metrics-Requests`
+   via the [pre-filled form](https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?projects=Commons-Impact-Metrics-Requests),
+   assigned `GFontenelle_WMF`, subscriber `FRomeo_WMF`. Category name = the
+   URL slug after `Category:` (underscores, not spaces).
+4. The Culture & Heritage team adds qualifying categories to the allow-list at
+   month-end (submit by the **20th** for that month's processing).
 5. Data appears from the following month. **No retroactive calculation** by
-   default. Renames/removals also go through the monthly request cycle.
+   default. Renames/removals also go through the same monthly request cycle.
+
+> ⚠️ **Do NOT rely on `{{Views from category}}`.** It is the legacy "category
+> page views" table system (COM:VIEWS) and does **not** register a category
+> for CIM — it merely correlates. (Re-verified Sep 2026: 886 categories
+> transclude the template and 98.4% of them are allow-listed anyway, because
+> GLAM categories usually have both; of the ~14 that are not allow-listed, a
+> live CIM probe returns 404. The DPLA bot — not the template — adds some
+> transcluding categories to the hidden tracking category "Category:Category
+> requested for Commons Impact Metrics", whose 7 current members have never
+> been allow-listed: a passive queue, not a registration path.)
 
 ### API — AQS Commons endpoints
 
