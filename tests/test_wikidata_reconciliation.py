@@ -44,10 +44,15 @@ class TestSkillDocs:
 
     def test_broken_batch_endpoint_trap_documented(self):
         text = read_skill("wikidata-reconciliation")
-        # the verified-broken batch POST must be flagged, not silently omitted
+        # the batch-POST failure scope must be flagged, not silently omitted
         assert "invalid query" in text
         assert "POST" in text
-        assert "currently broken" in text or "broken" in text
+        # precise scope: works for plain queries, fails on type-filtered ones
+        assert "type-filtered" in text
+        assert "type" in text
+        # root cause and upstream fix are documented
+        assert "T400119" in text
+        assert "T419770" in text
         assert "wbsearchentities" in text  # the working fallback is named
 
     def test_core_principle_and_guardrails(self):

@@ -60,7 +60,7 @@ reconciliation protocol or the verify-before-write discipline.
 | `wbsearchentities` "Barack Obama" | **Q649593 = Barack Obama Sr. (his father!)** — search ranking put the father first; `--verify` caught `label_matches: false`. Perfect live demonstration of why verification is mandatory |
 | `wbgetentities` Q243 | exists, label "Eiffel Tower", P31 ∈ {Q1440476, Q1440300, Q2319498} |
 | `suggest/entity?prefix=Eiffel` | Q243 first, with description |
-| `POST /en/api` batch query | **broken** (see table above) — documented trap |
+| `POST /en/api` batch query | **partial** — plain-text & default-type queries work; type-filtered queries fail (WDQS UA-policy 403 → misleading "invalid query"). Root cause identified 2026-08-26: T400119 enforcement; confirmed by others at T419770 + forum #2641/#2779; fix merged in nfdi4culture fork MR #11 (2026-04-13) but not deployed. |
 
 ## 5. Candidacy filter
 
@@ -68,7 +68,7 @@ reconciliation protocol or the verify-before-write discipline.
 2. **Generalizability** — recurs across any Wikidata/Commons write task, any entity type, any language ✅
 3. **Reuse frequency** — every QuickStatements/SDC/upload prep workflow; recurring in AI-harness work ✅
 4. **Context clutter** — keywords (`reconcile`, `match QID`, `grounding`) distinctive; no collisions with `wikidata`/`quickstatements`/`wikidata-vector-search` hints checked ✅
-5. **Staleness** — encodes protocol shape + verified traps; broken-batch-endpoint caveat is timestamped and instructs re-testing; links live endpoints ✅
+5. **Staleness** — encodes protocol shape + verified traps; batch-endpoint failure scope (type-filtered queries) is timestamped with root cause + upstream fix links (T400119/T419770/MR #11) and instructs re-testing; links live endpoints ✅
 6. **Fetch-on-demand** — points at live endpoints (`wbsearchentities`, `wbgetentities`, service URLs); no enumerated volatile data ✅
 7. **Home vs. new** — audited: no existing home. `wikidata` lacks the SOP; `quickstatements` lacks the procedure; `commons-sdc` references but doesn't document ✅
 
@@ -105,7 +105,8 @@ patterns (Python) → guardrails → use cases → tooling → cross-references.
 - Wikidata Action API: `action=wbsearchentities`, `action=wbgetentities`
   (live-verified, formatversion=2).
 - OpenRefine reconciliation protocol: manifest/suggest/batch shape (verified
-  against the live service; the batch shape is documented in the skill even
-  though the endpoint is currently broken).
+  against the live service; the type-filtered batch failure is documented in
+  the skill with root cause: WDQS UA-policy 403, T400119 → T419770, fix in
+  nfdi4culture fork MR #11).
 - Repo framework: AGENTS.md (PR-first), CONTRIBUTING.md (skill format),
   docs/design-philosophy.md §2 (tier system + candidacy filter).
