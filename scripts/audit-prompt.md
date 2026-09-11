@@ -29,7 +29,7 @@ Run **6 parallel subagents** using the `worker` agent, each analyzing one domain
 | Commons | wikimedia-commons, commons-file-resolution, wikimedia-commons-audio-video, wikimedia-commons-pdf, wikimedia-commons-sdc, wikimedia-commons-sparql, wikimedia-commons-svg, wikimedia-commons-thumbnails | `reports/audit-commons.json` |
 | Content | wikipedia-categories, wikipedia-citations, wikipedia-page-anatomy, wikipedia-talk-page, wikipedia-templates, wikipedia-wikitables, wikipedia-en-article-audit, wikipedia-en-biography-writing, wikipedia-notability-assessment, wikipedia-reference-verifiability | `reports/audit-content.json` |
 | Toolforge | wikimedia-toolforge, toolforge-nodejs, wikimedia-database, wikimedia-eventstreams, wikimedia-i18n-l10n-for-tools, wikimedia-ml-services, wikimedia-cdn-assets, wikimedia-phabricator | `reports/audit-toolforge.json` |
-| Tools | pywikibot, mediawiki-page-navigation, mediawiki-translate-extension, wikimedia-page-styling, wikimedia-wikitext, wikipedia-pagetriage-api, wiktionary-and-wikisource | `reports/audit-tools.json` |
+| Tools | pywikibot, mediawiki-page-navigation, mediawiki-translate-extension, wikimedia-page-styling, wikimedia-wikitext, wikipedia-pagetriage-api, wiktionary, wikisource | `reports/audit-tools.json` |
 
 For **each** skill in your batch, produce this JSON structure:
 ```json

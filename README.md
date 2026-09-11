@@ -93,7 +93,8 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [wikipedia-notability-assessment](.claude/skills/wikipedia-notability-assessment/SKILL.md) | Evaluate whether a subject meets Wikipedia notability guidelines — the General Notability Guideline (GNG), all 13 subject-specific SNGs with decision trees, source quality evaluation, structured report generation, AfD-ready summaries, and common invalid arguments |
 | | **▸ Other Wikimedia Projects** |
 | [wikimedia-url-shortener](.claude/skills/wikimedia-url-shortener/SKILL.md) | Create and expand w.wiki short URLs (Wikimedia's URL shortener) — 301 redirect behavior, the missing expansion API, the browser CORS trap, server-side resolution patterns, and creation via the meta.wikimedia.org `action=shortenurl` API |
-| [wiktionary-and-wikisource](.claude/skills/wiktionary-and-wikisource/SKILL.md) | Work with Wiktionary (dictionary entries, translation tables, etymologies, audio pronunciations, lexemes) and Wikisource (proofread page workflow, OCR text extraction, quality validation, compiled works) — the two largest Wikimedia content projects after Wikipedia |
+| [wikisource](.claude/skills/wikisource/SKILL.md) | Work with Wikisource — ProofreadPage workflow, page quality levels, cross-wiki namespace resolution (the T74525 trap), the completed-book catalogue (wsindex), EPUB export, and the OCR/AI-transcription layer with its community norms |
+| [wiktionary](.claude/skills/wiktionary/SKILL.md) | Work with Wiktionary entries across languages — entry anatomy, definitions, translation tables, pronunciations, and Wikidata lexemes |
 | [wikivoyage](.claude/skills/wikivoyage/SKILL.md) | Work with Wikivoyage — the free, collaborative, multilingual travel guide. Covers listing templates (See/Do/Buy/Eat/Drink/Sleep), the geographical hierarchy (continent → country → region → city), dynamic OSM maps via Kartographer, article status (stub/outline/usable/guide/star), the mobile-friendly image policy, Wikidata integration for coordinates, and batch operations |
 
 ### 🛠 For tool developers
@@ -186,8 +187,10 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | Evaluate whether a subject is notable enough for Wikipedia | [wikipedia-notability-assessment](.claude/skills/wikipedia-notability-assessment/SKILL.md) |
 | Assess notability from the CLI | `python3 .claude/skills/wikipedia-notability-assessment/assets/notability_checker.py "Jane Smith" --description "Professor at MIT, Nobel Prize winner"` |
 | Generate an AfD-ready notability summary | `python3 .claude/skills/wikipedia-notability-assessment/assets/notability_checker.py "Test" --description "desc" --json` |
-| Parse a Wiktionary entry for definitions, translations, and pronunciations | [wiktionary-and-wikisource](.claude/skills/wiktionary-and-wikisource/SKILL.md) |
-| Check proofreading progress for a Wikisource work | `bash .claude/skills/wiktionary-and-wikisource/scripts/ws-page-status.sh en "Index:Pride and Prejudice"` |
+| Parse a Wiktionary entry for definitions, translations, and pronunciations | [wiktionary](.claude/skills/wiktionary/SKILL.md) |
+| Check proofreading progress for a Wikisource work | `bash .claude/skills/wikisource/scripts/ws-page-status.sh en "Index:Pride and Prejudice"` |
+| Find finished (proofread/validated) books across Wikisource editions | `python3 .claude/skills/wikisource/assets/ws_catalog.py --languages en --limit 5` |
+| Resolve Page/Index namespaces on any Wikisource edition | `python3 .claude/skills/wikisource/assets/ws_namespace_resolver.py de pl it` |
 | Extract listings from a Wikivoyage travel guide article | [wikivoyage](.claude/skills/wikivoyage/SKILL.md) |
 | Check the quality status of a Wikivoyage article (stub/outline/usable/guide/star) | [wikivoyage](.claude/skills/wikivoyage/SKILL.md) |
 | Extract all POI listings from a Wikivoyage article as JSON | `bash .claude/skills/wikivoyage/scripts/extract-listings.sh "Tokyo"` |

@@ -249,7 +249,7 @@
    "wikitext"
   ]
  },
- "generated_at": "2026-08-08T13:54:52Z",
+ "generated_at": "2026-09-11T19:59:16Z",
  "generator": "scripts/refresh-api-surface.py",
  "note": "Ground-truth Wikimedia Action API surface. Do not edit by hand; regenerate with scripts/refresh-api-surface.py.",
  "query": {
@@ -319,6 +319,7 @@
    "pageimages",
    "pageprops",
    "pageviews",
+   "proofread",
    "redirects",
    "revisions",
    "templates",
@@ -326,5 +327,5 @@
    "wikibase"
   ]
  },
- "source": "live paraminfo from https://en.wikipedia.org/w/api.php, https://www.wikidata.org/w/api.php, https://commons.wikimedia.org/w/api.php"
+ "source": "live paraminfo from https://en.wikipedia.org/w/api.php, https://www.wikidata.org/w/api.php, https://commons.wikimedia.org/w/api.php, https://en.wikisource.org/w/api.php"
 }
