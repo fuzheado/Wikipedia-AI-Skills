@@ -43,6 +43,7 @@
   "https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-goodfaith:predict": "2026-08-10T12:57:50Z",
   "https://api.wikimedia.org/service/lw/inference/v1/models/langid:predict": "2026-08-10T12:57:50Z",
   "https://api.wikimedia.org/service/lw/inference/v1/models/llm-qwen3-14b/openai/v1": "2026-08-16T03:45:22Z",
+  "https://api.wikimedia.org/service/lw/inference/v1/models/llm-qwen3-14b/openai/v1/chat/completions": "2026-09-11T10:35:22Z",
   "https://api.wikimedia.org/service/lw/inference/v1/models/outlink-topic-model:predict": "2026-08-10T12:57:50Z",
   "https://api.wikimedia.org/service/lw/inference/v1/models/readability:predict": "2026-08-10T12:57:50Z",
   "https://api.wikimedia.org/service/lw/inference/v1/models/reference-need:predict": "2026-08-10T12:57:50Z",
@@ -708,8 +709,7 @@
   "https://your-tool.toolforge.org": "2026-08-10T12:57:50Z",
   "https://\u0440\u0443.wikipedia.org": "2026-08-10T13:07:28Z"
  },
- "generated_at": "2026-09-10T15:53:10Z",
- "generator": "scripts/refresh-url-registry.py",
+ "generated_at": "2026-09-11T10:35:22Z", "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
   "post_only": "POST-only or parameter-required endpoints (bare HEAD/GET cannot verify)"
@@ -759,6 +759,7 @@
   "https://api.wikimedia.org/service/lw/inference/v1/models/langid:predict": -2,
   "https://api.wikimedia.org/service/lw/inference/v1/models/llm-<model": -1,
   "https://api.wikimedia.org/service/lw/inference/v1/models/llm-qwen3-14b/openai/v1": -2,
+  "https://api.wikimedia.org/service/lw/inference/v1/models/llm-qwen3-14b/openai/v1/chat/completions": 405,
   "https://api.wikimedia.org/service/lw/inference/v1/models/outlink-topic-model:predict": -2,
   "https://api.wikimedia.org/service/lw/inference/v1/models/readability:predict": -2,
   "https://api.wikimedia.org/service/lw/inference/v1/models/reference-need:predict": -2,
@@ -1436,5 +1437,5 @@
   "https://your-tool.toolforge.org": -1,
   "https://\u0440\u0443.wikipedia.org": 0
  },
- "user_agent": "wikipedia-ai-skills-url-registry/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills)"
+ "user_agent": "WikipediaSkill/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills; andrew.lih@gmail.com) ContentGapResearch"
 }
