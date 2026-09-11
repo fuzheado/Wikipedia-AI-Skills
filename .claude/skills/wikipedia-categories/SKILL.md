@@ -348,6 +348,16 @@ incategory:"Suspension bridges|Bridges in New York City"
 
 This returns all articles in EITHER category. Note: does **not** include subcategories.
 
+> ⚠️ **Escape inner double quotes.** Category names may legitimately contain `"`
+> (e.g. Commons: `Collections of the musée départemental Albert-Kahn, mission
+> "1923 - Suisse Allemande - Frédéric Gadmer (28 septembre-7 octobre)"` —
+> autochrome missions use quoted date ranges). An unescaped inner quote
+> terminates `incategory:"…"` early and the query **silently returns zero
+> results forever** — while `prop=categoryinfo` still reports the file counts,
+> so a tool can show "198 files" over an empty feed. Escape `"` as `\"` in any
+> generated query. See [wikimedia-search-cirrussearch](../wikimedia-search-cirrussearch/SKILL.md)
+> Guardrail 11 for the full signature and fix.
+
 ### External Tools
 
 **PetScan** (`https://petscan.wmflabs.org/`) — category intersection and data extraction tool. Useful for:

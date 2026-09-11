@@ -7,7 +7,8 @@ skill_discovery_hints:
   - keywords: ["CirrusSearch", "search syntax", "find pages", "insource", "hastemplate", "linksto", "deepcategory", "haswbstatement"]
   - keywords: ["maintenance query", "search API", "prefix search", "full-text search", "title search"]
   - keywords: ["PetScan", "search results", "ranking", "search filter", "cross-wiki search"]
-last_verified: 2026-06-11
+  - keywords: ["escape quotes", "quoting", "special characters in search", "zero results", "empty search results", "search returns nothing"]
+last_verified: 2026-09-04
 depends_on: [wikimedia-api-access, wikipedia-categories]
 ---
 
@@ -707,6 +708,33 @@ Not all wikis have Wikibase structured data enabled. Commons and Wikidata are th
 ### 10. `articletopic:` Is Wikipedia-Only
 
 The `articletopic:` keyword uses ML topic models that only exist for Wikipedia (main namespace articles). It does not work on Commons, Wiktionary, or other projects.
+
+### 11. Escape Double Quotes Inside Keyword Values (verified 2026-09-04)
+
+Quoted keyword values — `incategory:"…"`, `deepcategory:"…"`, `hastemplate:"…"`,
+`linksto:"…"` — terminate at the first unescaped `"`. **Real category and page
+titles contain double quotes** (e.g. Commons:
+`Collections of the musée départemental Albert-Kahn, mission "1923 - Suisse
+Allemande - Frédéric Gadmer (28 septembre-7 octobre)"` — autochrome missions use
+quoted date ranges). Building the keyword with the raw name silently returns
+**zero results forever**, with no error:
+
+```cirrus
+# BROKEN — inner quote ends the value early; parses as garbage → 0 results
+incategory:"Collections of … mission "1923 - Suisse Allemande …""
+
+# CORRECT — escape inner quotes as \"
+incategory:"Collections of … mission \"1923 - Suisse Allemande …\""
+```
+
+The failure signature is sneaky: the query returns HTTP 200 with an empty result
+set, while non-search endpoints (`prop=categoryinfo`) happily report the page
+counts — so a UI can show "198 files" over a permanently empty feed. Any
+generated `srsearch` must escape `"` → `\"` in interpolated titles
+(e.g. `name.replace(/"/g, '\\"')` in JS). Related: the deep category caps in
+§8 (depth 5 / 256 categories) push high-coverage tools toward client-side
+walks + per-category `incategory:` draws, which multiplies exposure to this
+escaping rule.
 
 ---
 
