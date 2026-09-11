@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["pageviews", "traffic", "popularity", "article views", "views per article"]
   - keywords: ["top pages", "pageview API", "daily views", "analytics"]
   - keywords: ["media views", "mediarequests", "file views", "image views", "media requests"]
-last_verified: 2026-08-12
+last_verified: 2026-09-05
 ---
 
 > ⚠️ **User-Agent required:** The REST API examples below require a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -123,9 +123,16 @@ media file was actually served. For the latter, use the **Media Requests API**
  (`/wikipedia/commons/0/00/Crab_Nebula.jpg` -> `%2Fwikipedia%2Fcommons%2F0%2F00%2FCrab_Nebula.jpg`;
  omit the slash and you get 404 "invalid route"). `referer` is
  `all-referers|internal|external|unknown` or a project domain; `agent-type` is
- `user|spider|automated|all-agents`; `granularity` is `daily|monthly`.
+ `user|spider|all-agents`; `granularity` is `daily|monthly`.
  (Corrected 2026-08-14: an earlier note claimed per-file was removed - that
  was a path-format error.)
+ - ⚠️ **`agent-type=automated` returns HTTP 400 on every mediarequests route**
+ (verified 2026-09-05: per-file and aggregate, referer = all-referers /
+ external / internal / project domain). The AQS media-requests surface
+ exposes only `user`, `spider`, and `all-agents`; the `automated` class
+ (HTML-fetching crawlers) exists in the dumps dataset but not here. HTML-only
+ fetchers request ~no images, so their absence understates nothing for image
+ counts — but never expect an automated image-request series from this API.
 - Per-day aggregate:
  `https://wikimedia.org/api/rest_v1/metrics/mediarequests/top/{referer}/{media-type}/{year}/{month}/{day}`
  - returns the day's top media files (`file_path`, `requests`, `rank`).

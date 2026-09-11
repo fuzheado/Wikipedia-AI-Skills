@@ -92,6 +92,51 @@ The skill's manifest uses `Sanitized Title (<photo id>).jpg` — keep the photo 
 Commons↔Flickr matching stays possible. Follow the pattypan skill's filename rules
 (no `:`, no `# < > [ ] | { }`, no camera prefixes, ≤ 240 bytes).
 
+### Filename-sanitization field notes (verified 2026-08-25)
+
+- **flickr2commons' `[:/|]`→space mapping diverges from MediaWiki's own behavior.**
+  `: / \` are `$wgIllegalFileChars` (default `':\/\\'`, 1.39+): the upload API
+  **auto-converts them to `-`** (`badfilename` warning) rather than to a space. A
+  batch manifest builder should remap to `-` itself so the final names are known
+  before upload (dedupe/progress); flickr2commons only gets away with its mapping
+  because it re-queries Commons per file and reports the effective name.
+- **flickr2commons does not remap `# < > [ ] { }`** — those uploads fail with
+  `badfilename` and need manual fixes; a manifest builder should remap them.
+- **Strip hidden characters**: Commons' titleblacklist hard-blocks control chars,
+  NBSP/other unusual spaces, BiDi overrides, soft hyphen, BOM, and private-use
+  codepoints — delete them from titles (see pattypan skill's filename rules).
+- **Normalization collisions**: `_`→space, first-char case-insensitive, whitespace
+  collapse — check composed names for pairs that differ only in these.
+- **Flickypedia** (the Flickr Foundation's tool) takes the opposite approach:
+  reject titles containing `:/\` client-side, and validate everything else via
+  API round-trips rather than a local table: `action=titleblacklist&tbaction=create&
+  tbtitle=File:…`, `action=query&titles=`, `action=opensearch`. Good pattern for
+  single-file flows; batch tools should aggregate the same checks into a preview
+  before uploading.
+
+  **`action=titleblacklist` — what it actually catches (live-verified 2026-08-25):**
+  returns `{"result":"ok"}`, `{"result":"blacklisted","reason":…,"line":…}`
+  (with the matching blacklist entry, e.g. camera prefixes like `IMG_`), or an
+  `invalidtitle` API error. It catches the **per-wiki custom blacklist** (camera
+  prefixes, hidden chars — NBSP/BiDi/control, pattern blocks) and structurally
+  broken titles (>255 bytes, empty). It does **NOT** catch `# < > [ ] | { }`
+  (verified: `File:bad#title.jpg` → `ok`), nor `:` `/` `\` (those are upload-time
+  conversions, not legality). One call per title — not batchable.
+
+  **`action=query&titles=File:X` is the better batch check** (50 titles/call): the
+  response's `normalized[].to` shows what MediaWiki would *actually* store —
+  `under_score.jpg` → `Under score.jpg`, `  spaced  name.jpg` → `Spaced name.jpg`,
+  and `bad#title.jpg` → `Bad` (the `#` **truncates the title silently**!).
+  Comparing input vs normalized output catches normalization collisions AND
+  silent mangling in one batched call — use it as a pre-upload gate; keep a local
+  table only to render preview names offline.
+- **Dedupe index from SDC dumps**: Flickypedia builds a Commons-wide SQLite index
+  from weekly SDC snapshots — `P7482 source of file` = file-available-on-internet +
+  qualifier `P123 operator` = Flickr + `P973 described at URL` → parse the Flickr
+  URL for the photo id (`duplicates_from_sdc/` in their repo). O(1) lookups across
+  all of Commons; overkill for category-scoped transfers but the reference
+  implementation for a web tool.
+
 ## License map
 
 Flickr id → Commons template for the free set: `4→{{Cc-by-2.0}}`, `5→{{Cc-by-sa-2.0}}`,

@@ -47,8 +47,10 @@ For new or changed skills (`.claude/skills/<name>/`):
 ## API etiquette (summary)
 
 Every request to Wikimedia/Wikimedia-adjacent hosts needs a descriptive
-User-Agent (`$WIKIMEDIA_USER_AGENT`), ≥1s pacing, and 429/403 handling —
-see the global AGENTS.md and the `wikimedia-api-access` skill for details.
+User-Agent (`$WIKIMEDIA_USER_AGENT`), 429/403 handling, and ≥1s pacing
+**when running outside Toolforge/WMCS** (rate limiting is not enforced on
+bots in Toolforge/WMCS — see the Wikitech Robot policy) — see the global
+AGENTS.md and the `wikimedia-api-access` skill for details.
 
 ## Local tooling
 

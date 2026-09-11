@@ -7,7 +7,8 @@ skill_discovery_hints:
   - keywords: ["Wikipedia API", "Action API", "REST API", "API endpoint", "api.php", "rest_v1", "User-Agent", "rate limit", "API call", "ratelimits"]
   - keywords: ["Site Matrix", "sitematrix", "domain mapping", "language code", "language domain", "yue wikipedia", "zh-yue", "interlanguage"]
   - keywords: ["page summary", "page extract", "extintro", "exintro", "page content", "fetch article", "get page"]
-last_verified: 2026-08-10
+  - keywords: ["CORS preflight", "NetworkError", "Load failed", "browser fetch", "Firefox", "Safari", "WebKit", "forbidden header", "OPTIONS 405", "Api-User-Agent"]
+last_verified: 2026-09-08
 ---
 
 All requests to Wikimedia APIs **must** include a descriptive `User-Agent` header or they will be blocked (HTTP 403 or 429). This is enforced by the [Wikimedia Foundation User-Agent Policy](https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy).
@@ -139,7 +140,16 @@ fetch('https://en.wikipedia.org/w/api.php?action=query&format=json', {
 
 1. **Connection reuse** — Always use a `requests.Session()` (or equivalent) to reuse connections. Do not create a new connection per request.
 2. **Retry-After** — On 429, respect the `Retry-After` header value. Never retry immediately.
-3. **Pacing & Batching** — For batch operations, add a small delay (at least 0.5s) between requests. For the Action API, respect the `maxlag` parameter. **Always use the largest batch size the API supports** (e.g., `rvlimit=500`, `uclimit=500`) rather than fetching items one at a time. See the **SOP: Batching and Pagination for Efficiency** in the [`wikipedia-edit-history`](../wikipedia-edit-history/SKILL.md) skill for detailed patterns.
+3. **Pacing & Batching** — Pacing depends on where you run (see the tier table
+   below): outside Toolforge/WMCS, pace unauthenticated batch work at ≥1s
+   between requests (~60/min, safely under the 200/min UA-only gateway class);
+   inside Toolforge/WMCS you are exempt from rate limiting and no fixed delay
+   is required — keep concurrency modest and honor 429s instead. For the
+   Action API, respect the `maxlag` parameter. **Always use the largest batch
+   size the API supports** (e.g., `rvlimit=500`, `uclimit=500`) rather than
+   fetching items one at a time. See the **SOP: Batching and Pagination for
+   Efficiency** in the [`wikipedia-edit-history`](../wikipedia-edit-history/SKILL.md)
+   skill for detailed patterns.
 4. **403 handling** — A 403 almost always means a bad/missing UA. Check the UA string before debugging anything else.
 5. **User-Agent per project** — Parameterize the contact info so users can swap in their own details. Never hardcode someone else's email.
 6. **SPARQL queries** — For Wikidata Query Service, always set the UA and use `&format=json`. Consider using `SPARQLWrapper` with the `agent` parameter.
@@ -189,6 +199,26 @@ Practical consequences (verified 2026-08-10):
 - Retry-After may be absent; the docs recommend exponential backoff (min 5s)
   when it is. For per-IP CDN blocks (e.g. live.staticflickr.com) the window
   can be ~60 min — see the [flickr](../flickr/SKILL.md) skill.
+
+### Authoritative sources & per-surface guidance
+
+The two governing documents, both current as of 2026-09:
+
+- **[Wikitech Robot policy](https://wikitech.wikimedia.org/wiki/Robot_policy)** —
+  per-surface etiquette *guidance*: website reads <10 concurrent & <20 req/s
+  average; REST API unauth 3 concurrent / <5 req/s (auth: 10 req/s); Action
+  API unauth 1 concurrent / <5 req/s (auth: 3 concurrent / 10 req/s);
+  `upload.wikimedia.org` ≤2 concurrent / ≤25 Mbps; other resources
+  (gitlab/gerrit/Phab) 1 concurrent / ≥1s delay. **Rate limiting is not
+  enforced on bots running in Toolforge or any other WMCS offering** — they
+  are explicitly exempt, though WMF reserves the right to throttle clients
+  that threaten stability.
+- **[Wikimedia APIs / Rate limits](https://www.mediawiki.org/wiki/Wikimedia_APIs/Rate_limits)** —
+  the cross-API gateway classes (the 10/200/2000-per-min table above).
+  AQS metrics endpoints (`wikimedia.org/api/rest_v1/metrics/...`) are not
+  listed in either document's per-surface tables; the general read guidance
+  applies, WMCS exemption included — no fixed delay inside Toolforge, honor
+  429/`Retry-After` when it appears.
 
 ### Caching Strategy (Prevents Redundant Calls)
 
@@ -470,6 +500,61 @@ with WikimediaClient("MyBot/1.0 (user@example.com) MyProject") as client:
 
 When building **browser-based applications** (JavaScript, not server-side Python), you may encounter CORS (Cross-Origin Resource Sharing) restrictions. This section explains when this happens and how to handle it.
 
+### ⚠️ Browser Fetches: NEVER Set `User-Agent` (the Firefox/Safari preflight trap)
+
+The UA policy above (**"always send a descriptive User-Agent"**) applies to
+**scripts and server-side code** — curl, Python, Node on a server. It **cannot
+and must not be applied to browser `fetch()` calls**:
+
+- `User-Agent` is a **forbidden header name** in browsers. Chromium strips it
+  *before* the CORS preflight check, so a fetch with it set stays a "simple
+  request" and works — **masking the bug during Chrome-only testing**.
+- **Firefox and WebKit (Safari) include it in the CORS preflight check**: the
+  browser sends an `OPTIONS` request with `Access-Control-Request-Headers:
+  user-agent`, and Wikimedia's REST endpoints reject it:
+  - RESTBase (`*.wikipedia.org/api/rest_v1/`, `wikimedia.org/api/rest_v1/`):
+    preflight allow-list is `api-user-agent` only — `user-agent` is not in it.
+  - The **Commons Impact Metrics service** (`wikimedia.org/api/rest_v1/metrics/
+    commons-analytics/*`) returns **HTTP 405 for every OPTIONS request**.
+  - The MediaWiki **Action API** (`/w/api.php`) answers preflights properly —
+    which produces the confusing split where some widgets work and others fail
+    with `NetworkError` (Firefox) / `Load failed` (Safari) in the same page load.
+
+**Verified 2026-09-03** (WikiBento, Playwright Firefox + WebKit against
+production; 60 CORS console errors, fixed by a one-line change).
+
+**Rules:**
+
+1. **Browser fetches: send NO custom headers** when possible. A header-free GET
+   is a *simple request* — no preflight, works in every engine. The browser
+   sends its own User-Agent anyway; a custom one is silently ignored by
+   Chromium and *harmful* in Firefox/WebKit.
+2. **Identification lives server-side**: proxies/relays on your own backend
+   should send the descriptive policy-compliant User-Agent (see the proxy
+   pattern below).
+3. `Api-User-Agent` **is** in RESTBase's preflight allow-list (the documented
+   browser identification header) — but setting ANY non-simple header forces a
+   preflight on every request, and some endpoints (CIM) 405 all OPTIONS. Only
+   use it if preflight-safe endpoints are *all* you call.
+
+**Diagnostics:** in Firefox, the console shows `Cross-Origin Request Blocked:
+... header 'user-agent' is not allowed according to header
+'Access-Control-Allow-Headers' from CORS preflight response` — a preflight
+failure, even though `curl -H "Origin: …" <url>` shows `200` with
+`access-control-allow-origin: *` (the GET is fine; the **OPTIONS** is not).
+Test the preflight directly:
+
+```bash
+curl -s -D - -o /dev/null -X OPTIONS \
+  -H "Origin: https://your-app.example" \
+  -H "Access-Control-Request-Method: GET" \
+  -H "Access-Control-Request-Headers: user-agent" \
+  "https://en.wikipedia.org/api/rest_v1/page/summary/Ada_Lovelace"
+```
+
+A 405, or a 200 whose `access-control-allow-headers` omits `user-agent`, means
+browser fetches with that header will fail in Firefox/Safari.
+
 ### When CORS Becomes an Issue
 
 Most Wikimedia APIs (Action API, REST API, SPARQL) **do send CORS headers** and work fine from browser JavaScript. However, **media files served from `upload.wikimedia.org` do not** — and this is where you'll encounter CORS errors.
@@ -477,7 +562,7 @@ Most Wikimedia APIs (Action API, REST API, SPARQL) **do send CORS headers** and 
 | Resource | CORS Headers? | Browser Access |
 |----------|:-------------:|----------------|
 | Action API (`/w/api.php`) | Yes | Works from any origin |
-| REST API (`/api/rest_v1/`) | Yes | Works from any origin |
+| REST API (`/api/rest_v1/`) | Yes (GET; ⚠ preflight rejects `user-agent`) | Simple requests only — see the preflight trap below |
 | SPARQL (`query.wikidata.org/sparql`) | Yes | Works from any origin |
 | **Media files** (`upload.wikimedia.org`) | **No** | **Blocked for Canvas/WebGL/`background-image`** |
 | File page redirects (`Special:FilePath/`) | Yes | Works for `<img>` display |

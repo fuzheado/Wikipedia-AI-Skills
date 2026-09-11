@@ -88,7 +88,9 @@ Sibling API for **media file loads**, not page views. Base:
 > omit the slash or the `agent-type` segment and you get a 404 "invalid route",
 > which previously misled a note into claiming the endpoint was removed).
 > `referer` ∈ `all-referers|internal|external|unknown` or a project domain;
-> `agent-type` ∈ `user|spider|automated|all-agents`.
+> `agent-type` ∈ `user|spider|all-agents` — **`automated` returns HTTP 400 on
+> every route** (verified 2026-09-05 across all referer values); the AQS
+> surface has no `automated` class (dumps only).
 
 ```
 GET /top/{referer}/{media-type}/{year}/{month}/{day}
