@@ -180,9 +180,11 @@ focused on GLAM (galleries, libraries, archives, museums) impact measurement.
 [allow list](https://gitlab.wikimedia.org/repos/data-engineering/airflow-dags/-/blob/main/main/dags/commons/commons_category_allow_list.tsv)
 and their subcategories (up to 7 levels deep) have data. Unregistered
 categories return **HTTP 404** with *"the category you asked for is not loaded
-yet"* — treat 404 as "not registered", not as an error. Registration: add
-`{{Views from category}}` to the category page (staff process requests at
-month-end; submit by the 20th; no retroactive data). See the
+yet"* — treat 404 as "not registered", not as an error. Registration: open a
+Phabricator request (project `Commons-Impact-Metrics-Requests`, pre-filled
+form) — staff process requests at month-end; submit by the 20th; no
+retroactive data. The `{{Views from category}}` template does **not** register
+a category. See the
 [`wikimedia-commons`](../../wikimedia-commons/SKILL.md) skill's Commons Impact
 Metrics section for the full process and the try-CIM-then-fallback pattern.
 
