@@ -11,7 +11,7 @@ skill_discovery_hints:
   - keywords: ["PDF metadata", "pdf_version", "pdf_encrypted", "DjVu metadata", "document rendering"]
   - keywords: ["Commons document", "Commons PDF", "Commons DjVu", "upload PDF", "upload DjVu"]
   - keywords: ["iiurlparam", "page selector", "page dimension"]
-last_verified: 2026-06-16
+last_verified: 2026-09-11
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -297,7 +297,7 @@ print(f"Used on {len(wikisource_usage)} Wikisource(s)")
 | `{{Book}}` | Full book description template (author, title, year, pages) |
 | `{{ProofreadPage}}` | Links the file to its Wikisource work |
 
-> 🔗 **Detailed Wikisource workflow:** See the **[wiktionary-and-wikisource](../wiktionary-and-wikisource/SKILL.md)** skill for complete coverage of the proofread page lifecycle, including validation levels, progress tracking, and transclusion.
+> 🔗 **Detailed Wikisource workflow:** See the **[wikisource](../wikisource/SKILL.md)** skill for complete coverage of the proofread page lifecycle, including validation levels, progress tracking, and transclusion.
 
 ---
 
@@ -500,5 +500,5 @@ Each archived version includes a timestamped URL to download that version.
 | **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent, rate limiting, error handling |
 | **[wikimedia-commons](../wikimedia-commons/SKILL.md)** | File search, categories, upload basics |
 | **[wikimedia-commons-thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** | Document page rendering, thumb URL scheme, `thumbmime` |
-| **[wiktionary-and-wikisource](../wiktionary-and-wikisource/SKILL.md)** | Wikisource proofread workflow, Page: namespace, transclusion |
+| **[wikisource](../wikisource/SKILL.md)** | Wikisource proofread workflow, Page: namespace, transclusion, EPUB export |
 | **[wikimedia-auth-oauth](../wikimedia-auth-oauth/SKILL.md)** | Authentication for uploading new document versions |
