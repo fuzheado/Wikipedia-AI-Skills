@@ -7,12 +7,24 @@ depends_on: [wikimedia-toolforge]
 skill_discovery_hints:
   - keywords: ["SQL", "database", "replica", "Toolforge database", "enwiki_p", "MySQL"]
   - keywords: ["SSH tunnel", "pymysql", "query Wikipedia", "schema", "page table", "revision table"]
-last_verified: 2026-06-10
+last_verified: 2026-09-11
 ---
 
 > ⚠️ **User-Agent required:** While this skill primarily uses SQL via SSH tunnel, any direct API calls (e.g., for verification via `curl` or `requests`) must include a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
 
 Enables the agent to execute dynamic SQL queries against Wikimedia production replicas (e.g., `enwiki`, `enwiki_p`, `wikidata`, `commonswiki`) by leveraging a local SSH tunnel and specific environment variables for multi-layer authentication.
+
+> ⚠️ **Commons links tables moved to a separate cluster (`x4`) on 2026-09-08.** The links
+> tables on `commonswiki` (`categorylinks`, `pagelinks`, `templatelinks`, `imagelinks`,
+> `globalimagelinks`, `linktarget`, `externallinks`, `iwlinks`, `langlinks`,
+> `existencelinks`, `collation`) are no longer on the core cluster. Connect to
+> `links.commonswiki.analytics.db.svc.wikimedia.cloud` for those tables, and **join them to
+> `page` / `redirect` / `revision` in application code — cross-cluster JOINs are not
+> possible**. The old copies on the core cluster are no longer updated, so any query still
+> hitting them silently returns stale data. Table/column names are unchanged, and `page` +
+> `redirect` remain available on both clusters. Details:
+> [News/2026 Commons links tables database split](https://wikitech.wikimedia.org/wiki/News/2026_Commons_links_tables_database_split)
+> and `references/schema-replicas.md` (hostname mapping + code-side join pattern).
 
 ## **Prerequisites**
 

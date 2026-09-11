@@ -5,6 +5,62 @@ databases ending in `_p` (e.g., `enwiki_p`, `commonswiki_p`, `wikidatawiki_p`).
 
 ---
 
+## ⚠️ Commons: links tables are on a separate cluster (`x4`)
+
+Since **2026-09-08**, the Commons links tables live in a new `x4` database cluster,
+separate from the core (`s4`) cluster. This is a *location* change, not a schema
+change — table and column names are unchanged — but the tables are only reachable
+through a different hostname, and rows are no longer written to the old location.
+
+**Tables moved to `x4`:** `linktarget`, `externallinks`, `pagelinks`,
+`templatelinks`, `categorylinks`, `collation`, `imagelinks`, `globalimagelinks`,
+`iwlinks`, `existencelinks`, `langlinks`
+
+**Still on the core cluster, and also present on `x4`:** `page`, `redirect`
+
+| Old hostname | New hostname (for the links tables) |
+|---|---|
+| `commonswiki.analytics.db.svc.wikimedia.cloud` | `links.commonswiki.analytics.db.svc.wikimedia.cloud` |
+| `commonswiki.web.db.svc.wikimedia.cloud` | `links.commonswiki.web.db.svc.wikimedia.cloud` |
+| `testcommonswiki.analytics.db.svc.wikimedia.cloud` | `links.testcommonswiki.analytics.db.svc.wikimedia.cloud` |
+| `testcommonswiki.web.db.svc.wikimedia.cloud` | `links.testcommonswiki.web.db.svc.wikimedia.cloud` |
+
+**The rule that bites:** *"any code performing JOINs between those tables and other
+`commonswiki` … will need to be changed to perform the same operations in code
+instead."* A cross-cluster `JOIN categorylinks … JOIN page` that used to work now
+fails (or, if it hits the frozen core copies, returns silently stale results).
+
+```python
+# Two connections, one join — done in Python, not in SQL.
+core_c = pymysql.connect(host=CORE_HOST, ...)    # commonswiki_p        -> page, redirect
+links_c = pymysql.connect(host=LINKS_HOST, ...)  # links.commonswiki_p  -> categorylinks, ...
+
+with core_c.cursor() as cur:
+    cur.execute("SELECT page_id, page_title FROM page "
+                "WHERE page_namespace = 14 AND page_is_redirect = 0")
+    cats = {pid: title for pid, title in cur.fetchall()}
+
+with links_c.cursor() as cur:
+    cur.execute("SELECT cl_from, cl_to FROM categorylinks")
+    membership = cur.fetchall()
+
+# join in code, not in SQL
+for cl_from, cl_to in membership:
+    if cl_from in cats:
+        ...
+```
+
+**Status / timeline:** hostnames announced and writes switched on 2026-09-08 (old
+core tables frozen, to be dropped); exposing `x4` on the Wiki Replicas as a
+separate section is still pending, after which queries return fresh data again but
+with no access to the core copies of these tables. Tracked in
+[T343131](https://phabricator.wikimedia.org/T343131) and
+[T398709](https://phabricator.wikimedia.org/T398709); announcement
+[News/2026 Commons links tables database split](https://wikitech.wikimedia.org/wiki/News/2026_Commons_links_tables_database_split).
+Why: the Commons database has been growing too fast.
+
+---
+
 ## `page` — Core page metadata
 
 | Column | Type | Description |
