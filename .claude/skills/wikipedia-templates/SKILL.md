@@ -8,7 +8,8 @@ skill_discovery_hints:
   - keywords: ["template", "wikitext template", "parser function", "transclusion", "Lua module"]
   - keywords: ["#if", "#switch", "#invoke", "TemplateData", "infobox template"]
   - keywords: ["limitreport", "ResourceLoader", "Scribunto", "Module namespace", "ns 828"]
-last_verified: 2026-08-12
+  - keywords: ["Related Changes", "RecentChangesLinked", "WhatLinksHere", "link table", "Prefixindex"]
+last_verified: 2026-09-11
 ---
 
 > ⚠️ **User-Agent required:** The API examples below hit Wikimedia endpoints. All requests must include a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
@@ -637,6 +638,149 @@ Common tracking categories:
 - **What links here:** `Special:WhatLinksHere/Template:Name` — pages using the template
 - **Transclusion count:** `Special:PageInfo/Template:Name` — shows usage count
 - **TemplateData:** Structured parameter documentation used by the Visual Editor
+
+---
+
+## SOP: Link Tracking for Template-Generated Content
+
+`Special:RecentChangesLinked`, `Special:WhatLinksHere`, and `prop=links` read the
+wiki's **link tables**, never the rendered HTML. A page can therefore *visibly*
+list 20 pages that the change feeds believe do not exist.
+
+**Symptom:** a dashboard or index page lists pages (via `{{Special:Prefixindex}}`,
+a module, a template, or another dynamic construct), but "Related changes" on that
+page returns nothing — or only changes to the few pages that also appear as
+literal links.
+
+### What gets recorded, and attributed to whom
+
+| Construct | In a link table? | Attributed to |
+|---|---|---|
+| `[[Wikilink]]` in the page's own wikitext | ✅ `pagelinks` | that page |
+| Link emitted by a parser tag/function placed **directly on the page** (e.g. `<dynamicpagelist>` on the page) | ✅ `pagelinks` | that page |
+| Link inside a **transcluded template or Lua module** | ✅ — but | the **template/module**, not the including page (the includer only gets a `templatelinks` row) |
+| **Transcluded special page** (`{{Special:Prefixindex}}`, `{{Special:RecentChanges}}`, `{{Special:CategoryTree}}`) | ❌ nowhere | — |
+| Raw HTML `<a href>` built by an extension or JavaScript | ❌ | — |
+| Links inside `<nowiki>`, HTML comments, or `<pre>` | ❌ | — |
+| `[[Category:X]]` — **including when emitted by a transcluded template** | ✅ `categorylinks` | the **including page** (the opposite rule to plain links) |
+| `[https://example.org …]` external link | ✅ `externallinks` (separate table; not usable for internal feeds) | that page |
+
+Consequence worth remembering: a navbox template's links belong to the *template's*
+link table, so one template edit reaches thousands of pages for **categories**
+(cascade to the includer) but not for **links**. This is also why `WhatLinksHere`
+on a target often lists the template rather than the articles that display the link.
+
+### Diagnose in three calls
+
+```bash
+TITLE="Wikimedia Futures Lab/Dashboard/Experiment Tracker"
+UA="MyTool/1.0 (https://example.org/me)"
+
+# 1. What IS recorded for the page? (empty/minimal result = not link-tracked)
+curl -s -H "User-Agent: $UA" \
+  "https://meta.wikimedia.org/w/api.php?action=query&titles=${TITLE}&prop=links|categories|templates&pllimit=max&format=json"
+
+# 2. Reproduce the symptom: count rendered change rows on Related changes
+curl -s -H "User-Agent: $UA" \
+  "https://meta.wikimedia.org/wiki/Special:RecentChangesLinked?target=${TITLE}&days=30&limit=50" | grep -c mw-changeslist-line
+```
+
+Compare (1) and (2) against the page's rendered output. If the visible list is far
+larger than `prop=links`, the list comes from a construct in the table above that is
+not tracked. Note that a **non-existent target returns HTTP 404**, not an empty
+list — do not read that as "no changes".
+
+### Recipe 1 — category anchor (general fix, self-maintaining)
+
+1. Put `[[Category:Name]]` on every page in the list. For generated pages, add it to
+   the **preload template** so future pages self-categorize; backfill existing pages
+   with a bot run or JWB/AWB.
+2. Point Related Changes at the category instead of the page:
+   `https://{wiki}/wiki/Special:RecentChangesLinked?target=Category:Name&days=30&limit=100`
+3. Verify membership landed (category links are applied by **deferred jobs**, so a
+   new category can lag — a null edit on the page forces it):
+   `https://{wiki}/w/api.php?action=query&list=categorymembers&cmtitle=Category:Name&format=json`
+
+This works regardless of how the list is generated (prefixindex, DPL, module, bot),
+which is why it is the general answer when "Related changes" must keep working.
+
+### Recipe 2 — hidden DynamicPageList block (Related changes on the page itself)
+
+Meta and the Wikinews projects run the legacy **DynamicPageList (Intersection)**;
+its tag output *is* link-tracked. Keep the pretty display and add a hidden block
+whose only job is to populate the page's link table:
+
+```text
+<div style="display:none">
+<dynamicpagelist>
+category=Name
+count=100
+mode=unordered
+suppresserrors=true
+</dynamicpagelist>
+</div>
+```
+
+Constraints: category-driven only (no prefix/titlematch), output is cached, and it
+will not be installed on further WMF wikis. Put it **on the page itself** — inside a
+template, the links would be attributed to the template.
+
+### Recipe 3 — feed from the API (no wiki edits at all)
+
+Enumerate the list yourself, then ask for the changes per page and merge:
+
+```python
+import json, time, urllib.parse, urllib.request
+
+UA = "MyTool/1.0 (https://example.org/me)"  # descriptive User-Agent is required
+API = "https://meta.wikimedia.org/w/api.php"
+
+def get(params):
+    url = API + "?" + urllib.parse.urlencode(dict(params, format="json"))
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    with urllib.request.urlopen(req, timeout=45) as resp:
+        return json.loads(resp.read())
+
+prefix = "Wikimedia Futures Lab/Dashboard/Experiment Tracker/"
+pages, cont = [], {}
+while True:
+    data = get({"action": "query", "list": "allpages", "apprefix": prefix,
+                "apnamespace": "0", "aplimit": "500", **cont})
+    pages += [p["title"] for p in data["query"]["allpages"]]
+    if "continue" not in data:
+        break
+    cont = data["continue"]
+
+events = []
+for title in pages:
+    data = get({"action": "query", "list": "recentchanges", "rctitle": title,
+                "rcprop": "title|timestamp|user|comment|sizes", "rclimit": "10",
+                "rcdir": "older", "rcend": "2026-08-12T00:00:00Z"})
+    events += data["query"]["recentchanges"]
+    time.sleep(1)  # >=1s pacing outside Toolforge/WMCS
+
+for event in sorted(events, key=lambda e: e["timestamp"], reverse=True)[:20]:
+    print(event["timestamp"], event["title"], event["user"], event["comment"])
+```
+
+Personal variant needing no code: watch the pages and use `Special:Watchlist`
+(30-day window) plus its RSS/Atom feed. Real-time variant: EventStreams filtered
+client-side (see [wikimedia-eventstreams](../wikimedia-eventstreams/SKILL.md)).
+
+### Pitfalls
+
+- **Category lag.** `categorylinks` rows are written by deferred jobs; a freshly
+  added category may not appear in Related changes for a moment. Force with a null
+  edit, or wait for the job queue.
+- **404 ≠ empty.** A Related changes target that does not exist returns 404 — check
+  the target spelling before concluding there are no changes.
+- **30-day horizon.** The UI defaults to 30 days; RSS/Atom feeds serve short windows
+  only, so "all changes ever" needs the API or a database replica.
+- **Template attribution surprise.** Links rendered by a transcluded template are
+  recorded against the *template*: point Related changes at the template page only
+  when every page in the list transcludes it.
+- **Cached parser output.** DPL and other extension output is cached; changes to the
+  underlying category may not re-render the page immediately.
 
 ---
 
