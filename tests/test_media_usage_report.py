@@ -64,6 +64,7 @@ class TestSkillContent:
         assert "NOT on-demand" in text
         assert "allow-listed" in text and "pre-computed" in text
         assert "Views from category" in text and "Phabricator" in text
+        assert "does **not** register" in text
         assert "no retroactive backfill" in text
 
 

@@ -9,7 +9,7 @@ skill_discovery_hints:
   - keywords: ["mediacounts", "mediarequests", "GlobalUsage", "globalimagelinks", "imagelinks", "file transfer counts", "image serve counts"]
   - keywords: ["how many times was image served", "where is file used", "pageviews of articles using image", "GLAM impact", "GLAM metrics"]
   - keywords: ["BaGLAMa", "GLAMorgan", "GLAMorous", "external reuse", "hotlink", "referer", "media transfer counts"]
-last_verified: 2026-09-05
+last_verified: 2026-09-10
 ---
 
 # Media Usage Metrics — Measuring Use of Wikimedia Files
@@ -112,13 +112,14 @@ verified for this workflow:
 > get same-day numbers for an arbitrary category; use the §5 live pipeline
 > for anything not on the list.
 
-**Registration is a staff cycle, not an API call:** add
-`{{Views from category}}` to the category page -> hidden tracking category ->
-staff add it to the allow-list at month-end (submit by the 20th) -> data
-starts the following month, **no retroactive backfill**. A Phabricator
-ticket (project `Commons-Impact-Metrics-Requests`) is created automatically
-for documentation; renames/removals go through the same monthly cycle via
-the pre-filled Phabricator form. Full process: the
+**Registration is a staff cycle, not an API call:** open a Phabricator
+request (project `Commons-Impact-Metrics-Requests`, [pre-filled form](https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?projects=Commons-Impact-Metrics-Requests),
+assigned `GFontenelle_WMF`) by the **20th**; staff add the category to the
+allow-list at month-end -> data starts the following month, **no retroactive backfill**.
+The `{{Views from category}}` template does **not** register a category
+(legacy page-views table; correlation trap — GLAM categories commonly have
+both). Renames/removals go through the same monthly cycle.
+Full process: the
 **[wikimedia-commons](../wikimedia-commons/SKILL.md)** skill.
 
 Endpoint table, `category-scope`/`edit-type` values, and the try-CIM-
