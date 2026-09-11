@@ -3,7 +3,7 @@ name: wikidata-reconciliation
 description: Resolve unstructured labels to verified Wikidata QIDs — OpenRefine reconciliation protocol, wbsearchentities fallback, candidate scoring, and LLM QID grounding guardrails
 license: MIT
 compatibility: opencode
-last_verified: 2026-08-18
+last_verified: 2026-08-26
 depends_on: [wikimedia-api-access, wikidata]
 skill_discovery_hints:
   - keywords: ["reconcile", "reconciliation", "match QID", "resolve QID", "entity matching", "QID verification", "label to QID", "OpenRefine reconcile"]
@@ -62,18 +62,41 @@ curl -s -A "$WIKIMEDIA_USER_AGENT" \
 
 Returns `{"result": [{"id": "Q243", "name": "Eiffel Tower", "description": "tower located on the Champ de Mars in Paris, France"}, ...]}`. The description field is the **disambiguation key** — always read it.
 
-### 3. Batch query (`POST /api`) — ⚠️ currently broken (verified 2026-08-18)
+### 3. Batch query (`POST /api`) — ⚠️ type-filtered queries fail (root cause known, fix merged upstream but not deployed)
 
 ```bash
 curl -s -A "$WIKIMEDIA_USER_AGENT" -X POST \
   "https://wikidata-reconciliation.wmcloud.org/en/api" \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  --data-urlencode 'queries={"q0":{"query":"Eiffel Tower","limit":3,"type":"/common/topic"}}'
+  --data-urlencode 'queries={"q0":{"query":"Eiffel Tower","limit":3}}'           # ✅ works
+  --data-urlencode 'queries={"q0":{"query":"Eiffel Tower","limit":3,"type":"Q35120"}}'  # ✅ works (default type)
+  --data-urlencode 'queries={"q0":{"query":"Barack Obama","limit":3,"type":"/person"}}' # ❌ fails
 ```
 
-**Trap (verified live):** as of 2026-08-18 this returns
-`{"status":"error","message":"invalid query","details":"...Attempt to decode JSON with unexpected mimetype: text/plain..."}`
-— the service's internal SPARQL call to `query.wikidata.org` is failing to get JSON. The `suggest/entity` autocomplete endpoint still works; the batch `POST` does not. **Do not rely on the batch endpoint** — use `wbsearchentities` (below) as the primary reconciliation path, and re-test `POST /api` if the service is fixed.
+**Precise failure scope (verified live 2026-08-26):** the batch endpoint works for
+plain-text queries and default-type (`Q35120`) queries. It fails **only when a
+non-default type filter is supplied** (`/person`, `/common/topic`, ...), because that
+path runs the type-subclass SPARQL query (`?child wdt:P279* wd:Q43229`) against
+`query.wikidata.org`. WDQS returns `403 text/plain` for the service's non-compliant
+User-Agent, aiohttp raises `ContentTypeError` (the `0, message='...'` in the error),
+and the service re-labels it as the misleading
+`{"status":"error","message":"invalid query","details":"...Attempt to decode JSON with unexpected mimetype: text/plain..."}`.
+
+**Root cause chain (investigated 2026-08-26):** WMF's User-Agent enforcement
+([T400119](https://phabricator.wikimedia.org/T400119), resolved 2025-11-21) blocks
+requests without a policy-compliant UA; the service's `user_agent` was
+`OpenRefine-Wikidata reconciliation interface` (no contact info) and some request
+paths sent none at all. Confirmed by other users: Phabricator
+[T419770](https://phabricator.wikimedia.org/T419770) (open) and OpenRefine forum
+[#2641](https://forum.openrefine.org/t/2641) (2025-11) and
+[#2779](https://forum.openrefine.org/t/2779) (2026-04). **A fix is merged upstream**
+([nfdi4culture fork MR #11](https://gitlab.com/nfdi4culture/openrefine-reconciliation-services/openrefine-wikibase/-/merge_requests/11),
+2026-04-13: adds the UA to all requests, uses policy-compliant UA) but has **not been
+deployed** to `wikidata-reconciliation.wmcloud.org` — re-test periodically.
+
+**Practical guidance: do not rely on the batch endpoint for type-filtered queries** —
+use `wbsearchentities` (below) as the primary reconciliation path and implement type
+filtering as a P31 check on verified QIDs. Plain-text batches work if you need them.
 
 ## Primary path: `wbsearchentities` (always works)
 
@@ -194,12 +217,12 @@ def verify(qids):
 ## Constraint & Guardrails
 
 1. **Never write an unverified QID.** Verify via `wbgetentities` in the same session as the write (see `wikimedia-commons-sdc` / `quickstatements` for the write side).
-2. **The reconciliation batch `POST` endpoint is broken (2026-08-18)** — `suggest/entity` and `wbsearchentities` are the working paths. Re-test before relying on it; the trap is documented in this skill so future readers don't burn an hour.
+2. **The reconciliation batch `POST` endpoint fails on type-filtered queries** (root cause known since 2026-08-26: WDQS UA-policy 403 → misleading "invalid query"; see §3 above). `suggest/entity` and `wbsearchentities` are the working paths; plain-text batches work. For type filtering, verify P31 on the QID instead of relying on the service's type filter.
 3. **Descriptions are the disambiguation key.** Two entities can share a label; their descriptions cannot (usually). Read `description` on every candidate.
 4. **Language matters.** Search in the language of the label; descriptions come back in `uselang`. For multilingual lookups use `language=mul` sparingly — prefer explicit language + `uselang=en`.
 5. **Rate limits:** `wbsearchentities`/`wbgetentities` are Action API calls — ≥1s pacing for batch work, batch IDs 50/call, respect 429 `Retry-After`. The reconciliation service is a separate host with its own limits; keep to a few requests/second.
 6. **"UNRESOLVED" is a valid answer.** If no candidate passes, return `None`/`UNRESOLVED` and let the caller decide (skip, flag for human, or create a new item deliberately — never auto-create).
-7. **Don't confuse the reconciliation service with the Wikidata API.** The service speaks the OpenRefine protocol (manifest/autocomplete/batch); `wbsearchentities` is the underlying search. Prefer `wbsearchentities` for programmatic use until the service's batch endpoint is fixed.
+7. **Don't confuse the reconciliation service with the Wikidata API.** The service speaks the OpenRefine protocol (manifest/autocomplete/batch); `wbsearchentities` is the underlying search. Prefer `wbsearchentities` for programmatic use — especially for type-filtered lookups, where the service's batch endpoint currently fails (see §3).
 
 ## Example Use Cases
 
