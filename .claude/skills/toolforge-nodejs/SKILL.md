@@ -13,7 +13,7 @@ skill_discovery_hints:
   - keywords: ["Toolforge logs", "kubectl logs", "webservice logs", "debug", "tail logs", "toolforge debug"]
   - keywords: ["Node streaming", "buffer", "readFile", "createReadStream", "Pannellum", "XHR", "WebGL"]
   - keywords: ["Toolforge cron", "node job", "scheduled task", "cron node", "batch job"]
-last_verified: 2026-08-08
+last_verified: 2026-09-14
 ---
 
 > ⚠️ **Prerequisites:** This skill assumes you have a Toolforge account and can SSH in. See **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** for account setup, tool creation, and basic SSH configuration.
@@ -611,3 +611,4 @@ become my-tool
 - **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** — User-Agent, rate limiting, error handling
 - **[wikimedia-commons-thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** — Thumbnail URL generation and format conversion
 - **[wikimedia-security-and-privacy](../wikimedia-security-and-privacy/SKILL.md)** — CDN privacy risks, data minimization, and third-party script policies
+- **[wikimedia-codex](../wikimedia-codex/SKILL.md)** — Codex design system (Vue 3 + CSS-only components, tokens, icons) for tool frontends

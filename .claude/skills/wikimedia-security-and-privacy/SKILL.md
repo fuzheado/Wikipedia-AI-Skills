@@ -4,7 +4,7 @@ description: Build tools that respect Wikimedia user privacy and security — da
 depends_on: [wikimedia-api-access, wikimedia-auth-oauth, wikimedia-toolforge]
 license: MIT
 compatibility: opencode
-last_verified: 2026-06-11
+last_verified: 2026-09-14
 skill_discovery_hints:
   - keywords: ["privacy", "security", "data minimization", "PII", "deanonymization"]
   - keywords: ["suppressed revision", "deleted revision", "AbuseFilter", "block", "XSS"]
@@ -467,6 +467,9 @@ $('#bio').html(userBio);  // User-generated content may contain scripts
 const userBio = data.query.pages[pageId].extract;
 $('#bio').text(userBio);  // Escapes HTML automatically
 ```
+
+Building the UI itself? See the **[wikimedia-codex](../wikimedia-codex/SKILL.md)** skill
+for the Codex design system's components and design tokens.
 
 ---
 

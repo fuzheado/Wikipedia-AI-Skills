@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["Toolforge", "tool hosting", "Kubernetes", "web service", "cron job", "deploy"]
   - keywords: ["toolsadmin", "become", "webservice", "toolforge jobs"]
   - keywords: ["CDN", "cdnjs", "tools-static", "privacy-preserving CDN", "content delivery", "third-party script", "external CDN tracking"]
-last_verified: 2026-08-08
+last_verified: 2026-09-14
 ---
 
 Toolforge (formerly Wikimedia Tool Labs) is a cloud hosting platform for community-developed tools that interact with Wikimedia wikis and data. This skill covers account setup, service management, deployment, and debugging.
@@ -938,6 +938,7 @@ kubectl exec my-pod -n tool-mytool -- sh -c "
 | **[wikimedia-database](../wikimedia-database/SKILL.md)** | SQL replicas — SSH tunnel setup shared with Toolforge |
 | **[toolforge-nodejs](../toolforge-nodejs/SKILL.md)** | Node.js web services on Toolforge Kubernetes |
 | **[toolforge-python](../toolforge-python/SKILL.md)** | Python web services on Toolforge Kubernetes (Flask + gunicorn) |
+| **[wikimedia-codex](../wikimedia-codex/SKILL.md)** | Codex design system — components, design tokens, and icons for tool frontends |
 | **[wikimedia-eventstreams](../wikimedia-eventstreams/SKILL.md)** | Real-time streams for monitoring tool events |
 | **[wikimedia-i18n-l10n-for-tools](../wikimedia-i18n-l10n-for-tools/SKILL.md)** | Multilingual design for Toolforge tools |
 | **[wikimedia-ml-services](../wikimedia-ml-services/SKILL.md)** | ML inference (Lift Wing) — often deployed as Toolforge services |
