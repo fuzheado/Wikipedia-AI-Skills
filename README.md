@@ -30,13 +30,12 @@ These skills are designed to **help you research, understand, and prepare conten
 
 ## Skills
 
-This repository contains **58 skills** organized into two groups.
+This repository contains **61 skills** organized into two groups.
 
-> 💡 **[Explore the interactive skills network →](docs/skills-network.html)** — see how all 58
-> skills connect to each other in a force-directed graph. Drag nodes, zoom, and hover
-> to discover cross-references between skills.
-
-![Skills network preview](docs/skills-network.png)
+> 💡 **[Explore the skills directory →](docs/skills-explorer.html)** — search and filter by
+> task, domain, role, dependencies, and related skills. The full
+> [network graph](docs/skills-network.html) is still available as an advanced relationship view,
+> but the directory is the recommended starting point now that the graph is too dense for quick browsing.
 
 ### 📝 For editors and contributors
 
