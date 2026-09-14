@@ -40,6 +40,26 @@ import re
 from typing import Optional
 
 
+# ── Section splitting ─────────────────────────────────────────────────────
+#
+# Language sections are delimited by a legacy `----` divider (4 hyphens)
+# and/or by level-2 `==Language==` headings. Current en.wiktionary entries
+# frequently omit the divider entirely, so split on both and key on headings.
+_SPLIT_RE = re.compile(r'(?m)^(?=(?:-{4,}\s*$|==[^=]))')
+
+
+def _split_language_sections(wikitext: str) -> list[str]:
+    """Split a Wiktionary page into chunks, one per language section.
+
+    Splits before every ``----`` divider line (4 hyphens) **and** before every
+    level-2 ``==Language==`` heading. The lookahead consumes nothing, so no
+    text is dropped. Chunks without a level-2 heading — a lone divider, or a
+    leading ``{{also|...}}`` template — are filtered out.
+    """
+    chunks = _SPLIT_RE.split(wikitext)
+    return [c for c in chunks if re.search(r'^==([^=]+)==', c, re.MULTILINE)]
+
+
 class WiktionaryParser:
     """Parse Wiktionary wikitext into structured entry data."""
 
@@ -57,8 +77,9 @@ class WiktionaryParser:
         """
         result = {"title": title, "languages": {}}
         
-        # Split by ---- (4 hyphens) — the language section delimiter
-        raw_sections = re.split(r'^-{4,}\s*$', wikitext, flags=re.MULTILINE)
+        # Split into language chunks (legacy `----` dividers and/or
+        # level-2 `==Language==` headings — see _split_language_sections).
+        raw_sections = _split_language_sections(wikitext)
         
         for section in raw_sections:
             # Check if this section has a language heading
@@ -239,7 +260,7 @@ def extract_language_section(wikitext: str, target_lang: str) -> Optional[str]:
     Useful when you only need one language's data and don't want to
     parse the entire entry.
     """
-    sections = re.split(r'^-{4,}\s*$', wikitext, flags=re.MULTILINE)
+    sections = _split_language_sections(wikitext)
     for section in sections:
         lang_match = re.search(r'^==([^=]+)==', section, re.MULTILINE)
         if lang_match and lang_match.group(1).strip() == target_lang:
@@ -249,7 +270,7 @@ def extract_language_section(wikitext: str, target_lang: str) -> Optional[str]:
 
 def count_languages(wikitext: str) -> int:
     """Count the number of language sections in a Wiktionary entry."""
-    sections = re.split(r'^-{4,}\s*$', wikitext, flags=re.MULTILINE)
+    sections = _split_language_sections(wikitext)
     count = 0
     for section in sections:
         if re.search(r'^==([^=]+)==', section, re.MULTILINE):

@@ -84,8 +84,9 @@ import sys, re
 
 text = sys.stdin.read()
 
-# Split on ---- (5 hyphens)
-sections = re.split(r'^-{5,}\s*$', text, flags=re.MULTILINE)
+# Split on ---- (legacy 4-hyphen divider) and/or level-2 ==Language== headings.
+# Modern entries often omit the divider, so keying on headings is required.
+sections = re.split(r'(?m)^(?=(?:-{4,}\s*$|==[^=]))', text)
 
 found_langs = []
 for section in sections:

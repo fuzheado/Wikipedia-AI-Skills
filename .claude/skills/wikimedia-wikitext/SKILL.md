@@ -7,7 +7,7 @@ depends_on: [wikimedia-api-access]
 skill_discovery_hints:
   - keywords: ["wikitext", "wiki markup", "parse", "mwparserfromhell", "wikitext parsing", "template parsing"]
   - keywords: ["wikitext AST", "syntax tree", "section parsing", "link extraction", "template expansion"]
-last_verified: 2026-08-18
+last_verified: 2026-09-11
 ---
 
 > ⚠️ **User-Agent required:** The API examples below use the Action API and REST API. All requests must include a descriptive `User-Agent` header or they will be blocked. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
@@ -331,5 +331,6 @@ Example script for converting wikitext tables to pandas DataFrames via the Parso
 | **[wikipedia-citations](../wikipedia-citations/SKILL.md)** | Citation/reference extraction from wikitext |
 | **[wikipedia-page-anatomy](../wikipedia-page-anatomy/SKILL.md)** | Page structure — sections, infoboxes, navboxes parsed from wikitext |
 | **[pywikibot](../pywikibot/SKILL.md)** | Bot framework — uses `mwparserfromhell` for template manipulation |
-| **[wiktionary-and-wikisource](../wiktionary-and-wikisource/SKILL.md)** | Dictionary/text extraction patterns using AST-based parsing |
+| **[wiktionary](../wiktionary/SKILL.md)** | Dictionary entry structure and AST-based parsing of translation tables |
+| **[wikisource](../wikisource/SKILL.md)** | Proofread page text extraction, `Page:`/`Index:` namespaces, transclusion |
 | **[wikivoyage](../wikivoyage/SKILL.md)** | Wikivoyage listing templates (`{{see}}`, `{{eat}}`, etc.) are structured wikitext templates parsed with `mwparserfromhell` |

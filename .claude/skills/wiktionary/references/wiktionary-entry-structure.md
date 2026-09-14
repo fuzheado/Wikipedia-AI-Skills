@@ -3,7 +3,10 @@
 ## Heading Hierarchy
 
 A Wiktionary page contains entries for one word in multiple languages, separated
-by `----` (5 hyphens) lines:
+by `----` (4 hyphens) lines. The divider is **legacy**: many current entries
+(e.g. `word`, `water`, `cat` on en.wiktionary) just start a new level-2
+`==Language==` heading, so a robust parser must key on the headings and treat
+`----` as optional. See the Guardrails section of SKILL.md.
 
 ```
 ==Language 1==              # Level 2: Language section
@@ -28,7 +31,7 @@ by `----` (5 hyphens) lines:
 ===Part of speech 2===
   ...
 
-----                        # 5 hyphens separate language sections
+----                        # 4 hyphens separate language sections (legacy/optional)
 
 ==Language 2==
 ...
@@ -178,3 +181,36 @@ Template parameters use the **ISO code** (e.g., `{{t|fr|mot}}` for French).
   }
 }
 ```
+
+---
+
+## API Modules (Wiktionary Action API)
+
+Everything lives at `{lang}.wiktionary.org/w/api.php`. Verified on
+en.wiktionary, 2026-09-11.
+
+| Module | Purpose | Key parameters |
+|--------|---------|----------------|
+| `action=parse` | Entry wikitext (primary format — HTML loses the section structure) | `page=word&prop=wikitext\|text\|categories` |
+| `action=query&prop=langlinks` | Interwiki links to the same word in other editions | `lllimit=max` |
+| `action=query&list=categorymembers` | Enumerate words in a category | `cmtitle=Category:English_nouns&cmlimit=max` |
+| `action=query&list=prefixsearch` | Prefix lookup for a word | `pssearch=word*` |
+| `action=query&list=search` | Full-text search | `srwhat=text` |
+| `action=query&meta=siteinfo` | Namespaces / language codes | `siprop=namespaces\|languages` |
+
+## Namespaces
+
+Verified against `action=query&meta=siteinfo&siprop=namespaces` on
+en.wiktionary (2026-09-11). Numbers differ from the older sister-project
+reference table — use these.
+
+| # | Namespace | Prefix example |
+|---|-----------|----------------|
+| 0 | Main (entry) | `word` |
+| 100 | Appendix | `Appendix:English irregular verbs` |
+| 106 | Rhymes | `Rhymes:English:-ɜː(r)d` |
+| 108 | Transwiki | `Transwiki:…` |
+| 110 | Thesaurus | `Thesaurus:word` |
+| 114 | Citations | `Citations:word` |
+| 116 | Sign gloss | `Sign gloss:WORD` |
+| 118 | Reconstruction | `Reconstruction:Proto-Indo-European/…` |

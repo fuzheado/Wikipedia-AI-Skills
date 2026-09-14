@@ -4,7 +4,9 @@ surface into scripts/api-surface.json (ground truth for verify-api.py).
 
 Sources (all live, all authoritative):
   1. paraminfo main-module `action` parameter — the full top-level action list,
-     merged across en.wikipedia.org, www.wikidata.org and commons.wikimedia.org
+     merged across en.wikipedia.org, www.wikidata.org, commons.wikimedia.org and
+     en.wikisource.org (the last for Wikisource-only extension modules such as
+     ProofreadPage's prop=proofread)
      (so Wikibase modules like wbgetentities are included)
   2. paraminfo query+NAME — verifies every candidate query submodule
      (prop=/list=/meta=); names that don't exist come back in warnings, so the
@@ -41,6 +43,7 @@ APIS = (
     "https://en.wikipedia.org/w/api.php",
     "https://www.wikidata.org/w/api.php",
     "https://commons.wikimedia.org/w/api.php",
+    "https://en.wikisource.org/w/api.php",
 )
 USER_AGENT = os.environ.get(
     "WIKIMEDIA_USER_AGENT",
@@ -153,13 +156,20 @@ def main() -> int:
     used = skill_api_tokens(DEFAULT_SKILLS_DIR)
     enwiki = APIS[0]
 
-    # 2. query submodules
+    # 2. query submodules — enwiki is the baseline, but some modules are
+    #    extension-provided and exist only on other wikis (ProofreadPage's
+    #    `prop=proofread`/`proofreadinfo`/`list=proofreadpages` are Wikisource-only).
+    #    Union the skill-used tokens across every host so those validate too.
     seed_props = used["prop"] | set(CORE_PROPS)
     seed_lists = used["list"] | set(CORE_LISTS)
     seed_metas = used["meta"] | set(CORE_METAS)
     props = paraminfo_batch(enwiki, sorted(seed_props), prefix="query")
     lists = paraminfo_batch(enwiki, sorted(seed_lists), prefix="query")
     metas = paraminfo_batch(enwiki, sorted(seed_metas), prefix="query")
+    for api in APIS[1:]:
+        props |= paraminfo_batch(api, sorted(used["prop"]), prefix="query")
+        lists |= paraminfo_batch(api, sorted(used["list"]), prefix="query")
+        metas |= paraminfo_batch(api, sorted(used["meta"]), prefix="query")
 
     # 3. per-action prop= values for non-query actions used with prop= in skills
     action_props = {}
