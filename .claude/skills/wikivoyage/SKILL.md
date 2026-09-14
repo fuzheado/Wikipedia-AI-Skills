@@ -11,7 +11,7 @@ skill_discovery_hints:
   - keywords: ["banner", "pagebanner", "article skeleton", "IsPartOf", "breadcrumb"]
   - keywords: ["article status", "usable", "guide", "star", "outline", "stub"]
   - keywords: ["hotel", "restaurant", "attraction", "accommodation", "itinerary", "phrasebook"]
-last_verified: 2026-06-23
+last_verified: 2026-09-14
 ---
 
 > ⚠️ **Prerequisites:** This skill assumes familiarity with the MediaWiki Action
@@ -1009,18 +1009,18 @@ not useful for travellers. Rewrite for the travel context.
 | **[wikidata-vector-search](../wikidata-vector-search/SKILL.md)** | Finding QIDs for POIs by natural language description |
 | **[wikimedia-search-cirrussearch](../wikimedia-search-cirrussearch/SKILL.md)** | Searching Wikivoyage articles with `hastemplate:`, `insource:`, `haswbstatement:` |
 | **[wikimedia-commons](../wikimedia-commons/SKILL.md)** | Finding and referencing banner images, listing photos |
-| **[wikimedia-commons-thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** | Thumbnail URLs for banners and listing images |
 | **[wikimedia-database](../wikimedia-database/SKILL.md)** | SQL queries against `enwikivoyage_p` replicas |
-| **[wikimedia-pageviews](../wikimedia-pageviews/SKILL.md)** | Pageview analysis for travel destinations |
 | **[wikimedia-auth-oauth](../wikimedia-auth-oauth/SKILL.md)** | Authentication for editing Wikivoyage programmatically |
 | **[pywikibot](../pywikibot/SKILL.md)** | Batch listing operations, dump processing, status analysis |
-| **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** | Hosting tools (listing editors, geocoding helpers, status checkers) |
 | **[mediawiki-page-navigation](../mediawiki-page-navigation/SKILL.md)** | General navigation patterns; Wikivoyage extends this with GeoCrumbs/IsPartOf |
 | **[wikimedia-i18n-l10n-for-tools](../wikimedia-i18n-l10n-for-tools/SKILL.md)** | Multilingual tooling — Wikivoyage has 25+ language editions |
-| **[wikipedia-error-handling](../wikipedia-error-handling/SKILL.md)** | Same error/rate-limit handling patterns apply |
 | **[wikipedia-templates](../wikipedia-templates/SKILL.md)** | General template concepts; Wikivoyage has its own template ecosystem |
-| **[wikipedia-categories](../wikipedia-categories/SKILL.md)** | Wikivoyage categories exist but are secondary to the geographical hierarchy |
-| **[mediawiki-translate-extension](../mediawiki-translate-extension/SKILL.md)** | Translating travel guides between language editions |
+| **[wikipedia-categories](../wikipedia-categories/SKILL.md)** | Category trees behind the geographical hierarchy (listings themselves are template-driven) |
+
+Section note: this list is limited to skills that this skill's procedures actually use.
+General-purpose Wikimedia skills (tool hosting, pageview statistics, image thumbnails,
+translation, rate-limit handling) are deliberately not linked here — reach for those
+directly when a task needs them.
 
 ---
 
