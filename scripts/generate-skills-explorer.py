@@ -106,7 +106,7 @@ def skill_records() -> list[dict]:
     return rows
 
 
-def write_html(rows: list[dict]) -> None:
+def write_html(rows: list[dict], out: Path | None = None) -> None:
     domains = sorted({r["domain"] for r in rows})
     tasks = sorted({r["task"] for r in rows})
     roles = sorted({role for r in rows for role in r["roles"]})
@@ -200,8 +200,13 @@ render();
 </body>
 </html>
 """
-    OUT.write_text(html_doc, encoding="utf-8")
-    print(f"Generated {OUT.relative_to(ROOT)} — {len(rows)} skills")
+    target = out or OUT
+    target.write_text(html_doc, encoding="utf-8")
+    try:
+        shown: Path | str = target.relative_to(ROOT)
+    except ValueError:  # caller passed a path outside the repo (e.g. tests)
+        shown = target
+    print(f"Generated {shown} — {len(rows)} skills")
 
 
 def main() -> None:
