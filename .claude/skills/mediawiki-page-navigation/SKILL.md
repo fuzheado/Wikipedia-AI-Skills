@@ -7,7 +7,7 @@ depends_on: [wikimedia-api-access, wikipedia-templates]
 skill_discovery_hints:
   - keywords: ["navigation", "menu bar", "breadcrumbs", "subpage", "tab navigation", "#titleparts"]
   - keywords: ["page hierarchy", "sub-navigation", "dynamic menu"]
-last_verified: 2026-06-10
+last_verified: 2026-09-14
 ---
 
 > ⚠️ **User-Agent required:** The API examples below hit Wikimedia endpoints. All requests must include a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
@@ -581,6 +581,7 @@ curl -s "https://meta.wikimedia.org/w/api.php?action=query&prop=templates&titles
 | Skill: Page styling | [wikimedia-page-styling](../wikimedia-page-styling/SKILL.md) |
 | Skill: Translate extension | [mediawiki-translate-extension](../mediawiki-translate-extension/SKILL.md) |
 | Skill: API access | [wikimedia-api-access](../wikimedia-api-access/SKILL.md) |
+| Skill: Codex components | [wikimedia-codex](../wikimedia-codex/SKILL.md) |
 
 ---
 
