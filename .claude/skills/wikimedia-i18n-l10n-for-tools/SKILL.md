@@ -10,7 +10,7 @@ skill_discovery_hints:
   - keywords: ["domain mapping", "language to domain", "language code", "yue", "zh-yue", "nan", "zh-min-nan", "site matrix", "sitematrix", "wiki domain"]
   - keywords: ["message file", "ICU", "pluralization", "language fallback", "gettext"]
   - keywords: ["Wikidata label", "multilingual label", "wbgetentities", "language detection"]
-last_verified: 2026-06-11
+last_verified: 2026-09-14
 depends_on: [wikimedia-api-access, wikidata]
 ---
 
@@ -1084,3 +1084,4 @@ Different language Wikipedias are separate API endpoints with separate rate limi
 | **[wikipedia-error-handling](../wikipedia-error-handling/SKILL.md)** | 429 handling per wiki domain |
 | **[pywikibot](../pywikibot/SKILL.md)** | Pywikibot's `mylang` config, cross-wiki `-interwiki:` generator |
 | **[wikimedia-database](../wikimedia-database/SKILL.md)** | `langlinks` table for interlanguage lookups via SQL |
+| **[wikimedia-codex](../wikimedia-codex/SKILL.md)** | Codex components and design tokens for RTL/bidi-aware tool interfaces |

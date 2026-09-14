@@ -12,7 +12,7 @@ skill_discovery_hints:
   - keywords: ["Toolforge PORT", "gunicorn bind", "Toolforge static", "Python http server"]
   - keywords: ["Toolforge flask", "flask app", "Toolforge deploy python", "toolforge python"]
   - keywords: ["Toolforge cron python", "python job", "scheduled python", "Toolforge batch"]
-last_verified: 2026-08-08
+last_verified: 2026-09-14
 ---
 
 > ⚠️ **Prerequisites:** This skill assumes you have a Toolforge account and can SSH in. See **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** for account setup, tool creation, and basic SSH configuration.
@@ -958,6 +958,7 @@ become my-python-tool job schedule python3.11 \
 | **[wikimedia-database](../wikimedia-database/SKILL.md)** | SQL replicas — database access from Python tools |
 | **[pywikibot](../pywikibot/SKILL.md)** | Bot framework — often deployed on Toolforge with Python |
 | **[wikimedia-auth-oauth](../wikimedia-auth-oauth/SKILL.md)** | OAuth 1.0a/2.0 — authenticate users of your Python web app via Wikimedia accounts |
+| **[wikimedia-codex](../wikimedia-codex/SKILL.md)** | Codex design system — components, design tokens, and icons for tool frontends |
 
 ---
 

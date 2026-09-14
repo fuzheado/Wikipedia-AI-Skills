@@ -7,7 +7,7 @@ depends_on: [wikimedia-api-access, wikipedia-templates]
 skill_discovery_hints:
   - keywords: ["TemplateStyles", "CSS", "styling", "grid layout", "flexbox", "design system"]
   - keywords: ["wiki design", "custom CSS", "templatestyles", "card layout", "button styling"]
-last_verified: 2026-06-10
+last_verified: 2026-09-14
 ---
 
 > ⚠️ **User-Agent required:** The API examples below hit Wikimedia endpoints. All requests must include a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
@@ -1223,6 +1223,7 @@ Use your browser's **Inspect Element** on the rendered page. TemplateStyles clas
 | Skill: Navigation | [mediawiki-page-navigation](../mediawiki-page-navigation/SKILL.md) |
 | Skill: Translate extension | [mediawiki-translate-extension](../mediawiki-translate-extension/SKILL.md) |
 | Skill: API access | [wikimedia-api-access](../wikimedia-api-access/SKILL.md) |
+| Skill: Codex components | [wikimedia-codex](../wikimedia-codex/SKILL.md) |
 
 ---
 

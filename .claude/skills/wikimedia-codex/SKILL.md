@@ -3,7 +3,7 @@ name: wikimedia-codex
 description: "Build Wikimedia-consistent UIs with the Codex design system: Vue 3 and CSS-only components, design tokens, icons, composables. For Toolforge tools and MediaWiki frontends."
 license: MIT
 compatibility: opencode
-last_verified: 2026-06-24
+last_verified: 2026-09-14
 skill_discovery_hints:
   - keywords: ["codex", "wikimedia-codex", "design system", "wikimedia", "vue", "components"]
   - keywords: ["toolforge", "mediawiki", "frontend", "ui", "design tokens"]
@@ -209,6 +209,18 @@ The canonical docs are checked out at `codex-source/packages/codex-docs/docs/` (
 per-component demos under `codex-source/packages/codex-docs/component-demos/<component>/` and
 component source under `codex-source/packages/codex/src/components/<component>/`.
 Run `scripts/list-codex-checkout.ps1` to list all components and demo folders found locally.
+
+## Cross-References
+
+| Related Skill | Why |
+|--------------|-----|
+| **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** | Platform for tool frontends — account setup, deployment, and the privacy-preserving CDN that Codex assets load from |
+| **[toolforge-nodejs](../toolforge-nodejs/SKILL.md)** | Serving Codex assets with a Node.js tool — static files and caching headers |
+| **[toolforge-python](../toolforge-python/SKILL.md)** | Serving Codex assets with a Python tool — static files and templates |
+| **[wikimedia-page-styling](../wikimedia-page-styling/SKILL.md)** | The on-wiki CSS path (TemplateStyles) — a different venue from Codex components |
+| **[mediawiki-page-navigation](../mediawiki-page-navigation/SKILL.md)** | Menus, tabs, and subpage navigation for on-wiki interfaces |
+| **[wikimedia-i18n-l10n-for-tools](../wikimedia-i18n-l10n-for-tools/SKILL.md)** | RTL/bidi layout and message files for multilingual tool UIs |
+| **[wikimedia-security-and-privacy](../wikimedia-security-and-privacy/SKILL.md)** | XSS prevention and third-party script policy for gadgets and tool UIs |
 
 ## References
 - `references/accessing-codex.md` — what Codex is, resources, Figma/MediaWiki/Gerrit/GitHub
