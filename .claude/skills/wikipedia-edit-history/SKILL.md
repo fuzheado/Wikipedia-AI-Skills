@@ -7,7 +7,7 @@ depends_on: [wikimedia-api-access, wikimedia-diffs]
 skill_discovery_hints:
   - keywords: ["edit history", "revision history", "page history", "user contributions", "rollback"]
   - keywords: ["revision ID", "undo", "edit summary", "minor edit", "mw-reverted"]
-last_verified: 2026-06-10
+last_verified: 2026-09-12
 ---
 
 > ⚠️ **User-Agent required:** The history examples below use the Action API. All requests must include a descriptive `User-Agent` header or they will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -383,6 +383,10 @@ Fetch recent contributions for a user with page titles, edit summaries, byte cha
 ### 📚 Diff Patterns Reference (`references/diff-patterns.md`)
 
 Reference guide for interpreting diffs by byte change (small/medium/large/very large), visual signature (addition, removal, revert, blanking), edit summary keywords, and automated edit detection signals.
+
+### 📚 Historic Page Reconstruction (`references/historic-page-reconstruction.md`)
+
+How to recover what a page looked like at a past date — the templates and images included. MediaWiki cannot do this (`action=parse&oldid=` always expands today's templates), so the reference maps the four real options: WikiHist.html (enwiki revision history to 2019-03 parsed to HTML), official rendered HTML dumps/APIs (legacy 2006–2008 static dumps, four Feb–Mar 2025 Enterprise mirror runs, current-only APIs), web archives (Wayback/archive.today — the only source that preserves time-dependent magic words and the image bytes as served), and DIY reconstruction from `pages-meta-history` dumps with frozen template revisions. Includes the measured template-drift example, the image-version API recipe, and what is unavoidably lost.
 
 ### 🐍 History Auditor (`assets/history-audit.py`)
 
