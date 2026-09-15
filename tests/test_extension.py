@@ -3,6 +3,7 @@
 import json
 import re
 import subprocess
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -25,32 +26,25 @@ _TS_KEYWORDS = frozenset({
 # ---------------------------------------------------------------------------
 
 
-def _gather_scope(content: str) -> set:
-    """Collect all identifiers defined or imported in a TypeScript file."""
-    scope: set[str] = set()
+def _check_ts_syntax(ts_file: Path) -> subprocess.CompletedProcess:
+    """Syntax-check a TypeScript source the way pi's loader parses it (ESM).
 
-    for m in re.finditer(r'(?:export\s+)?(?:async\s+)?function\s+(\w+)', content):
-        scope.add(m.group(1))
-    for m in re.finditer(r'^\s*(?:export\s+)?(?:const|let|var)\s+(\w+)', content, re.MULTILINE):
-        scope.add(m.group(1))
-    for m in re.finditer(r'import\s+\{\s*([^}]+)\}', content):
-        for name in m.group(1).split(','):
-            clean = name.strip()
-            if ' as ' in clean:
-                clean = clean.split(' as ')[-1].strip()
-            if clean and clean not in _TS_KEYWORDS:
-                scope.add(clean)
-    for m in re.finditer(r'import\s+(\w+)\s+from', content):
-        scope.add(m.group(1))
-    for m in re.finditer(r'import\s+type\s+\{\s*([^}]+)\}', content):
-        for name in m.group(1).split(','):
-            clean = name.strip()
-            if clean:
-                scope.add(clean)
+    `node --check` infers the module type from the file extension or the nearest
+    package.json. The extension's package.json declares no "type", so a `.ts`
+    file is parsed as CommonJS and `export interface` fails as a syntax error —
+    a false positive. Copying the source to a `.mts` suffix forces ESM parsing,
+    which is what pi's jiti loader actually uses.
 
-    scope -= _TS_KEYWORDS
-    return scope
-
+    Returns the completed `node` process; callers assert on `returncode`.
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        esm_copy = Path(tmp) / f"{ts_file.stem}.mts"
+        esm_copy.write_text(ts_file.read_text(encoding='utf-8'), encoding='utf-8')
+        return subprocess.run(
+            ['node', '--experimental-strip-types', '--check', str(esm_copy)],
+            capture_output=True,
+            text=True,
+        )
 
 
 def _gather_scope(content: str) -> set:
@@ -338,22 +332,30 @@ class TestExtensionCorrectness:
         """Use Node.js's built-in --experimental-strip-types to verify
         that all extension .ts files parse without errors.
 
-        This is the authoritative syntax check — it catches missing parens,
-        braces, commas, and undefined identifiers that would crash pi's jiti
-        loader at startup. Unlike the regex approach, Node's built-in
-        TypeScript stripper handles all edge cases correctly.
+        Sources are checked as ESM (copied to `.mts`), matching how pi loads
+        them — see `_check_ts_syntax` for why the extension alone is enough.
+
+        Scope, verified empirically on Node 26: this catches JavaScript-level
+        syntax errors that survive type stripping (e.g. `const x = ;`). It does
+        **not** flag unbalanced braces/parens or invalid type annotations —
+        `node --check` tolerates those when stripping types. Identifier and
+        registration mistakes are covered by the structural tests above
+        (`test_all_callback_references_exist_in_index`).
 
         Requires Node.js 22+ (for --experimental-strip-types).
         """
         for ts_file in sorted(EXT_DIR.rglob('*.ts')):
             rel = ts_file.relative_to(EXT_DIR.parent.parent)
 
-            result = subprocess.run(
-                ['node', '--experimental-strip-types', '--check', str(ts_file)],
-                capture_output=True,
-                text=True,
-            )
+            result = _check_ts_syntax(ts_file)
             if result.returncode != 0:
                 pytest.fail(
                     f"{rel}: syntax check failed:\n{result.stderr.strip()[:500]}"
                 )
+
+    def test_typescript_syntax_check_catches_broken_code(self, tmp_path):
+        """Guard the guard: the checker must fail on invalid JavaScript-level
+        syntax, or the check above could pass vacuously."""
+        broken = tmp_path / 'broken.ts'
+        broken.write_text('const empty = ;\n', encoding='utf-8')
+        assert _check_ts_syntax(broken).returncode != 0
