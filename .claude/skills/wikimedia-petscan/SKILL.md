@@ -4,7 +4,7 @@ description: Use PetScan for multi-source Wikimedia queries — category interse
 license: MIT
 compatibility: opencode
 depends_on: [wikimedia-api-access]
-last_verified: 2026-06-30
+last_verified: 2026-09-14
 skill_discovery_hints:
   - keywords: ["PetScan", "petscan", "category intersection", "category union", "category difference", "category overlap"]
   - keywords: ["multi-source query", "combine categories", "combine SPARQL", "combine PagePile", "combine templates"]
@@ -314,4 +314,3 @@ Sources are ordered as: categories → manual_list → pagepile → sparql → s
 - **[wikimedia-search-cirrussearch](../wikimedia-search-cirrussearch/SKILL.md)** — CirrusSearch is faster for simple keyword+category. PetScan is the right choice when you need category intersection/union/difference, multi-source combination (categories + templates + SPARQL), ORES filtering, or bulk export. See the comparison table in that skill.
 - **[wikidata](../wikidata/SKILL.md)** — For complex SPARQL queries that exceed PetScan's single-query input, use the Wikidata Query Service directly.
 - **[wikimedia-commons-sparql](../wikimedia-commons-sparql/SKILL.md)** — For Commons-specific MediaInfo queries; PetScan complements with file media type filtering and uncategorized file detection.
-- **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** — PetScan runs on Toolforge infrastructure.

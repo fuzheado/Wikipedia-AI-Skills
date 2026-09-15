@@ -215,12 +215,10 @@ Run `scripts/list-codex-checkout.ps1` to list all components and demo folders fo
 | Related Skill | Why |
 |--------------|-----|
 | **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** | Platform for tool frontends — account setup, deployment, and the privacy-preserving CDN that Codex assets load from |
-| **[toolforge-nodejs](../toolforge-nodejs/SKILL.md)** | Serving Codex assets with a Node.js tool — static files and caching headers |
-| **[toolforge-python](../toolforge-python/SKILL.md)** | Serving Codex assets with a Python tool — static files and templates |
+| **[toolforge-nodejs](../toolforge-nodejs/SKILL.md)** | npm/UMD packaging — installing Codex in a Node.js project or serving the bundle as a static asset |
 | **[wikimedia-page-styling](../wikimedia-page-styling/SKILL.md)** | The on-wiki CSS path (TemplateStyles) — a different venue from Codex components |
 | **[mediawiki-page-navigation](../mediawiki-page-navigation/SKILL.md)** | Menus, tabs, and subpage navigation for on-wiki interfaces |
 | **[wikimedia-i18n-l10n-for-tools](../wikimedia-i18n-l10n-for-tools/SKILL.md)** | RTL/bidi layout and message files for multilingual tool UIs |
-| **[wikimedia-security-and-privacy](../wikimedia-security-and-privacy/SKILL.md)** | XSS prevention and third-party script policy for gadgets and tool UIs |
 
 ## References
 - `references/accessing-codex.md` — what Codex is, resources, Figma/MediaWiki/Gerrit/GitHub

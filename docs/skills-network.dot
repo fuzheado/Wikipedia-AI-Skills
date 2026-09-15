@@ -41,7 +41,7 @@ digraph Skills {
   "wikimedia-petscan" [label="wikimedia-petscan", fillcolor="#fce4ec", style="filled,rounded", fontsize=11];
   "wikimedia-phabricator" [label="wikimedia-phabricator", fillcolor="#fce4ec", style="filled,rounded", fontsize=10];
   "wikimedia-search-cirrussearch" [label="wikimedia-search-cirrussearch", fillcolor="#fce4ec", style="filled,rounded", fontsize=11];
-  "wikimedia-security-and-privacy" [label="wikimedia-security-and-privacy", fillcolor="#fce4ec", style="filled,rounded", fontsize=11];
+  "wikimedia-security-and-privacy" [label="wikimedia-security-and-privacy", fillcolor="#fce4ec", style="filled,rounded", fontsize=10];
   "wikimedia-toolforge" [label="wikimedia-toolforge", fillcolor="#fce4ec", style="filled,rounded", fontsize=11];
   "wikimedia-url-shortener" [label="wm-url-shortener", fillcolor="#fce4ec", style="filled,rounded", fontsize=10];
   "wikimedia-wikitext" [label="wikimedia-wikitext", fillcolor="#fce4ec", style="filled,rounded", fontsize=11];
@@ -145,16 +145,13 @@ digraph Skills {
   "wikimedia-auth-oauth" -> "wikipedia-error-handling";
   "wikimedia-codex" -> "mediawiki-page-navigation";
   "wikimedia-codex" -> "toolforge-nodejs";
-  "wikimedia-codex" -> "toolforge-python";
   "wikimedia-codex" -> "wikimedia-i18n-l10n-for-tools";
   "wikimedia-codex" -> "wikimedia-page-styling";
-  "wikimedia-codex" -> "wikimedia-security-and-privacy";
   "wikimedia-codex" -> "wikimedia-toolforge";
   "wikimedia-commons" -> "commons-file-resolution";
   "wikimedia-commons" -> "pattypan";
   "wikimedia-commons" -> "pywikibot";
   "wikimedia-commons" -> "wikimedia-api-access";
-  "wikimedia-commons" -> "wikimedia-commons";
   "wikimedia-commons" -> "wikimedia-commons-audio-video";
   "wikimedia-commons" -> "wikimedia-commons-pdf";
   "wikimedia-commons" -> "wikimedia-commons-sdc";
@@ -251,7 +248,6 @@ digraph Skills {
   "wikimedia-petscan" -> "wikimedia-api-access";
   "wikimedia-petscan" -> "wikimedia-commons-sparql";
   "wikimedia-petscan" -> "wikimedia-search-cirrussearch";
-  "wikimedia-petscan" -> "wikimedia-toolforge";
   "wikimedia-petscan" -> "wikipedia-categories";
   "wikimedia-phabricator" -> "wikimedia-api-access";
   "wikimedia-search-cirrussearch" -> "pywikibot";
@@ -266,7 +262,6 @@ digraph Skills {
   "wikimedia-search-cirrussearch" -> "wikipedia-page-anatomy";
   "wikimedia-security-and-privacy" -> "wikimedia-api-access";
   "wikimedia-security-and-privacy" -> "wikimedia-auth-oauth";
-  "wikimedia-security-and-privacy" -> "wikimedia-codex";
   "wikimedia-security-and-privacy" -> "wikimedia-toolforge";
   "wikimedia-toolforge" -> "pywikibot";
   "wikimedia-toolforge" -> "toolforge-nodejs";
@@ -372,9 +367,7 @@ digraph Skills {
   "wikisource" -> "wikimedia-api-access";
   "wikisource" -> "wikimedia-commons";
   "wikisource" -> "wikimedia-commons-pdf";
-  "wikisource" -> "wikimedia-pageviews";
   "wikisource" -> "wikimedia-wikitext";
-  "wikisource" -> "wiktionary";
   "wikivoyage" -> "mediawiki-page-navigation";
   "wikivoyage" -> "pywikibot";
   "wikivoyage" -> "wikidata";
