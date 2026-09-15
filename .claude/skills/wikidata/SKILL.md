@@ -131,6 +131,34 @@ https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q937&props=labels|de
 
 ---
 
+## **Getting Labels: `mul` Is Not Optional** (measured 2026-09-14)
+
+Some Wikidata items have **no `en` label at all**. Names that are identical in every language are stored
+under the **`mul`** (multiple languages) code, and readers get them through the language fallback — but a
+*label request* that asks only for a language plus `en` returns nothing for them, and the UI prints the
+bare QID. The worked example is embarrassing on purpose: **Q7186 is Marie Curie** — 247 sitelinks, an
+English *description*, no `en` label.
+
+| request | result |
+|---|---|
+| `wbgetentities&props=labels&languages=en` | *(no label)* → callers render `Q7186` |
+| `wbgetentities&props=labels&languages=en\|mul` | `Marie Curie` |
+| `wbgetentities&props=labels&languages=en&languagefallback=1` | `Marie Curie` (returned under `en`, sourced `mul`) |
+| WDQS `SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }` | `Q7186` |
+| WDQS `SERVICE wikibase:label { bd:serviceParam wikibase:language "en,mul". }` | `Marie Curie` |
+| `wbsearchentities&search=Marie Curie&language=en` | ✅ finds `Q7186` and returns "Marie Curie" — search matches across languages, so **search needs no `mul`** (verified with `strictlanguage=1` too) |
+
+**Rules:**
+
+1. Request `<reader-language>|en|mul` from `wbgetentities` and read the labels in that order.
+2. Put `mul` in every `wikibase:language` list in a SPARQL label service.
+3. `wbsearchentities` needs nothing — it resolves the returned label with the fallback.
+4. A **bare QID in a label cell is a failed lookup, not a name**: show the ID as a last resort, and treat
+   such a column as unusable when choosing what to display (a column of `Q…` values will happily name a
+   chart axis "Q7186").
+5. The failure is **silent and looks like data** — a QID is a valid-looking cell, nothing errors, and the
+   wrong value ships. Test for it: grep your label fetches and assert `mul` is present.
+
 ## **SPARQL Query Service**
 
 Wikidata's most powerful query interface is the **SPARQL endpoint** at `https://query.wikidata.org`. It allows you to ask complex, relational questions across the entire knowledge graph.
