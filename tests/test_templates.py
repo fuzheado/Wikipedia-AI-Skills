@@ -9,6 +9,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 
 from conftest import REPO_ROOT
+from live_calls import run_live
 
 TMPL_SKILL = REPO_ROOT / '.claude' / 'skills' / 'wikipedia-templates'
 TMPL_EXPAND = TMPL_SKILL / 'scripts' / 'expand-template.sh'
@@ -62,7 +63,7 @@ class TestExpandTemplateScript:
     @pytest.mark.slow
     def test_expand_simple_template(self):
         """Expanding a simple template should return wikitext output."""
-        result = subprocess.run(
+        result = run_live(
             ['bash', str(TMPL_EXPAND), 'CURRENTYEAR'],
             capture_output=True, text=True, timeout=30,
         )
@@ -73,7 +74,7 @@ class TestExpandTemplateScript:
     @pytest.mark.slow
     def test_expand_with_parameters(self):
         """Expanding with parameters should work."""
-        result = subprocess.run(
+        result = run_live(
             ['bash', str(TMPL_EXPAND), 'Abbr', '1=etc|2=et cetera'],
             capture_output=True, text=True, timeout=30,
         )
@@ -83,7 +84,7 @@ class TestExpandTemplateScript:
     @pytest.mark.slow
     def test_expand_non_existent_template(self):
         """A non-existent template should still return some output."""
-        result = subprocess.run(
+        result = run_live(
             ['bash', str(TMPL_EXPAND), 'NoSuchTemplateXyzzy12345'],
             capture_output=True, text=True, timeout=30,
         )
@@ -124,7 +125,7 @@ class TestTemplateUsageScript:
     @pytest.mark.slow
     def test_usage_common_template(self):
         """Checking usage of a common template should find pages."""
-        result = subprocess.run(
+        result = run_live(
             ['bash', str(TMPL_USAGE), 'Cn', '--limit', '5'],
             capture_output=True, text=True, timeout=30,
         )
@@ -135,7 +136,7 @@ class TestTemplateUsageScript:
     @pytest.mark.slow
     def test_usage_with_count(self):
         """--count should show a total."""
-        result = subprocess.run(
+        result = run_live(
             ['bash', str(TMPL_USAGE), 'Stub', '--count', '--limit', '3'],
             capture_output=True, text=True, timeout=60,
         )
@@ -175,7 +176,7 @@ class TestInspectTemplateScript:
     @pytest.mark.slow
     def test_inspect_known_template(self):
         """Inspecting a known template should return protection info."""
-        result = subprocess.run(
+        result = run_live(
             ['bash', str(TMPL_INSPECT), 'Infobox person', '--protection'],
             capture_output=True, text=True, timeout=30,
         )
@@ -185,7 +186,7 @@ class TestInspectTemplateScript:
     @pytest.mark.slow
     def test_inspect_with_modules(self):
         """--modules should show Lua dependencies for a Lua-backed template."""
-        result = subprocess.run(
+        result = run_live(
             ['bash', str(TMPL_INSPECT), 'Infobox settlement', '--modules'],
             capture_output=True, text=True, timeout=30,
         )
@@ -196,7 +197,7 @@ class TestInspectTemplateScript:
     @pytest.mark.slow
     def test_inspect_non_existent_template(self):
         """A non-existent template should produce an error."""
-        result = subprocess.run(
+        result = run_live(
             ['bash', str(TMPL_INSPECT), 'NoSuchTemplateXyzzy12345'],
             capture_output=True, text=True, timeout=30,
         )
@@ -359,10 +360,9 @@ class TestTemplateInspector:
                     assert len(result['parameters']['named']) == 2
 
     @pytest.mark.slow
-    @pytest.mark.slow
     def test_inspector_real_template(self):
         """Inspecting a real template should work."""
-        result = subprocess.run(
+        result = run_live(
             [sys.executable, str(TMPL_INSPECTOR), "Infobox person", "--format", "json"],
             capture_output=True, text=True, timeout=30,
         )
@@ -373,10 +373,9 @@ class TestTemplateInspector:
         assert "classification" in data
 
     @pytest.mark.slow
-    @pytest.mark.slow
     def test_inspector_non_existent(self):
         """A non-existent template should report does not exist."""
-        result = subprocess.run(
+        result = run_live(
             [sys.executable, str(TMPL_INSPECTOR), "NoSuchTemplateXyzzy12345"],
             capture_output=True, text=True, timeout=30,
         )
@@ -468,10 +467,9 @@ class TestTemplateScanner:
         assert data["total_templates"] == 1
 
     @pytest.mark.slow
-    @pytest.mark.slow
     def test_scanner_real_page(self):
         """Scanning a real page should produce output."""
-        result = subprocess.run(
+        result = run_live(
             [sys.executable, str(TMPL_SCANNER), "Albert Einstein", "--flat"],
             capture_output=True, text=True, timeout=30,
         )
@@ -480,10 +478,9 @@ class TestTemplateScanner:
         assert 'Page:' in result.stdout or 'page:' in result.stdout.lower()
 
     @pytest.mark.slow
-    @pytest.mark.slow
     def test_scanner_with_modules(self):
         """--modules should show Lua dependencies."""
-        result = subprocess.run(
+        result = run_live(
             [sys.executable, str(TMPL_SCANNER), "Berlin", "--modules"],
             capture_output=True, text=True, timeout=30,
         )
@@ -492,10 +489,9 @@ class TestTemplateScanner:
         assert result.stdout.strip(), "Expected non-empty output"
 
     @pytest.mark.slow
-    @pytest.mark.slow
     def test_scanner_json_format(self):
         """JSON output should be valid JSON."""
-        result = subprocess.run(
+        result = run_live(
             [sys.executable, str(TMPL_SCANNER), "Albert Einstein", "--format", "json"],
             capture_output=True, text=True, timeout=30,
         )
