@@ -449,8 +449,10 @@
   "https://phabricator.wikimedia.org/T182351": "2026-09-14T21:06:39Z",
   "https://phabricator.wikimedia.org/T258590": "2026-08-10T12:57:50Z",
   "https://phabricator.wikimedia.org/T288840": "2026-08-17T11:31:05Z",
+  "https://phabricator.wikimedia.org/T343131": "2026-09-15T16:05:54Z",
   "https://phabricator.wikimedia.org/T346108": "2026-08-10T12:57:50Z",
   "https://phabricator.wikimedia.org/T376979": "2026-08-10T12:57:50Z",
+  "https://phabricator.wikimedia.org/T398709": "2026-09-15T16:05:57Z",
   "https://phabricator.wikimedia.org/T400119": "2026-08-26T15:17:34Z",
   "https://phabricator.wikimedia.org/T419770": "2026-08-26T15:17:37Z",
   "https://phabricator.wikimedia.org/maniphest/": "2026-08-10T12:57:50Z",
@@ -596,6 +598,7 @@
   "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/API/ORES_migration_guide": "2026-08-10T12:57:50Z",
   "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/Large_Language_Models": "2026-08-16T03:45:27Z",
   "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/Large_Language_Models/Wikimania_2026": "2026-08-16T03:45:28Z",
+  "https://wikitech.wikimedia.org/wiki/News/2026_Commons_links_tables_database_split": "2026-09-15T16:06:00Z",
   "https://wikitech.wikimedia.org/wiki/RCStream": "2026-08-10T12:57:50Z",
   "https://wikitech.wikimedia.org/wiki/Robot_policy": "2026-09-08T21:42:33Z",
   "https://wikitech.wikimedia.org/wiki/Security": "2026-08-10T12:57:50Z",
@@ -732,7 +735,7 @@
   "https://your-tool.toolforge.org": "2026-08-10T12:57:50Z",
   "https://\u0440\u0443.wikipedia.org": "2026-08-10T13:07:28Z"
  },
- "generated_at": "2026-09-14T21:07:02Z",
+ "generated_at": "2026-09-15T16:05:52Z",
  "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
@@ -1196,8 +1199,10 @@
   "https://phabricator.wikimedia.org/T182351": 200,
   "https://phabricator.wikimedia.org/T258590": 200,
   "https://phabricator.wikimedia.org/T288840": 200,
+  "https://phabricator.wikimedia.org/T343131": 200,
   "https://phabricator.wikimedia.org/T346108": 200,
   "https://phabricator.wikimedia.org/T376979": 200,
+  "https://phabricator.wikimedia.org/T398709": 200,
   "https://phabricator.wikimedia.org/T400119": 200,
   "https://phabricator.wikimedia.org/T419770": 200,
   "https://phabricator.wikimedia.org/maniphest/": 200,
@@ -1349,6 +1354,7 @@
   "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/API/ORES_migration_guide": 200,
   "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/Large_Language_Models": 200,
   "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/Large_Language_Models/Wikimania_2026": 200,
+  "https://wikitech.wikimedia.org/wiki/News/2026_Commons_links_tables_database_split": 200,
   "https://wikitech.wikimedia.org/wiki/RCStream": 200,
   "https://wikitech.wikimedia.org/wiki/Robot_policy": 200,
   "https://wikitech.wikimedia.org/wiki/Security": 200,
@@ -1487,5 +1493,5 @@
   "https://your-tool.toolforge.org": -1,
   "https://\u0440\u0443.wikipedia.org": 0
  },
- "user_agent": "wikipedia-ai-skills-url-registry/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills)"
+ "user_agent": "WikipediaSkill/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills; andrew.lih@gmail.com) ContentGapResearch"
 }
