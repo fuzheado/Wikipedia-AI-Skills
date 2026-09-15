@@ -7,7 +7,7 @@ depends_on: [wikimedia-api-access, wikidata]
 skill_discovery_hints:
   - keywords: ["Pywikibot", "bot", "automated editing", "page generator", "pwb.py", "MediaWiki bot"]
   - keywords: ["bulk edit", "category operations", "template harvesting", "archive bot", "replace.py"]
-last_verified: 2026-08-10
+last_verified: 2026-09-15
 ---
 
 > ⚠️ **User-Agent required:** Pywikibot sets `User-Agent` automatically based on your `user-config.py` settings, but any direct `curl`/`requests` calls in this skill still need a proper header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for format and rate-limiting patterns. Before writing custom code alongside Pywikibot, load that skill for the required User-Agent boilerplate.
@@ -492,6 +492,16 @@ data = item.get()  # dict with labels, descriptions, claims, sitelinks
 
 # Labels (multilingual)
 print(item.labels)       # {'en': 'Albert Einstein', 'de': 'Albert Einstein', ...}
+
+# ⚠️ `mul` (multiple languages) default values are in here too. Verified with
+# pywikibot 11.3.0: for Q185 (Larry Sanger) `item.labels` contains 'mul' and
+# `item.labels['en']` raises KeyError — the item has no English label at all.
+# Read a default-aware value instead of indexing:
+name = item.labels.get('en') or item.labels.get('mul')
+# Writing defaults works the same way: Pywikibot passes the dict straight to
+# wbgetentities/wbeditentity without language-code validation, so
+# `item.editLabels({'en': name, 'mul': name})` sets both. Labels and aliases
+# accept `mul`; descriptions do not.
 
 # Claims
 for prop_id, claims in data['claims'].items():

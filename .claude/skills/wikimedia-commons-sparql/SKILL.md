@@ -9,7 +9,7 @@ skill_discovery_hints:
   - keywords: ["depicts", "P180", "schema:url", "schema:contentUrl", "image grid", "commons-query"]
   - keywords: ["federated query Commons", "Commons Wikidata federation", "cross-project SPARQL"]
   - keywords: ["file metadata", "copyright SPARQL", "license SPARQL", "media dimensions", "camera data"]
-last_verified: 2026-06-12
+last_verified: 2026-09-15
 ---
 
 > ⚠️ **User-Agent required:** All HTTP requests to Wikimedia endpoints need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns. Requests without a proper User-Agent will be blocked with HTTP 403.
@@ -360,12 +360,12 @@ M IDs have multilingual captions accessible via `rdfs:label` or the `wikibase:la
 SELECT ?file ?fileLabel WHERE {
   ?file wdt:P180 wd:Q102231 .          # depicts rose
   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "en" .
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
   }
 }
 ```
 
-Note: The `wikibase:label` SERVICE works the same way as in WDQS but returns the **file caption** as the label for M IDs.
+Note: The `wikibase:label` SERVICE works the same way as in WDQS but returns the **file caption** as the label for M IDs. Captions can live in the `mul` default value instead of per-language entries — that is why `mul` is in the language list above: without it, those files come back labelled `M…`.
 
 ### Pattern 4: Media Metadata — Files by Dimensions
 
@@ -463,7 +463,7 @@ SELECT ?file ?itemLabel WHERE {
   ?file wdt:P180 wd:Q42 .
   SERVICE <https://query.wikidata.org/sparql> {
     SERVICE wikibase:label {
-      bd:serviceParam wikibase:language "en" .
+      bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
       wd:Q42 rdfs:label ?itemLabel .
     }
   }
@@ -481,7 +481,7 @@ SELECT ?image ?painting ?paintingLabel WITH {
     SERVICE <https://query.wikidata.org/sparql> {
       ?painting wdt:P170 wd:Q5582 .                          # painter = Van Gogh
       SERVICE wikibase:label {
-        bd:serviceParam wikibase:language "en" .
+        bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
         ?painting rdfs:label ?paintingLabel .
       }
     }
@@ -502,7 +502,7 @@ SELECT DISTINCT ?item ?itemLabel ?image WITH {
     SERVICE <https://query.wikidata.org/sparql> {
       ?item wdt:P31/wdt:P279* wd:Q34687 .   # subclasses of rose
       SERVICE wikibase:label {
-        bd:serviceParam wikibase:language "en" .
+        bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
         ?item rdfs:label ?itemLabel .
       }
     }
@@ -539,7 +539,7 @@ WHERE {
   ?file wdt:P4082 ?capturedWith .
   SERVICE <https://query.wikidata.org/sparql> {
     SERVICE wikibase:label {
-      bd:serviceParam wikibase:language "en" .
+      bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
       ?capturedWith rdfs:label ?capturedWithLabel .
     }
   }
@@ -586,7 +586,7 @@ SELECT ?file ?color ?image WITH {
   INCLUDE %roses .
   SERVICE <https://query.wikidata.org/sparql> {
     SERVICE wikibase:label {
-      bd:serviceParam wikibase:language "en" .
+      bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
       ?color rdfs:label ?colorName .
     }
   }
@@ -610,7 +610,7 @@ WHERE {
   INCLUDE %values .
   SERVICE <https://query.wikidata.org/sparql> {
     SERVICE wikibase:label {
-      bd:serviceParam wikibase:language "en" .
+      bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
       ?value rdfs:label ?valueLabel .
     }
   }

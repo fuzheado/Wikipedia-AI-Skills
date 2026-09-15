@@ -106,7 +106,7 @@ check_endpoint "pageviews" \
     GET "" "🔹 Pageviews API"
 
 check_endpoint "sparql" \
-    "https://query.wikidata.org/sparql?format=json&query=SELECT%20?item%20?itemLabel%20WHERE%20%7B%20wd:Q937%20wdt:P106%20?item.%20SERVICE%20wikibase:label%20%7B%20bd:serviceParam%20wikibase:language%20%22en%22.%20%7D%20%7D" \
+    "https://query.wikidata.org/sparql?format=json&query=SELECT%20?item%20?itemLabel%20WHERE%20%7B%20wd:Q937%20wdt:P106%20?item.%20SERVICE%20wikibase:label%20%7B%20bd:serviceParam%20wikibase:language%20%22en%2Cmul%22.%20%7D%20%7D" \
     GET "" "🔹 Wikidata SPARQL"
 
 check_endpoint "liftwing" \

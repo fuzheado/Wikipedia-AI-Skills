@@ -245,7 +245,11 @@ def main():
         print(f'no existing item; create new: {label}')
         item = pywikibot.ItemPage(repo)
         if not args.dry:
-            robust(item.editLabels, {'en': label}, summary=f'Create item for {label}')
+            # Edition titles are language-independent, and "version, edition or
+            # translation" is an explicit default-value case (Help:Default values
+            # for labels and aliases), so set the `mul` default alongside `en`.
+            robust(item.editLabels, {'en': label, 'mul': label},
+                   summary=f'Create item for {label}')
             robust(item.editDescriptions, {'en': desc}, summary=f'Create item for {label}')
             print('   created item', item.title())
     else:

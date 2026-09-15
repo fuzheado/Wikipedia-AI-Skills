@@ -56,14 +56,23 @@ def resolve(label, lang="en", limit=3):
 
 
 def verify(qid, expected_label=None, lang="en"):
-    """Check a QID exists, has a label, and report its P31 types."""
+    """Check a QID exists, has a label, and report its P31 types.
+
+    Requests the label language plus ``mul`` and ``languagefallback=1``:
+    language-independent names are stored as `mul` default values, so a
+    ``languages=<lang>``-only request returns an empty labels object for such
+    items (Q185, Q7186) and this guardrail reports ``label_matches: false``
+    for a perfectly valid QID.
+    """
     d = api({"action": "wbgetentities", "format": "json", "formatversion": "2",
-             "ids": qid, "props": "labels|descriptions|claims", "languages": lang})
+             "ids": qid, "props": "labels|descriptions|claims",
+             "languages": f"{lang}|mul", "languagefallback": "1"})
     ent = d.get("entities", {}).get(qid)
     if ent is None:
         return {"qid": qid, "exists": False, "label": None, "p31": [],
                 "label_matches": False}
-    label = ent.get("labels", {}).get(lang, {}).get("value")
+    labels = ent.get("labels", {})
+    label = (labels.get(lang) or labels.get("mul") or {}).get("value")
     p31 = [c["mainsnak"]["datavalue"]["value"]["id"]
            for c in ent.get("claims", {}).get("P31", [])
            if c.get("mainsnak", {}).get("datavalue", {}).get("value", {}).get("id")]

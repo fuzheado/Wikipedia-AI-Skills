@@ -3,7 +3,7 @@ name: wikisource
 description: "Work with Wikisource - ProofreadPage workflow, page quality levels, cross-wiki namespace resolution, completed-book catalogues, EPUB export, and the OCR/AI layer."
 license: MIT
 compatibility: opencode
-last_verified: 2026-09-14
+last_verified: 2026-09-15
 depends_on: [wikimedia-api-access, wikimedia-commons, wikimedia-wikitext]
 skill_discovery_hints:
   - keywords: ["Wikisource", "ProofreadPage", "proofread", "Index namespace", "validated text"]
@@ -270,7 +270,7 @@ SELECT ?item ?itemLabel WHERE {
   ?sitelink schema:isPartOf <https://en.wikisource.org/> ; schema:about ?item .
   { ?sitelink wikibase:badge wd:Q20748092. } UNION { ?sitelink wikibase:badge wd:Q20748093. }
   ?item wdt:P1957 ?indexPage .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ```
 

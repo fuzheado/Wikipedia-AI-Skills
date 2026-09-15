@@ -1,19 +1,33 @@
 #!/usr/bin/env bash
 # Fetch Multilingual Labels — Get Wikidata labels/descriptions in one or more languages
 # Usage:
-#   ./fetch-multilingual-labels.sh Q937               — Labels in en (default)
-#   ./fetch-multilingual-labels.sh Q937 en,fr,de       — Labels in multiple languages
-#   ./fetch-multilingual-labels.sh Q937 en,ar --desc   — Include descriptions
-#   ./fetch-multilingual-labels.sh Q937 en --aliases    — Include aliases
-#   ./fetch-multilingual-labels.sh Q937,P31,P279 en    — Multiple entities
+#   ./fetch-multilingual-labels.sh Q937                  — Labels in en (mul is added automatically)
+#   ./fetch-multilingual-labels.sh Q937 'en|fr|de'       — Labels in multiple languages
+#   ./fetch-multilingual-labels.sh Q937 'en|ar' --desc   — Include descriptions
+#   ./fetch-multilingual-labels.sh Q937 en --aliases     — Include aliases
+#   ./fetch-multilingual-labels.sh Q937,P31,P279 en      — Multiple entities
 #   ./fetch-multilingual-labels.sh --help
+#
+# Language lists are pipe-separated: "en|fr|de". Commas are NOT a valid
+# separator — wbgetentities warns and then silently returns ALL languages.
+#
+# `mul` (multiple languages) is appended automatically. Wikidata stores
+# language-independent labels and aliases as `mul` default values, and a
+# request that omits mul returns an empty labels object for items that have
+# only a default (Q185, Q7186). See the wikidata skill, section
+# "Getting Labels: `mul` Is Not Optional".
+#
+# Set WIKIMEDIA_USER_AGENT to your own contact string before batch use.
 
 set -eo pipefail
 
-UA="multilingual-labels/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills; user@example.com) WMSkills"
+UA="${WIKIMEDIA_USER_AGENT:-multilingual-labels/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills; user@example.com) WMSkills}"
 
 usage() {
-    grep '^#' "$0" | sed 's/^# \?//' | sed '$d'
+    # Print only the leading comment block (the shebang is skipped and the
+    # first non-comment line ends the block), so later #-comments stay out of
+    # --help output.
+    awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "$0"
     exit 0
 }
 
@@ -41,6 +55,15 @@ fi
 
 QIDS="$1"
 LANGS="${2:-en}"
+
+# Normalize commas to pipes and always append `mul`. Commas are not accepted by
+# wbgetentities (it warns, then ignores the filter), and a request without mul
+# returns no labels at all for items that only carry a default value.
+LANGS=$(printf '%s' "$LANGS" | tr ',' '|')
+case "|${LANGS}|" in
+    *"|mul|"*) ;;
+    *) LANGS="${LANGS}|mul" ;;
+esac
 
 # Build the props parameter
 PROPS="labels"

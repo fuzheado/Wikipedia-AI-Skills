@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["SPARQL", "Wikidata", "knowledge graph", "semantic query", "QID", "Q number", "P number", "entity"]
   - keywords: ["cross-wiki", "interlanguage", "sitelink", "language link", "gap analysis"]
   - keywords: ["image", "P18", "property lookup", "item type", "instance of", "P31"]
-last_verified: 2026-06-10
+last_verified: 2026-09-15
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns. Before writing any code, load that skill for the required User-Agent boilerplate.
@@ -144,20 +144,32 @@ English *description*, no `en` label.
 | `wbgetentities&props=labels&languages=en` | *(no label)* → callers render `Q7186` |
 | `wbgetentities&props=labels&languages=en\|mul` | `Marie Curie` |
 | `wbgetentities&props=labels&languages=en&languagefallback=1` | `Marie Curie` (returned under `en`, sourced `mul`) |
-| WDQS `SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }` | `Q7186` |
+| WDQS `SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }` | `Q7186` | <!-- verify-mul-labels: allow (negative example; the next row is the correct form) -->
 | WDQS `SERVICE wikibase:label { bd:serviceParam wikibase:language "en,mul". }` | `Marie Curie` |
 | `wbsearchentities&search=Marie Curie&language=en` | ✅ finds `Q7186` and returns "Marie Curie" — search matches across languages, so **search needs no `mul`** (verified with `strictlanguage=1` too) |
 
 **Rules:**
 
-1. Request `<reader-language>|en|mul` from `wbgetentities` and read the labels in that order.
+1. Request `<reader-language>|mul|en` from `wbgetentities` and read the labels in
+   **fallback order — `mul` before `en`** (`labels[lang] || labels["mul"] || labels["en"]`).
+   Request order does not matter, the read order does: a `mul` default is the intended name in
+   every language, English is the last resort. The separator must be `|` — a comma
+   (`languages=en,mul`) is rejected with a warning, after which the API silently returns *all*
+   languages instead of the requested set.
 2. Put `mul` in every `wikibase:language` list in a SPARQL label service.
 3. `wbsearchentities` needs nothing — it resolves the returned label with the fallback.
 4. A **bare QID in a label cell is a failed lookup, not a name**: show the ID as a last resort, and treat
    such a column as unusable when choosing what to display (a column of `Q…` values will happily name a
    chart axis "Q7186").
 5. The failure is **silent and looks like data** — a QID is a valid-looking cell, nothing errors, and the
-   wrong value ships. Test for it: grep your label fetches and assert `mul` is present.
+   wrong value ships. Test for it: grep your label fetches and assert `mul` is present. (The same rule is
+   enforced in this repo by `scripts/verify-mul-labels.py`.)
+6. **Server-side alternative:** `languagefallback=1` resolves the default for you —
+   `languages=en&languagefallback=1` returns the `mul` value *under the requested key* (verified
+   2026-09-15, for `fr`/`de` as well). The Wikibase REST API behaves the same way:
+   `/entities/items/Q185/labels/en` is a 404 for an item that only carries a default, while
+   `/entities/items/Q185/labels_with_language_fallback/en` answers with a 307 redirect to
+   `/labels/mul`.
 
 ## **SPARQL Query Service**
 
@@ -179,7 +191,7 @@ SELECT ?museum ?museumLabel ?coords WHERE {
   ?museum wdt:P31 wd:Q33506;       # instance of museum
           wdt:P131 wd:Q90;          # located in Paris
           wdt:P625 ?coords.         # coordinate location
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ```
 
@@ -192,7 +204,7 @@ SELECT ?museum ?museumLabel ?coords WHERE {
   ?museum wdt:P31 wd:Q33506;
           wdt:P131 wd:Q90;
           wdt:P625 ?coords.
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 """
 
@@ -247,7 +259,7 @@ SELECT ?item ?itemLabel ?enArticle WHERE {
                schema:isPartOf <https://fr.wikipedia.org/> .
   }
   
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 LIMIT 100
 ```
@@ -263,7 +275,7 @@ SELECT ?item ?itemLabel ?enArticle WHERE {
     ?frArticle schema:about ?item ;
                schema:isPartOf <https://fr.wikipedia.org/> .
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 LIMIT 100
 """
@@ -559,7 +571,7 @@ Some entities are instances of subclasses rather than directly of a common type 
 # Check if Q33999 (actor) is a subclass of Q5 (human) transitively
 SELECT ?item ?itemLabel WHERE {
   wd:Q33999 wdt:P279* wd:Q5.  # Follow subclass chain up to Q5
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ```
 
@@ -569,7 +581,7 @@ import requests
 query = """
 SELECT ?item ?itemLabel WHERE {
   wd:Q33999 wdt:P279* wd:Q5.
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 """
 

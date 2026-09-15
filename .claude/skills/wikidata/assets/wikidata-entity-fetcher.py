@@ -26,8 +26,14 @@ SESSION = requests.Session()
 SESSION.headers.update({"User-Agent": USER_AGENT})
 
 
-def fetch_entity(entity_id, props="labels|descriptions|aliases|claims|sitelinks", langs="en"):
-    """Fetch entity data from the Wikibase Action API."""
+def fetch_entity(entity_id, props="labels|descriptions|aliases|claims|sitelinks",
+                 langs="en|mul"):
+    """Fetch entity data from the Wikibase Action API.
+
+    `langs` defaults to ``en|mul`` so that `mul` default values are included:
+    a request for ``en`` alone returns an empty labels object for items whose
+    name is stored only as a multilingual default (Q185, Q7186).
+    """
     params = {
         "action": "wbgetentities",
         "ids": entity_id,
@@ -48,10 +54,10 @@ def fetch_entity(entity_id, props="labels|descriptions|aliases|claims|sitelinks"
 
 def fetch_property_label(prop_id):
     """Fetch the label for a property (for display)."""
-    entity = fetch_entity(prop_id, props="labels", langs="en")
+    entity = fetch_entity(prop_id, props="labels", langs="en|mul")
     if entity:
         labels = entity.get("labels", {})
-        label_data = labels.get("en", {})
+        label_data = labels.get("en") or labels.get("mul") or {}
         return label_data.get("value", prop_id)
     return prop_id
 
@@ -86,7 +92,8 @@ def display_entity(entity, verbose=False):
     claims = entity.get("claims", {})
     sitelinks = entity.get("sitelinks", {})
 
-    en_label = labels.get("en", {}).get("value", "(no English label)")
+    label_data = labels.get("en") or labels.get("mul") or {}
+    en_label = label_data.get("value", "(no label)")
     en_desc = descriptions.get("en", {}).get("value", "")
 
     print(f"\n{'='*60}")
@@ -96,7 +103,7 @@ def display_entity(entity, verbose=False):
     print(f"{'='*60}")
 
     # Aliases
-    alias_list = aliases.get("en", [])
+    alias_list = aliases.get("en") or aliases.get("mul") or []
     if alias_list:
         alias_str = ", ".join(a.get("value", "") for a in alias_list)
         print(f"\n  Aliases: {alias_str}")
