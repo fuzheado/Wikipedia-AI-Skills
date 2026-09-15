@@ -388,14 +388,14 @@ SELECT ?item ?itemLabel ?coords WHERE {
   ?item wdt:P31 wd:Q33506;          # instance of museum
          wdt:P131 wd:Q90;           # located in Paris
          wdt:P625 ?coords.          # coordinate location
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 
 -- Get properties and values for a specific entity
 SELECT ?property ?propertyLabel ?value ?valueLabel WHERE {
   wd:Q937 ?prop ?value.             # Q937 = Albert Einstein
   ?property wikibase:directClaim ?prop .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ```
 

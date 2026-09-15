@@ -55,21 +55,23 @@ if not entities:
 
 eid, entity = next(iter(entities.items()))
 
-# Labels
+# Labels -- read en first, then mul: language-independent names live in the mul
+# default value, and an item such as Q185 has no en label at all (see SKILL.md,
+# section: Getting Labels, mul Is Not Optional).
 labels = entity.get('labels', {})
-label_data = labels.get('en', {})
+label_data = labels.get('en') or labels.get('mul') or {}
 label = label_data.get('value', '(no label)')
 print(f'  Label:       {label}')
 
-# Description
+# Description -- no mul default exists for descriptions (labels/aliases only)
 descriptions = entity.get('descriptions', {})
 desc_data = descriptions.get('en', {})
 desc = desc_data.get('value', '(no description)')
 print(f'  Description: {desc}')
 
-# Aliases
+# Aliases -- same default-value rule as labels (en, then mul)
 aliases = entity.get('aliases', {})
-alias_list = aliases.get('en', [])
+alias_list = aliases.get('en') or aliases.get('mul') or []
 if alias_list:
     alias_str = ', '.join(a.get('value', '') for a in alias_list)
     print(f'  Aliases:     {alias_str}')

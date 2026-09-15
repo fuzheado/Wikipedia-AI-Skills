@@ -7,7 +7,7 @@ depends_on: [wikimedia-api-access, wikipedia-page-anatomy]
 skill_discovery_hints:
   - keywords: ["category", "categorization", "category tree", "WP:CATDEF", "WP:CATV"]
   - keywords: ["sort key", "DEFAULTSORT", "hidden category", "category redirect", "PetScan"]
-last_verified: 2026-06-10
+last_verified: 2026-09-15
 ---
 
 > ⚠️ **User-Agent required:** The API examples below hit Wikimedia endpoints. All requests must include a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
@@ -592,7 +592,7 @@ https://petscan.wmflabs.org/?language=en&project=wikipedia&categories=Physics
 SELECT ?category ?categoryLabel WHERE {
   wd:Q413 wdt:P910 ?category .                        # Main topic's category
   ?category wdt:P279* ?subcategory .                   # Recursive subcategories
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ```
 

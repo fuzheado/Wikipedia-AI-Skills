@@ -10,7 +10,7 @@ skill_discovery_hints:
   - keywords: ["domain mapping", "language to domain", "language code", "yue", "zh-yue", "nan", "zh-min-nan", "site matrix", "sitematrix", "wiki domain"]
   - keywords: ["message file", "ICU", "pluralization", "language fallback", "gettext"]
   - keywords: ["Wikidata label", "multilingual label", "wbgetentities", "language detection"]
-last_verified: 2026-09-14
+last_verified: 2026-09-15
 depends_on: [wikimedia-api-access, wikidata]
 ---
 
@@ -461,11 +461,14 @@ sparql = """
 SELECT ?item ?itemLabel ?itemDescription WHERE {
     VALUES ?item { wd:Q937 wd:Q5 wd:P31 }
     SERVICE wikibase:label {
-        bd:serviceParam wikibase:language "%s", "en".
+        bd:serviceParam wikibase:language "%s,mul,en".
     }
 }
 """ % (user_lang,)
-# The wikibase:label service handles fallback internally!
+# The wikibase:label service walks the language list you give it — it does not
+# add `mul` on its own, so keep the `,mul,en` tail or default values are missed.
+# Build the list from resolve_fallback() (see assets/i18n_utils.py) and it will
+# contain mul already.
 ```
 
 ---
@@ -534,7 +537,8 @@ resp = requests.get(
 Commons file pages have multilingual captions and descriptions stored as Wikibase statements:
 
 ```python
-# Fetch Commons file captions
+# Fetch Commons file captions (captions can also live in the `mul` default value,
+# so request it and resolve labels[lang] || labels["mul"] client-side)
 resp = requests.get(
     "https://commons.wikimedia.org/w/api.php",
     params={
@@ -542,7 +546,7 @@ resp = requests.get(
         "sites": "commonswiki",
         "titles": "File:Example.jpg",
         "props": "labels|descriptions",
-        "languages": "en|fr|de|ar",
+        "languages": "en|fr|de|ar|mul",
         "format": "json",
     },
     headers={"User-Agent": "MyTool/1.0 (contact) ContentGapResearch"},
@@ -885,11 +889,11 @@ title_length = len(page_title)  # Counts codepoints, not graphemes
 
 
 # ❌ BAD: Hardcoded "en" in SPARQL
-SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }  # verify-mul-labels: allow (negative example: no mul, so mul-only entities render as QIDs)
 
-# ✅ GOOD: Use user's language with en fallback
+# ✅ GOOD: reader's language, then `mul` default values, then en
 SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "{user_lang}", "en".
+    bd:serviceParam wikibase:language "{user_lang},mul,en".
 }
 ```
 

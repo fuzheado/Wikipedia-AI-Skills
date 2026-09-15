@@ -11,7 +11,7 @@ skill_discovery_hints:
   - keywords: ["banner", "pagebanner", "article skeleton", "IsPartOf", "breadcrumb"]
   - keywords: ["article status", "usable", "guide", "star", "outline", "stub"]
   - keywords: ["hotel", "restaurant", "attraction", "accommodation", "itinerary", "phrasebook"]
-last_verified: 2026-09-14
+last_verified: 2026-09-15
 ---
 
 > ⚠️ **Prerequisites:** This skill assumes familiarity with the MediaWiki Action
@@ -520,7 +520,7 @@ Wikivoyage editors source coordinates from:
 ```sparql
 # Find Wikivoyage articles with coordinates for a region
 SELECT ?article ?articleLabel ?coord WHERE {
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
   ?article wdt:P31 wd:Q486972;          # instance of human settlement
            wdt:P625 ?coord;              # coordinate location
            wdt:P4342 ?wvPage.            # has Wikivoyage page
@@ -653,7 +653,7 @@ SELECT ?item ?itemLabel ?wvPage WHERE {
   ?wvLink schema:about ?item;
            schema:isPartOf <https://en.wikivoyage.org/>;
            wikibase:badge wd:Q17437796.  # featured article badge
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ```
 

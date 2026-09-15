@@ -143,7 +143,7 @@ SELECT ?item ?itemLabel ?prev ?prevLabel ?next ?nextLabel WHERE {
   ?item wdt:P179 wd:Q1141279.
   OPTIONAL { ?item wdt:P155 ?prev. }
   OPTIONAL { ?item wdt:P156 ?next. }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ```
 

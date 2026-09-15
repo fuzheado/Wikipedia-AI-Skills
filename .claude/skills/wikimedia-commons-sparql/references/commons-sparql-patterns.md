@@ -116,7 +116,7 @@ SELECT ?item ?itemLabel ?image WHERE {
              wdt:P106 wd:Q36180 .       # occupation = writer
       FILTER NOT EXISTS { ?item wdt:P18 ?image . }  # no image yet
       SERVICE wikibase:label {
-        bd:serviceParam wikibase:language "en" .
+        bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
       }
     }
     LIMIT 100

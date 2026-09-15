@@ -29,6 +29,7 @@ freshness = load("verify-freshness")
 links = load("verify-links")
 api = load("verify-api")
 snippets = load("verify-snippets")
+mul = load("verify-mul-labels")
 
 
 def make_skill(tmp_path: Path, content: str) -> Path:
@@ -184,6 +185,89 @@ def test_snippets_skips_placeholders(tmp_path):
 def test_snippets_skips_annotated_json(tmp_path):
     d = make_skill(tmp_path, "```json\n{ \"a\": 1,  # annotated\n}\n```\n")
     assert snippets.scan_file(d / "SKILL.md") == []
+
+
+# ---------------------------------------------------------------------------
+# verify-mul-labels
+# ---------------------------------------------------------------------------
+
+def test_mul_flags_label_service_without_mul(tmp_path):
+    d = make_skill(
+        tmp_path,
+        'SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }\n',
+    )
+    problems, _ = mul.scan_file(d / "SKILL.md", tmp_path / "skills")
+    assert any("SPARQL label service without mul" in p for p in problems)
+
+
+def test_mul_accepts_label_service_with_mul(tmp_path):
+    d = make_skill(
+        tmp_path,
+        'bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en".\n',
+    )
+    problems, _ = mul.scan_file(d / "SKILL.md", tmp_path / "skills")
+    assert problems == []
+
+
+def test_mul_decodes_url_encoded_sparql(tmp_path):
+    """The shell-script status check embeds a percent-encoded SPARQL query."""
+    d = make_skill(tmp_path, 'query=...wikibase:language%20%22en%22...\n')
+    problems, _ = mul.scan_file(d / "SKILL.md", tmp_path / "skills")
+    assert any("SPARQL label service without mul" in p for p in problems)
+
+
+def test_mul_flags_piped_languages_without_mul(tmp_path):
+    d = make_skill(tmp_path, '"languages": "en|fr|de",\n')
+    problems, _ = mul.scan_file(d / "SKILL.md", tmp_path / "skills")
+    assert any("multi-language label request without mul" in p for p in problems)
+
+
+def test_mul_ignores_bare_separator_literal(tmp_path):
+    """`"|".join(langs)` is a separator, not a language list."""
+    d = make_skill(tmp_path, '"languages": "|".join(langs),\n')
+    problems, _ = mul.scan_file(d / "SKILL.md", tmp_path / "skills")
+    assert problems == []
+
+
+def test_mul_allow_marker_suppresses_negative_example(tmp_path):
+    d = make_skill(
+        tmp_path,
+        'bd:serviceParam wikibase:language "en".  # verify-mul-labels: allow (demo)\n',
+    )
+    problems, marked = mul.scan_file(d / "SKILL.md", tmp_path / "skills")
+    assert problems == []
+    assert marked
+
+
+def test_mul_repo_is_clean():
+    problems = []
+    for path in mul._iter_files(SKILLS):
+        file_problems, _ = mul.scan_file(path, SKILLS)
+        problems.extend(file_problems)
+    problems.extend(mul.scan_label_readers(SKILLS))
+    assert problems == [], "\n".join(problems)
+
+
+def test_mul_flags_pinned_reader_without_default_handling(tmp_path):
+    skills = tmp_path / "skills"
+    for rel in mul.LABEL_READERS:
+        p = skills / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text("label = labels.get('en')\n")
+    assert len(mul.scan_label_readers(skills)) == len(mul.LABEL_READERS)
+
+
+def test_mul_accepts_pinned_reader_with_default_handling(tmp_path):
+    skills = tmp_path / "skills"
+    for rel in mul.LABEL_READERS:
+        p = skills / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text("label = labels.get('en') or labels.get('mul')\n")
+    assert mul.scan_label_readers(skills) == []
+
+
+def test_mul_pinned_readers_exist():
+    assert mul.scan_label_readers(SKILLS) == []
 
 
 # ---------------------------------------------------------------------------

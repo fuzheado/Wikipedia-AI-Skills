@@ -15,6 +15,19 @@ action=wbgetentities&ids=Q937|Q5|Q5&props=labels|descriptions|claims|sitelinks&l
 > label, the API returns an empty labels object — the `mul` label is excluded
 > because it wasn't in the filter. Pass `languages=en|mul` (or `{lang}|mul` for
 > any language) so the response includes both and you can fall back client-side.
+>
+> Three details worth knowing (verified 2026-09-15):
+> * The separator is `|`. `languages=en,mul` is rejected with a warning and the
+>   API then silently returns **all** languages instead of the requested set.
+> * Read the labels `mul`-before-`en`: a default value is the intended name in
+>   every language, English is the last resort.
+> * `languagefallback=1` does the resolution server-side: with
+>   `languages=en&languagefallback=1` the `mul` default comes back **under the
+>   requested key** (`"en"`), so `labels[lang]` works without a manual fallback.
+>   The REST API's `labels_with_language_fallback/<lang>` endpoint redirects to
+>   `/labels/mul` for the same cases.
+>
+> Descriptions have no `mul` default (labels and aliases only).
 
 ### Search entities
 ```
@@ -58,7 +71,7 @@ Base: `https://query.wikidata.org/sparql`
 ```sparql
 SELECT ?item ?itemLabel WHERE {
   ?item wdt:P31 wd:Q5.    # instance of human
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 LIMIT 100
 ```
@@ -67,7 +80,7 @@ LIMIT 100
 ```sparql
 SELECT ?item ?itemLabel WHERE {
   ?item wdt:P279* wd:Q729.   # subclass of* animal (transitive)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ```
 
@@ -78,7 +91,7 @@ SELECT ?item ?itemLabel ?population ?pointInTime WHERE {
          p:P1082 ?popStmt.      # population statement (property path)
   ?popStmt ps:P1082 ?population;  # population value
            pq:P585 ?pointInTime.  # point in time qualifier
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 LIMIT 20
 ```

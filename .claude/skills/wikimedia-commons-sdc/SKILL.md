@@ -9,7 +9,7 @@ skill_discovery_hints:
   - keywords: ["AC/DC", "ISA Tool", "OpenRefine Commons", "QuickStatements Commons", "Pattypan"]
   - keywords: ["wbcreateclaim", "wbeditentity", "wbsetclaim", "wbsetlabel", "GLAM Commons"]
   - keywords: ["Structured data editing", "batch SDC", "Commons API editing", "copyright statement", "license statement"]
-last_verified: 2026-06-12
+last_verified: 2026-09-15
 ---
 
 > ⚠️ **User-Agent and authentication required:** All write operations to Wikimedia Commons require authentication. You need a Commons account and either a bot password or OAuth authorization. See the **[wikimedia-auth-oauth](../wikimedia-auth-oauth/SKILL.md)** skill for setup. All HTTP requests need a descriptive `User-Agent` header — see the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill.
@@ -169,7 +169,7 @@ A MediaInfo entity in JSON looks like this:
 | Get all SDC for a file | Action API (read) | `wbgetentities` | `ids=M12345` or `sites=commonswiki&titles=File:Example.jpg` |
 | Get claims only | Action API (read) | `wbgetclaims` | `entity=M12345` or `entity=M12345&property=P180` |
 | Add a depicts statement | Action API (write) | `wbcreateclaim` | `entity=M12345&property=P180&value={"id":"Q42"}` |
-| Set a file caption | Action API (write) | `wbsetlabel` | `id=M12345&language=en&value="A black hole"` |
+| Set a file caption | Action API (write) | `wbsetlabel` | `id=M12345&language=en&value="A black hole"` (`language=mul` sets the default caption) |
 | Update a claim value | Action API (write) | `wbsetclaimvalue` | `claim=M12345$...&value={"id":"Q42"}` |
 | Set a full claim (value + qualifiers) | Action API (write) | `wbsetclaim` | `claim={...full claim JSON...}` |
 | Add a qualifier | Action API (write) | `wbsetqualifier` | `claim=M12345$...&property=P462&value={...}` |
@@ -279,9 +279,12 @@ resp = SESSION.get(
 data = resp.json()
 entity = data["entities"]["M12345"]
 
-# Captions
-en_caption = entity.get("labels", {}).get("en", {}).get("value", "")
-print(f"English caption: {en_caption}")
+# Captions are MediaInfo labels, so they can also carry a `mul` default
+# value — read en -> mul (see the wikidata skill, "Getting Labels: `mul`
+# Is Not Optional"). Omitting `languages` returns every language, mul included.
+labels = entity.get("labels", {})
+caption = (labels.get("en") or labels.get("mul") or {}).get("value", "")
+print(f"English caption: {caption}")
 
 # Depicts statements
 depicts_claims = entity.get("claims", {}).get("P180", [])
@@ -307,6 +310,12 @@ resp = SESSION.get(
 ### 2. Setting File Captions (`wbsetlabel`)
 
 File captions are the **entity label** for MediaInfo entities — short, multilingual descriptions without wikitext or hyperlinks.
+
+> ⚠️ **Captions can be default values.** Like Wikidata labels, a caption may be stored once as the `mul`
+> (multiple languages) default instead of per language, and a per-language request does not return it:
+> read `<lang> || mul` (`labels.get(lang) or labels.get("mul")`), and add `mul` to the `languages` list of
+> any fetching call. A bare `M…` ID where a caption was expected means the default was missed — see the
+> [wikidata](../wikidata/SKILL.md) skill, "Getting Labels: `mul` Is Not Optional".
 
 ```python
 resp = SESSION.post(

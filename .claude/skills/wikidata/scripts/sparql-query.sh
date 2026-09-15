@@ -28,13 +28,13 @@ if [ "$1" = "--examples" ]; then
     echo '   SELECT ?museum ?museumLabel WHERE {
 #     ?museum wdt:P31 wd:Q33506;
 #             wdt:P131 wd:Q90.
-#     SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+#     SERVICE wikibase:label { bd:serviceParam wikibase:language "mul,en". }
 #   }'
     echo ""
     echo "2. Children of Albert Einstein (Q937):"
     echo '   SELECT ?child ?childLabel WHERE {
 #     wd:Q937 wdt:P40 ?child.
-#     SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+#     SERVICE wikibase:label { bd:serviceParam wikibase:language "mul,en". }
 #   }'
     echo ""
     echo "3. All humans (Q5) with their occupation (P106) and date of birth (P569), limited to 10:"
@@ -42,7 +42,7 @@ if [ "$1" = "--examples" ]; then
 #     ?person wdt:P31 wd:Q5;
 #             wdt:P106 ?occupation;
 #             wdt:P569 ?dob.
-#     SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+#     SERVICE wikibase:label { bd:serviceParam wikibase:language "mul,en". }
 #   }
 #   LIMIT 10'
     exit 0

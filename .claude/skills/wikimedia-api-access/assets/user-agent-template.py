@@ -284,7 +284,7 @@ def main():
         sparql_results = client.sparql_query(
             'SELECT ?item ?itemLabel WHERE { '
             '  VALUES ?item { wd:Q937 wd:Q42 } '
-            '  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }'
+            '  SERVICE wikibase:label { bd:serviceParam wikibase:language "mul,en". }'
             '}'
         )
         for r in sparql_results:
