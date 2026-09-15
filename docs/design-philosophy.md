@@ -99,7 +99,7 @@ A surprising finding: **splitting skills reduces context bloat, not increases it
 | One 26K-word monolithic Commons skill | 26,000 (every time) |
 | Hub (4K) + 2 specialized sub-skills (3K each) | ~10,000 |
 
-The same logic applies catalog-wide: 43 focused skills are better than 20
+The same logic applies catalog-wide: many focused skills beat a few
 monolithic ones. The risk isn't the size of the catalog — it's the size of
 individual skills.
 
@@ -120,13 +120,15 @@ is the model: a 4K hub skill routing to 7 specialized sub-skills (2-5K each).
 Different models have different context windows, but the sizing strategy works
 across all of them:
 
-| Model Family | Context | Max Skills* | Our Strategy |
+| Context class | Example family | Max skills* | Our strategy |
 |-------------|---------|-------------|--------------|
-| DeepSeek / Gemini | 1M tokens | All 43 + massive headroom | Don't let headroom tempt you to load all skills |
-| Claude | 200K tokens | ~35 + 90K free | Comfortable with 3-8 skills per task |
-| GPT-4 | 128K tokens | ~20 + 55K free | Tight but workable with 3-5 skills |
+| 1M+ tokens | Gemini-class | the whole catalog, with large headroom | Don't let headroom tempt you to load everything |
+| 200K tokens | Claude-class | ~35 + 90K free | Comfortable with 3-8 skills per task |
+| ~128-200K tokens | GPT-class | ~20 + 55K free | Tight but workable with 3-5 skills |
 
-*\*~3,800 tokens/skill (2,900 words + code), ~10K system prompt, ~30K conversation*
+*\*~3,800 tokens/skill (2,900 words + code), ~10K system prompt, ~30K conversation.*
+Grouped by context class rather than product name — released context sizes change
+faster than the strategy does.
 
 **The real defense isn't the model's context size — it's keyword-based loading.**
 A task should load 3-8 skills regardless of model capacity. Loading more
@@ -143,11 +145,12 @@ effectively.
 A skill succeeds when an agent can pick it up and use it without reading
 anything else. Every skill should have:
 
-1. **YAML frontmatter** — `name`, `description`, `depends_on`, keywords for discovery
+1. **YAML frontmatter** — `name`, `description`, `license`, `compatibility`, `last_verified`, plus `depends_on` and discovery keywords for the loader
 2. **Clear SOPs** — numbered procedures with concrete code examples
 3. **Guardrails** — explicit "don't do this" warnings for common mistakes
 4. **Tooling section** — scripts, reference docs, and reusable assets
 5. **Cross-references** — links to related skills with a "Why" column
+6. **Verification** — skills that ship code carry tests (`python3 -m pytest tests/ -q`), and every command, API module, and URL they document must exist in the ground-truth registries. CI enforces both (see README → Ground-truth verification suite).
 
 The `depends_on` field is critical: it tells the agent which skills are
 prerequisites, preventing it from loading a specialized skill without its
@@ -166,6 +169,10 @@ There's no hard limit, but there are natural constraints:
 - **Discovery fatigue** — The `<available_skills>` list shown to agents grows.
   Keep descriptions distinct and action-oriented.
 
-The current portfolio of 43 skills is comfortably within these bounds.
-Additions should pass the tier test, and merges should happen when a skill
-proves narrower than anticipated.
+The current catalog is comfortably within these bounds. Additions should pass
+the tier test, and merges should happen when a skill proves narrower than
+anticipated.
+
+Counts are deliberately not written down here: per CONTRIBUTING, prose should
+say "all skills" rather than a number — hardcoded counts go stale within a
+release or two.
