@@ -34,9 +34,15 @@ class TestSkillContent:
         assert "trailing slash" in text.lower()
 
     def test_license_filter(self):
+        """The free-license rule lives in SKILL.md; the id → Commons template
+        map lives in the case-study reference (it was moved out of SKILL.md)."""
         text = read_skill("flickr-wayback-recovery")
-        assert "license `2`" in text or "license 2" in text
-        assert "cc-by-2.0" in text and "cc-by-sa-2.0" in text
+        assert "free set" in text.lower()
+        assert "4, 5, 7, 8, 9, 10, 11, 12" in text
+        assert "license 2" in text  # CC BY-NC — explicitly skipped
+        case_study = (SKILL / "references" / "internetstiftelsen-case-study.md").read_text()
+        assert "{{cc-by-2.0}}" in case_study
+        assert "{{cc-by-sa-2.0}}" in case_study
 
     def test_match_by_id(self):
         text = read_skill("flickr-wayback-recovery")
