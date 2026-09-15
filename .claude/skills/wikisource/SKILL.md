@@ -3,7 +3,7 @@ name: wikisource
 description: "Work with Wikisource - ProofreadPage workflow, page quality levels, cross-wiki namespace resolution, completed-book catalogues, EPUB export, and the OCR/AI layer."
 license: MIT
 compatibility: opencode
-last_verified: 2026-09-11
+last_verified: 2026-09-14
 depends_on: [wikimedia-api-access, wikimedia-commons, wikimedia-wikitext]
 skill_discovery_hints:
   - keywords: ["Wikisource", "ProofreadPage", "proofread", "Index namespace", "validated text"]
@@ -429,6 +429,4 @@ lacks access control, a **review step**, and progress reporting.
 | **[wikimedia-commons-pdf](../wikimedia-commons-pdf/SKILL.md)** | PDF/DjVu file handling behind the page images |
 | **[wikimedia-wikitext](../wikimedia-wikitext/SKILL.md)** | Parsing the wikitext of Page:/main-namespace content |
 | **[wikidata](../wikidata/SKILL.md)** | The Books data model, `P1957`, and sitelink badges |
-| **[wikimedia-pageviews](../wikimedia-pageviews/SKILL.md)** | Measuring readership of exported/compiled works |
 | **[pywikibot](../pywikibot/SKILL.md)** | Batch operations across Wikisource editions |
-| **[wiktionary](../wiktionary/SKILL.md)** | The sister dictionary project (separate skill) |

@@ -468,9 +468,6 @@ const userBio = data.query.pages[pageId].extract;
 $('#bio').text(userBio);  // Escapes HTML automatically
 ```
 
-Building the UI itself? See the **[wikimedia-codex](../wikimedia-codex/SKILL.md)** skill
-for the Codex design system's components and design tokens.
-
 ---
 
 ## SOP: AbuseFilter and Block Awareness

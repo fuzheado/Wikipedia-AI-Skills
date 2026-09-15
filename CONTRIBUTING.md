@@ -145,7 +145,26 @@ Each skill should cover one well-defined task. If a skill covers two unrelated c
 - File: `.claude/skills/<skill-name>/SKILL.md`
 - The directory name and the `name` field in frontmatter must match.
 
-### 8. Research APIs Thoroughly — Don't Stop at the TOC
+### 8. Cross-Reference What the Skill Uses
+
+Skill-to-skill links become graph edges (`docs/skills-network.html`) and relationship chips in the
+skills explorer, so they are read as claims about how the skills fit together:
+
+- **Link a skill only for a capability, technique, or artifact this skill actually uses** — and say
+  which one in the table's *Why* column ("`langlinks` table for interlanguage lookups", not
+  "general concepts").
+- **Do not link the universal hubs from leaf skills.** `wikimedia-api-access` (and friends) are one
+  hop from everything already; adding them everywhere adds edges without adding information and
+  inflates the node in the force-directed layout. Use the `depends_on` field for genuine
+  prerequisites instead.
+- **Avoid trivia and structural-only links** ("runs on X infrastructure", "the sister project").
+  If the only relationship is that both skills are Wikimedia-adjacent, leave it out.
+- **Do not link to yourself** — self-links are ignored by the graph but show up as noise in tables.
+
+Auditing an existing skill: regenerate the explorer with `python3 scripts/generate-skills-explorer.py`
+and read each card's related-skill list as a set of claims to check against the skill body.
+
+### 9. Research APIs Thoroughly — Don't Stop at the TOC
 
 Wikimedia API documentation is extensive and often spread across multiple pages.
 The following failure mode has happened in production: an agent reads a
