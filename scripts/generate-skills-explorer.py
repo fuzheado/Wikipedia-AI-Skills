@@ -15,6 +15,12 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / ".claude" / "skills"
 OUT = ROOT / "docs" / "skills-explorer.html"
 
+# Canonical source location for a skill, so links work from the published site
+# (GitHub Pages serves docs/ as the site root, so repo-relative links 404 there).
+REPO_SLUG = "fuzheado/Wikipedia-AI-Skills"
+DEFAULT_BRANCH = "main"
+BLOB_BASE = f"https://github.com/{REPO_SLUG}/blob/{DEFAULT_BRANCH}/.claude/skills"
+
 DOMAIN_RULES = [
     ("Commons & media", ("commons", "flickr", "pattypan")),
     ("APIs, data & infrastructure", ("wikimedia-api", "wikimedia-auth", "wikimedia-database", "wikimedia-eventstreams", "wikimedia-toolforge", "toolforge", "wikimedia-i18n", "wikimedia-ml", "wikimedia-codex", "wikimedia-phabricator", "wikimedia-url-shortener", "wikipedia-error-handling")),
@@ -94,7 +100,11 @@ def skill_records() -> list[dict]:
         rows.append({
             "name": name,
             "description": desc,
+            # `path` is repo-relative (handy when working inside a checkout); `url` is
+            # absolute because the published page is served from docs/ on GitHub Pages,
+            # where '../.claude/...' resolves to a 404.
             "path": f"../.claude/skills/{skill_file.parent.name}/SKILL.md",
+            "url": f"{BLOB_BASE}/{skill_file.parent.name}/SKILL.md",
             "domain": classify(name, desc, DOMAIN_RULES, "Other / cross-cutting"),
             "task": classify(name, desc, TASK_RULES, "General reference"),
             "roles": roles_for(name, desc),
@@ -180,7 +190,7 @@ function escapeHtml(s) {{ return String(s).replace(/[&<>"']/g, c => ({{'&':'&amp
 function card(s) {{
   const deps = s.depends_on.slice(0,5).map(x => badge(x,'soft')).join('');
   const rel = s.cross_links.slice(0,6).map(x => `<a href="#" data-skill="${{escapeHtml(x)}}">${{escapeHtml(x)}}</a>`).join(' ');
-  return `<article class="card"><h2><a href="${{escapeHtml(s.path)}}">${{escapeHtml(s.name)}}</a></h2><p class="desc">${{escapeHtml(s.description)}}</p><div class="badges">${{badge(s.domain)}}${{badge(s.task,'soft')}}${{s.roles.map(r=>badge(r,'soft')).join('')}}</div>${{deps ? `<div class="badges"><span class="badge soft">depends on</span>${{deps}}</div>` : ''}}<div class="links">${{rel ? `Related: ${{rel}}` : 'No direct cross-links found'}}</div></article>`;
+  return `<article class="card"><h2><a href="${{escapeHtml(s.url)}}">${{escapeHtml(s.name)}}</a></h2><p class="desc">${{escapeHtml(s.description)}}</p><div class="badges">${{badge(s.domain)}}${{badge(s.task,'soft')}}${{s.roles.map(r=>badge(r,'soft')).join('')}}</div>${{deps ? `<div class="badges"><span class="badge soft">depends on</span>${{deps}}</div>` : ''}}<div class="links">${{rel ? `Related: ${{rel}}` : 'No direct cross-links found'}}</div></article>`;
 }}
 function currentFilters() {{ return {{q:el('q').value.trim().toLowerCase(), domain:el('domain').value, task:el('task').value, role:el('role').value}}; }}
 function render() {{
