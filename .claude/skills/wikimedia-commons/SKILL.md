@@ -15,7 +15,7 @@ skill_discovery_hints:
   - keywords: ["Commons namespaces", "gallery", "Creator namespace"]
   - keywords: ["CORS", "cross-origin", "upload.wikimedia.org", "browser app", "Canvas", "WebGL"]
   - keywords: ["Commons Impact Metrics", "CIM", "category analytics", "Views from category", "impact metrics"]
-last_verified: 2026-09-10
+last_verified: 2026-09-14
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -509,7 +509,7 @@ Are you building a browser app?
 
 | Skill | Purpose |
 |-------|--------|
-| **[wikimedia-commons](../wikimedia-commons/SKILL.md)** *(this skill)* | Generic Commons — search, upload, licensing, categories, namespaces |
+| `wikimedia-commons` *(this skill)* | Generic Commons — search, upload, licensing, categories, namespaces |
 | **[wikimedia-commons-thumbnails](../wikimedia-commons-thumbnails/SKILL.md)** | Thumbnail generation, thumb URL scheme, `iiurlwidth`, `thumbmime` |
 | **[wikimedia-commons-svg](../wikimedia-commons-svg/SKILL.md)** | SVG files — editing, validation, optimization, versioning |
 | **[wikimedia-commons-pdf](../wikimedia-commons-pdf/SKILL.md)** | PDF/DjVu documents — page selection, Wikisource integration, OCR |

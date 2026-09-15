@@ -152,7 +152,6 @@ digraph Skills {
   "wikimedia-commons" -> "pattypan";
   "wikimedia-commons" -> "pywikibot";
   "wikimedia-commons" -> "wikimedia-api-access";
-  "wikimedia-commons" -> "wikimedia-commons";
   "wikimedia-commons" -> "wikimedia-commons-audio-video";
   "wikimedia-commons" -> "wikimedia-commons-pdf";
   "wikimedia-commons" -> "wikimedia-commons-sdc";
