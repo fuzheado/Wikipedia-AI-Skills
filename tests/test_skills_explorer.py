@@ -38,11 +38,31 @@ def test_every_record_has_the_fields_the_page_renders():
         assert rec["name"], rec
         assert rec["description"], rec
         assert rec["path"].startswith("../.claude/skills/"), rec
+        assert rec["url"].startswith("https://github.com/"), rec
+        assert rec["url"].endswith(f"/{rec['name']}/SKILL.md"), rec
         assert rec["domain"] and rec["task"], rec
         assert isinstance(rec["roles"], list), rec
         assert isinstance(rec["depends_on"], list), rec
         assert isinstance(rec["cross_links"], list), rec
         assert rec["degree"] == len(rec["cross_links"]), rec
+
+
+def test_card_links_are_absolute_so_they_work_on_pages():
+    """GitHub Pages serves docs/ as the site root, so a repo-relative href 404s there.
+
+    Card links are built client-side from the embedded records, so this checks the
+    template expression and the data rather than a literal href attribute.
+    """
+    gen = _load_generator()
+    records = gen.skill_records()
+    committed = COMMITTED_HTML.read_text(encoding="utf-8")
+    assert "escapeHtml(s.url)" in committed, "card links must use the absolute url field"
+    assert "escapeHtml(s.path)" not in committed, (
+        "card links must not use the repo-relative path — those 404 on the published site"
+    )
+    assert committed.count('"url":"https://github.com/') == len(records), (
+        "every embedded record needs an absolute url"
+    )
 
 
 def test_committed_html_is_in_sync_with_the_generator(tmp_path):
