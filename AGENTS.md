@@ -7,7 +7,7 @@ short version.
 ## PR-first workflow (hard rule)
 
 All changes to `main` go through a pull request. Branch protection enforces
-this server-side (5 required CI checks, no reviews); follow it even when you
+this server-side (6 required CI checks, no reviews); follow it even when you
 could bypass it.
 
 1. Start from up-to-date `main`: `git checkout main && git pull --ff-only origin main`
@@ -16,7 +16,7 @@ could bypass it.
 4. Push the branch, then `gh pr create` — the template
    (`.github/PULL_REQUEST_TEMPLATE.md`) auto-applies; fill in summary,
    what/why, and how it was tested
-5. `gh pr checks --watch` — all 5 checks must pass before merging
+5. `gh pr checks --watch` — all 6 checks must pass before merging
 6. Merge with `gh pr merge --merge --delete-branch`
 
 Direct pushes to `main` are admin-bypass only, reserved for emergencies
@@ -55,6 +55,6 @@ AGENTS.md and the `wikimedia-api-access` skill for details.
 ## Local tooling
 
 - Githooks (pre-push tooling-reference check): `./setup-hooks.sh`
-- The 5 required CI checks: `check-skill-registration`,
+- The 6 required CI checks: `check-skill-registration`,
   `check-conftest-auto-discovery`, `check-roadmap-mentions`, `verify`,
-  `validate-tooling` — they run on every PR unconditionally
+  `validate-tooling`, `tests` — they run on every PR unconditionally

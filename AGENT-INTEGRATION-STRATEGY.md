@@ -285,9 +285,9 @@ Practical guidance for a non-pi harness:
 
 ## Coverage map (illustrative, not an inventory)
 
-This is a sample of how skill *profiles* map to layers, not a complete list — the repository now
-carries **61 skills**, most of which post-date this analysis. Use it to classify a skill you are
-considering upgrading.
+This is a sample of how skill *profiles* map to layers, not a complete list — the repository's
+catalog is considerably larger than this sample, and most of it post-dates this analysis. Use it to
+classify a skill you are considering upgrading.
 
 ### Cross-cutting (event hooks only — no custom tool needed)
 
