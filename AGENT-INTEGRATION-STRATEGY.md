@@ -92,15 +92,17 @@ Everything below lives in [`.pi/extensions/wikimedia-skills/`](.pi/extensions/wi
 | Retry-flag injection for curl/wget (rate-limit/backoff ergonomics) | 1 | `core.ts` (`injectRetry`) |
 | `wikidata_vector_search` — semantic Wikidata item search as a callable tool | 2 | `tools/vector-search.ts`, registered by `index.ts` |
 | User-Agent config (env var → `~/.config/wikimedia-skills/config.json` → shipped default) | — | `config.json` |
-| Tests | — | `test-core.mjs` (**51** `node:test` cases, 0 failures), `tests/test_extension.py` (**22** pytest cases) |
+| Tests | — | `test-core.mjs` (**51** `node:test` cases, 0 failures), `tests/test_extension.py` (**23** pytest cases) |
 
-**Known issue (test-only, does not affect the extension):**
-`tests/test_extension.py::TestExtensionCorrectness::test_typescript_strips_and_parses_with_node`
-fails on current Node. Cause: the extension's `package.json` has no `"type": "module"`, so
-`node --check <file>.ts` parses the sources as CommonJS and rejects `export interface`. Verified
-that the same files parse cleanly when checked as ESM (a `.mts` copy). Two candidate fixes: add
-`"type": "module"` to the extension's `package.json`, or have the test check an ESM copy. The
-extension itself loads correctly under pi, so this is a verification gap, not a runtime bug.
+**Syntax-check scope (worth knowing before trusting it):** the TypeScript check in
+`tests/test_extension.py` parses each source as ESM with Node's built-in type stripping, which
+requires copying it to a `.mts` suffix — `node --check` infers module type from the extension or
+`package.json`, and the extension declares no `"type"`, so a plain `.ts` read is parsed as
+CommonJS and `export interface` looks like a syntax error. Measured on Node 26, the check catches
+JavaScript-level syntax errors (e.g. `const x = ;`) but **not** unbalanced braces/parens or invalid
+type annotations — `node --check` tolerates those while stripping types, and a guard test asserts
+the checker still fails on invalid input. Identifier and registration mistakes are covered by the
+structural tests in the same file. No `tsc`/type check runs in CI (typescript is not vendored).
 
 ## Layer Details
 
