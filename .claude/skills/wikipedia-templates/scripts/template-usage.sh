@@ -113,7 +113,6 @@ fi
 # --- Fetch pages using the template ---------------------------------------
 RESULTS=()
 CONTINUE=""
-PAGE=1
 
 while true; do
     ENCODED_TITLE=$(url_encode "${TEMPLATE_NAME}")
@@ -169,7 +168,6 @@ if cont:
         break
     fi
     CONTINUE="$CONT_VAL"
-    ((PAGE++))
 done
 
 # --- Output results -------------------------------------------------------
@@ -188,7 +186,7 @@ COUNT=0
 for item in "${RESULTS[@]}"; do
     if [[ -n "$item" ]]; then
         echo "$item"
-        ((COUNT++))
+        COUNT=$((COUNT + 1))
         if [[ -n "$LIMIT" ]] && (( COUNT >= LIMIT )); then
             break
         fi

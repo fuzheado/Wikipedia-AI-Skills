@@ -94,6 +94,16 @@ fi
 
 Otherwise, prefer POSIX sh syntax where practical, or delegate complex logic to Python.
 
+### The reverse trap: code that works on 3.2 and breaks on bash 5
+
+Portability cuts both ways — and CI runs Linux bash 5, so a construct that is fine on macOS can fail on every Linux user and on every PR:
+
+| Construct | Problem | Portable replacement |
+|---|---|---|
+| `((counter++))` under `set -e` | The post-increment returns the **old** value as its exit status, so the first increment from 0 yields status 1 and `set -e` aborts the script — silently, after partial output | `counter=$((counter + 1))`, or use pre-increment `((++counter))` |
+
+bash 3.2 does not abort here, which is why the bug hides on macOS. Real example: `wikipedia-templates/scripts/template-usage.sh` printed its first result and exited 1 on Linux until this was fixed. Prefer plain assignment for counters; if you use `(( ))` for a side effect, remember it doubles as a command with an exit status.
+
 ---
 
 ## 3. Portability Beyond macOS (Windows/Linux)
