@@ -138,6 +138,88 @@ def test_missing_prompt_file_is_not_an_error(tmp_path):
 
 
 # ---------------------------------------------------------------------------
+# ROADMAP 'Published skills' and the README headline count
+# ---------------------------------------------------------------------------
+
+CLEAN_ROADMAP = (
+    "### Published skills\n\n"
+    "- **alpha** — Complete. Does a thing.\n"
+    "- **beta** — Complete. Does another thing.\n"
+    "\n### What's outstanding\n"
+)
+
+
+def _fake_docs(tmp_path: Path, roadmap: str, readme: str, skills=("alpha", "beta")):
+    skills_dir = tmp_path / "skills"
+    for name in skills:
+        (skills_dir / name).mkdir(parents=True)
+        (skills_dir / name / "SKILL.md").write_text("---\nname: x\n---\n", encoding="utf-8")
+    roadmap_path = tmp_path / "ROADMAP.md"
+    roadmap_path.write_text(roadmap, encoding="utf-8")
+    readme_path = tmp_path / "README.md"
+    readme_path.write_text(readme, encoding="utf-8")
+    return str(skills_dir), str(roadmap_path), str(readme_path)
+
+
+def test_roadmap_consistent_has_no_errors(tmp_path):
+    skills_dir, roadmap, _ = _fake_docs(tmp_path, CLEAN_ROADMAP, "")
+    assert HOOK.check_roadmap(skills_dir, roadmap) == ([], [])
+
+
+def test_roadmap_entry_for_nonexistent_skill_is_an_error(tmp_path):
+    """The bug this guards: a merged-away skill left in the inventory."""
+    roadmap = CLEAN_ROADMAP.replace(
+        "- **beta** — Complete. Does another thing.",
+        "- **beta** — Complete. Does another thing.\n- **ghost** — Complete. Does a ghost thing.",
+    )
+    skills_dir, roadmap_path, _ = _fake_docs(tmp_path, roadmap, "")
+    errors, _ = HOOK.check_roadmap(skills_dir, roadmap_path)
+    assert len(errors) == 1 and "ghost" in errors[0]
+
+
+def test_roadmap_skill_missing_from_the_section_is_an_error(tmp_path):
+    roadmap = CLEAN_ROADMAP.replace("- **beta** — Complete. Does another thing.\n", "")
+    skills_dir, roadmap_path, _ = _fake_docs(tmp_path, roadmap, "")
+    errors, _ = HOOK.check_roadmap(skills_dir, roadmap_path)
+    assert len(errors) == 1 and "beta" in errors[0]
+
+
+def test_roadmap_without_the_section_is_an_error(tmp_path):
+    skills_dir, roadmap_path, _ = _fake_docs(tmp_path, "- **alpha** — Complete.\n", "")
+    errors, _ = HOOK.check_roadmap(skills_dir, roadmap_path)
+    assert errors and "Published skills" in errors[0]
+
+
+def test_absorbed_skill_notes_are_not_treated_as_entries(tmp_path):
+    """Absorbed skills are recorded as italic notes, not live bold entries."""
+    roadmap = CLEAN_ROADMAP.replace(
+        "- **beta** — Complete. Does another thing.",
+        "- *Former `beta` — absorbed into `alpha`.*",
+    )
+    skills_dir, roadmap_path, _ = _fake_docs(tmp_path, roadmap, "")
+    errors, _ = HOOK.check_roadmap(skills_dir, roadmap_path)
+    # the note is ignored, so the real problem reported is the gap (not a dead entry)
+    assert len(errors) == 1 and "beta" in errors[0] and "ghost" not in errors[0]
+
+
+def test_readme_count_matches(tmp_path):
+    skills_dir, _, readme = _fake_docs(tmp_path, "", "contains **2 skills** organized into groups.\n")
+    assert HOOK.check_readme_count(skills_dir, readme) == ([], [])
+
+
+def test_readme_count_drift_is_an_error(tmp_path):
+    skills_dir, _, readme = _fake_docs(tmp_path, "", "contains **3 skills** organized into groups.\n")
+    errors, _ = HOOK.check_readme_count(skills_dir, readme)
+    assert len(errors) == 1 and "3 skills" in errors[0]
+
+
+def test_readme_without_a_count_is_allowed(tmp_path):
+    """CONTRIBUTING prefers 'all skills'; no count means nothing to drift."""
+    skills_dir, _, readme = _fake_docs(tmp_path, "", "contains all skills.\n")
+    assert HOOK.check_readme_count(skills_dir, readme) == ([], [])
+
+
+# ---------------------------------------------------------------------------
 # The real repository must satisfy the hook
 # ---------------------------------------------------------------------------
 
@@ -157,3 +239,13 @@ def test_repo_audit_prompt_matches_skills():
     errors, warnings = HOOK.check_audit_prompt(str(SKILLS_DIR), str(AUDIT_PROMPT))
     assert errors == [], errors
     assert warnings == [], warnings
+
+
+def test_repo_roadmap_published_matches_skills():
+    errors, _ = HOOK.check_roadmap(str(SKILLS_DIR), str(REPO_ROOT / "ROADMAP.md"))
+    assert errors == [], errors
+
+
+def test_repo_readme_count_matches_skills():
+    errors, _ = HOOK.check_readme_count(str(SKILLS_DIR), str(REPO_ROOT / "README.md"))
+    assert errors == [], errors

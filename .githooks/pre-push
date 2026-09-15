@@ -18,12 +18,20 @@ import os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS_DIR = os.path.join(ROOT, ".claude", "skills")
 AUDIT_PROMPT = os.path.join(ROOT, "scripts", "audit-prompt.md")
+ROADMAP = os.path.join(ROOT, "ROADMAP.md")
+README = os.path.join(ROOT, "README.md")
 
 EXIT_OK = 0
 EXIT_FAIL = 1
 
 # "| Batch name | skill-a, skill-b | `reports/out.json` |"
 BATCH_ROW_RE = re.compile(r"^\|\s*([A-Za-z &]+?)\s*\|([^|]+)\|\s*[^|]*\|", re.MULTILINE)
+
+# "- **skill-name** — Complete. ..." inside the Published skills section
+PUBLISHED_RE = re.compile(r"^- \*\*`?([a-z0-9-]+)`?\*\* — ", re.MULTILINE)
+
+# "This repository contains **61 skills** organized into two groups."
+README_COUNT_RE = re.compile(r"contains \*\*(\d+) skills\*\*")
 
 
 def parse_audit_batches(text: str) -> dict[str, list[str]]:
@@ -83,6 +91,67 @@ def check_audit_prompt(skills_dir: str, prompt_path: str) -> tuple[list[str], li
         for name in sorted({n for n in listed if listed.count(n) > 1})
     ]
     return errors, warnings
+
+
+def check_roadmap(skills_dir: str, roadmap_path: str) -> tuple[list[str], list[str]]:
+    """Validate ROADMAP's 'Published skills' section against the catalog.
+
+    The section is the project's inventory of shipped skills, so it must list
+    every skill and nothing that has been merged away.
+    """
+    if not os.path.isfile(roadmap_path):
+        return [], []
+
+    with open(roadmap_path) as fh:
+        text = fh.read()
+
+    start = text.find("### Published skills")
+    if start == -1:
+        return ["ROADMAP.md: '### Published skills' section not found"], []
+    rest = text[start + len("### Published skills"):]
+    nxt = re.search(r"^### ", rest, re.MULTILINE)
+    section = rest[: nxt.start()] if nxt else rest
+
+    listed = set(PUBLISHED_RE.findall(section))
+    skills = existing_skills(skills_dir)
+
+    errors = [
+        f"ROADMAP.md 'Published skills' lists '{name}', which has no .claude/skills/{name}/SKILL.md"
+        for name in sorted(listed - skills)
+    ]
+    missing = sorted(skills - listed)
+    if missing:
+        errors.append(
+            f"ROADMAP.md 'Published skills' covers {len(listed & skills)}/{len(skills)} skills — "
+            f"missing: {', '.join(missing)}"
+        )
+    return errors, []
+
+
+def check_readme_count(skills_dir: str, readme_path: str) -> tuple[list[str], list[str]]:
+    """The README states a headline skill count; it must not drift.
+
+    CONTRIBUTING asks prose to say "all skills" rather than a number, with the
+    README's headline count as the deliberate exception — this check is what makes
+    that exception safe. A README without a count is fine (then there is nothing
+    to drift).
+    """
+    if not os.path.isfile(readme_path):
+        return [], []
+
+    with open(readme_path) as fh:
+        match = README_COUNT_RE.search(fh.read())
+    if not match:
+        return [], []
+
+    stated = int(match.group(1))
+    actual = len(existing_skills(skills_dir))
+    if stated != actual:
+        return [
+            f"README.md says '**{stated} skills**' but .claude/skills/ holds {actual} — "
+            f"update the count (or drop it and say 'all skills', per CONTRIBUTING)"
+        ], []
+    return [], []
 
 
 def find_tooling_references(skill_dir: str) -> list[tuple[str, str]]:
@@ -188,6 +257,18 @@ def main():
     for warn in audit_warnings:
         print(f"\n⚠️  {warn}")
 
+    for label, (errs, warns) in (
+        ("ROADMAP.md", check_roadmap(SKILLS_DIR, ROADMAP)),
+        ("README.md", check_readme_count(SKILLS_DIR, README)),
+    ):
+        if errs:
+            print(f"\n❌ {label} is out of sync with .claude/skills/:")
+            for err in errs:
+                print(f"   📄 {err}")
+            errors += 1
+        for warn in warns:
+            print(f"\n⚠️  {warn}")
+
     if errors:
         print(f"\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         print(f"⛔ {errors} check(s) failed.")
@@ -197,6 +278,7 @@ def main():
 
     print("✅ All tooling references verified — no missing files.")
     print("✅ scripts/audit-prompt.md batch tables match .claude/skills/.")
+    print("✅ ROADMAP.md 'Published skills' and the README count match .claude/skills/.")
     return EXIT_OK
 
 
