@@ -134,6 +134,25 @@ resp = requests.get("https://commons.wikimedia.org/w/api.php", params={
 > `thumburl` the API described as 1024 × 1405, and Wikimedia served **960 × 1317** — widths are bucketed.
 > Lay out from the image's own `naturalWidth`/`naturalHeight`; do not trust `thumbwidth`/`thumbheight`.
 
+> 🚫 **A page render is served only at certain widths — and the wrong width is not a 404.** Measured
+> 2026-09-15 on a PDF (`File:PDF metadata.pdf`) and a DjVu (`File:Mozart Sonate (manuscript).djvu`), with
+> identical results, so this is a property of document rendering and not of one file:
+>
+> | | widths |
+> |---|---|
+> | **served** | `120` · `250` · `330` · `500` · `960` · `1280` |
+> | **HTTP 400 + an HTML error page** | `70` · `150` · `200` · `320` · `400` · `640` · `700` · `800` · `1024` · `1200` |
+>
+> A 400 here is not a harmless miss. Chrome will not hand an HTML response to an `<img>` at all — the request
+> fails as **`net::ERR_BLOCKED_BY_ORB`** and you get a blank page with no visible reason. It is *not*
+> MediaWiki's image-thumbnail width set: 150/200/400/640/800/1024 are standard image widths and every one of
+> them fails for documents. And note the top of the range: **960 is a ceiling** — asking 1200 or 2000 returns
+> 960.
+>
+> So build a document's width ladder from the served list, and let `iiurlwidth` be your friend: the API
+> **rewrites** a requested width to a legal one (asked 320 → got 330; asked 700 → 960). If you need one
+> specific width, ask the API for it rather than constructing the URL yourself.
+
 > 🧹 **`thumburl` carries query junk** (`?utm_source=commons.wikimedia.org…`). Strip everything from `?`
 > before caching, comparing or de-duplicating thumb URLs.
 
