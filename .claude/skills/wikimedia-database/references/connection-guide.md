@@ -41,7 +41,10 @@ These give you access to Wikimedia production replicas (enwiki, wikidata, etc.).
 2. You'll find:
    - **Username** (starts with `u`, e.g., `u12345`) → set as `TOOLFORGE_SQL_USER`
    - **Password** → set as `TOOLFORGE_SQL_PASSWORD`
-   - **Hostname** (e.g., `enwiki.analytics.db.svc.wikimedia.cloud`)
+   - **Hostname** (e.g., `enwiki.analytics.db.svc.wikimedia.cloud`) — for the
+     Commons links tables use `links.commonswiki.analytics.db.svc.wikimedia.cloud`
+     instead; see `schema-replicas.md` ("Commons: links tables are on a separate
+     cluster (`x4`)")
 3. Copy these into your `.env` file
 
 **Important:** These are NOT per-tool credentials. They're linked to your Toolforge user account and work for all replica databases.
