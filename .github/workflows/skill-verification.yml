@@ -32,3 +32,5 @@ jobs:
         run: python3 scripts/verify-snippets.py
       - name: last_verified freshness
         run: python3 scripts/verify-freshness.py
+      - name: mul default values requested wherever labels are read
+        run: python3 scripts/verify-mul-labels.py

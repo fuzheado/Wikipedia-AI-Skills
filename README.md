@@ -345,6 +345,7 @@ live systems, and every skill is verified against them in CI
 | Links/`depends_on`/wikilinks | — (offline) | `scripts/verify-links.py` |
 | Code snippet syntax (python/bash/json/js) | — (offline) | `scripts/verify-snippets.py` |
 | `last_verified` freshness | — (offline) | `scripts/verify-freshness.py` |
+| `mul` default values (label service, label readers, multi-language requests) | — (offline) | `scripts/verify-mul-labels.py` |
 
 Run all checks locally:
 
@@ -354,6 +355,7 @@ python3 scripts/verify-api.py
 python3 scripts/verify-links.py
 python3 scripts/verify-snippets.py
 python3 scripts/verify-freshness.py
+python3 scripts/verify-mul-labels.py
 ```
 
 Refresh the registries when the underlying systems change (or every few months):

@@ -259,12 +259,13 @@ Before submitting a skill, verify every item:
   - Remove from "Future skill candidates" if it was listed there
   - Keep prose references to counts generic ("all skills") — hardcoded counts go stale
 - [ ] **CI will verify on push:** The `.github/workflows/skill-registration-check.yml` CI workflow checks that:
-- [ ] **Ground-truth verification:** `.github/workflows/skill-verification.yml` runs five checks on every PR touching skills:
+- [ ] **Ground-truth verification:** `.github/workflows/skill-verification.yml` runs six checks on every PR touching skills:
   - `verify-commands.py` — CLI commands (`toolforge`, `pwb.py`, `webservice`, `sql`, `become`) must exist in `scripts/command-registry.json`
   - `verify-api.py` — `action=`/`prop=`/`list=`/`meta=` tokens must exist in `scripts/api-surface.json`
   - `verify-links.py` — `depends_on`, cross-skill links, and external URLs (status from `scripts/url-registry.json`)
   - `verify-snippets.py` — python/bash/json/js code blocks must parse
   - `verify-freshness.py` — `last_verified` within the freshness window
+  - `verify-mul-labels.py` — `mul` (default value) present in SPARQL label services, pinned label readers, and multi-language `languages=` requests
   If you document a new command/API/URL, regenerate the matching registry first (see README "Ground-truth verification suite").
 - [ ] **Test suite:** `.github/workflows/tests.yml` runs `python3 -m pytest tests/ -q` on every PR. Node 22 is
   set up for the extension syntax check; dependencies come from `requirements.txt` plus `pytest pyyaml xlrd`.

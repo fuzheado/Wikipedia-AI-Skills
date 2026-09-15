@@ -42,7 +42,7 @@ For new or changed skills (`.claude/skills/<name>/`):
 - **Verify before pushing skill changes** (all offline, all must pass):
   `python3 scripts/verify-links.py && python3 scripts/verify-freshness.py \
   && python3 scripts/verify-snippets.py && python3 scripts/verify-commands.py \
-  && python3 scripts/verify-api.py`
+  && python3 scripts/verify-api.py && python3 scripts/verify-mul-labels.py`
 
 ## API etiquette (summary)
 
