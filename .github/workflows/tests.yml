@@ -1,0 +1,38 @@
+name: Tests
+
+# The verifier scripts (skill-verification.yml) check skills against ground-truth
+# registries, but they do not run the test suite. Without this workflow the ~1,200
+# tests in tests/ were never executed in CI, which is how stale expectations
+# accumulated (see AGENTS.md "known failures").
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # tests/test_extension.py syntax-checks the extension with
+      # `node --experimental-strip-types`, which needs Node 22+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        # requirements.txt = skill-asset deps; pytest/pyyaml/xlrd are test-only
+        # (xlrd lets tests/test_pattypan.py read back the generated .xls)
+        run: python3 -m pip install -r requirements.txt pytest pyyaml xlrd
+
+      - name: Run test suite
+        run: python3 -m pytest tests/ -q

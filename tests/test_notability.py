@@ -1,6 +1,7 @@
 """Tests for the notability assessment skill — checker, source evaluator, templates, and scripts."""
 
 import json
+import re
 import sys
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -11,6 +12,7 @@ SKILL_DIR = (
     Path(__file__).resolve().parent.parent
     / ".claude" / "skills" / "wikipedia-notability-assessment"
 )
+SKILLS_DIR = SKILL_DIR.parent
 ASSETS_DIR = SKILL_DIR / "assets"
 SCRIPTS_DIR = SKILL_DIR / "scripts"
 
@@ -733,12 +735,24 @@ class TestSkillFile:
         path = SKILL_DIR / "SKILL.md"
         content = path.read_text()
         assert "wikipedia-en-biography-writing" in content
-    def test_skill_file_cross_references_pagetriage(self):
-        """Verifies the new skill name appears in cross-references."""
+    def test_skill_file_cross_references_existing_skills(self):
+        """Cross-references must name skills that still exist.
+
+        This test used to assert "wikipedia-pagetriage-api", which was merged
+        into its parent skills (7834017). PageTriage-style source finding is
+        covered by the cross-references below.
+        """
         path = SKILL_DIR / "SKILL.md"
         content = path.read_text()
-        assert "wikipedia-pagetriage-api" in content
-        assert "wikimedia-api-access" in content
+        refs = set(re.findall(r'\.\./([a-z0-9-]+)/SKILL\.md', content))
+        assert refs, "expected cross-references to other skills"
+        missing = sorted(
+            name for name in refs if not (SKILLS_DIR / name / "SKILL.md").exists()
+        )
+        assert not missing, f"cross-references to nonexistent skills: {missing}"
+        assert "wikipedia-en-biography-writing" in content
+        assert "wikipedia-reference-verifiability" in content
+        assert "wikimedia-search-cirrussearch" in content
 
     def test_skill_file_has_sops(self):
         path = SKILL_DIR / "SKILL.md"

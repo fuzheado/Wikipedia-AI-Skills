@@ -92,11 +92,30 @@ class TestResolveFallback:
 
     def test_english(self):
         from i18n_utils import resolve_fallback
-        assert resolve_fallback("en") == ["en"]
+        # `mul` follows the requested language: entities that carry only a
+        # multilingual label then still resolve (d9ec07e; see the docstring of
+        # resolve_fallback for why mul is in every chain)
+        assert resolve_fallback("en") == ["en", "mul"]
 
     def test_french(self):
         from i18n_utils import resolve_fallback
-        assert resolve_fallback("fr") == ["fr", "en"]
+        # `mul` is inserted immediately before the final English fallback
+        assert resolve_fallback("fr") == ["fr", "mul", "en"]
+
+    def test_mul_is_not_duplicated(self):
+        """Asking for `mul` directly must not append it twice."""
+        from i18n_utils import resolve_fallback
+        assert resolve_fallback("mul") == ["mul", "en"]
+
+    @pytest.mark.parametrize("lang", ["de", "sr", "pt-br", "zh-cn", "be-tarask"])
+    def test_mul_precedes_english_in_every_chain(self, lang):
+        """Every chain ends … → mul → en, exactly once."""
+        from i18n_utils import resolve_fallback
+        chain = resolve_fallback(lang)
+        assert chain[0] == lang, chain
+        assert chain[-1] == "en", chain
+        assert chain[-2] == "mul", chain
+        assert chain.count("mul") == 1, chain
 
     def test_brazilian_portuguese(self):
         from i18n_utils import resolve_fallback
@@ -753,7 +772,7 @@ class TestScripts:
             capture_output=True, text=True, timeout=10,
         )
         assert result.returncode == 0
-        assert "fr → en" in result.stdout
+        assert "fr → mul → en" in result.stdout
 
     def test_i18n_utils_domain_command(self):
         """Test i18n_utils.py domain fr."""

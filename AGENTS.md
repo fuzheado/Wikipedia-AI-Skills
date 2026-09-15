@@ -34,9 +34,9 @@ For new or changed skills (`.claude/skills/<name>/`):
   `python3 scripts/refresh-url-registry.py --new-only` for any new URLs —
   CI's Skill Registration Check enforces the first two
 - **Tests:** add mock-based tests under `tests/` for new scripts/assets;
-  run `python3 -m pytest tests/ -q`. Some pre-existing failures
-  (flickr-wayback, i18n, notability) are unrelated known issues — verify a
-  failure is yours before touching it
+  run `python3 -m pytest tests/ -q`. The suite is green (3 skips are
+  optional-dependency guards) and the `Tests` workflow runs it on every PR —
+  a failure is yours to fix or explain
 - **Freshness:** bump `last_verified` in the frontmatter of any changed
   SKILL.md
 - **Verify before pushing skill changes** (all offline, all must pass):
