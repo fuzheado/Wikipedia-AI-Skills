@@ -266,6 +266,8 @@ Before submitting a skill, verify every item:
   - `verify-snippets.py` — python/bash/json/js code blocks must parse
   - `verify-freshness.py` — `last_verified` within the freshness window
   If you document a new command/API/URL, regenerate the matching registry first (see README "Ground-truth verification suite").
+- [ ] **Test suite:** `.github/workflows/tests.yml` runs `python3 -m pytest tests/ -q` on every PR. Node 22 is
+  set up for the extension syntax check; dependencies come from `requirements.txt` plus `pytest pyyaml xlrd`.
   - Every skill directory is linked in `README.md`
   - Every skill is mentioned in `ROADMAP.md` under Published skills
   - `conftest.py` auto-discovers all skill directories (no manual list needed)
