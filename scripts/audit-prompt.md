@@ -20,16 +20,21 @@ and missing YAML fields for every skill. Review this for anomalies.
 
 ## Phase 2: Deep Analysis (Subagents)
 
-Run **6 parallel subagents** using the `worker` agent, each analyzing one domain:
+Run **7 parallel subagents** using the `worker` agent, each analyzing one domain:
 
 | Batch | Skills | Output File |
 |-------|--------|-------------|
-| APIs & Auth | wikimedia-api-access, wikimedia-api-strategy, wikimedia-auth-oauth, wikimedia-security-and-privacy, wikipedia-error-handling, wikimedia-diffs, wikipedia-edit-history | `reports/audit-apis-auth.json` |
-| Wikidata & Search | wikidata, wikidata-vector-search, wikimedia-search-cirrussearch, wikimedia-pageviews, wikimedia-page-assessment | `reports/audit-wikidata-search.json` |
-| Commons | wikimedia-commons, commons-file-resolution, wikimedia-commons-audio-video, wikimedia-commons-pdf, wikimedia-commons-sdc, wikimedia-commons-sparql, wikimedia-commons-svg, wikimedia-commons-thumbnails | `reports/audit-commons.json` |
-| Content | wikipedia-categories, wikipedia-citations, wikipedia-page-anatomy, wikipedia-talk-page, wikipedia-templates, wikipedia-wikitables, wikipedia-en-article-audit, wikipedia-en-biography-writing, wikipedia-notability-assessment, wikipedia-reference-verifiability | `reports/audit-content.json` |
-| Toolforge | wikimedia-toolforge, toolforge-nodejs, wikimedia-database, wikimedia-eventstreams, wikimedia-i18n-l10n-for-tools, wikimedia-ml-services, wikimedia-cdn-assets, wikimedia-phabricator | `reports/audit-toolforge.json` |
-| Tools | pywikibot, mediawiki-page-navigation, mediawiki-translate-extension, wikimedia-page-styling, wikimedia-wikitext, wikipedia-pagetriage-api, wiktionary, wikisource | `reports/audit-tools.json` |
+| APIs & Auth | wikimedia-api-access, wikimedia-api-strategy, wikimedia-auth-oauth, wikimedia-security-and-privacy, wikipedia-error-handling, wikimedia-diffs, wikipedia-edit-history, wikimedia-url-shortener | `reports/audit-apis-auth.json` |
+| Wikidata & Search | wikidata, wikidata-vector-search, wikidata-reconciliation, quickstatements, wikimedia-search-cirrussearch, wikimedia-petscan, wikimedia-pageviews, wikimedia-page-assessment, xtools, wikiwho | `reports/audit-wikidata-search.json` |
+| Commons | wikimedia-commons, commons-file-resolution, wikimedia-commons-audio-video, wikimedia-commons-pdf, wikimedia-commons-sdc, wikimedia-commons-sparql, wikimedia-commons-svg, wikimedia-commons-thumbnails, wikimedia-commons-categories, wikimedia-media-usage-metrics, flickr, flickr-wayback-recovery, pattypan | `reports/audit-commons.json` |
+| Content | wikipedia-categories, wikipedia-citations, wikipedia-page-anatomy, wikipedia-talk-page, wikipedia-templates, wikipedia-wikitables, wikipedia-en-article-audit, wikipedia-en-biography-writing, wikipedia-notability-assessment, wikipedia-reference-verifiability, wikipedia-wikiprojects, wikiportraits-event-series | `reports/audit-content.json` |
+| Toolforge | wikimedia-toolforge, toolforge-nodejs, toolforge-python, wikimedia-codex, wikimedia-database, wikimedia-eventstreams, wikimedia-i18n-l10n-for-tools, wikimedia-ml-services, wikimedia-phabricator | `reports/audit-toolforge.json` |
+| Tools | pywikibot, mediawiki-page-navigation, mediawiki-translate-extension, wikimedia-page-styling, wikimedia-wikitext, mint | `reports/audit-tools.json` |
+| Sister projects | wikisource, wiktionary, wikivoyage | `reports/audit-sister-projects.json` |
+
+Every skill in `.claude/skills/` must appear in exactly one batch — the pre-push hook
+(`.githooks/pre-push`) fails if a batch names a skill that does not exist, or if a skill
+is missing from every batch, so this table stays a complete inventory.
 
 For **each** skill in your batch, produce this JSON structure:
 ```json
@@ -80,7 +85,7 @@ so a human or the ground-truth verifiers can check it.
 
 ## Phase 3: Synthesize Report
 
-After all 6 batches complete, read the JSON outputs and produce a markdown report in
+After all 7 batches complete, read the JSON outputs and produce a markdown report in
 `reports/skill-audit-{date}.md` covering:
 1. Executive summary with score distribution
 2. Deep-dive on any new skills
