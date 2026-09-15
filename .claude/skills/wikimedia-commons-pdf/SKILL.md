@@ -11,7 +11,7 @@ skill_discovery_hints:
   - keywords: ["PDF metadata", "pdf_version", "pdf_encrypted", "DjVu metadata", "document rendering"]
   - keywords: ["Commons document", "Commons PDF", "Commons DjVu", "upload PDF", "upload DjVu"]
   - keywords: ["iiurlparam", "page selector", "page dimension"]
-last_verified: 2026-09-11
+last_verified: 2026-09-15
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -125,6 +125,18 @@ resp = requests.get("https://commons.wikimedia.org/w/api.php", params={
 
 > 💡 **`iiurlparam` syntax:** `page{N}` where N is the 1-indexed page number. This works for both PDF and DjVu.
 
+> ⚠️ **An out-of-range page is CLAMPED, not refused.** Measured 2026-09-15: `iiurlparam=page189` on a
+> 188-page document returned page **188** — the identical file, byte for byte (136,458 bytes both times) —
+> with no error and no warning. Clamp to the `pagecount` from `imageinfo`; never probe for a 404 to find
+> the last page.
+
+> 📐 **The delivered image is not the size you asked for.** The same request (`iiurlwidth=1024`) returned a
+> `thumburl` the API described as 1024 × 1405, and Wikimedia served **960 × 1317** — widths are bucketed.
+> Lay out from the image's own `naturalWidth`/`naturalHeight`; do not trust `thumbwidth`/`thumbheight`.
+
+> 🧹 **`thumburl` carries query junk** (`?utm_source=commons.wikimedia.org…`). Strip everything from `?`
+> before caching, comparing or de-duplicating thumb URLs.
+
 ### Constructing Thumb URLs for Arbitrary Pages
 
 If you have the page 1 thumb URL, you can construct URLs for other pages by replacing the page number:
@@ -136,7 +148,20 @@ page1_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Doc.pdf/p
 page_n_url = re.sub(r"/page\d+-", f"/page{page_number}-", page1_url)
 ```
 
-> ⚠️ This pattern works 99% of the time, but the safest approach is always to use `iiurlparam` with the API.
+> ⚠️ **Don't construct — ask.** This pattern works *most* of the time, and when it fails it fails with an
+> opaque 400 rather than a fallback. Measured 2026-09-15 on a 50 MB, 188-page PDF
+> (`File:The excavations at Dura-Europos … The Palace of Dux Ripae and the Dolicheneum.pdf`):
+>
+> | request | result |
+> |---|---|
+> | hand-built `upload.wikimedia.org/…/page1-1024px-….jpg` — also tried for pages 94, 188 and 189, and with the filename unencoded, `lossy-page1-`, and `800px` | **HTTP 400** — a Wikimedia error page, `text/html`, ~2 KB |
+> | the same pages via `prop=imageinfo&iiurlwidth=1024&iiurlparam=page{N}` → the `thumburl` it returns | **200**, `image/jpeg` |
+>
+> The returned URL was on **`thumb.wikimedia.org`**, not `upload.wikimedia.org`. Both hosts serve a
+> *cached* thumbnail (a small PDF's page 1 came back byte-identical from each), but a host you guess may not
+> be the one that can render the page. So: **take the URL from the API response** — its host, hash
+> directories and percent-encoding are already correct — and keep this regex only for adjusting the page
+> number within a URL the API gave you.
 
 ### Thumbnail Format
 
