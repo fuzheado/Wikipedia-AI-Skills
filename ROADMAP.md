@@ -9,6 +9,8 @@
 
 - **wikimedia-api-strategy** — Complete. Covers choosing the right Wikimedia API or tool for the task — decision framework covering REST API, Action API, SPARQL, SQL replicas, EventStreams, and Pywikibot, with latency/complexity/authentication trade-offs. Ships with `scripts/api-strategy.sh` (interactive CLI) and `assets/api_selector.py` (importable Python module with `recommend()` and `compare()` functions).
 
+- **wikimedia-url-shortener** — Complete. Covers creating and expanding `w.wiki` short URLs — the 301 redirect behaviour, the missing expansion API and the browser-CORS trap it leaves, server-side resolution patterns, and creation via `action=shortenurl` on meta.wikimedia.org. Depends on `wikimedia-api-access`, `wikimedia-auth-oauth`.
+
 - **wikipedia-notability-assessment** — Complete. Covers evaluating whether a subject meets English Wikipedia notability guidelines — the GNG four-element test (significant coverage, reliable sources, independent sources, multiple sources) with structured decision trees, all 13 subject-specific notability guidelines (NACADEMIC, NASTRO, NBOOK, NEVENT, NFILM, NGEO, NMUSIC, NNUMBER, NCORP, BIO, NSPECIES, NSPORT, NWEB) with per-SNG decision trees and keyword-based auto-classification, WP:BIO sub-criteria (ANYBIO, NACADEMIC, NCREATIVE, NENTERTAINER, NPOL, NSPORT, NCRIME, BIO1E) with political office/sports competition/major award detection, source quality assessment with domain reliability database (100+ domains scored 1-10) and churnalism detection, structured report generation in four formats (full, short, AfD, maintenance tag), invalid argument reference (20+ common bad arguments with policy shortcuts and counters), and 15 guardrails for common assessment mistakes. Ships with `assets/notability_checker.py` (complete assessment engine with auto-classification, SNG decision trees, GNG scoring, exclusion flagging, and CLI), `assets/source_evaluator.py` (source quality evaluator with domain reliability database, significance keyword analysis, source type classification, and CLI), `assets/notability_templates.py` (report formatting in 4 modes: full report, one-line short, AfD summary, maintenance tag), `scripts/notability-check.sh` (CLI assessment tool with --type/--desc/--source/--json/--afd/--short flags), `references/sng-decision-trees.md` (detailed decision tree cards for all 13 SNGs with common mistakes), and `references/invalid-arguments.md` (20+ documented invalid arguments with policy shortcuts, explanations, and counter examples). Tests: `tests/test_notability.py` (70 tests across checker, evaluator, templates, scripts, references, and SKILL.md validation).
 
 - **wikimedia-i18n-l10n-for-tools** — Complete. Covers designing multilingual Wikimedia tools — two layers of i18n (app UI messages vs Wikimedia-specific API i18n), message files with ICU MessageFormat plural support, language detection from Accept-Language headers with 4-source resolution (URL→cookie→header→default), language fallback chains for 100+ Wikimedia languages, RTL/bidi layout with CSS logical properties, Unicode normalization (NFC/NFD) and invisible character stripping, cross-wiki domain↔language mapping, batch Wikidata label fetching with language fallback, Commons multilingual file descriptions, page title normalization across APIs, and a systematic checklist for avoiding English Wikipedia assumptions. Ships with `assets/i18n_utils.py` (language detection, fallback resolution, domain mapping, title normalization, RTL checking, Accept-Language parsing), `assets/message_loader.py` (JSON message file loader with full fallback chain resolution, ICU plural/select support, locale-aware number formatting, and a self-contained demo), `assets/wikidata_labels.py` (batch Wikidata label/description/alias fetcher with fallback chain support and automatic 50-item batching), `scripts/language-fallback.sh` (CLI fallback chain lookup for 100+ languages, with --list mode), `scripts/fetch-multilingual-labels.sh` (CLI Wikidata label fetcher with --desc and --aliases), `references/language-codes.md` (language code reference with script/region info, RTL list, domain patterns, Accept-Language parsing code), and `references/unicode-pitfalls.md` (8 documented Unicode pitfalls with code examples: NFC/NFD, invisible characters, RTL overrides, combining characters, percent-encoding, Punycode, bidi in JSON). Tests: `tests/test_i18n.py` (95 tests across all modules).
@@ -28,10 +30,16 @@
 
 - **wikimedia-commons-sdc** — Complete. Covers adding, editing, and managing Structured Data on Commons — MediaInfo data model (M IDs, entity JSON, captions vs statements), 13 Wikibase API operations (wbgetentities, wbsetlabel, wbcreateclaim for 7 property types, wbsetclaim, wbsetclaimvalue, wbsetqualifier, wbsetreference, wbremoveclaims, wbcheckconstraints) with complete Python code per property type (item, date with precision/calendar, coordinates, string/URL) plus qualifier-only properties (P462 color, P6022 gesture, P2093 author string), statement ranks (preferred/normal/deprecated), 4 batch patterns (category-based, spreadsheet-driven, claim copying, value updates), constraint checking API integration, 5 GLAM workflows (Pattypan, OpenRefine, ISA campaigns, large-scale API scripts, SPARQL quality checking), community tools (AC/DC, Depictor, SDC Tool, Image Annotator, Cat2Data, Minefield, QuickStatements), and data modeling guidelines. Ships with `assets/commons-sdc-editor.py` (full CLI tool with 7 commands: caption, claim, date, coord, inspect, copy, batch-csv, batch-category), `references/sdc-properties.md` (property reference with common Q IDs, constraint rules, rank/snak types, date/coordinate time formats), and `scripts/sdc-stats.sh` (coverage checker for any Commons category showing captions/depicts/copyright/license/creator percentages). Depends on `wikimedia-api-access`, `wikimedia-auth-oauth`.
 
+- **wikimedia-commons-categories** — Complete. Covers creating and disambiguating Commons categories from Wikidata — the occupation-from-country pattern, "by name" people categories, definite-article country phrases, pluralisation, existence probing, and homonym disambiguation, distilled from the production Catapult gadget. Ships with `scripts/suggest_categories.py` and `references/catapult-category-patterns.md`. Tests: `tests/test_wikimedia_commons_categories.py`. Depends on `wikimedia-api-access`, `wikidata`.
+
 - **wikidata** — Complete. Covers Wikidata's role as the inter-language linking backbone for Wikipedia, the Q-number (items) and P-number (properties) system, Wikibase as a MediaWiki extension with its own Action API modules (`wbgetentities`, `wbsearchentities`, `wbgetclaims`, etc.), the SPARQL query service at query.wikidata.org (web interface and programmatic access), the fundamental properties P31 (instance of) and P279 (subclass of) with hierarchical query patterns, the community-driven (non-rigid) taxonomy model, a comparison of SPARQL vs. `haswbstatement:`, and workflow guidance for choosing the right access method.
 
 - **wikidata-reconciliation** — Complete. Covers resolving unstructured labels to verified Wikidata QIDs — the OpenRefine reconciliation service protocol (manifest at wikidata-reconciliation.wmcloud.org, suggest/entity autocomplete, batch POST — with the verified-2026-08-18 "invalid query" breakage documented as a trap), the always-working `wbsearchentities` primary path with candidate scoring (label match + description disambiguation + P31 type check + disambiguation-page detection), the verify-before-write guardrail via `wbgetentities`, and the LLM QID grounding discipline (batch-verify model-proposed QIDs, drop/flag mismatches, re-search failed labels, 10% threshold for systemic hallucination). Ships with `scripts/reconcile.py` (stdlib-only CLI: resolve labels, `--verify` flag checks existence/label/P31; verified live: Eiffel Tower→Q243, Leonardo da Vinci→Q762, "Jane Smith (artist?)"→UNRESOLVED, Barack Obama→Q649593 caught as label-mismatch). Depends on `wikimedia-api-access`, `wikidata`; cross-references `wikimedia-commons-sdc`, `quickstatements`, `wikidata-vector-search`.
 - **wikidata-vector-search** — Complete. Covers the Wikidata Vector Database API at wd-vectordb.wmcloud.org — a semantic/vector search engine over all Wikidata items and properties. Three endpoints: item search, property search, and similarity scoring. Hybrid vector+keyword retrieval with Reciprocal Rank Fusion (RRF), multilingual support (100+ languages, 4 with dedicated vectors), and optional reranker. Includes a CLI query script (wd-vector-search.sh) that resolves QIDs to labels and descriptions and filters to Wikipedia articles by default. Documents the alpha limitations (non-functional instanceof filter, concept-first ranking, no labels in response).
+
+- **quickstatements** — Complete. Covers building and running QuickStatements batches for Wikidata and (via QS 2.0) Commons SDC — the V1 grammar (statements, qualifiers, references, ranks, item creation), value formatting (dates, quantities, coordinates, monolingual text), multilingual labels/descriptions/aliases, and the QS 2.0 vs 3.0 choice. Ships with `scripts/qs_batch.py` (pure-function validator plus URL builders for both versions) and `references/quickstatements-syntax.md`. Tests: `tests/test_quickstatements.py`. Depends on `wikimedia-api-access`, `wikidata`.
+
+- **wikiportraits-event-series** — Complete. Covers recurring-event workflows in one place — Wikidata edition items (P31/P179/P393/P585, P155/P156 follows/followed-by chains, P856/P973 with language qualifiers, references, aliases), edition numbering across cancelled-year gaps, and the Commons `<Event> <YYYY>` year-category scheme. Ships with `scripts/create_edition.py`, `references/event-editions-workflow.md`, and `references/patterns.md`. Depends on `wikidata`, `pywikibot`, `wikimedia-api-access`, `wikimedia-commons-categories`.
 
 - **wikipedia-citations** — Complete. Covers Wikipedia citation templates (CS1/CS2) with full parameter reference for 20+ template types, the Wayback Machine API for checking and saving archives, dead link detection workflows, bare URL expansion, citation linting and validation, and 30+ maintenance templates. Ships with 4 CLI scripts (expand-bare-url, archive-check, check-dead-links, citation-inspector), 4 Python assets (wayback_inspector, dead_link_scanner, citation_linter, citation_generator), and 2 reference docs (CS1 parameters, maintenance templates).
 
@@ -52,7 +60,7 @@
 
 - **wikipedia-error-handling** — Complete. Covers HTTP error handling across all Wikimedia APIs: status code reference, per-service rate limits, universal retry pattern, SPARQL-specific rate limiting, User-Agent 403 debugging, Lift Wing model errors (422, 404, empty scores), EventStreams connection drops and canary events, and debugging checklist. Ships with `scripts/check-api-status.sh` (connectivity checker for 9 endpoints) and `assets/api_client.py` (reusable Python client with retry, rate limiting, SPARQL, Lift Wing, and EventStreams methods).
 
-- **wikimedia-cdn-assets** — Complete. Guides agents on loading JavaScript, CSS, and fonts from Wikimedia's privacy-preserving cdnjs.toolforge.org CDN to ensure user privacy and policy compliance.
+- *Former `wikimedia-cdn-assets` — absorbed into `wikimedia-toolforge` (2026-08, `7834017`): the privacy-preserving CDN guide, `references/cdn-mirror-guide.md`, `scripts/check-cdn.sh`, and `scripts/list-available.sh` now ship there.*
 
 - **wikimedia-diffs** — Complete. Covers fetching and interpreting diffs between Wikipedia page revisions via the Action API `compare` module and the REST API `/compare` endpoint, with HTML diff table parsing using BeautifulSoup, edit magnitude detection (byte churn, net changes, additions vs. removals), diff sharing links, anti-pattern guidance, and a fetch-diff script and diff-stats analyzer.
 
@@ -86,7 +94,7 @@
 
 - **wikipedia-reference-verifiability** — Complete. Covers analyzing whether a page's references contain URLs — detecting bare plain-text citations, template-based citations without `url=` parameters (18+ parameter names), shortened footnotes (harvsp/sfn/harvnb), and named ref reuse. Ships with `scripts/check-ref-urls.sh`, `scripts/batch-ref-audit.sh`, `assets/ref_url_checker.py` (importable library with `has_any_url_refs`, `has_infobox`, `get_shortened_footnotes`), and a 27-test test suite.
 
-- **wikipedia-pagetriage-api** — Complete. Covers the PageTriage extension API — listing unreviewed pages (`action=pagetriagelist`), marking pages reviewed/unreviewed (`action=pagetriageaction`), applying curation tags (`action=pagetriagetagging`), and the legacy `unreviewedpages` API. Documents the patrol permission model, review status codes (0=unreviewed through 3=autopatrolled), and the `pagetriage_page` SQL table. Front matter warns that PageTriage is primarily deployed on enwiki and testwiki only. Ships with `scripts/list-unreviewed.sh`, `scripts/check-status.sh`, `assets/pagetriage_client.py` (Python API client), and `assets/patrol_simulator.py` (two-pass pipeline demo).
+- *Former `wikipedia-pagetriage-api` — absorbed into `wikipedia-reference-verifiability` (2026-08, `7834017`): PageTriage listing/patrol guidance plus `assets/pagetriage_client.py`, `assets/patrol_simulator.py`, `scripts/list-unreviewed.sh`, and `scripts/check-status.sh` now live there.*
 
 - **wikimedia-auth-oauth** — Complete. Covers Wikimedia authentication for programmatic access: OAuth 2.0 Authorization Code Grant (multi-user web apps), OAuth 2.0 Client Credentials Grant (owner-only/Toolforge tools), OAuth 1.0a (legacy), bot passwords (personal scripts/cron), PKCE for non-confidential clients, CSRF token handling for write actions, permission/user rights checking, secure credential storage, and 8 categories of anti-patterns. Ships with `assets/oauth2_client.py` (importable Python library), `assets/flask-oauth2-app.py` (full demo web app), `assets/bot-password-editor.py` (CLI editing script), `references/oauth-endpoints.md`, `references/scopes-reference.md`, `references/common-mistakes.md`, `scripts/register-consumer.sh`, `scripts/test-auth.sh` (tests 3 auth methods), and `tests/test_auth_client.py` (50+ tests covering guardrails: CSRF token validation, assert=user, userinfo verification, anonymous fallback protection, and mock-based integration tests for all code assets). Depends on `wikimedia-api-access`, `wikimedia-error-handling`, `wikimedia-toolforge`.
 
@@ -110,6 +118,10 @@
 
 - **wikipedia-wikiprojects** — Complete. Covers understanding and working with English Wikipedia's WikiProject system — finding relevant projects, interpreting assessment tables, using Popular pages and work lists, and navigating project directories.
 
+- **flickr** — Complete. Covers fetching photos from Flickr's read-only REST API (photosets, search, metadata, tags, geo) and preparing pattypan upload manifests for Commons batch uploads — license filtering (free ids `4,5,7,8,9,10,11,12`; `0–3,6` skipped), flickr2commons-style descriptions, attribution, and date pitfalls. Ships with `scripts/fetch_flickr.py`, `references/flickr-api.md`, `references/flickr-to-commons.md`, and `references/flickr-download-and-date-pitfalls.md`. Depends on `wikimedia-commons`, `wikimedia-commons-sdc`, `pattypan`.
+
+- **pattypan** — Complete. Covers building valid pattypan upload spreadsheets (`.xls`) for batch Commons uploads — the two-sheet Data/Template format, `path`/`name` headers, template-variable matching, filename validation, and the bundled generator. Ships with `scripts/build_pattypan_spreadsheet.py` and `references/pattypan-spreadsheet-format.md`. Tests: `tests/test_pattypan.py`. Depends on `wikimedia-commons`.
+
 - **flickr-wayback-recovery** — Complete. Covers recovering a deleted or offline Flickr account from the Wayback Machine and batch-uploading the photos missing from Wikimedia Commons via pattypan — the CDX API (both NSID and alias URL forms, the trailing-slash regex pitfall that drops IDs, digest dedup), determining which Flickr IDs already exist on Commons (title + wikitext + SDC, matched by Flickr ID never by filename), scraping per-photo metadata from archived pages (the `modelExport` cyclical-JSON blob and its `~N` legend references, latin-1 percent-decoding, `error: no capture` / `error: no model` handling), downloading images (largest size first, `id_` raw rewrites, magic-byte validation because Wayback returns HTML error pages with HTTP 200), building the 13-column pattypan manifest (sequential per-year naming for camera-garbage titles, language-tagged descriptions with event placeholders, account/event/year/person categories, license-id passthrough with CC BY-NC skipped, plain-username credit when the people page is dead, tags as `other_fields`, and an explicit `skip_photos.txt` so pruned photos stay out even when an archived URL exists), and the non-negotiable validation checks. Derived from the production Internetstiftelsen rescue (1,130 archived IDs, 399 already on Commons, 675 uploaded). Ships with `scripts/cdx-photo-ids.py`, `scripts/check-commons.py`, `scripts/fetch-photo-metadata.py`, `scripts/download-images.py`, `scripts/build-manifest.py`, `scripts/validate-manifest.py`, `assets/inspect_model.py`, `references/wayback-cdx-notes.md`, and `references/internetstiftelsen-case-study.md`. Depends on `flickr`, `pattypan`, `wikimedia-commons`, `wikimedia-api-access`. Tests: `tests/test_flickr_wayback_recovery.py`.
 
 ### Project infrastructure
@@ -121,12 +133,12 @@
 - GitHub repository initialized at `fuzheado/Wikipedia-AI-Skills`
 - `.claude.json` project configuration for agent discovery
 - `CONTRIBUTING.md` with skill authoring guidelines, accuracy checklist, and PR process
-- Test suite with **250+ tests across 8 modules**: YAML frontmatter validation for all 47 skills (deduplicated),
-  mock-based unit tests for the cross-API pipeline script, content-accuracy checks for key SOPs,
-  mock-based tests for the Lift Wing multi-model scorer and article quality report,
-  citation tool tests (wayback, dead link scanner, linter, generator), category skill tests,
-  and template skill tests (expand-template, template-usage, inspect-template scripts,
-  template-inspector, template-scanner Python assets, and reference docs)
+- Test suite (`python3 -m pytest tests/ -q`), executed by the `Tests` CI workflow: YAML frontmatter validation for
+  every skill, mock-based tests for skill scripts and assets (cross-API pipeline, Lift Wing scorers,
+  citation tools, categories, templates, pattypan, quickstatements, wikisource/wiktionary, i18n,
+  notability), the explorer drift guard, and the pi extension's User-Agent-injection core
+- Six required CI checks on every PR: `check-skill-registration`, `check-conftest-auto-discovery`,
+  `check-roadmap-mentions`, `verify` (five ground-truth verifier scripts), `validate-tooling`, `tests`
 - `.gitignore` updated to exclude `.pytest_cache/`
 
 ## What's outstanding
@@ -155,18 +167,16 @@
 
 - **Domain-specific article templates** — Structure templates for common article types: companies, educational institutions, films, albums, software, scientific concepts. Each has distinct section conventions and notability guidelines.
 
-- **Notability assessment tool** — A standalone skill for evaluating whether a subject/topic meets Wikipedia notability criteria before investing in drafting. Could produce a structured report against GNG and relevant SNGs.
-
-- **Citation health checker** — SOPs for checking whether citations actually support the claims they are attached to, identifying dead links, missing metadata, and inappropriate sources.
+- **Citation health checker** — SOPs for checking whether citations actually support the claims they are attached to (partially covered today by `wikipedia-citations` and `wikipedia-reference-verifiability`, which audit the citations themselves rather than claim–source fit)
 
 ### Improvements to existing skills
 
 - Add more domain-specific infobox templates to the biography skill (e.g., `Infobox scientist`, `Infobox writer`, `Infobox artist`, `Infobox athlete`)
-- Add `Api-User-Agent` header guidance to the API access skill for browser-based tools
 - Consider adding citation template generators for common scenarios (book with ISBN lookup, news article with URL extraction)
 
 ### Completed improvements
 
+- **Browser `Api-User-Agent` guidance** — documented in `wikimedia-api-access`: browser JavaScript cannot set `User-Agent`, so requests use the `Api-User-Agent` header instead
 - **Script compliance audit** — Completed a full audit of all 33+ shell and Python scripts across all skills. Fixed 8 scripts with missing zero-argument guards, bash 4+ incompatibilities (`declare -A` → `case`), unsafe `curl | python3` pipes (→ temp files with HTTP status checks), non-portable `mktemp` templates, deferred imports that blocked `--help`. Published `.claude/guidelines/script-audit-guidelines.md` with compliance standard, pre-commit hook template, and CI workflow template.
 
 - **`wikimedia-api-strategy` skill** — New skill (added June 2026) providing a decision framework for choosing between the 6 Wikimedia access methods (REST API, Action API, SPARQL, SQL replicas, EventStreams, Pywikibot). Covers: quick decision flowchart, latency/complexity/authentication comparison table, 6 decision trees by task category (reading, batch, analytics, real-time, editing, graph queries), performance comparison (API vs. SQL speed ratios), strategy selection SOP with constraint checking, common anti-patterns with better alternatives, and quick reference cards by data size/operation scale. Ships with `scripts/api-strategy.sh` (interactive CLI with keyword-based task auto-detection) and `assets/api_selector.py` (importable Python module with `recommend()` and `compare()` functions).
@@ -234,14 +244,19 @@ See **[AGENT-INTEGRATION-STRATEGY.md](AGENT-INTEGRATION-STRATEGY.md)** for the f
 2. **Custom tools** (`pi.registerTool()`) — callable functions for vector search, page quality, pageviews, diffs, etc. — visible in the LLM's tool list, deterministic execution
 3. **Skills (retained)** — reference documentation and creative tasks, serendipitous discovery
 
-**Done:**
-- ✅ **Phase 0:** Single pi extension at `.pi/extensions/wikimedia-skills/index.ts` — auto-injects User-Agent headers on all `curl`, `wget`, `python`, and `node` commands targeting Wikimedia servers. Ships with unit tests (36 tests via `node --test`), extension structure validation (13 tests via `pytest`), config.json for customization, and full README install docs.
+**Shipped (Layers 1–2):**
+- ✅ **Layer 1 — hooks:** User-Agent injection on every `curl`, `wget`, `python`, and `node` command targeting Wikimedia servers, plus retry-flag injection for curl/wget
+- ✅ **Layer 2 — one tool:** `wikidata_vector_search` (semantic Wikidata lookup, deterministic execution)
+- Tests: `node --test` cases for the injection core and pytest cases for extension structure and the syntax check
 
-**Phases:**
-- Phase 1: Top 3 hooks — rate limit backoff (`tool_result` interceptor for 429), SSH tunnel health check (`tool_call` before SQL)
-- Phase 2: Top 5 custom tools (vector search, page quality, pageviews, page assessment, diffs)
-- Phase 3: Keyword-based auto-activation via `before_agent_start`
-- Phase 4: Event-driven cross-tool orchestration
+**Open:**
+- Layer 1: SSH tunnel pre-flight check before SQL
+- Layer 2: the remaining tools (page quality, pageviews, page assessment, diffs, Commons search)
+- Layer 3+: keyword auto-activation via `before_agent_start`, then cross-tool orchestration
+
+[`AGENT-INTEGRATION-STRATEGY.md`](AGENT-INTEGRATION-STRATEGY.md) is the source of truth — it carries the
+file-level As-built table and the portability mapping for other harnesses. This section intentionally
+summarises rather than duplicating it.
 
 ### Process
 
