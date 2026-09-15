@@ -404,7 +404,7 @@ See **[`research/ab-testing/`](research/ab-testing/)** for the full reports, inc
 - Code example consistency audit
 
 ```bash
-pip install pytest pyyaml requests
+pip install -r requirements.txt pytest pyyaml xlrd
 python -m pytest tests/
 ```
 

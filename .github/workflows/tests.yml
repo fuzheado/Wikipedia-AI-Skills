@@ -29,8 +29,10 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install test dependencies
-        run: python3 -m pip install pytest pyyaml requests
+      - name: Install dependencies
+        # requirements.txt = skill-asset deps; pytest/pyyaml/xlrd are test-only
+        # (xlrd lets tests/test_pattypan.py read back the generated .xls)
+        run: python3 -m pip install -r requirements.txt pytest pyyaml xlrd
 
       - name: Run test suite
         run: python3 -m pytest tests/ -q
