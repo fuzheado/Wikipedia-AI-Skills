@@ -35,8 +35,9 @@ For new or changed skills (`.claude/skills/<name>/`):
   CI's Skill Registration Check enforces the first two
 - **Tests:** add mock-based tests under `tests/` for new scripts/assets;
   run `python3 -m pytest tests/ -q`. The suite is green (3 skips are
-  optional-dependency guards) and the `Tests` workflow runs it on every PR —
-  a failure is yours to fix or explain
+  optional-dependency guards); tests marked `@pytest.mark.slow` make real API
+  calls and skip on HTTP 429/network drops via `run_live()` from
+  `tests/live_calls.py` — a skip there is CI throttling, not a failure
 - **Freshness:** bump `last_verified` in the frontmatter of any changed
   SKILL.md
 - **Verify before pushing skill changes** (all offline, all must pass):

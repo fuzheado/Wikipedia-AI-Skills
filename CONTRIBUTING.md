@@ -314,6 +314,29 @@ Consider adding a `tests/` directory in your skill directory with prompt-test pa
 
 Test that the agent respects each guardrail. For example, if a skill says "never query a table named X", test that the agent refuses to do so or flags it.
 
+### Live-API tests
+
+Tests that make real API calls must be marked `@pytest.mark.slow` (registered in `pytest.ini`; deselect with
+`-m "not slow"`) and run their commands through `run_live()` from `tests/live_calls.py` instead of calling
+`subprocess.run()` directly:
+
+```python
+from live_calls import run_live
+
+@pytest.mark.slow
+def test_scanner_real_page():
+    result = run_live([sys.executable, str(TMPL_SCANNER), 'Berlin'],
+                      capture_output=True, text=True, timeout=30)
+    assert result.returncode == 0, f"Failed: {result.stderr}"
+```
+
+`run_live()` paces calls at least one second apart (Wikimedia etiquette), retries an HTTP 429 or network drop,
+and then **skips** the test with the API output in the skip reason instead of failing CI — data-centre
+runners get throttled far more often than laptops (this is what failed the `tests` job on 2026-09-15, with
+eight HTTP 429s in `tests/test_templates.py`). Real failures still fail: the transient signatures must match
+*and* the command must have exited non-zero. Set `SKILLS_LIVE_STRICT=1` to turn those skips back into
+failures when you deliberately want to verify the live API from a given host.
+
 ## Pull Request Process
 
 1. **Fork and branch** — Create a feature branch from `main`
