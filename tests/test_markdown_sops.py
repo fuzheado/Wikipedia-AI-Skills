@@ -180,3 +180,68 @@ class TestLiftWingLLMSection:
         text = self._text()
         assert "must match the URL path" in text  # model name == URL segment
         assert "think" in text  # reasoning wrapper
+
+
+class TestPhabricatorResponsibleInteraction:
+    """Verify the responsible-interaction policy gate in wikimedia-phabricator."""
+
+    def _skill(self):
+        from conftest import read_skill
+        return read_skill('wikimedia-phabricator')
+
+    def _reference(self):
+        from conftest import SKILLS_DIR
+        path = SKILLS_DIR / 'wikimedia-phabricator' / 'references' / 'responsible-interaction.md'
+        assert path.exists(), 'references/responsible-interaction.md must exist'
+        return path.read_text('utf-8')
+
+    def test_gate_section_and_pointer(self):
+        text = self._skill()
+        assert 'Responsible Interaction' in text
+        assert 'references/responsible-interaction.md' in text
+        assert 'read-only' in text.lower()
+
+    def test_read_only_default_in_reference(self):
+        text = self._reference()
+        assert 'READ-ONLY' in text
+        assert 'Do not file, comment, edit, claim, assign' in text
+        assert 'ERR-INVALID-SESSION' in text  # anonymous Conduit is expected, not a bug
+
+    def test_ai_llm_responsibility_rule_quoted(self):
+        text = self._reference()
+        assert 'fully responsible for its content' in text
+        assert 'represent your own understanding' in text
+
+    def test_security_never_a_public_task(self):
+        text = self._reference()
+        assert 'security@wikimedia.org' in text
+        assert 'form/75' in text
+        assert 'never public' in text.lower()
+
+    def test_status_priority_reflect_reality(self):
+        text = self._reference()
+        assert 'do *not* cause it' in text
+        assert 'prior agreement' in text  # no assigning without consent
+
+    def test_bot_account_route(self):
+        text = self._reference()
+        assert '#Phabricator-Bot-Requests' in text
+        assert 'personal account must not be used' in text
+
+    def test_robot_policy_limits_for_phabricator(self):
+        text = self._reference()
+        assert 'concurrency of at most 1' in text
+        assert 'at least 1 second between requests' in text
+        assert '15 minutes' in text
+
+    def test_conduct_and_privacy(self):
+        text = self._reference()
+        assert 'techconduct@wikimedia.org' in text
+        assert 'PermanentlyPrivate' in text
+        assert 'Uploaded files are private until' in text
+
+    def test_sources_listed(self):
+        text = self._reference()
+        for anchor in ('Bug_management/Phabricator_etiquette', 'Code_of_Conduct',
+                       'Reporting_security_bugs', 'Phabricator/Bots', 'wiki/Robot_policy'):
+            assert anchor in text, f'missing source: {anchor}'

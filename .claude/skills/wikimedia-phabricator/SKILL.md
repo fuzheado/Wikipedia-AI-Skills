@@ -4,7 +4,7 @@ description: Navigate Wikimedia's Phabricator instance — search tasks, track p
 license: MIT
 compatibility: opencode
 depends_on: [wikimedia-api-access]
-last_verified: 2026-06-12
+last_verified: 2026-09-17
 skill_discovery_hints:
   - keywords: ["Phabricator", "Phab", "bug report", "bug tracker", "known issue", "known bug", "feature request", "task"]
   - keywords: ["in development", "being worked on", "project status", "roadmap", "sprint", "workboard", "deployment status"]
@@ -185,6 +185,32 @@ Tag the task with the relevant project so it reaches the right team. If unsure, 
 
 ---
 
+## SOP: Responsible Interaction (policy gate for any write)
+
+**Agents default to read-only here.** Do not file, comment, assign, re-prioritise or attach on a person's
+behalf — produce the draft (body, reproduction steps, evidence) and hand it to the human, who posts it from
+their own account. Reading needs no credential; anonymous Conduit returns `ERR-INVALID-SESSION`, which is
+expected. The full rules, quoted from the primary policy pages, live in
+**[references/responsible-interaction.md](references/responsible-interaction.md)** — read that file before
+any write action. The load-bearing points:
+
+| Rule | Source |
+|---|---|
+| **AI/LLM-assisted content**: "you are fully responsible for its content. Your text must be accurate, factually correct, and represent your own understanding" — verify every claim, number and task ID | Phabricator etiquette |
+| **Security issues are never public tasks** — `security@wikimedia.org` or form/75, coordinated disclosure | Reporting security bugs |
+| **Status and priority "reflect reality and do not cause it"** — when in doubt, comment instead of changing | Phabricator etiquette |
+| **Don't assign without the person's prior agreement**; no "me too"/"Fix this now" — subscribe or use a mention | Phabricator etiquette |
+| **Act in public**: technical detail belongs in the task, not in private email (security excepted) | Phabricator etiquette |
+| **No confidential data** in tasks, comments or attachments — no IPs, emails, tokens, credentials or NDA material; uploaded files are private only until attached | How to report a bug |
+| **Use @usernames, not real names**; prefer mentions/subscriptions/Herald over mass pings | Phabricator etiquette |
+| **Automation needs a registered bot account** (requested in #Phabricator-Bot-Requests with a named human owner) — never a personal account for repetitive activity | Phabricator/Bots |
+| Phabricator is covered by the **Code of Conduct for Wikimedia technical spaces**; reports → `techconduct@wikimedia.org` | Code of Conduct |
+
+Automated access is also rate-limited: for Phabricator (and Gerrit/GitLab) the Robot policy is **at most
+1 concurrent request, at least 1 second between requests, and a 15-minute pause after any 5xx**.
+
+---
+
 ## SOP: Tracking What's in Development
 
 To answer "is X being worked on?":
@@ -214,7 +240,7 @@ Goal: Find out if section-level watchlisting is deployed
 
 - **wikimedia-toolforge** — Toolforge infrastructure tasks on Phabricator; this skill helps find them
 - **wikipedia-error-handling** — Known API bugs and error conditions are tracked in Phabricator; this skill helps verify whether a 429/403 behavior is a known issue
-- **wikimedia-api-access** — API feature requests and bug reports go through Phabricator
+- **wikimedia-api-access** — API feature requests and bug reports go through Phabricator; its Robot-policy section also carries the rate limits that govern automated Phabricator access (concurrency ≤ 1, ≥ 1 s between requests, 15-minute pause after any 5xx)
 - **All skills that reference specific tasks** — Use this skill to look up referenced tasks and understand their current status (e.g. checking whether a deprecation noted in a skill is still in progress)
 
 ---
