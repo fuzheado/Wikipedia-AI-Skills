@@ -666,6 +666,7 @@
   "https://www.mediawiki.org/wiki/Help:Subpages": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Help:TemplateStyles": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Manual:$wgIllegalFileChars": "2026-09-03T22:47:01Z",
+  "https://www.mediawiki.org/wiki/Manual:Categorylinks_table": "2026-09-19T10:44:04Z",
   "https://www.mediawiki.org/wiki/Manual:Pywikibot": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Manual:Pywikibot/Cookbook": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Manual:RCFeed": "2026-08-10T12:57:50Z",
@@ -735,7 +736,7 @@
   "https://your-tool.toolforge.org": "2026-08-10T12:57:50Z",
   "https://\u0440\u0443.wikipedia.org": "2026-08-10T13:07:28Z"
  },
- "generated_at": "2026-09-15T16:05:52Z",
+ "generated_at": "2026-09-19T10:44:04Z",
  "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
@@ -1423,6 +1424,7 @@
   "https://www.mediawiki.org/wiki/Help:Subpages": 200,
   "https://www.mediawiki.org/wiki/Help:TemplateStyles": 200,
   "https://www.mediawiki.org/wiki/Manual:$wgIllegalFileChars": 200,
+  "https://www.mediawiki.org/wiki/Manual:Categorylinks_table": 200,
   "https://www.mediawiki.org/wiki/Manual:Pywikibot": 200,
   "https://www.mediawiki.org/wiki/Manual:Pywikibot/Cookbook": 200,
   "https://www.mediawiki.org/wiki/Manual:RCFeed": 200,
@@ -1493,5 +1495,5 @@
   "https://your-tool.toolforge.org": -1,
   "https://\u0440\u0443.wikipedia.org": 0
  },
- "user_agent": "WikipediaSkill/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills; andrew.lih@gmail.com) ContentGapResearch"
+ "user_agent": "wikipedia-ai-skills-url-registry/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills)"
 }

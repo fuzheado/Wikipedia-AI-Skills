@@ -41,11 +41,13 @@ with core_c.cursor() as cur:
     cats = {pid: title for pid, title in cur.fetchall()}
 
 with links_c.cursor() as cur:
-    cur.execute("SELECT cl_from, cl_to FROM categorylinks")
+    cur.execute("SELECT cl_from, lt_title FROM categorylinks "
+                "JOIN linktarget ON lt_id = cl_target_id "
+                "WHERE lt_namespace = 14")
     membership = cur.fetchall()
 
 # join in code, not in SQL
-for cl_from, cl_to in membership:
+for cl_from, cl_title in membership:
     if cl_from in cats:
         ...
 ```
@@ -192,7 +194,8 @@ SELECT page_title, CAST(pp_value AS UNSIGNED) as avg_views
 FROM page
 JOIN page_props ON pp_page = page_id
 JOIN categorylinks ON cl_from = page_id
-WHERE cl_to = 'Physics'
+JOIN linktarget ON lt_id = cl_target_id
+WHERE lt_namespace = 14 AND lt_title = 'Physics'
   AND pp_propname = 'pageview_daily_average'
   AND page_namespace = 0
 ORDER BY avg_views DESC
@@ -214,15 +217,23 @@ WHERE pp_propname = 'wikibase_item'
 | Column | Type | Description |
 |---|---|---|
 | `cl_from` | int | `page_id` of the page |
-| `cl_to` | varbinary(255) | Category name (without `Category:` prefix) |
+| `cl_target_id` | bigint unsigned | Foreign key to `linktarget.lt_id`. Replaced `cl_to` in MediaWiki 1.44 |
 | `cl_type` | varbinary(10) | `page`, `subcat`, or `file` |
+
+> ⚠️ **`cl_to` no longer exists.** MediaWiki 1.44 normalised the category name out of
+> `categorylinks` into the shared `linktarget` table. Every query must join
+> `linktarget ON lt_id = cl_target_id` and filter on `lt_title` (with
+> `lt_namespace = 14`) instead. A query still using `cl_to` fails with
+> `ERROR 1054 (42S22): Unknown column 'cl_to'`. See
+> [Manual:Categorylinks table](https://www.mediawiki.org/wiki/Manual:Categorylinks_table).
 
 ```sql
 -- All pages in a category
 SELECT page_title
 FROM categorylinks
 JOIN page ON cl_from = page_id
-WHERE cl_to = 'Physics'
+JOIN linktarget ON lt_id = cl_target_id
+WHERE lt_namespace = 14 AND lt_title = 'Physics'
   AND page_namespace = 0
 LIMIT 100;
 
@@ -234,12 +245,14 @@ WHERE page_id = 736
 GROUP BY page_title;
 
 -- Subcategories of a category
-SELECT cl_to as subcategory
+SELECT lt_title AS subcategory
 FROM categorylinks
+JOIN linktarget ON lt_id = cl_target_id
 WHERE cl_from IN (
   SELECT page_id FROM page
   JOIN categorylinks ON cl_from = page_id
-  WHERE cl_to = 'Physics' AND page_namespace = 14
+  JOIN linktarget ON lt_id = cl_target_id
+  WHERE lt_namespace = 14 AND lt_title = 'Physics' AND page_namespace = 14
 )
 AND cl_type = 'subcat';
 ```
