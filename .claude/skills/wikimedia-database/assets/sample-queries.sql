@@ -54,17 +54,19 @@ LIMIT 25;
 SELECT p.page_title, p.page_len
 FROM categorylinks cl
 JOIN page p ON cl.cl_from = p.page_id
-WHERE cl.cl_to = 'Physics'
+JOIN linktarget lt ON lt.lt_id = cl.cl_target_id
+WHERE lt.lt_namespace = 14 AND lt.lt_title = 'Physics'
   AND p.page_namespace = 0
 ORDER BY p.page_len DESC
 LIMIT 50;
 
 -- Count of pages per category (top categories)
-SELECT cl_to AS category, COUNT(*) AS page_count
+SELECT lt_title AS category, COUNT(*) AS page_count
 FROM categorylinks
 JOIN page ON cl_from = page_id
-WHERE page_namespace = 0
-GROUP BY cl_to
+JOIN linktarget ON lt_id = cl_target_id
+WHERE page_namespace = 0 AND lt_namespace = 14
+GROUP BY lt_title
 ORDER BY page_count DESC
 LIMIT 50;
 
@@ -72,15 +74,17 @@ LIMIT 50;
 SELECT p.page_title AS subcategory
 FROM categorylinks cl
 JOIN page p ON cl.cl_from = p.page_id
-WHERE cl.cl_to = 'Physics'
+JOIN linktarget lt ON lt.lt_id = cl.cl_target_id
+WHERE lt.lt_namespace = 14 AND lt.lt_title = 'Physics'
   AND p.page_namespace = 14  -- Category namespace
 ORDER BY p.page_title;
 
 -- Categories a specific page belongs to
-SELECT cl_to AS category
+SELECT lt_title AS category
 FROM categorylinks
+JOIN linktarget ON lt_id = cl_target_id
 WHERE cl_from = (SELECT page_id FROM page WHERE page_title = 'Albert_Einstein' AND page_namespace = 0)
-ORDER BY cl_to;
+ORDER BY lt_title;
 
 -- ═══════════════════════════════════════════════════════════
 -- 4. PAGEVIEW DATA (via page_props)
@@ -91,7 +95,8 @@ SELECT p.page_title, CAST(pp.pp_value AS UNSIGNED) AS avg_daily_views
 FROM categorylinks cl
 JOIN page p ON cl.cl_from = p.page_id
 JOIN page_props pp ON pp.pp_page = p.page_id
-WHERE cl.cl_to = 'Physics'
+JOIN linktarget lt ON lt.lt_id = cl.cl_target_id
+WHERE lt.lt_namespace = 14 AND lt.lt_title = 'Physics'
   AND p.page_namespace = 0
   AND pp.pp_propname = 'pageview_daily_average'
 ORDER BY avg_daily_views DESC
@@ -112,7 +117,8 @@ SELECT p.page_title, CAST(pp.pp_value AS UNSIGNED) AS avg_daily_views
 FROM categorylinks cl
 JOIN page p ON cl.cl_from = p.page_id
 JOIN page_props pp ON pp.pp_page = p.page_id
-WHERE cl.cl_to = 'Biology'
+JOIN linktarget lt ON lt.lt_id = cl.cl_target_id
+WHERE lt.lt_namespace = 14 AND lt.lt_title = 'Biology'
   AND p.page_namespace = 0
   AND pp.pp_propname = 'pageview_daily_average'
   AND CAST(pp.pp_value AS UNSIGNED) > 5000
@@ -127,7 +133,8 @@ SELECT p.page_title, pp.pp_value AS wikidata_qid
 FROM categorylinks cl
 JOIN page p ON cl.cl_from = p.page_id
 JOIN page_props pp ON pp.pp_page = p.page_id
-WHERE cl.cl_to = 'Physics'
+JOIN linktarget lt ON lt.lt_id = cl.cl_target_id
+WHERE lt.lt_namespace = 14 AND lt.lt_title = 'Physics'
   AND p.page_namespace = 0
   AND pp.pp_propname = 'wikibase_item'
 ORDER BY p.page_title;
@@ -137,7 +144,8 @@ SELECT p.page_title
 FROM categorylinks cl
 JOIN page p ON cl.cl_from = p.page_id
 LEFT JOIN page_props pp ON pp.pp_page = p.page_id AND pp.pp_propname = 'wikibase_item'
-WHERE cl.cl_to = 'Uncategorized_pages'
+JOIN linktarget lt ON lt.lt_id = cl.cl_target_id
+WHERE lt.lt_namespace = 14 AND lt.lt_title = 'Uncategorized_pages'
   AND p.page_namespace = 0
   AND pp.pp_page IS NULL
 LIMIT 50;
@@ -207,7 +215,7 @@ LIMIT 25;
 -- Most viewed pages that are in multiple categories
 SELECT p.page_title,
        CAST(pp.pp_value AS UNSIGNED) AS avg_daily_views,
-       COUNT(DISTINCT cl.cl_to) AS category_count
+       COUNT(DISTINCT cl.cl_target_id) AS category_count
 FROM page p
 JOIN page_props pp ON pp.pp_page = p.page_id AND pp.pp_propname = 'pageview_daily_average'
 JOIN categorylinks cl ON cl.cl_from = p.page_id
