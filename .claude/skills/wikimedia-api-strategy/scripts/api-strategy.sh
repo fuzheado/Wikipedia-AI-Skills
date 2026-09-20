@@ -138,7 +138,9 @@ recommend() {
             echo "    Requires SSH tunnel to Toolforge. 100-1000× faster."
             echo "    SELECT p.page_title FROM categorylinks cl"
             echo "    JOIN page p ON cl.cl_from = p.page_id"
-            echo "    WHERE cl.cl_to = 'Category_name' AND p.page_namespace = 0"
+            echo "    JOIN linktarget lt ON lt.lt_id = cl.cl_target_id"
+            echo "    WHERE lt.lt_namespace = 14 AND lt.lt_title = 'Category_name'"
+            echo "      AND p.page_namespace = 0"
             echo
             echo -e "  ${YELLOW}Tip:${NC} If you're writing a loop with >50 API calls, switch to SQL."
             ;;

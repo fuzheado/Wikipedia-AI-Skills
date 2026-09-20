@@ -12,7 +12,8 @@ SELECT p.page_title,
 FROM page p
 JOIN page_props pp ON pp.pp_page = p.page_id
 JOIN categorylinks cl ON cl.cl_from = p.page_id
-WHERE cl.cl_to = 'Physics'
+JOIN linktarget lt ON lt.lt_id = cl.cl_target_id
+WHERE lt.lt_namespace = 14 AND lt.lt_title = 'Physics'
   AND p.page_namespace = 0
   AND p.page_is_redirect = 0
   AND pp.pp_propname = 'pageview_daily_average'
@@ -74,17 +75,19 @@ LIMIT 25;
 -- 5. COMPARE POPULARITY ACROSS CATEGORIES
 -- ═══════════════════════════════════════════════════════════
 
-SELECT cl.cl_to AS category,
+SELECT lt.lt_title AS category,
        COUNT(*) AS pages_with_data,
        ROUND(AVG(CAST(pp.pp_value AS UNSIGNED))) AS avg_views,
        ROUND(MAX(CAST(pp.pp_value AS UNSIGNED))) AS max_views
 FROM categorylinks cl
 JOIN page p ON cl.cl_from = p.page_id
+JOIN linktarget lt ON lt.lt_id = cl.cl_target_id
 JOIN page_props pp ON pp.pp_page = p.page_id
     AND pp.pp_propname = 'pageview_daily_average'
-WHERE p.page_namespace = 0
+WHERE lt.lt_namespace = 14
+  AND p.page_namespace = 0
   AND p.page_is_redirect = 0
-GROUP BY cl.cl_to
+GROUP BY lt.lt_title
 HAVING pages_with_data > 50
 ORDER BY avg_views DESC
 LIMIT 25;
@@ -117,7 +120,8 @@ SELECT @rank := @rank + 1 AS rank,
 FROM page p
 JOIN page_props pp ON pp.pp_page = p.page_id
 JOIN categorylinks cl ON cl.cl_from = p.page_id
-WHERE cl.cl_to = 'Physics'
+JOIN linktarget lt ON lt.lt_id = cl.cl_target_id
+WHERE lt.lt_namespace = 14 AND lt.lt_title = 'Physics'
   AND p.page_namespace = 0
   AND p.page_is_redirect = 0
   AND pp.pp_propname = 'pageview_daily_average'

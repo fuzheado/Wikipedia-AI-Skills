@@ -167,9 +167,10 @@ LIMIT 30;
 SELECT cl.cl_sortkey AS page_title
 FROM categorylinks cl
 JOIN page p ON cl.cl_from = p.page_id
+JOIN linktarget lt ON lt.lt_id = cl.cl_target_id
 LEFT JOIN page_assessments pa ON p.page_id = pa.pa_page_id
   AND pa.pa_project_id = (SELECT pap_project_id FROM page_assessments_projects WHERE pap_project_title = 'Biology')
-WHERE cl.cl_to = 'WikiProject_Biology_articles'
+WHERE lt.lt_namespace = 14 AND lt.lt_title = 'WikiProject_Biology_articles'
   AND p.page_namespace = 0
   AND pa.pa_page_id IS NULL
 LIMIT 25;
