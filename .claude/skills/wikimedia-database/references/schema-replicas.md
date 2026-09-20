@@ -181,7 +181,7 @@ WHERE actor_name = 'ExampleUser';
 
 | Property | Description | Value type |
 |---|---|---|
-| `pageview_daily_average` | Average daily pageviews | Float (use `CAST AS UNSIGNED`) |
+| ⚠️ `pageview_daily_average` | **Retired — no longer written.** 0 rows on enwiki, commons, dewiki, frwiki, nlwiki and wikidatawiki (verified 2026-09-20), and no `pageview*` property exists on any of them, so queries filtering on it return an **empty result set** rather than an error. Use the AQS/REST pageviews API instead (see the wikimedia-pageviews skill); the patterns below are kept for when a popularity property exists. | Float (use `CAST AS UNSIGNED`) |
 | `wikibase_item` | Linked Wikidata Q-ID | String (e.g., `Q937`) |
 | `noeditsection` | Disable section edit links | String |
 | `displaytitle` | Custom display title | String |
@@ -190,6 +190,8 @@ WHERE actor_name = 'ExampleUser';
 
 ```sql
 -- Get average daily views for pages in a category
+-- ⚠️ Returns 0 rows today: `pageview_daily_average` is no longer written
+-- (see the page_props table above — verified 2026-09-20).
 SELECT page_title, CAST(pp_value AS UNSIGNED) as avg_views
 FROM page
 JOIN page_props ON pp_page = page_id
@@ -280,15 +282,29 @@ AND cl_type = 'subcat';
 | Column | Type | Description |
 |---|---|---|
 | `pl_from` | int | Page that contains the link |
-| `pl_namespace` | int | Target page namespace |
-| `pl_title` | varbinary(255) | Target page title |
+| `pl_from_namespace` | int | Namespace of the linking page |
+| `pl_target_id` | bigint unsigned | Foreign key to `linktarget.lt_id` — the target page. Replaced `pl_namespace`/`pl_title` in the link-table normalisation |
 
 ```sql
 -- Count of pages linking to a given page
 SELECT COUNT(*) as incoming_links
-FROM pagelinks
-WHERE pl_title = 'Albert_Einstein' AND pl_namespace = 0;
+FROM pagelinks pl
+JOIN linktarget lt ON lt.lt_id = pl.pl_target_id
+WHERE lt.lt_namespace = 0 AND lt.lt_title = 'Albert_Einstein';
 ```
+
+> ⚠️ **`pl_title` / `pl_namespace` no longer exist.** `pagelinks` was normalised exactly like
+> `categorylinks`: the target title moved into `linktarget`, reached with `pl_target_id` and
+> filtered on `lt_namespace` **and** `lt_title`. Same story for `templatelinks` (`tl_target_id`)
+> and `imagelinks` (`il_target_id`) — but **not** for `langlinks` (still `ll_title`) or
+> `globalimagelinks` (still `gil_to`). A query using the old names fails with
+> `ERROR 1054 (42S22): Unknown column 'pl_title'`.
+>
+> Tracking tasks, per table: `pagelinks` [T299947](https://phabricator.wikimedia.org/T299947)/[T352010](https://phabricator.wikimedia.org/T352010),
+> `templatelinks` [T299417](https://phabricator.wikimedia.org/T299417)/[T314041](https://phabricator.wikimedia.org/T314041),
+> `imagelinks` [T299953](https://phabricator.wikimedia.org/T299953),
+> `categorylinks` [T299951](https://phabricator.wikimedia.org/T299951)/[T402925](https://phabricator.wikimedia.org/T402925).
+> Keep both `lt_*` filters: they match the `linktarget` index on (`lt_namespace`, `lt_title`).
 
 ---
 

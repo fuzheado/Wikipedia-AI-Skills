@@ -266,6 +266,7 @@ Before submitting a skill, verify every item:
   - `verify-snippets.py` — python/bash/json/js code blocks must parse
   - `verify-freshness.py` — `last_verified` within the freshness window
   - `verify-mul-labels.py` — `mul` (default value) present in SPARQL label services, pinned label readers, and multi-language `languages=` requests
+  - `verify-sql-live.py` — **opt-in, not run by CI** (it needs Toolforge replica credentials and SSH tunnels): executes every SQL asset/fence as a zero-row probe against `enwiki_p`/`commonswiki_p`, so a removed column (`cl_to`, `pl_title`) or a retired property (`pageview_daily_average`) fails before it ships. Run it when you change SQL in a skill.
   If you document a new command/API/URL, regenerate the matching registry first (see README "Ground-truth verification suite").
 - [ ] **Test suite:** `.github/workflows/tests.yml` runs `python3 -m pytest tests/ -q` on every PR. Node 22 is
   set up for the extension syntax check; dependencies come from `requirements.txt` plus `pytest pyyaml xlrd`.
