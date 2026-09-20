@@ -217,7 +217,7 @@ WHERE pp_propname = 'wikibase_item'
 | Column | Type | Description |
 |---|---|---|
 | `cl_from` | int | `page_id` of the page |
-| `cl_target_id` | bigint unsigned | Foreign key to `linktarget.lt_id`. Replaced `cl_to` in MediaWiki 1.44 |
+| `cl_target_id` | bigint unsigned | Foreign key to `linktarget.lt_id`. Added in MediaWiki 1.44, which wrote `cl_to` **and** `cl_target_id`; `cl_to` went away in 1.45 and from the Wiki Replicas on 2026-03-01 ([T402925](https://phabricator.wikimedia.org/T402925), [T417492](https://phabricator.wikimedia.org/T417492)) |
 | `cl_type` | varbinary(10) | `page`, `subcat`, or `file` |
 
 > ⚠️ **`cl_to` no longer exists.** MediaWiki 1.44 normalised the category name out of
@@ -226,6 +226,22 @@ WHERE pp_propname = 'wikibase_item'
 > `lt_namespace = 14`) instead. A query still using `cl_to` fails with
 > `ERROR 1054 (42S22): Unknown column 'cl_to'`. See
 > [Manual:Categorylinks table](https://www.mediawiki.org/wiki/Manual:Categorylinks_table).
+>
+> **Why this keeps biting.** The compatibility window makes the change look recent:
+> 1.44 (2025) shipped *both* columns in "write both" mode, so queries copied from
+> older examples kept working; the Wiki Replicas then served a compatibility view
+> until it was dropped on **2026-03-02** ([Gerrit 1239483](https://gerrit.wikimedia.org/r/c/1239483)).
+> Guides that predate that — notably
+> [Help:Wiki Replicas/Queries/Example queries](https://wikitech.wikimedia.org/wiki/Help:Wiki_Replicas/Queries/Example_queries),
+> last edited 2024-10 — still contain `cl_to` examples, which is how the queries in this
+> repo ended up broken for four months without anyone noticing. **Execute a category query
+> against a replica before shipping it**: the repo's verifiers check URLs, snippets, CLI
+> commands and API names, but nothing runs SQL, so a wrong column name is invisible until a
+> human runs the query.
+>
+> **Keep both filters.** `lt_namespace = 14` *and* `lt_title = ...` match the `linktarget`
+> index on (`lt_namespace`, `lt_title`). Filtering on `lt_title` alone returns the same rows
+> but cannot use that index and has been reported as very slow.
 
 ```sql
 -- All pages in a category
