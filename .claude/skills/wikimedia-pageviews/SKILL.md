@@ -1,6 +1,6 @@
 ---
 name: wikimedia-pageviews
-description: Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties (sorting/filtering) or the REST API (precise historical data)
+description: Retrieve traffic and popularity statistics for Wikipedia articles via the Wikimedia pageviews/AQS REST API — top-pages ranking, per-article history, media requests, and why the old page_props popularity cache no longer works
 license: MIT
 compatibility: opencode
 depends_on: [wikimedia-api-access]
@@ -8,22 +8,38 @@ skill_discovery_hints:
   - keywords: ["pageviews", "traffic", "popularity", "article views", "views per article"]
   - keywords: ["top pages", "pageview API", "daily views", "analytics"]
   - keywords: ["media views", "mediarequests", "file views", "image views", "media requests"]
-last_verified: 2026-09-15
+last_verified: 2026-09-20
 ---
 
 > ⚠️ **User-Agent required:** The REST API examples below require a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
 
-Enables the agent to retrieve traffic and popularity statistics for Wikipedia articles. Since historical pageview logs are not stored in the SQL replicas, the agent must distinguish between using a **cached SQL property** for sorting and the **REST API** for precise historical data.
+Enables the agent to retrieve traffic and popularity statistics for Wikipedia articles. Historical pageview logs are not stored in the SQL replicas, and the old `page_props` popularity cache (`pageview_daily_average`) is no longer populated — **the API is the source of truth**, and SQL is only for producing the candidate set to rank (see Scenario A).
 
 ## **SOP: Data Source Selection**
 
-### **Scenario A: Sorting/Filtering by General Popularity (SQL)**
+### **Scenario A: Sorting/Filtering by General Popularity — no SQL path today**
 
-If the task requires finding "popular pages" within a large SQL result set (e.g., "Top 100 most viewed pages in Category:Physics"), use the `page_props` table. This is much faster than making 100 API calls.
+⚠️ **The `page_props` popularity cache is retired.** The property this skill used to recommend,
+`pageview_daily_average`, has **0 rows** on enwiki, commons, dewiki, frwiki, nlwiki and
+wikidatawiki (verified 2026-09-20), and no `pageview*` property exists on any of them — while
+`page_props` itself is healthy (`wikibase_item` has 10.3M rows on enwiki). Queries filtering on it
+still parse, then return an **empty result set**: a silent wrong answer, not an error.
+([Tool:Popular Pages](https://wikitech.wikimedia.org/wiki/Tool:Popular_Pages) reads the PageviewAPI
+rather than writing a property.)
 
-* **Property Name:** `pageview_daily_average`
+For "Top 100 most viewed pages in Category:Physics", the working shape is:
+
+1. **Candidate set from SQL** — category membership via `categorylinks` + `linktarget` (no popularity data needed).
+2. **Rank with the API** — AQS `pageviews/per-article` for a bounded set, the `top` endpoints for a
+   site-wide ranking, or the [popularpages](https://github.com/wikimedia/popularpages) reports.
+   Batch and pace per the wikimedia-api-access skill.
+
+The SQL shortcut below is kept as the pattern to use **if** a popularity property is restored; do not
+expect rows from it today.
+
+* **Property Name (retired):** `pageview_daily_average`
 * **Table:** `page_props`
-* **Implementation:**
+* **Historical implementation:**
 
 ```sql
 SELECT 
@@ -150,7 +166,7 @@ media file was actually served. For the latter, use the **Media Requests API**
 ## **Constraint & Guardrails**
 
 1. **The "No Table" Rule:** The agent must **never** attempt to query a table named `pageviews`, `traffic`, or `hits` in the SQL replicas. They do not exist.
-2. **SQL Casting:** The `pp_value` in `page_props` is stored as a string (BLOB). To sort numerically, the agent must use `CAST(pp_value AS UNSIGNED)`.
+2. **SQL Casting (historical):** when a `page_props` value is involved, `pp_value` is stored as a string (BLOB) — use `CAST(pp_value AS UNSIGNED)` to sort numerically. For `pageview_daily_average` this is moot: the property has no rows anywhere (see Scenario A).
 3. **API Rate Limits:** When fetching views for multiple pages, the agent should implement a small delay or use a single session object to avoid being throttled by the Wikimedia REST API.
 4. **Title Formatting:** SQL returns titles with underscores (e.g., `Potomac,_Maryland`). The Pageview API accepts these directly, but the agent should ensure no leading/trailing spaces exist.
 
@@ -238,7 +254,7 @@ Features:
 
 ### 🧩 Sample SQL Queries (`assets/example-queries.sql`)
 
-SQL queries for working with pageview data in the `page_props` table:
+SQL queries for working with pageview data in the `page_props` table — ⚠️ they query the **retired** `pageview_daily_average` property (0 rows on six wikis, see Scenario A), so they return empty result sets. Kept as the pattern for a future popularity property; the file header repeats this.
 - Top pages by category
 - Overall most viewed
 - Pages without pageview data

@@ -1,6 +1,16 @@
 -- Pageview-related SQL queries for Wikimedia replicas
 -- These use page_props.pp_propname = 'pageview_daily_average'
 -- Run against database names ending in _p (e.g., enwiki_p)
+--
+-- ⚠️ RETIRED PROPERTY — VERIFIED 2026-09-20. Everything below returns an EMPTY
+--    RESULT SET: `pageview_daily_average` has 0 rows on enwiki, commons, dewiki,
+--    frwiki, nlwiki and wikidatawiki, and no `pageview*` property exists on any
+--    of them (page_props itself is healthy: `wikibase_item` = 10.3M rows on
+--    enwiki). The queries parse and run, so the failure is silent — treat an
+--    empty result as "property missing", not as "nothing is popular".
+--    For real numbers use the AQS/REST pageviews API — see SKILL.md, "Scenario A".
+--    The file is kept as the pattern to reuse if a popularity property returns.
+--    The category/link joins below (linktarget via cl_target_id) are current.
 
 -- ═══════════════════════════════════════════════════════════
 -- 1. TOP PAGES IN A CATEGORY BY AVERAGE DAILY VIEWS

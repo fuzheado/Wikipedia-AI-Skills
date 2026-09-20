@@ -4,7 +4,7 @@ description: Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importan
 license: MIT
 compatibility: opencode
 depends_on: [wikimedia-database]
-last_verified: 2026-06-10
+last_verified: 2026-09-20
 skill_discovery_hints:
   - keywords: ["WikiProject", "WikiProject assessment", "article quality", "GA", "FA", "page assessment", "content assessment"]
   - keywords: ["popular pages", "WikiProject popular pages", "Assessment subpage", "quality matrix", "importance rating"]
@@ -88,14 +88,17 @@ Three primary tables:
 
 ```sql
 -- Basic lookup: get assessment for a specific article
+-- Drive from `page` (indexed by title), join the assessment tables second: the
+-- reverse order scans page_assessments and times out (>60 s, verified
+-- 2026-09-20), while this form answers in 0.0 s.
 SELECT 
     p.page_title, 
     pap.pap_project_title AS wikiproject,
     pa.pa_class, 
     pa.pa_importance
-FROM page_assessments pa
+FROM page p
+JOIN page_assessments pa ON pa.pa_page_id = p.page_id
 JOIN page_assessments_projects pap ON pa.pa_project_id = pap.pap_project_id
-JOIN page p ON pa.pa_page_id = p.page_id
 WHERE p.page_title = 'YOUR_PAGE_TITLE'  -- Replace spaces with underscores
   AND p.page_namespace = 0;
 ```
