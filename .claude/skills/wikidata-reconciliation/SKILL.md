@@ -3,7 +3,7 @@ name: wikidata-reconciliation
 description: Resolve unstructured labels to verified Wikidata QIDs — OpenRefine reconciliation protocol, wbsearchentities fallback, candidate scoring, and LLM QID grounding guardrails
 license: MIT
 compatibility: opencode
-last_verified: 2026-08-26
+last_verified: 2026-09-29
 depends_on: [wikimedia-api-access, wikidata]
 skill_discovery_hints:
   - keywords: ["reconcile", "reconciliation", "match QID", "resolve QID", "entity matching", "QID verification", "label to QID", "OpenRefine reconcile"]
@@ -31,6 +31,34 @@ A QID is a *claim* about identity. The cost of a wrong QID is not a typo — it 
 2. **An LLM-emitted QID is a hypothesis, not a fact.** Treat "Q243" from a model as "maybe Q243" until `wbgetentities` confirms it.
 3. **When a label is ambiguous, prefer the reconciliation service (or `wbsearchentities`) candidate list with descriptions** over guessing from label alone.
 4. **When confidence is below threshold, emit a "needs human review" verdict instead of a QID.** It is always correct to say "unresolved" and wrong to say "Q123" when you are guessing.
+5. **Resolve the entity through its Wikipedia article first.** Wikipedia titles track renames (page moves) far faster than Wikidata labels and aliases. `wbsearchentities` matches labels/aliases only, so a recently renamed entity is **invisible to it** until someone adds the alias. Look up the Wikipedia title -> QID via `prop=pageprops` *before* falling back to label search.
+
+## Renamed entities: Wikipedia first, then Wikidata
+
+**Symptom:** `wbsearchentities` returns nothing (or the wrong item) for a name you know exists -- because the organisation/place/person was renamed and Wikidata's label and aliases still carry the old name. (Verified 2026-09: `Andrew Carnegie Foundation` -> 0 search hits, because Q3660410 was still labelled "Carnegie Corporation of New York" with no alias; the English Wikipedia article had been moved in June 2026.)
+
+**Rule:** search by Wikipedia title, not by remembered label. A page move leaves a redirect at the old title, and `redirects=1` follows it to the current article, whose `pageprops.wikibase_item` is the QID.
+
+```bash
+# Current enwiki title -> QID (redirects=1 also resolves an OLD title, if that is all you have)
+curl -s -A "$WIKIMEDIA_USER_AGENT" -G "https://en.wikipedia.org/w/api.php" \
+  --data-urlencode "action=query" --data-urlencode "titles=Andrew Carnegie Foundation" \
+  --data-urlencode "redirects=1" --data-urlencode "prop=pageprops" --data-urlencode "ppprop=wikibase_item" \
+  --data-urlencode "format=json" --data-urlencode "formatversion=2"
+# -> pages[0].pageprops.wikibase_item = "Q3660410"
+
+# Confirm the old title redirects to the new one, and see who renamed it/when/why
+curl -s -A "$WIKIMEDIA_USER_AGENT" -G "https://en.wikipedia.org/w/api.php" \
+  --data-urlencode "action=query" --data-urlencode "titles=Carnegie Corporation of New York" \
+  --data-urlencode "redirects=1" --data-urlencode "prop=pageprops" --data-urlencode "format=json" \
+  --data-urlencode "formatversion=2"
+curl -s -A "$WIKIMEDIA_USER_AGENT" -G "https://en.wikipedia.org/w/api.php" \
+  --data-urlencode "action=query" --data-urlencode "list=logevents" --data-urlencode "letype=move" \
+  --data-urlencode "letitle=Carnegie Corporation of New York" --data-urlencode "format=json" --data-urlencode "formatversion=2"
+# -> 2026-06-10 "Subject changed its name on 9 June 2026" -> Andrew Carnegie Foundation
+```
+
+Then read back the QID: `sitelinks.enwiki.title` gives the **current** name even when `labels.en` is stale, and absence of an alias for the new name tells you the Wikidata side needs updating (label + alias + possibly a Commons category, `P373`). Check the article's move log for the rename date before concluding that a search failure means "no item exists".
 
 ## The reconciliation service (OpenRefine protocol)
 

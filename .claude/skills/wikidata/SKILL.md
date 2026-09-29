@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["SPARQL", "Wikidata", "knowledge graph", "semantic query", "QID", "Q number", "P number", "entity"]
   - keywords: ["cross-wiki", "interlanguage", "sitelink", "language link", "gap analysis"]
   - keywords: ["image", "P18", "property lookup", "item type", "instance of", "P31"]
-last_verified: 2026-09-15
+last_verified: 2026-09-29
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns. Before writing any code, load that skill for the required User-Agent boilerplate.
@@ -80,8 +80,9 @@ Properties describe relationships between items or attach values to them. Each p
 | Goal | Best Method | Endpoint / Query | Key Parameters |
 |------|-------------|------------------|----------------|
 | Look up a single item's label, description, or statements | Action API (`wbgetentities`) | `https://www.wikidata.org/w/api.php` | `action=wbgetentities&ids=Q937&props=labels\|descriptions\|claims` |
-| Search for an item by name | Action API (`wbsearchentities`) | `https://www.wikidata.org/w/api.php` | `action=wbsearchentities&search=Einstein&language=en&limit=50` |
-| Resolve Wikipedia titles to QIDs (batch) | Action API (`prop=pageprops`) | `https://en.wikipedia.org/w/api.php` | `action=query&prop=pageprops&ppprop=wikibase_item&titles=Title1\|Title2` |
+| Search for an item by name | Action API (`wbsearchentities`) | `https://www.wikidata.org/w/api.php` | `action=wbsearchentities&search=Einstein&language=en&limit=50` -- matches labels/aliases only, so **renamed entities return nothing**; do the Wikipedia-title lookup below first |
+| Resolve Wikipedia titles to QIDs (batch) | Action API (`prop=pageprops`) | `https://en.wikipedia.org/w/api.php` | `action=query&redirects=1&prop=pageprops&ppprop=wikibase_item&titles=Title1\|Title2` |
+| Detect a rename / get an entity's current name | Wikipedia `pageprops` + move log | `https://en.wikipedia.org/w/api.php` | `action=query&titles=Name&redirects=1&prop=pageprops&ppprop=wikibase_item`, then `action=query&list=logevents&letype=move&letitle=Old_title` |
 | Check what class/type an item is (P31) | Action API (`wbgetentities`) + claims | `https://www.wikidata.org/w/api.php` | `action=wbgetentities&ids=Q937&props=claims` → access `claims.P31[].mainsnak.datavalue.value.id` |
 | Find all items matching criteria | **SPARQL** | `https://query.wikidata.org/sparql` | See SPARQL examples below |
 | Check if an item has a specific property value | **SPARQL** (faster) or Action API | SPARQL: `?item wdt:P166 wd:Q38104.` API: `wbgetentities` + filter locally | SPARQL is 10-100× faster for filtering across many items |
@@ -446,10 +447,18 @@ Use the Action API's `prop=pageprops` with `ppprop=wikibase_item` to batch-resol
 params = {
     'action': 'query',
     'titles': '|'.join(titles),       # accepts underscores or spaces
+    'redirects': 1,                   # REQUIRED: follow page moves left by renames
     'prop': 'pageprops',
     'ppprop': 'wikibase_item',
 }
 ```
+
+📌 **Renamed entities are the #1 cause of "no QID found".** A page move leaves a redirect at the old
+title; without `redirects=1` the API returns the redirect page (or `missing`) and you lose the item --
+and `wbsearchentities` will *also* miss it, because Wikidata labels/aliases lag the rename. With
+`redirects=1`, the response contains a `query.redirects` array mapping `from` -> `to`; use those `to`
+titles as the lookup keys. Verified example: `Carnegie Corporation of New York` still redirects to
+`Andrew Carnegie Foundation` (moved 2026-06-10), whose `wikibase_item` remains `Q3660410`.
 
 ⚠️ **Critical: Title normalization.** The Action API returns titles **with spaces** (e.g., `Donald Trump`), not underscores. When using titles from the Pageviews API (which uses underscores like `Donald_Trump`) as dictionary keys, normalize: `t.replace('_', ' ')`. See the **[Title Format Guide](../wikimedia-api-access/references/endpoints.md#11-title-format-guide-cross-api-gotcha)** in the API access reference for a full cross-API table.
 
