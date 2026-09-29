@@ -109,6 +109,17 @@ url_encode() {
     python3 -c "import urllib.parse; print(urllib.parse.quote('$1', safe=''))"
 }
 
+# A body that is not JSON — or a JSON API error object — means the API refused us:
+# rate limiting, an edge/proxy block, an HTML error page. Say so, instead of letting
+# a traceback escape or a section quietly come back empty. tests/live_calls.py treats
+# this message as a transient environment condition, so a throttled CI runner skips
+# the live test rather than failing it (a JSON traceback was unrecognisable there).
+api_failure() {
+    echo "Error: unexpected API response from ${API_URL} (not JSON, or an API error object)" >&2
+    echo "  Usually an edge/proxy block rather than a missing template." >&2
+    exit 2
+}
+
 # --- Fetch basic page info (protection, pageprops) ------------------------
 fetch_page_info() {
     ENCODED_TITLE=$(url_encode "${API_TITLE}")
@@ -128,7 +139,13 @@ fetch_raw_source() {
         "${API_URL}?action=query&prop=revisions&rvprop=content&rvlimit=1&titles=${ENCODED_TITLE}&format=json")
     echo "$RESPONSE" | python3 -c "
 import json, sys
-data = json.load(sys.stdin)
+try:
+    data = json.load(sys.stdin)
+except ValueError:
+    sys.exit(3)
+if not isinstance(data, dict) or 'error' in data:
+    sys.exit(4)
+
 pages = data.get('query', {}).get('pages', {})
 for pid, pdata in pages.items():
     if pid == '-1':
@@ -139,7 +156,7 @@ for pid, pdata in pages.items():
         print(revs[0].get('content', '(empty)'))
     else:
         print('(no revisions — page may be missing)')
-"
+" || api_failure
 }
 
 # --- Fetch Lua module dependencies ----------------------------------------
@@ -150,7 +167,13 @@ fetch_module_deps() {
         "${API_URL}?action=query&prop=templates&titles=${ENCODED_TITLE}&format=json" | \
         python3 -c "
 import json, sys
-data = json.load(sys.stdin)
+try:
+    data = json.load(sys.stdin)
+except ValueError:
+    sys.exit(3)
+if not isinstance(data, dict) or 'error' in data:
+    sys.exit(4)
+
 pages = data.get('query', {}).get('pages', {})
 for pid, pdata in pages.items():
     if pid == '-1':
@@ -164,7 +187,7 @@ for pid, pdata in pages.items():
             print(f'  • {m[\"title\"]}')
     else:
         print(f'No Lua module dependencies found for {pdata.get(\"title\", \"?\")}.')
-"
+" || api_failure
 }
 
 # --- Fetch transclusion count ---------------------------------------------
@@ -175,14 +198,20 @@ fetch_transclusion_count() {
         "${API_URL}?action=query&prop=pageprops&titles=${ENCODED_TITLE}&format=json" | \
         python3 -c "
 import json, sys
-data = json.load(sys.stdin)
+try:
+    data = json.load(sys.stdin)
+except ValueError:
+    sys.exit(3)
+if not isinstance(data, dict) or 'error' in data:
+    sys.exit(4)
+
 pages = data.get('query', {}).get('pages', {})
 for pid, pdata in pages.items():
     count = pdata.get('pageprops', {}).get('wikibase-badge-goodcount', '') or \
             pdata.get('pageprops', {}).get('expected-unconnected-page', '')
     # Use embeddedin for actual count
     print(f'Page ID: {pid}')
-"
+" || api_failure
 }
 
 # --- Main -----------------------------------------------------------------
@@ -221,9 +250,7 @@ for pid, pdata in pages.items():
 
 case "$PAGE_TITLE" in
     PARSE_ERROR)
-        echo "Error: unexpected API response from ${API_URL} (not JSON, or an API error object)" >&2
-        echo "  Usually an edge/proxy block rather than a missing template." >&2
-        exit 2
+        api_failure
         ;;
     "")
         echo "Error: unexpected API response from ${API_URL} (no page data returned)" >&2
@@ -279,7 +306,13 @@ if ! $SINGLE_VIEW; then
         "${API_URL}?action=query&list=embeddedin&eititle=${ENCODED_TITLE}&eilimit=1&format=json" 2>/dev/null)
     echo "$COUNT_RESPONSE" | python3 -c "
 import json, sys
-data = json.load(sys.stdin)
+try:
+    data = json.load(sys.stdin)
+except ValueError:
+    sys.exit(3)
+if not isinstance(data, dict) or 'error' in data:
+    sys.exit(4)
+
 query = data.get('query', {})
 pages = query.get('embeddedin', [])
 total = len(pages)
@@ -289,5 +322,5 @@ if total > 0:
     print(f'  {total}+ page(s) use this template (use template-usage.sh for full list)')
 else:
     print('  No pages currently use this template')
-" 2>/dev/null
+" 2>/dev/null || api_failure
 fi
