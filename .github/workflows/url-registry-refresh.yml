@@ -8,7 +8,8 @@ on:
   workflow_dispatch:  # Allow manual trigger
 
 permissions:
-  contents: write
+  contents: write        # push the bot branch
+  pull-requests: write   # open/update the refresh PR
 
 jobs:
   refresh-registry:
@@ -26,17 +27,72 @@ jobs:
         env:
           WIKIMEDIA_USER_AGENT: wikipedia-ai-skills-url-registry/1.0 (scheduled GitHub Action; https://github.com/fuzheado/Wikipedia-AI-Skills)
 
-      - name: Commit refreshed registry
-        # Push by the default GITHUB_TOKEN does not re-trigger workflows, so
-        # this cannot loop. If main is branch-protected and this push fails,
-        # open a PR with scripts/url-registry.json instead.
+      - name: Open a pull request with the refreshed registry
+        # main is branch-protected (6 required checks), so a direct push by the bot is
+        # rejected with GH006. That failed this workflow every week from 2026-08-25 to
+        # 2026-09-29 while the registry quietly stopped being refreshed: the commit was
+        # made and then discarded by the rejected push. Push a bot branch and open a
+        # PR for it instead.
+        #
+        # Opening that PR needs one of two things, because this repository has
+        # can_approve_pull_request_reviews = false (Actions may not create PRs):
+        #   1. Settings -> Actions -> General -> Workflow permissions ->
+        #      "Allow GitHub Actions to create and approve pull requests"
+        #   2. the REGISTRY_REFRESH_TOKEN secret: a fine-grained PAT with contents:
+        #      write + pull-requests: write. This is the better option, because a PR
+        #      authored by a real actor DOES trigger CI, so its checks report and it
+        #      becomes mergeable on its own.
+        # Without either, the branch is still pushed and the run fails with a message
+        # naming the setting, so the failure is actionable instead of a GH006 puzzle.
+        env:
+          GH_TOKEN: ${{ secrets.REGISTRY_REFRESH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           if git diff --quiet scripts/url-registry.json; then
             echo "Registry unchanged — nothing to commit."
+            exit 0
+          fi
+
+          BRANCH="bot/url-registry-refresh"
+          COMPARE="https://github.com/${GITHUB_REPOSITORY}/compare/main...${BRANCH}?expand=1"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add scripts/url-registry.json
+          git commit -m "chore(links): refresh url-registry (incremental freshness run)"
+
+          # The branch is bot-owned and single-writer, so replace it each run and keep
+          # one open PR rather than accumulating them.
+          git push --force origin "HEAD:refs/heads/${BRANCH}"
+
+          CHANGED=$(git show --stat --format='' HEAD | tail -n 2 | sed 's/^ *//')
+          BODY=$(mktemp)
+          {
+            echo 'The scheduled freshness run changed `scripts/url-registry.json`.'
+            echo
+            echo '```'
+            echo "${CHANGED}"
+            echo '```'
+            echo
+            echo 'Opened by `.github/workflows/url-registry-refresh.yml`. A PR authored with the'
+            echo 'default `GITHUB_TOKEN` does not trigger CI, so its checks will not report: merge'
+            echo 'it directly (`enforce_admins` is off on main), or set `REGISTRY_REFRESH_TOKEN`'
+            echo 'for a loop whose checks do run.'
+          } > "${BODY}"
+
+          if gh pr list --head "${BRANCH}" --state open --json number --jq '.[].number' | grep -q .; then
+            echo "Updated the pull request already open for ${BRANCH}."
+          elif ERR=$(gh pr create --base main --head "${BRANCH}" \
+                       --title "chore(links): refresh the URL registry" \
+                       --body-file "${BODY}" 2>&1); then
+            echo "Opened a pull request for ${BRANCH}."
           else
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add scripts/url-registry.json
-            git commit -m "chore(links): refresh url-registry (incremental freshness run)"
-            git push
+            echo "::error title=Refreshed registry needs a merge::Could not open a PR: ${ERR}"
+            echo "  Nothing is lost — the refreshed registry is on the ${BRANCH} branch."
+            echo "  Review and merge it here: ${COMPARE}"
+            echo "  To let Actions open the PR itself, either enable"
+            echo "    Settings -> Actions -> General -> Workflow permissions ->"
+            echo "    'Allow GitHub Actions to create and approve pull requests'"
+            echo "  or set the REGISTRY_REFRESH_TOKEN secret (fine-grained PAT with"
+            echo "  contents: write + pull-requests: write)."
+            exit 1
           fi
