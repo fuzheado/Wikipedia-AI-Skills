@@ -9,7 +9,7 @@ skill_discovery_hints:
   - keywords: ["#if", "#switch", "#invoke", "TemplateData", "infobox template"]
   - keywords: ["limitreport", "ResourceLoader", "Scribunto", "Module namespace", "ns 828"]
   - keywords: ["Related Changes", "RecentChangesLinked", "WhatLinksHere", "link table", "Prefixindex"]
-last_verified: 2026-09-11
+last_verified: 2026-09-29
 ---
 
 > ⚠️ **User-Agent required:** The API examples below hit Wikimedia endpoints. All requests must include a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
