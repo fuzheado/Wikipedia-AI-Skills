@@ -9,7 +9,7 @@ skill_discovery_hints:
   - keywords: ["person category", "occupation category", "people by occupation", "surname index"]
   - keywords: ["Catapult", "Wikidata to Commons", "category from Wikidata", "P106 category"]
   - keywords: ["the Netherlands", "definite article", "country category", "category naming"]
-last_verified: 2026-06-24
+last_verified: 2026-09-29
 ---
 
 > ?? **User-Agent required:** All API calls below hit Wikimedia endpoints. Requests without a descriptive `User-Agent` are blocked with HTTP 403/429. See **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)**.
@@ -120,6 +120,34 @@ Germany, France, India, Belgium etc. stay article-free.
 - **Century** (P569/P570): `ordinal(ceil(year/100))-century`. Basis year =
   death year, else birth year+60 if born more than 120 years ago (historical
   figures), else current year.
+
+## Resolve the current name first (entities get renamed)
+
+A Commons category must use the entity's **current** name, and the Wikipedia article title is the
+most reliable source for it -- page moves track renames long before Wikidata labels, aliases and
+Commons categories catch up. Before generating or probing a category name:
+
+```bash
+# Current article title -> QID (redirects=1 follows the move left at the old title)
+curl -s -A "$WIKIMEDIA_USER_AGENT" -G "https://en.wikipedia.org/w/api.php" \
+  --data-urlencode "action=query" --data-urlencode "titles=Andrew Carnegie Foundation" \
+  --data-urlencode "redirects=1" --data-urlencode "prop=pageprops" --data-urlencode "ppprop=wikibase_item" \
+  --data-urlencode "format=json" --data-urlencode "formatversion=2"
+```
+
+Cross-check `wbgetentities&props=labels|aliases|sitelinks`: if `sitelinks.enwiki.title` differs from
+`labels.en`, the label is stale -- **the sitelink is the current name**. (Verified 2026-09: Q3660410 is
+still labelled "Carnegie Corporation of New York" while enwiki and the real-world organisation have
+used "Andrew Carnegie Foundation" since June 2026; the alias was never added.)
+
+Naming and migration rules:
+
+- **Create under the current name**; leave the old name as a `{{Category redirect|New name}}` so
+  existing links and old uploads keep resolving.
+- Probe **both** names for pre-existing content -- files are often filed under the superseded name
+  because they predate the rename.
+- Add the current name as a Wikidata **alias** and set/refresh **P373** to the category you create,
+  otherwise the next person repeats the same failed label search.
 
 ## Check existence before doing anything
 
