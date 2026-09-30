@@ -51,6 +51,8 @@ jobs:
         #      so the push is that actor's too and nothing is parked for approval.
         # Without either, the branch is still pushed and the run fails with a message
         # naming the setting, so the failure is actionable instead of a GH006 puzzle.
+        #
+        # When the PR exists, auto-merge is armed on it so the refresh lands by itself.
         env:
           GH_TOKEN: ${{ secrets.REGISTRY_REFRESH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
@@ -102,4 +104,20 @@ jobs:
             echo "  or set the REGISTRY_REFRESH_TOKEN secret (fine-grained PAT with"
             echo "  contents: write + pull-requests: write)."
             exit 1
+          fi
+
+          # Let it merge itself once the checks pass, so a weekly refresh needs nobody.
+          # --merge (not --squash) to match this repo's history: every other PR here
+          # landed as "Merge pull request #N from ...".
+          #
+          # Arming auto-merge needs the repository's "Allow auto-merge" setting. If that
+          # is off the PR is still open and mergeable by hand, so this is a warning
+          # rather than an error: the deliverable exists.
+          if gh pr view "${BRANCH}" --json autoMergeRequest --jq '.autoMergeRequest != null' | grep -q '^true$'; then
+            echo "Auto-merge already armed for ${BRANCH}."
+          elif ARM_ERR=$(gh pr merge "${BRANCH}" --auto --merge 2>&1); then
+            echo "Armed auto-merge — this PR merges itself when its checks pass."
+          else
+            echo "::warning title=Auto-merge not armed::${ARM_ERR}"
+            echo "  The PR is open; merge it by hand when the checks are green: ${COMPARE}"
           fi
