@@ -1,6 +1,16 @@
 -- Pageview-related SQL queries for Wikimedia replicas
 -- These use page_props.pp_propname = 'pageview_daily_average'
 -- Run against database names ending in _p (e.g., enwiki_p)
+--
+-- ⚠️ RETIRED PROPERTY — VERIFIED 2026-09-20. Everything below returns an EMPTY
+--    RESULT SET: `pageview_daily_average` has 0 rows on enwiki, commons, dewiki,
+--    frwiki, nlwiki and wikidatawiki, and no `pageview*` property exists on any
+--    of them (page_props itself is healthy: `wikibase_item` = 10.3M rows on
+--    enwiki). The queries parse and run, so the failure is silent — treat an
+--    empty result as "property missing", not as "nothing is popular".
+--    For real numbers use the AQS/REST pageviews API — see SKILL.md, "Scenario A".
+--    The file is kept as the pattern to reuse if a popularity property returns.
+--    The category/link joins below (linktarget via cl_target_id) are current.
 
 -- ═══════════════════════════════════════════════════════════
 -- 1. TOP PAGES IN A CATEGORY BY AVERAGE DAILY VIEWS
@@ -12,7 +22,8 @@ SELECT p.page_title,
 FROM page p
 JOIN page_props pp ON pp.pp_page = p.page_id
 JOIN categorylinks cl ON cl.cl_from = p.page_id
-WHERE cl.cl_to = 'Physics'
+JOIN linktarget lt ON lt.lt_id = cl.cl_target_id
+WHERE lt.lt_namespace = 14 AND lt.lt_title = 'Physics'
   AND p.page_namespace = 0
   AND p.page_is_redirect = 0
   AND pp.pp_propname = 'pageview_daily_average'
@@ -74,17 +85,19 @@ LIMIT 25;
 -- 5. COMPARE POPULARITY ACROSS CATEGORIES
 -- ═══════════════════════════════════════════════════════════
 
-SELECT cl.cl_to AS category,
+SELECT lt.lt_title AS category,
        COUNT(*) AS pages_with_data,
        ROUND(AVG(CAST(pp.pp_value AS UNSIGNED))) AS avg_views,
        ROUND(MAX(CAST(pp.pp_value AS UNSIGNED))) AS max_views
 FROM categorylinks cl
 JOIN page p ON cl.cl_from = p.page_id
+JOIN linktarget lt ON lt.lt_id = cl.cl_target_id
 JOIN page_props pp ON pp.pp_page = p.page_id
     AND pp.pp_propname = 'pageview_daily_average'
-WHERE p.page_namespace = 0
+WHERE lt.lt_namespace = 14
+  AND p.page_namespace = 0
   AND p.page_is_redirect = 0
-GROUP BY cl.cl_to
+GROUP BY lt.lt_title
 HAVING pages_with_data > 50
 ORDER BY avg_views DESC
 LIMIT 25;
@@ -117,7 +130,8 @@ SELECT @rank := @rank + 1 AS rank,
 FROM page p
 JOIN page_props pp ON pp.pp_page = p.page_id
 JOIN categorylinks cl ON cl.cl_from = p.page_id
-WHERE cl.cl_to = 'Physics'
+JOIN linktarget lt ON lt.lt_id = cl.cl_target_id
+WHERE lt.lt_namespace = 14 AND lt.lt_title = 'Physics'
   AND p.page_namespace = 0
   AND p.page_is_redirect = 0
   AND pp.pp_propname = 'pageview_daily_average'

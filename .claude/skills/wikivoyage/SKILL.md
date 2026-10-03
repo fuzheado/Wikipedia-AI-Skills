@@ -11,7 +11,7 @@ skill_discovery_hints:
   - keywords: ["banner", "pagebanner", "article skeleton", "IsPartOf", "breadcrumb"]
   - keywords: ["article status", "usable", "guide", "star", "outline", "stub"]
   - keywords: ["hotel", "restaurant", "attraction", "accommodation", "itinerary", "phrasebook"]
-last_verified: 2026-09-15
+last_verified: 2026-09-20
 ---
 
 > ⚠️ **Prerequisites:** This skill assumes familiarity with the MediaWiki Action
@@ -615,13 +615,17 @@ graph LR
 
 **Via SQL (templatelinks table):**
 ```sql
--- Find all guide-level city articles on en.wikivoyage
-SELECT tl_from, page_title
-FROM templatelinks
-JOIN page ON tl_from = page_id
-WHERE tl_namespace = 10  -- Template namespace
-  AND tl_title = 'Guidecity'
-  AND page_namespace = 0;  -- Main namespace
+-- Find all guide-level city articles on en.wikivoyage (enwikivoyage_p)
+-- The template title lives in `linktarget` since the link-table normalisation:
+-- `templatelinks` has no tl_title/tl_namespace. Verified 0.0 s on
+-- enwikivoyage_p (2026-09-20).
+SELECT tl.tl_from, p.page_title
+FROM templatelinks tl
+JOIN linktarget lt ON lt.lt_id = tl.tl_target_id
+JOIN page p ON p.page_id = tl.tl_from
+WHERE lt.lt_namespace = 10  -- Template namespace
+  AND lt.lt_title = 'Guidecity'
+  AND p.page_namespace = 0;  -- Main namespace
 ```
 
 **Via Action API (parse wikitext):**

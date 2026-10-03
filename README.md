@@ -70,7 +70,7 @@ Skills are arranged from **foundational** (understanding how Wikipedia works) to
 | [flickr](.claude/skills/flickr/SKILL.md) | Fetch photos from Flickr's read-only REST API (photosets, search, metadata, tags, geo) and prepare pattypan upload manifests for batch Wikimedia Commons uploads - license filtering, flickr2commons-style descriptions, and attribution |
 | [flickr-wayback-recovery](.claude/skills/flickr-wayback-recovery/SKILL.md) | Recover a deleted or offline Flickr account from the Wayback Machine (CDX enumeration, metadata scraping, image download) and batch-upload the photos missing from Wikimedia Commons via pattypan — matched by Flickr ID |
 | | **▸ Analyzing Articles** |
-| [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties (sorting/filtering) or the REST API (precise historical data) |
+| [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles via the Wikimedia pageviews/AQS REST API — top-pages ranking, per-article history, media requests, and why the old page_props popularity cache no longer works |
 | [xtools](.claude/skills/xtools/SKILL.md) | Query XTools — the canonical Wikimedia statistics API: page info, top editors, edit counts, prose stats, and admin/patroller metrics for any wiki |
 | [wikimedia-media-usage-metrics](.claude/skills/wikimedia-media-usage-metrics/SKILL.md) | Measure and count the use of Wikimedia media files — transfers (mediacounts/mediarequests), embeds (GlobalUsage), reach (pageviews/CIM), external reuse — with verified gotchas, a decision tree, and a live report pipeline |
 | [wikimedia-page-assessment](.claude/skills/wikimedia-page-assessment/SKILL.md) | Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners on any Wikimedia wiki with the PageAssessments extension |
@@ -107,7 +107,7 @@ Skills for building bots, web apps, and data pipelines on Wikimedia infrastructu
 | | **▸ Search & Data** |
 | [wikimedia-search-cirrussearch](.claude/skills/wikimedia-search-cirrussearch/SKILL.md) | Search Wikimedia wikis using CirrusSearch — syntax cheat sheet (insource, hastemplate, linksto, deepcategory, haswbstatement), API parameters, prefix vs full-text vs title search, ranking caveats, maintenance queries, and combining search with PetScan, SPARQL, and categories |
 | [wikimedia-petscan](.claude/skills/wikimedia-petscan/SKILL.md) | Query Wikimedia projects with PetScan — multi-source category intersections, template filtering, SPARQL integration, Wikidata item filters, bulk data export, and the PSID stable query ID system |
-| [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles using cached SQL properties (sorting/filtering) or the REST API (precise historical data) |
+| [wikimedia-pageviews](.claude/skills/wikimedia-pageviews/SKILL.md) | Retrieve traffic and popularity statistics for Wikipedia articles via the Wikimedia pageviews/AQS REST API — top-pages ranking, per-article history, media requests, and why the old page_props popularity cache no longer works |
 | [wikimedia-page-assessment](.claude/skills/wikimedia-page-assessment/SKILL.md) | Query Wikipedia article quality (FA/GA/B/C/Start/Stub) and importance ratings from WikiProject assessment banners |
 | [wikimedia-ml-services](.claude/skills/wikimedia-ml-services/SKILL.md) | Score articles and revisions using Lift Wing ML models — revert risk, article quality, topic classification, readability, language identification, and more. Includes ORES migration guidance |
 | | **▸ Automation** |
@@ -336,6 +336,7 @@ live systems, and every skill is verified against them in CI
 | Code snippet syntax (python/bash/json/js) | — (offline) | `scripts/verify-snippets.py` |
 | `last_verified` freshness | — (offline) | `scripts/verify-freshness.py` |
 | `mul` default values (label service, label readers, multi-language requests) | — (offline) | `scripts/verify-mul-labels.py` |
+| SQL semantics against the live replicas (opt-in; needs Toolforge credentials) | — (local only) | `scripts/verify-sql-live.py` |
 
 Run all checks locally:
 
@@ -346,6 +347,16 @@ python3 scripts/verify-links.py
 python3 scripts/verify-snippets.py
 python3 scripts/verify-freshness.py
 python3 scripts/verify-mul-labels.py
+```
+
+**SQL is the one thing CI cannot check.** The verifiers above validate URLs,
+commands, API names and snippet syntax, but nothing executes a query — which is how
+a removed column (`categorylinks.cl_to`, then `pagelinks.pl_title`) or a retired
+property (`page_props.pageview_daily_average`) survived here for months. With the two
+SSH tunnels from its `--help`, run the opt-in live check before shipping SQL changes:
+
+```bash
+TOOLFORGE_SQL_USER=uXXXXX TOOLFORGE_SQL_PASSWORD=... python3 scripts/verify-sql-live.py
 ```
 
 Refresh the registries when the underlying systems change (or every few months):

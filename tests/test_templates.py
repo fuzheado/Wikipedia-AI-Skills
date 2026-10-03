@@ -1,6 +1,7 @@
 """Tests for the wikipedia-templates skill scripts and assets."""
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -143,6 +144,16 @@ class TestTemplateUsageScript:
         assert result.returncode == 0, f"Script failed: {result.stderr}"
         assert 'Total' in result.stdout
 
+    def test_usage_reports_api_failure(self):
+        """An unreachable API must not look like 'this template is unused'."""
+        env = {**os.environ, 'WIKI': 'http://127.0.0.1:9'}
+        result = subprocess.run(
+            ['bash', str(TMPL_USAGE), 'Cn', '--limit', '5'],
+            capture_output=True, text=True, timeout=60, env=env,
+        )
+        assert result.returncode == 2, f"unexpected exit {result.returncode}: {result.stderr}"
+        assert 'HTTP' in result.stderr or 'unexpected API response' in result.stderr
+
 
 # ─── inspect-template.sh ────────────────────────────────────────────────
 
@@ -172,6 +183,92 @@ class TestInspectTemplateScript:
         )
         assert result.returncode == 0
         assert 'Usage:' in result.stdout
+
+    @staticmethod
+    def _stub_curl(tmp_path):
+        """A fake curl where page info answers 200 and later calls are blocked.
+
+        The shape of the CI failure on 2026-09-29: the page-info call succeeded,
+        then a later call came back as a throttled HTML page (rate limiting, or an
+        edge/proxy block) rather than JSON.
+        """
+        stub = tmp_path / 'curl'
+        stub.write_text(
+            '#!/usr/bin/env bash\n'
+            'body="<html><body>429 Too Many Requests</body></html>"\n'
+            'has_w=0\n'
+            'for arg in "$@"; do\n'
+            '  case "$arg" in -w) has_w=1 ;; esac\n'
+            '  case "$arg" in\n'
+            '''    *prop=info*)\n'''
+            '''      body='{"query":{"pages":{"123":{"pageid":123,"title":"Template:Infobox settlement"}}}}'\n'''
+            '      ;;\n'
+            '  esac\n'
+            'done\n'
+            'if [ "$has_w" = 1 ]; then printf "%s\\n200" "$body"; else printf "%s" "$body"; fi\n',
+            encoding='utf-8',
+        )
+        stub.chmod(0o755)
+        return {**os.environ, 'PATH': f'{tmp_path}{os.pathsep}{os.environ["PATH"]}'}
+
+    def test_modules_reports_api_failure(self, tmp_path):
+        """A blocked --modules body must not read as 'no Lua module dependencies'.
+
+        Before the guard, this raised a JSON traceback (exit 1), so
+        tests/live_calls.py could not recognise it as an environment condition and
+        CI failed instead of skipping. The message this asserts on is the signature
+        the live harness treats as transient.
+        """
+        result = subprocess.run(
+            ['bash', str(TMPL_INSPECT), 'Infobox settlement', '--modules'],
+            capture_output=True, text=True, timeout=60, env=self._stub_curl(tmp_path),
+        )
+        assert result.returncode == 2, f"unexpected exit {result.returncode}: {result.stderr}"
+        assert 'unexpected API response' in result.stderr
+        assert 'No Lua module dependencies' not in result.stdout
+
+    def test_source_reports_api_failure(self, tmp_path):
+        """Same for --source: a blocked body must not print 'Template not found.'"""
+        result = subprocess.run(
+            ['bash', str(TMPL_INSPECT), 'Infobox settlement', '--source'],
+            capture_output=True, text=True, timeout=60, env=self._stub_curl(tmp_path),
+        )
+        assert result.returncode == 2, f"unexpected exit {result.returncode}: {result.stderr}"
+        assert 'unexpected API response' in result.stderr
+        assert 'Template not found' not in result.stdout
+
+    def test_modules_reports_api_error_object(self, tmp_path):
+        """A JSON *error* body must also be reported, not read as 'no modules'.
+
+        The other half of the guard: the API can answer 200 with a well-formed
+        error object, which a bare parse would happily accept and then render as
+        an empty (and wrong) section.
+        """
+        stub = tmp_path / 'curl'
+        stub.write_text(
+            '#!/usr/bin/env bash\n'
+            'body=\'{"error":{"code":"ratelimited","info":"You have made too many requests"}}\'\n'
+            'has_w=0\n'
+            'for arg in "$@"; do\n'
+            '  case "$arg" in -w) has_w=1 ;; esac\n'
+            '  case "$arg" in\n'
+            '''    *prop=info*)\n'''
+            '''      body='{"query":{"pages":{"123":{"pageid":123,"title":"Template:Infobox settlement"}}}}'\n'''
+            '      ;;\n'
+            '  esac\n'
+            'done\n'
+            'if [ "$has_w" = 1 ]; then printf "%s\\n200" "$body"; else printf "%s" "$body"; fi\n',
+            encoding='utf-8',
+        )
+        stub.chmod(0o755)
+        env = {**os.environ, 'PATH': f'{tmp_path}{os.pathsep}{os.environ["PATH"]}'}
+        result = subprocess.run(
+            ['bash', str(TMPL_INSPECT), 'Infobox settlement', '--modules'],
+            capture_output=True, text=True, timeout=60, env=env,
+        )
+        assert result.returncode == 2, f"unexpected exit {result.returncode}: {result.stderr}"
+        assert 'unexpected API response' in result.stderr
+        assert 'No Lua module dependencies' not in result.stdout
 
     @pytest.mark.slow
     def test_inspect_known_template(self):
@@ -203,6 +300,21 @@ class TestInspectTemplateScript:
         )
         assert result.returncode != 0
         assert 'not found' in result.stderr.lower()
+
+    def test_inspect_reports_api_failure_not_missing_template(self):
+        """An unreachable API must not be reported as a missing template.
+
+        This masking cost a red CI for weeks: the runner got an error page, the
+        JSON parse failed, and the fallback claimed the template did not exist.
+        """
+        env = {**os.environ, 'WIKI': 'http://127.0.0.1:9'}
+        result = subprocess.run(
+            ['bash', str(TMPL_INSPECT), 'Infobox person'],
+            capture_output=True, text=True, timeout=60, env=env,
+        )
+        assert result.returncode == 2, f"unexpected exit {result.returncode}: {result.stderr}"
+        assert 'not found' not in result.stderr.lower()
+        assert 'HTTP' in result.stderr or 'unexpected API response' in result.stderr
 
 
 # ─── template-inspector.py ──────────────────────────────────────────────

@@ -12,7 +12,7 @@ skill_discovery_hints:
   - keywords: ["EXIF", "metadata", "file info", "global usage", "file metadata"]
   - keywords: ["depicts", "haswbstatement", "structured data", "QuickStatements"]
   - keywords: ["VRT", "permission", "Commons policy"]
-  - keywords: ["Commons namespaces", "gallery", "Creator namespace"]
+  - keywords: ["Commons namespaces", "gallery", "gallery pages", "{{Gallery page}}", "Creator namespace"]
   - keywords: ["CORS", "cross-origin", "upload.wikimedia.org", "browser app", "Canvas", "WebGL"]
   - keywords: ["Commons Impact Metrics", "CIM", "category analytics", "Views from category", "impact metrics"]
 last_verified: 2026-09-14
@@ -305,6 +305,77 @@ Like all MediaWiki sites, Commons organizes pages into **namespaces** — number
 - **Categories are always in namespace 14.** Use `incategory:"CategoryName"` or `srnamespace=14` to find category pages.
 - **Don't confuse namespace 0 (Galleries) with Wikipedia articles.** On Commons, namespace 0 is not encyclopedia articles — it's curated gallery pages that editors build by hand.
 - **The `--ns` flag** in the search tool (`srnamespace` in the API) accepts a single ID or comma-separated list: `--ns 6` (files only), `--ns 0,6` (galleries + files), `--ns 14` (categories only).
+
+## **Gallery Pages — Commons' Curated Layer**
+
+A Commons **gallery page** is a hand-curated presentation of selected files on a topic: someone chose the images,
+their order, and wrote a caption for each. It is the *curated* counterpart to a category, which is an unordered set
+with no captions.
+
+### **What makes a gallery a gallery**
+
+**There is no namespace, no prefix, and no page property for it.** All of these are true:
+
+- It is an ordinary **main-namespace (ns-0)** page — `The Venetian Macao`, not `Gallery:The Venetian Macao`.
+- **`Gallery:` is NOT a namespace alias on Commons.** `[[Gallery:The Venetian Macao]]` is simply a page that does
+  not exist (verified 2026-09-18: the API reports `missing: true` and `ns: 0`). Do not build anything that assumes
+  the prefix.
+- What marks one is **content**: a literal `<gallery>` tag in the wikitext, usually alongside the
+  `{{Gallery page}}` template (the tracking/boilerplate convention).
+- It is tracked in the **`Category:Gallery pages of …`** tree (`Category:Gallery pages of Macao`,
+  `…of buildings in China`, …). Root: `Category:Commons galleries`.
+- Scale (2026-09-18): **87,315** pages carry `{{Gallery page}}`; **140,220** contain a `<gallery>` tag.
+
+So a gallery is a **convention detected by content, not by title** — which means you find one by *search*:
+
+```
+https://commons.wikimedia.org/w/api.php?action=query&list=search
+  &srsearch=hastemplate:"Gallery page"&srnamespace=0     # or: insource:"<gallery"
+```
+
+A prefix search (`list=prefixsearch`) cannot do this: nothing in the title says "gallery".
+
+### **Reading a gallery's contents (there is no structured API)**
+
+`prop=images` gives titles only — **no captions, no order**, which is the whole point of a gallery. Read the page's
+**wikitext** and parse the `<gallery>` blocks:
+
+```
+https://commons.wikimedia.org/w/api.php?action=query&prop=revisions
+  &titles=The%20Venetian%20Macao&rvslots=main&rvprop=content&formatversion=2
+```
+
+```
+<gallery>
+Macau-Venetian-01.jpg                                   ← no caption
+File:The Venetian 05.jpg|The Great Hall                 ← caption after the first pipe
+File:The Venetian 05.jpg|[[:Category:Marco Polo Canal|Marco Polo Canal]]   ← a LINKED caption
+File:Some.jpg|A caption|link=File:Other.jpg             ← trailing key=value options are NOT caption text
+</gallery>
+```
+
+Then batch `prop=imageinfo&iiurlwidth=480` (50 titles per call) for thumbnails and dimensions.
+
+> ⚠️ **Wikitext beats the rendered HTML by 10×.** On `London` (542 images in 62 sectioned blocks) the wikitext is
+> **56 KB** and `action=parse&prop=text` is **654 KB** — for byte-identical item counts (measured 2026-09-18:
+> London 542/542, New York City 246/246, The Venetian Macao 5/5, Berlin 0/0). The wikitext also carries the
+> section headings between blocks, which the HTML flattens.
+
+### **Gotchas**
+
+- ⚠️ **A page that looks like a gallery may have no gallery.** `Berlin` is a 107 KB Commons page with **zero**
+  `<gallery>` blocks (a hub or redirect). "It is a Commons page" ≠ "it is a gallery" — check the parse result, not
+  the title.
+- ⚠️ **Galleries can be huge.** London has 542 images; Paris 470; New York City 246. Apply any cap *before* fetching
+  thumbnails, or you pay 11 imageinfo calls nobody asked for.
+- ⚠️ **Don't split a gallery line on every `|`.** Split on the **first** pipe only: a linked caption
+  (`[[:Category:X|X]]`) contains another one, and a naive split leaves `[[:Category:X`.
+- **Galleries and categories are complements, not rivals.** Galleries are curated, ordered and captioned; categories
+  are complete, unordered and caption-less. A Commons gallery is usually paired with a same-named category
+  (`The Venetian Macao` ↔ `Category:The Venetian Macao`).
+- A gallery can hold any media, not just images — audio, video and PDFs appear the same way.
+
+---
 
 ---
 

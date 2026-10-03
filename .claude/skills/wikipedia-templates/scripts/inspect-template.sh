@@ -109,12 +109,26 @@ url_encode() {
     python3 -c "import urllib.parse; print(urllib.parse.quote('$1', safe=''))"
 }
 
+# A body that is not JSON — or a JSON API error object — means the API refused us:
+# rate limiting, an edge/proxy block, an HTML error page. Say so, instead of letting
+# a traceback escape or a section quietly come back empty. tests/live_calls.py treats
+# this message as a transient environment condition, so a throttled CI runner skips
+# the live test rather than failing it (a JSON traceback was unrecognisable there).
+api_failure() {
+    echo "Error: unexpected API response from ${API_URL} (not JSON, or an API error object)" >&2
+    echo "  Usually an edge/proxy block rather than a missing template." >&2
+    exit 2
+}
+
 # --- Fetch basic page info (protection, pageprops) ------------------------
 fetch_page_info() {
     ENCODED_TITLE=$(url_encode "${API_TITLE}")
-    curl -s -S \
+    # -w appends the HTTP status so a blocked/throttled API can be told apart
+    # from a genuinely missing template (see the check in the main block).
+    curl -s -S -w '\n%{http_code}' \
         -H "User-Agent: ${USER_AGENT}" \
-        "${API_URL}?action=query&prop=info%7Cpageprops&inprop=protection&titles=${ENCODED_TITLE}&format=json"
+        "${API_URL}?action=query&prop=info%7Cpageprops&inprop=protection&titles=${ENCODED_TITLE}&format=json" \
+        2>/dev/null || true
 }
 
 # --- Fetch raw source -----------------------------------------------------
@@ -125,7 +139,13 @@ fetch_raw_source() {
         "${API_URL}?action=query&prop=revisions&rvprop=content&rvlimit=1&titles=${ENCODED_TITLE}&format=json")
     echo "$RESPONSE" | python3 -c "
 import json, sys
-data = json.load(sys.stdin)
+try:
+    data = json.load(sys.stdin)
+except ValueError:
+    sys.exit(3)
+if not isinstance(data, dict) or 'error' in data:
+    sys.exit(4)
+
 pages = data.get('query', {}).get('pages', {})
 for pid, pdata in pages.items():
     if pid == '-1':
@@ -136,7 +156,7 @@ for pid, pdata in pages.items():
         print(revs[0].get('content', '(empty)'))
     else:
         print('(no revisions — page may be missing)')
-"
+" || api_failure
 }
 
 # --- Fetch Lua module dependencies ----------------------------------------
@@ -147,7 +167,13 @@ fetch_module_deps() {
         "${API_URL}?action=query&prop=templates&titles=${ENCODED_TITLE}&format=json" | \
         python3 -c "
 import json, sys
-data = json.load(sys.stdin)
+try:
+    data = json.load(sys.stdin)
+except ValueError:
+    sys.exit(3)
+if not isinstance(data, dict) or 'error' in data:
+    sys.exit(4)
+
 pages = data.get('query', {}).get('pages', {})
 for pid, pdata in pages.items():
     if pid == '-1':
@@ -161,7 +187,7 @@ for pid, pdata in pages.items():
             print(f'  • {m[\"title\"]}')
     else:
         print(f'No Lua module dependencies found for {pdata.get(\"title\", \"?\")}.')
-"
+" || api_failure
 }
 
 # --- Fetch transclusion count ---------------------------------------------
@@ -172,35 +198,69 @@ fetch_transclusion_count() {
         "${API_URL}?action=query&prop=pageprops&titles=${ENCODED_TITLE}&format=json" | \
         python3 -c "
 import json, sys
-data = json.load(sys.stdin)
+try:
+    data = json.load(sys.stdin)
+except ValueError:
+    sys.exit(3)
+if not isinstance(data, dict) or 'error' in data:
+    sys.exit(4)
+
 pages = data.get('query', {}).get('pages', {})
 for pid, pdata in pages.items():
     count = pdata.get('pageprops', {}).get('wikibase-badge-goodcount', '') or \
             pdata.get('pageprops', {}).get('expected-unconnected-page', '')
     # Use embeddedin for actual count
     print(f'Page ID: {pid}')
-"
+" || api_failure
 }
 
 # --- Main -----------------------------------------------------------------
-PAGE_INFO=$(fetch_page_info)
+PAGE_RESPONSE=$(fetch_page_info)
+HTTP_CODE="${PAGE_RESPONSE##*$'\n'}"
+PAGE_INFO="${PAGE_RESPONSE%$'\n'*}"
+
+# A blocked, throttled or unreachable API must not be reported as a missing
+# template: say what actually happened instead of guessing. (This masked a CI
+# failure for weeks: the GitHub runner got an error page back, the JSON parse
+# failed, and the fallback claimed the template did not exist.)
+if [[ "$HTTP_CODE" != "200" ]]; then
+    echo "Error: API returned HTTP ${HTTP_CODE} from ${API_URL}" >&2
+    echo "  Retry later; if it persists, check the User-Agent policy" >&2
+    echo "  (see the wikimedia-api-access skill) or whether the wiki is reachable." >&2
+    exit 2
+fi
 
 # Parse page info
-PAGE_TITLE=$(echo "$PAGE_INFO" | python3 -c "
+PAGE_TITLE=$(printf '%s' "$PAGE_INFO" | python3 -c "
 import json, sys
-data = json.load(sys.stdin)
-pages = data.get('query', {}).get('pages', {})
+try:
+    data = json.load(sys.stdin)
+except ValueError:
+    sys.exit(3)
+if 'error' in data:
+    sys.exit(4)
+pages = (data.get('query') or {}).get('pages') or {}
 for pid, pdata in pages.items():
-    if pid == '-1':
+    if pid == '-1' or pdata.get('missing') is not None:
         print('NOT_FOUND')
     else:
         print(pdata.get('title', '?'))
-" 2>/dev/null || echo "NOT_FOUND")
+    break
+") || PAGE_TITLE="PARSE_ERROR"
 
-if [[ "$PAGE_TITLE" == "NOT_FOUND" ]]; then
-    echo "Error: Template '${TEMPLATE_NAME}' not found on ${WIKI}." >&2
-    exit 1
-fi
+case "$PAGE_TITLE" in
+    PARSE_ERROR)
+        api_failure
+        ;;
+    "")
+        echo "Error: unexpected API response from ${API_URL} (no page data returned)" >&2
+        exit 2
+        ;;
+    NOT_FOUND)
+        echo "Error: Template '${TEMPLATE_NAME}' not found on ${WIKI}." >&2
+        exit 1
+        ;;
+esac
 
 # --- Protection -----------------------------------------------------------
 if ! $SINGLE_VIEW || $SHOW_PROTECTION; then
@@ -246,7 +306,13 @@ if ! $SINGLE_VIEW; then
         "${API_URL}?action=query&list=embeddedin&eititle=${ENCODED_TITLE}&eilimit=1&format=json" 2>/dev/null)
     echo "$COUNT_RESPONSE" | python3 -c "
 import json, sys
-data = json.load(sys.stdin)
+try:
+    data = json.load(sys.stdin)
+except ValueError:
+    sys.exit(3)
+if not isinstance(data, dict) or 'error' in data:
+    sys.exit(4)
+
 query = data.get('query', {})
 pages = query.get('embeddedin', [])
 total = len(pages)
@@ -256,5 +322,5 @@ if total > 0:
     print(f'  {total}+ page(s) use this template (use template-usage.sh for full list)')
 else:
     print('  No pages currently use this template')
-" 2>/dev/null
+" 2>/dev/null || api_failure
 fi

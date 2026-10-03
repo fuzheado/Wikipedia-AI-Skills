@@ -41,11 +41,13 @@ with core_c.cursor() as cur:
     cats = {pid: title for pid, title in cur.fetchall()}
 
 with links_c.cursor() as cur:
-    cur.execute("SELECT cl_from, cl_to FROM categorylinks")
+    cur.execute("SELECT cl_from, lt_title FROM categorylinks "
+                "JOIN linktarget ON lt_id = cl_target_id "
+                "WHERE lt_namespace = 14")
     membership = cur.fetchall()
 
 # join in code, not in SQL
-for cl_from, cl_to in membership:
+for cl_from, cl_title in membership:
     if cl_from in cats:
         ...
 ```
@@ -179,7 +181,7 @@ WHERE actor_name = 'ExampleUser';
 
 | Property | Description | Value type |
 |---|---|---|
-| `pageview_daily_average` | Average daily pageviews | Float (use `CAST AS UNSIGNED`) |
+| ⚠️ `pageview_daily_average` | **Retired — no longer written.** 0 rows on enwiki, commons, dewiki, frwiki, nlwiki and wikidatawiki (verified 2026-09-20), and no `pageview*` property exists on any of them, so queries filtering on it return an **empty result set** rather than an error. Use the AQS/REST pageviews API instead (see the wikimedia-pageviews skill); the patterns below are kept for when a popularity property exists. | Float (use `CAST AS UNSIGNED`) |
 | `wikibase_item` | Linked Wikidata Q-ID | String (e.g., `Q937`) |
 | `noeditsection` | Disable section edit links | String |
 | `displaytitle` | Custom display title | String |
@@ -188,11 +190,14 @@ WHERE actor_name = 'ExampleUser';
 
 ```sql
 -- Get average daily views for pages in a category
+-- ⚠️ Returns 0 rows today: `pageview_daily_average` is no longer written
+-- (see the page_props table above — verified 2026-09-20).
 SELECT page_title, CAST(pp_value AS UNSIGNED) as avg_views
 FROM page
 JOIN page_props ON pp_page = page_id
 JOIN categorylinks ON cl_from = page_id
-WHERE cl_to = 'Physics'
+JOIN linktarget ON lt_id = cl_target_id
+WHERE lt_namespace = 14 AND lt_title = 'Physics'
   AND pp_propname = 'pageview_daily_average'
   AND page_namespace = 0
 ORDER BY avg_views DESC
@@ -214,15 +219,39 @@ WHERE pp_propname = 'wikibase_item'
 | Column | Type | Description |
 |---|---|---|
 | `cl_from` | int | `page_id` of the page |
-| `cl_to` | varbinary(255) | Category name (without `Category:` prefix) |
+| `cl_target_id` | bigint unsigned | Foreign key to `linktarget.lt_id`. Added in MediaWiki 1.44, which wrote `cl_to` **and** `cl_target_id`; `cl_to` went away in 1.45 and from the Wiki Replicas on 2026-03-01 ([T402925](https://phabricator.wikimedia.org/T402925), [T417492](https://phabricator.wikimedia.org/T417492)) |
 | `cl_type` | varbinary(10) | `page`, `subcat`, or `file` |
+
+> ⚠️ **`cl_to` no longer exists.** MediaWiki 1.44 normalised the category name out of
+> `categorylinks` into the shared `linktarget` table. Every query must join
+> `linktarget ON lt_id = cl_target_id` and filter on `lt_title` (with
+> `lt_namespace = 14`) instead. A query still using `cl_to` fails with
+> `ERROR 1054 (42S22): Unknown column 'cl_to'`. See
+> [Manual:Categorylinks table](https://www.mediawiki.org/wiki/Manual:Categorylinks_table).
+>
+> **Why this keeps biting.** The compatibility window makes the change look recent:
+> 1.44 (2025) shipped *both* columns in "write both" mode, so queries copied from
+> older examples kept working; the Wiki Replicas then served a compatibility view
+> until it was dropped on **2026-03-02** ([Gerrit 1239483](https://gerrit.wikimedia.org/r/c/1239483)).
+> Guides that predate that — notably
+> [Help:Wiki Replicas/Queries/Example queries](https://wikitech.wikimedia.org/wiki/Help:Wiki_Replicas/Queries/Example_queries),
+> last edited 2024-10 — still contain `cl_to` examples, which is how the queries in this
+> repo ended up broken for four months without anyone noticing. **Execute a category query
+> against a replica before shipping it**: the repo's verifiers check URLs, snippets, CLI
+> commands and API names, but nothing runs SQL, so a wrong column name is invisible until a
+> human runs the query.
+>
+> **Keep both filters.** `lt_namespace = 14` *and* `lt_title = ...` match the `linktarget`
+> index on (`lt_namespace`, `lt_title`). Filtering on `lt_title` alone returns the same rows
+> but cannot use that index and has been reported as very slow.
 
 ```sql
 -- All pages in a category
 SELECT page_title
 FROM categorylinks
 JOIN page ON cl_from = page_id
-WHERE cl_to = 'Physics'
+JOIN linktarget ON lt_id = cl_target_id
+WHERE lt_namespace = 14 AND lt_title = 'Physics'
   AND page_namespace = 0
 LIMIT 100;
 
@@ -234,12 +263,14 @@ WHERE page_id = 736
 GROUP BY page_title;
 
 -- Subcategories of a category
-SELECT cl_to as subcategory
+SELECT lt_title AS subcategory
 FROM categorylinks
+JOIN linktarget ON lt_id = cl_target_id
 WHERE cl_from IN (
   SELECT page_id FROM page
   JOIN categorylinks ON cl_from = page_id
-  WHERE cl_to = 'Physics' AND page_namespace = 14
+  JOIN linktarget ON lt_id = cl_target_id
+  WHERE lt_namespace = 14 AND lt_title = 'Physics' AND page_namespace = 14
 )
 AND cl_type = 'subcat';
 ```
@@ -251,15 +282,29 @@ AND cl_type = 'subcat';
 | Column | Type | Description |
 |---|---|---|
 | `pl_from` | int | Page that contains the link |
-| `pl_namespace` | int | Target page namespace |
-| `pl_title` | varbinary(255) | Target page title |
+| `pl_from_namespace` | int | Namespace of the linking page |
+| `pl_target_id` | bigint unsigned | Foreign key to `linktarget.lt_id` — the target page. Replaced `pl_namespace`/`pl_title` in the link-table normalisation |
 
 ```sql
 -- Count of pages linking to a given page
 SELECT COUNT(*) as incoming_links
-FROM pagelinks
-WHERE pl_title = 'Albert_Einstein' AND pl_namespace = 0;
+FROM pagelinks pl
+JOIN linktarget lt ON lt.lt_id = pl.pl_target_id
+WHERE lt.lt_namespace = 0 AND lt.lt_title = 'Albert_Einstein';
 ```
+
+> ⚠️ **`pl_title` / `pl_namespace` no longer exist.** `pagelinks` was normalised exactly like
+> `categorylinks`: the target title moved into `linktarget`, reached with `pl_target_id` and
+> filtered on `lt_namespace` **and** `lt_title`. Same story for `templatelinks` (`tl_target_id`)
+> and `imagelinks` (`il_target_id`) — but **not** for `langlinks` (still `ll_title`) or
+> `globalimagelinks` (still `gil_to`). A query using the old names fails with
+> `ERROR 1054 (42S22): Unknown column 'pl_title'`.
+>
+> Tracking tasks, per table: `pagelinks` [T299947](https://phabricator.wikimedia.org/T299947)/[T352010](https://phabricator.wikimedia.org/T352010),
+> `templatelinks` [T299417](https://phabricator.wikimedia.org/T299417)/[T314041](https://phabricator.wikimedia.org/T314041),
+> `imagelinks` [T299953](https://phabricator.wikimedia.org/T299953),
+> `categorylinks` [T299951](https://phabricator.wikimedia.org/T299951)/[T402925](https://phabricator.wikimedia.org/T402925).
+> Keep both `lt_*` filters: they match the `linktarget` index on (`lt_namespace`, `lt_title`).
 
 ---
 

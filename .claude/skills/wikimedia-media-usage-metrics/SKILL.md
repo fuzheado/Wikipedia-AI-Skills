@@ -9,7 +9,7 @@ skill_discovery_hints:
   - keywords: ["mediacounts", "mediarequests", "GlobalUsage", "globalimagelinks", "imagelinks", "file transfer counts", "image serve counts"]
   - keywords: ["how many times was image served", "where is file used", "pageviews of articles using image", "GLAM impact", "GLAM metrics"]
   - keywords: ["BaGLAMa", "GLAMorgan", "GLAMorous", "external reuse", "hotlink", "referer", "media transfer counts"]
-last_verified: 2026-09-15
+last_verified: 2026-09-20
 ---
 
 # Media Usage Metrics — Measuring Use of Wikimedia Files
@@ -76,7 +76,7 @@ Definitive cross-wiki "where used".
 - **Ideal:** per-file usage maps, cross-wiki reach (distinct wiki/page counts), feeding pageview lookups.
 
 ### 3.5 `imagelinks` (per-wiki SQL) + 3.6 `imageusage` (Action API)
-- `imagelinks`: `{db}_p.imagelinks` (`il_from`, `il_to`) — local usage incl. non-Commons images. Single-wiki only.
+- `imagelinks`: `{db}_p.imagelinks` (`il_from`, `il_from_namespace`, `il_target_id`) — the file title comes from `linktarget` (`JOIN linktarget lt ON lt.lt_id = il_target_id`, filter `lt_namespace = 6`). Local usage incl. non-Commons images. Single-wiki only. **`il_to` was removed** in the link-table normalisation (T299953) — a query using it fails with `ERROR 1054`; drive from `linktarget` (`lt_namespace = 6 AND lt_title = 'File:…'` without the prefix, i.e. `'Example.jpg'`) for a fast lookup (verified 0.0 s, 2026-09-20).
 - `imageusage`: `list=imageusage&iutitle=File:…` — on-demand local usage, no SQL needed.
 
 ### 3.7 GLAMorous / PetScan — population selection, not counting
@@ -211,6 +211,6 @@ Works for ANY file today, no allow-list. Implemented in `scripts/media_usage_rep
 |---|---|
 | **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | UA format, rate limits, endpoints |
 | **[wikimedia-database](../wikimedia-database/SKILL.md)** | `globalimagelinks`/`imagelinks` SQL via Toolforge |
-| **[wikimedia-pageviews](../wikimedia-pageviews/SKILL.md)** | pageviews API + `pageview_daily_average` sorting |
+| **[wikimedia-pageviews](../wikimedia-pageviews/SKILL.md)** | pageviews API (the `pageview_daily_average` SQL cache is retired — verified 2026-09-20) |
 | **[wikimedia-commons](../wikimedia-commons/SKILL.md)** | Commons Analytics endpoint table + CIM allow-list process |
 | **[wikimedia-commons-sparql](../wikimedia-commons-sparql/SKILL.md)** | SDC/SPARQL discovery (WCQS/QLever) |

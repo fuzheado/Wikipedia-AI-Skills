@@ -15,6 +15,14 @@ deliberately narrow (they must appear *and* the command must have exited
 non-zero). Set ``SKILLS_LIVE_STRICT=1`` to turn the skip into a failure, which
 is what you want when you are deliberately testing a live API from this host.
 
+The same class of failure resurfaced on 2026-09-20 as ``Error: Template
+'Infobox person' not found on https://en.wikipedia.org``: the skill scripts were
+*masking* an API refusal as a missing page, so this guard could not see it (and
+neither could anyone reading the log). The wikipedia-templates scripts now report
+``API returned HTTP <code>`` instead, and
+:func:`is_transient_live_failure` treats 403/429/5xx/000 plus an unparseable API
+response as transient — while a 404 stays a real failure.
+
 Usage in a test file::
 
     from live_calls import run_live
@@ -27,6 +35,7 @@ Usage in a test file::
 """
 
 import os
+import re
 import subprocess
 import time
 
@@ -45,6 +54,7 @@ NETWORK_SIGNATURES = (
     "Temporary failure in name resolution",
     "Name or service not known",
     "nodename nor servname",
+    "Could not resolve host",
     "getaddrinfo failed",
     "Connection refused",
     "Connection reset by peer",
@@ -53,7 +63,16 @@ NETWORK_SIGNATURES = (
     "Read timed out",
 )
 
-TRANSIENT_SIGNATURES = RATE_LIMIT_SIGNATURES + NETWORK_SIGNATURES
+# API refusals: the skill scripts report these as "API returned HTTP <code>" or
+# "unexpected API response" once they stop masking failures (see the
+# wikipedia-templates scripts). 403/429/5xx and 000 (no response at all) are
+# environment conditions for a live test; a 404 is not.
+API_STATUS_RE = re.compile(r"API returned HTTP (\d{3})")
+TRANSIENT_API_STATUSES = frozenset({0, 403, 429, 500, 502, 503, 504})
+API_REFUSAL_SIGNATURES = ("unexpected API response",)
+
+TRANSIENT_SIGNATURES = (RATE_LIMIT_SIGNATURES + NETWORK_SIGNATURES
+                        + API_REFUSAL_SIGNATURES)
 
 STRICT_ENV = "SKILLS_LIVE_STRICT"
 DEFAULT_MIN_INTERVAL = 1.0  # seconds; Wikimedia etiquette is >= 1s between calls
@@ -62,8 +81,17 @@ _last_live_call = 0.0
 
 
 def is_transient_live_failure(output: str) -> bool:
-    """True when *output* looks like rate limiting or a network drop."""
-    return any(signature in output for signature in TRANSIENT_SIGNATURES)
+    """True when *output* looks like rate limiting, an API refusal or a network drop.
+
+    A 404/400 reported by a script is deliberately **not** transient: that is a
+    real regression (wrong endpoint or wrong parameters), not a throttled runner.
+    """
+    if any(signature in output for signature in TRANSIENT_SIGNATURES):
+        return True
+    return any(
+        int(match.group(1)) in TRANSIENT_API_STATUSES
+        for match in API_STATUS_RE.finditer(output)
+    )
 
 
 def pace_live_call(min_interval: float = DEFAULT_MIN_INTERVAL) -> None:

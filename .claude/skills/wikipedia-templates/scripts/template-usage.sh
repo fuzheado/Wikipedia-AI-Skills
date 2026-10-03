@@ -128,12 +128,23 @@ while true; do
         PARAMS+="&eicontinue=${ENCODED_CONT}"
     fi
 
-    RESPONSE=$(curl -s -S \
+    RESPONSE=$(curl -s -S -w '\n%{http_code}' \
         -H "User-Agent: ${USER_AGENT}" \
-        "${API_URL}?${PARAMS}")
+        "${API_URL}?${PARAMS}" 2>/dev/null || true)
+    HTTP_CODE="${RESPONSE##*$'\n'}"
+    BODY="${RESPONSE%$'\n'*}"
+
+    # Never let a blocked/throttled API look like an empty result set: the empty
+    # stdout used to be indistinguishable from "this template is unused".
+    if [[ "$HTTP_CODE" != "200" ]]; then
+        echo "Error: API returned HTTP ${HTTP_CODE} from ${API_URL}" >&2
+        echo "  Retry later; if it persists, check the User-Agent policy" >&2
+        echo "  (see the wikimedia-api-access skill) or whether the wiki is reachable." >&2
+        exit 2
+    fi
 
     # Parse the response
-    NEW_ITEMS=$(echo "$RESPONSE" | python3 -c "
+    NEW_ITEMS=$(printf '%s' "$BODY" | python3 -c "
 import json, sys
 data = json.load(sys.stdin)
 pages = data.get('query', {}).get('embeddedin', [])
@@ -144,7 +155,10 @@ for p in pages:
 cont = data.get('continue', {}).get('eicontinue', '')
 if cont:
     print(f'__CONTINUE__{cont}')
-" 2>/dev/null || true)
+") || {
+        echo "Error: unexpected API response from ${API_URL} (not JSON, or an API error object)" >&2
+        exit 2
+    }
 
     # Extract continuation token
     CONT_VAL=""

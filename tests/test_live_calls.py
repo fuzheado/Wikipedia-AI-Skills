@@ -50,6 +50,31 @@ def test_real_failures_are_not_transient():
     assert not is_transient_live_failure("")
 
 
+def test_detects_api_refusal_statuses():
+    """403/429/5xx and 000 (no response) are environment, not regressions."""
+    for status in (403, 429, 500, 502, 503, 504, 0):
+        output = f"Error: API returned HTTP {status:03d} from https://en.wikipedia.org/w/api.php"
+        assert is_transient_live_failure(output), status
+
+
+def test_api_404_is_not_transient():
+    """A 404 means the endpoint/parameters are wrong — that is a real bug."""
+    output = "Error: API returned HTTP 404 from https://en.wikipedia.org/w/api.php"
+    assert not is_transient_live_failure(output)
+
+
+def test_detects_unexpected_api_response():
+    """An unparseable body is typically an edge/proxy block page."""
+    assert is_transient_live_failure(
+        "Error: unexpected API response from https://en.wikipedia.org/w/api.php "
+        "(not JSON, or an API error object)"
+    )
+
+
+def test_detects_curl_dns_failure():
+    assert is_transient_live_failure("curl: (6) Could not resolve host: en.wikipedia.invalid")
+
+
 # ─── run_live behaviour ─────────────────────────────────────────────────
 
 
