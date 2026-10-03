@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["Site Matrix", "sitematrix", "domain mapping", "language code", "language domain", "yue wikipedia", "zh-yue", "interlanguage"]
   - keywords: ["page summary", "page extract", "extintro", "exintro", "page content", "fetch article", "get page"]
   - keywords: ["CORS preflight", "NetworkError", "Load failed", "browser fetch", "Firefox", "Safari", "WebKit", "forbidden header", "OPTIONS 405", "Api-User-Agent"]
-last_verified: 2026-09-08
+last_verified: 2026-10-03
 ---
 
 All requests to Wikimedia APIs **must** include a descriptive `User-Agent` header or they will be blocked (HTTP 403 or 429). This is enforced by the [Wikimedia Foundation User-Agent Policy](https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy).
@@ -219,6 +219,32 @@ The two governing documents, both current as of 2026-09:
   listed in either document's per-surface tables; the general read guidance
   applies, WMCS exemption included — no fixed delay inside Toolforge, honor
   429/`Retry-After` when it appears.
+
+**Specifics from the Robot policy that are easy to miss** (page read 2026-09-17):
+
+- **Dumps first**: "Consider if dumps are more efficient than live requests" —
+  offline collection is preferred where it exists.
+- **Honor robots.txt**, and **default to `Accept-Encoding: gzip`** (unnecessary
+  only for media files, which are already compressed).
+- **Website reads**: crawl canonical `/wiki/Article_name` URLs **with no query
+  parameters**; do **not** emulate a browser (no cookies, no JS) unless under
+  ~5 req/s; **< 10 concurrent** and **< 20 req/s average** overall; never use
+  `oldId`/`curid`.
+- **Media (`upload.wikimedia.org`)**: ≤ 2 concurrent total, ≤ 25 Mbps measured
+  over 10-second intervals, and only originals or **standard thumbnail sizes**
+  — prefer thumbnails.
+- **Action API**: avoid expensive endpoints — if a call takes > 1s to serve,
+  wait 5s before the next one; use batch requests where supported.
+- **Non-wiki resources (Gerrit, GitLab, Phabricator)**: concurrency ≤ 1 and
+  ≥ 1s between requests; **pause ≥ 15 minutes after any 5xx**.
+- **Significant volume + no impersonation**: either publish a JSON list of your
+  source CIDRs, or authenticate (OAuth 2.0 preferred; session cookies also
+  supported).
+- **Escalation**: community bots → run in WMCS or authenticate + get a local bot
+  flag; external/commercial high volume → Wikimedia Enterprise APIs; unsure →
+  **bot-traffic@wikimedia.org**. Bots that repeatedly work around the limits, or
+  threaten stability, **may be blocked**. The policy notes it is an evolution of
+  the original 2009 version.
 
 ### Caching Strategy (Prevents Redundant Calls)
 

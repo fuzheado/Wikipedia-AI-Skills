@@ -1,13 +1,14 @@
 ---
 name: wikimedia-phabricator
-description: Navigate Wikimedia's Phabricator instance — search tasks, track project status, file bug reports, and understand why something might not work or what's in development
+description: Use when working with Wikimedia Phabricator — search tasks, read status, and interact responsibly (etiquette, conduct, privacy, security, bot-account rules)
 license: MIT
 compatibility: opencode
 depends_on: [wikimedia-api-access]
-last_verified: 2026-06-12
+last_verified: 2026-10-03
 skill_discovery_hints:
   - keywords: ["Phabricator", "Phab", "bug report", "bug tracker", "known issue", "known bug", "feature request", "task"]
   - keywords: ["in development", "being worked on", "project status", "roadmap", "sprint", "workboard", "deployment status"]
+  - keywords: ["history of", "when did", "when was", "debut", "first appeared", "timeline", "origin of", "test cycle", "experimental phase", "design goals", "design rationale", "compared to", "comparison", "evaluate this goal"]
   - keywords: ["why doesn't", "why won't", "broken", "not working", "regression", "reported", "submit a bug"]
   - keywords: ["phab:", "tracking ticket", "development tracking", "task status"]
 ---
@@ -183,6 +184,26 @@ Tag the task with the relevant project so it reaches the right team. If unsure, 
 | **One issue per task** | Don't list multiple unrelated bugs in one task |
 | **Use parent tasks for scope** | If filing a feature request that's part of a larger effort, link to the parent epic |
 
+### ⚠️ Before ANY write action: read `references/responsible-interaction.md`
+
+This agent's default is **read-only**: never file, comment, assign, re-prioritise or attach on someone's
+behalf — hand over a draft instead. (Project convention: many editors file their own tasks; agent output is
+"inspiration only".) Non-negotiables, from the primary policies:
+
+| Rule | Source |
+|---|---|
+| **AI/LLM-assisted content**: "you are fully responsible for its content. Your text must be accurate, factually correct, and represent your own understanding" — verify every claim and task ID | mw:Bug management/Phabricator etiquette |
+| **Security issues are never public tasks** — security@wikimedia.org or form/75, coordinated disclosure | mw:Reporting security bugs |
+| **Status/priority reflect reality, they don't cause it** — comment instead of changing when in doubt | Phabricator etiquette |
+| **Don't assign without the assignee's prior agreement**; no "me too"/"Fix this now" comments — subscribe or mention | Phabricator etiquette |
+| **No confidential data** (IPs, emails, tokens, NDA/vetted extracts) in tasks, comments or attachments; uploaded files are private only until attached | mw:How to report a bug; mw:Phabricator/Help |
+| **Use @usernames, not real names**, and prefer Herald/mentions over mass pings | Phabricator etiquette |
+| **Automation needs a registered bot account** (created natively, requested via #Phabricator-Bot-Requests with name/purpose/email/owner; human owner named in the description) — never a personal account for repetitive activity | mw:Phabricator/Bots |
+| Conduct is governed by the **Code of Conduct for Wikimedia technical spaces**, which names Phabricator explicitly; reports → techconduct@wikimedia.org | mw:Code of Conduct |
+
+The reference file also covers the read-only techniques (raw transaction pages, why the search UI is JS-only,
+the Conduit `ERR-INVALID-SESSION` behaviour) and a pre-flight checklist for any write.
+
 ---
 
 ## SOP: Tracking What's in Development
@@ -210,12 +231,79 @@ Goal: Find out if section-level watchlisting is deployed
 
 ---
 
+## SOP: Programmatic Access When Conduit API Requires Auth
+
+The Conduit API (`api/maniphest.search`, `api/transaction.search`) requires authentication for task details and comments. When working without auth (e.g., from curl in a terminal session), use **raw transaction pages**:
+
+```
+https://phabricator.wikimedia.org/transactions/raw/{PHID}/
+```
+
+### Extracting PHIDs for Recent Comments
+
+PHIDs for a task's recent comments can be extracted from the task page HTML. Look for patterns like:
+
+```
+PHID-XACT-TASK-{hash}
+```
+
+These appear in `anchor` attributes and `phid` keys embedded in the page's Javelin init data. The raw transaction page returns the comment as plain text in a `<textarea>` — no parsing needed beyond extracting the textarea content.
+
+### When to Use This
+
+- Bulk extraction of recent comments from a high-activity task
+- Researching status when browser navigation is too slow or verbose
+- Programmatic monitoring of task updates
+
+This is a workaround — the Conduit API is the proper interface for authenticated access.
+
+---
+
 ## Relationship to Other Skills
 
 - **wikimedia-toolforge** — Toolforge infrastructure tasks on Phabricator; this skill helps find them
 - **wikipedia-error-handling** — Known API bugs and error conditions are tracked in Phabricator; this skill helps verify whether a 429/403 behavior is a known issue
 - **wikimedia-api-access** — API feature requests and bug reports go through Phabricator
+- **wikimedia-feature-archaeology** — For full lifecycle investigations (origin → deployment → community communications audit), load this umbrella skill. It orchestrates Phabricator + GitHub + config scraping + comms auditing.
 - **All skills that reference specific tasks** — Use this skill to look up referenced tasks and understand their current status (e.g. checking whether a deprecation noted in a skill is still in progress)
+
+---
+
+## SOP: Researching a Wikimedia Feature's Full History
+
+When asked about the origin, timeline, or deployment history of a Wikimedia feature (e.g. "when did Special:PersonalDashboard debut?"):
+
+1. **Start with Phabricator** — search for the feature name. Look for:
+   - The **repo-request task** (e.g. "Request a gerrit repository for …") — gives the earliest date
+   - The **MVP/launch epic** — gives experiment scope and target wikis
+   - **Deployment tasks** — track when code landed on which wikis
+   - **Config tasks** — track when it went from silent to live
+
+2. **Extract Event Timelines efficiently** — instead of repeated `browser_scroll` + `browser_snapshot`, use `browser_console`:
+   ```js
+   document.querySelector('.phui-timeline-view').innerText
+   ```
+   This returns the full timeline as plain text. For long timelines, substring it:
+   ```js
+   document.querySelector('.phui-timeline-view').innerText.substring(0, 5000)
+   document.querySelector('.phui-timeline-view').innerText.substring(5000, 10000)
+   ```
+
+3. **Find the first commit** via GitHub API (Wikimedia mirrors all Gerrit repos to GitHub):
+   - Gerrit repo → GitHub mirror at `github.com/wikimedia/mediawiki-extensions-<Name>`
+   - Get the last page of commits: `curl -sI "https://api.github.com/repos/wikimedia/mediawiki-extensions-<Name>/commits?per_page=1" | grep link` → extract `rel="last"` page number
+   - Fetch that page: `curl -s "https://api.github.com/repos/wikimedia/mediawiki-extensions-<Name>/commits?per_page=1&page=<N>"`
+   - The initial commit message often reveals what it was forked from (e.g. "subset of the Homepage feature of the GrowthExperiments extension")
+
+4. **Check the extension page on mediawiki.org** — `https://www.mediawiki.org/wiki/Extension:<Name>` — for:
+   - **Release status** (experimental/stable/beta)
+   - **Author and team**
+   - **Required MediaWiki version**
+   - Whether the page is marked as a draft
+
+5. **Synthesize the timeline** — the deliverable is a date-ordered table showing: repo creation → first commit → deployment to pilot wikis → deployment to target wiki → live config activation → current status/epic.
+
+See `references/researching-extension-history.md` for a worked example (PersonalDashboard, 2025–2026).
 
 ---
 
