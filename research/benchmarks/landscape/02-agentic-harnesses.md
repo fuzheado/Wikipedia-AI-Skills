@@ -146,7 +146,7 @@
 
 ---
 
-## 6. Verification log (all fetched 2026-08-19, User-Agent `HermesAgent/1.0 benchmark research`)
+## 6. Verification log (all fetched 2026-08-19, descriptive research User-Agent)
 
 **Benchmarks — primary sources:**
 - https://arxiv.org/abs/2311.12983 (GAIA) — **200**

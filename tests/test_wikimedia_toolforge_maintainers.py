@@ -79,7 +79,11 @@ class TestExtractMaintainers:
 
     def test_user_agent_is_not_the_private_client_name(self, cm):
         """The audit was published from a private working library; its UA must not
-        travel with it (the value is also changeable by env var, see below)."""
+        travel with it (the value is also changeable by env var, see below).
+
+        This assertion is the reason the private client name still appears in this
+        file: it is here to keep the name out of the script.
+        """
         assert "HermesAgent" not in cm.UA
 
     def test_user_agent_comes_from_the_environment(self, monkeypatch):
