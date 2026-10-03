@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["pageviews", "traffic", "popularity", "article views", "views per article"]
   - keywords: ["top pages", "pageview API", "daily views", "analytics"]
   - keywords: ["media views", "mediarequests", "file views", "image views", "media requests"]
-last_verified: 2026-09-20
+last_verified: 2026-10-03
 ---
 
 > ⚠️ **User-Agent required:** The REST API examples below require a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -57,6 +57,11 @@ LIMIT 50;
 ### **Scenario B: Precise Historical Data (REST API)**
 
 If the task requires specific dates, trends, or "total views last month," the agent must use the **Analytics QuickMetrics API**.
+
+> **Batch shortcut for known sets:** if you need recent pageviews (rolling ~60
+> days) for a *known set* of articles, skip the per-article loop — the Action
+> API `prop=pageviews` returns up to **50 titles per call**. See
+> `references/pageview-api.md` → "Batch: Action API prop=pageviews".
 
 * **Endpoint:** `[https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/](https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/)`
 * **Access Pattern:** `project / access / agent / article / granularity / start / end`
@@ -162,6 +167,13 @@ media file was actually served. For the latter, use the **Media Requests API**
   `File:` page counts views of the description page (typically a few dozen/day);
   media requests count every load of the underlying file (often thousands×
   more). Never use pageviews to answer "how many people viewed this image".
+- **Pageviews ≠ media usage, generally.** Pageviews count *page loads*, never
+  *media-file transfers/views*. For "how many times was a file served" use the
+  **mediarequests AQS API** (`metrics/mediarequests/{aggregate,top,per-file}`);
+  for "where is it embedded" use **GlobalUsage** (`prop=globalusage`); for
+  "off-wiki reuse" use the **mediacounts `referer_external`** field. Full
+  method matrix + gotchas: `wikimedia-commons` skill →
+  `wikimedia-commons/references/media-usage-metrics.md`.
 
 ## **Constraint & Guardrails**
 

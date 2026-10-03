@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["maintenance query", "search API", "prefix search", "full-text search", "title search"]
   - keywords: ["PetScan", "search results", "ranking", "search filter", "cross-wiki search"]
   - keywords: ["escape quotes", "quoting", "special characters in search", "zero results", "empty search results", "search returns nothing"]
-last_verified: 2026-09-04
+last_verified: 2026-10-03
 depends_on: [wikimedia-api-access, wikipedia-categories]
 ---
 
@@ -42,6 +42,8 @@ depends_on: [wikimedia-api-access, wikipedia-categories]
 ## What CirrusSearch Is
 
 CirrusSearch is the Elasticsearch-based search engine powering all Wikimedia wikis (Wikipedia, Commons, Wikidata, Wiktionary, etc.). It replaces the old MediaWiki search with faster indexing, stemming across 50+ languages, template expansion in search results, and a rich query syntax.
+
+**Scope:** CirrusSearch indexes page content (rendered wikitext of the current revision). It does NOT index revision metadata — edit summaries, usernames, or timestamps are not searchable. For edit-summary search, see the **[wikimedia-database](../wikimedia-database/SKILL.md)** skill and its `references/edit-summary-search.md`.
 
 **Two search indexes to understand:**
 
@@ -736,6 +738,17 @@ generated `srsearch` must escape `"` → `\"` in interpolated titles
 walks + per-category `incategory:` draws, which multiplies exposure to this
 escaping rule.
 
+### 12. CirrusSearch Does NOT Index Edit Summaries
+
+CirrusSearch indexes **page content** — the rendered wikitext of the current page revision. It does NOT index revision metadata like edit summaries, usernames, or timestamps. `insource:` searches raw wikitext of the current revision, not the edit summary that accompanied any past revision. There is no `insummary:` keyword or equivalent.
+
+**❌ Common mistake:** Trying to find edits with a specific edit summary via CirrusSearch (e.g., "find all edits where the summary mentions 'revert'"). This will return zero relevant results regardless of query syntax.
+
+**For edit-summary search, use instead:**
+- **Constrained SQL on replicas** — `LIKE` on `comment_text` with user + date filters (see `references/edit-summary-search.md` in **[wikimedia-database](../wikimedia-database/SKILL.md)**)
+- **Σ (Sigma) Edit Summary Search** — `https://iw.toolforge.org/sigma/summary.py` — searches one user's summaries
+- **XML dumps** — `stub-meta-history` dump (~122 GB for enwiki) includes all edit summaries for offline search
+- **EventStreams** — real-time filtering of live edit summaries (31-day max replay)
 ---
 
 ## Cross-References

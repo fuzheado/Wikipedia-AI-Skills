@@ -13,7 +13,7 @@ skill_discovery_hints:
   - keywords: ["Toolforge logs", "kubectl logs", "webservice logs", "debug", "tail logs", "toolforge debug"]
   - keywords: ["Node streaming", "buffer", "readFile", "createReadStream", "Pannellum", "XHR", "WebGL"]
   - keywords: ["Toolforge cron", "node job", "scheduled task", "cron node", "batch job"]
-last_verified: 2026-09-14
+last_verified: 2026-10-03
 ---
 
 > ⚠️ **Prerequisites:** This skill assumes you have a Toolforge account and can SSH in. See **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** for account setup, tool creation, and basic SSH configuration.
@@ -26,6 +26,14 @@ last_verified: 2026-09-14
 > The absence of a license means default copyright laws apply, which is counter to
 > the principles of the Wikimedia movement. See the
 > [full rules](https://wikitech.wikimedia.org/wiki/Help:Toolforge/Rules).
+
+> 🔁 **Deployment is moving to Toolforge Components (push-to-deploy) + opt-in alerting.**
+> For a long-lived tool, know the path: a public repo with a `Procfile` + a
+> `toolforge.yaml` component config + a deployment token, so `git push` builds and
+> deploys. The same config file is where you opt in to the new email alerting service
+> (`defaults.alerts.notify: true`; opt-in opens October 2026, early access per tool on
+> request). Commands, the supported/unsupported list and pitfalls: SOP 10 in the
+> **[wikimedia-toolforge](../wikimedia-toolforge/SKILL.md)** skill.
 
 ---
 

@@ -10,7 +10,7 @@ skill_discovery_hints:
   - keywords: ["thumb.php", "thumbhandler", "thumbnailUrl", "contentUrl", "rendering pipeline", "image thumbnail API"]
   - keywords: ["SVG rasterize", "PDF page render", "DjVu thumbnail", "keyframe", "video thumbnail", "page rendering"]
   - keywords: ["resize image", "downscale", "preview size", "Varnish cache", "thumb cache"]
-last_verified: 2026-09-05
+last_verified: 2026-10-03
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -351,7 +351,38 @@ for multiplier, url in info.get("responsiveUrls", {}).items():
 srcset = ", ".join(srcset_parts)
 ```
 
+> ⚠️ **Bursts, not individual URLs, are what get rate-limited.** A probe of 1,566
+> thumbnail requests at 8 threads collected **101 × 429** — all of them on
+> ORIGINAL-file URLs (`upload.wikimedia.org`, no `/thumb/`), none on `/thumb/`
+> buckets. The same 101 URLs, fetched one at a time, returned **101 × 200**. So a 429
+> here usually means *your* client made too many parallel requests, not that the URL
+> is bad: back off, retry, and prefer thumb buckets over originals. Corollary for
+> galleries: a browser that picks an original as the 2× candidate for many tiles at
+> once is manufacturing exactly this burst.
+
 > ⚠️ **Small files may not get responsive URLs.** If the file's raster dimensions are close to or smaller than the requested thumbnail width, Commons may skip generating responsive versions.
+
+> ⚠️ **`responsiveUrls["2"]` can be the ORIGINAL FILE, not a thumb (verified 2026-09-10).**
+> For a 1800×1200 original at `iiurlwidth=600`, `responsiveUrls["2"]` is a
+> `…/1280px-…` bucket — but for an original whose width is ≤ 2× the requested
+> width (e.g. 1200×1800 portraits), it is the **original file URL**: no `/thumb/`
+> segment, 1.6–2.9 MB, full resolution. Measured across the 783 files of
+> `Category:Images from Wiki Loves Monuments 2026 in China`: **172 (22%) declared the
+> original as the 2× candidate, 611 declared a `/thumb/` bucket.** Check the URL
+> shape (`/thumb/` present? size vs `responsiveUrls` key) before putting an entry
+> into `srcset`; a gallery that hands the original to a retina tile downloads
+> multi-MB frames per tile and enlarges the failure surface.
+>
+> ⚠️ **A failed srcset candidate does NOT fall back to `src` (verified by experiment).**
+> Chromium 1243, DPR 2, all `960px-` requests aborted: **12 of 12 tiles rendered broken
+> although every tile's `src` (a 500px thumb) was reachable and fine** — the browser
+> picks a candidate and gives up, it does not retry the next one. Any `<img>` with a
+> `srcset` therefore needs an error path that degrades to the 1× URL:
+> drop `srcset`/`sizes`, keep the first declared candidate as `src`, and re-set the
+> URL with a cache-busting param (browsers negative-cache a failed image, so a bare
+> re-assignment of the same URL often refetches nothing). Applied to the 12 broken
+> tiles above, that restored **12/12 with no page reload** — the right fix when a page
+> carries state (shuffle order, scroll position) that a reload would destroy.
 
 ---
 
@@ -784,10 +815,52 @@ This pattern applies to thumbnails, panoramas, audio/video files, and any other 
 
 ---
 
+## 11. Face-Aware (Smart) Cropping — Beyond Proportional Thumbs
+
+The thumbnail pipeline is **proportional-only**: it always preserves the source
+aspect ratio (see §5). There is no built-in "crop to a different aspect while
+keeping the subject visible" (`gravity=face`) parameter — requesting `iiurlwidth`
+gives a *scaled* image, never a re-framed crop.
+
+When you need a **non-proportional crop** (e.g. a portrait forced into a 16:9 or
+square window) that keeps the face visible, the pattern is a **smart-crop proxy**
+on Toolforge: a small service that fetches the file via `Special:FilePath`, runs
+face detection, crops to the target aspect, and serves the result.
+
+```
+GET https://YOUR-TOOL.toolforge.org/crop?file=File:Name.jpg&width=300&height=200&gravity=face
+```
+
+Key design points:
+- **Fetch via `Special:FilePath/File:X.jpg?width=1200`** — you inherit Commons'
+  format handling (SVG→PNG, PDF→JPEG, video keyframes) for free; just detect + crop.
+- **Deterministic output → `Cache-Control: public, max-age=604800, immutable`.**
+- **~30 ms/image on CPU** (OpenCV YuNet, ~230 KB ONNX) — no GPU, no ML runtime.
+- **Fall back to center-crop when no face is found.**
+
+Option space, easiest → hardest to ship (and durability):
+| Option | Effort | Durability |
+|---|---|---|
+| Toolforge smart-crop proxy (custom) | ~1 day | community-maintained |
+| [thumbor](https://github.com/thumbor/thumbor) on Toolforge | ~1–2 days | community-maintained |
+| Client-side detection (MediaPipe JS / face-api.js) | hours | no shareable URL |
+| Batch precompute + cache (on top of proxy) | ~1 day | optimization, not standalone |
+| MediaWiki core `gravity=face` (native thumbhandler param) | months–years, WMF SRE | permanent |
+| WMF microservice (Lift Wing) | months + ops/ML review | WMF-backed |
+
+Honest caveat: a Toolforge tool is single-point-of-failure community infra; the
+*permanent* answer is the native `gravity=face` param, which needs a Phabricator
+task + WMF platform/SRE buy-in. Ship the proxy to iterate, start the Phab task
+for the long game.
+
+Implementation: a **face-aware-cropping** companion skill (not published in this repo)
+(detector + crop geometry + `face-aware-cropping/scripts/proxy.py`).
+
 ## Related Skills
 
 | Skill | Relevance |
 |-------|-----------|
+| **face-aware-cropping** (companion skill, not in this repo) | Face detector + smart-crop geometry; build a smart-crop proxy (§11) |
 | **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** | User-Agent, rate limiting, error handling for all API calls |
 | **[wikimedia-commons](../wikimedia-commons/SKILL.md)** | File search, metadata, categories — finding files to thumbnail |
 | **[wikimedia-commons-svg](../wikimedia-commons-svg/SKILL.md)** | SVG editing, versioning, and the rasterization implications |

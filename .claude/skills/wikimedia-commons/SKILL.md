@@ -15,7 +15,7 @@ skill_discovery_hints:
   - keywords: ["Commons namespaces", "gallery", "gallery pages", "{{Gallery page}}", "Creator namespace"]
   - keywords: ["CORS", "cross-origin", "upload.wikimedia.org", "browser app", "Canvas", "WebGL"]
   - keywords: ["Commons Impact Metrics", "CIM", "category analytics", "Views from category", "impact metrics"]
-last_verified: 2026-09-14
+last_verified: 2026-10-03
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -248,6 +248,13 @@ Full parameter specs: [api-spec.json](https://wikimedia.org/api/rest_v1/metrics/
 | Arbitrary/unregistered category, on-demand analysis | **Live computation** — `categorymembers` walk + batched `globalusage` + per-page pageviews (bounded), or PetScan server-side, or GLAMorgan |
 | Deep-dive shape analysis / sampling | catprobe-style CirrusSearch sampling |
 
+### Measuring media usage — full method matrix
+For the complete cross-method reference (transfers vs usage vs reach vs external
+reuse — mediacounts, mediarequests, GlobalUsage, pageviews, CIM, BaGLAMa, etc.)
+with **verified API gotchas** (mediarequests `per-file` leading-slash encoding,
+GlobalUsage is `prop=globalusage` not `iiprop`, CIM allow-list/404 semantics), see
+`references/media-usage-metrics.md`.
+
 A robust pattern: **try the CIM snapshot first; on 404 fall back to live
 computation** (a 404 is the API's way of saying "not registered").
 
@@ -467,6 +474,8 @@ Some formats are blocked from upload because of patent encumbrances, poor compre
 | **[video2commons](https://commons.wikimedia.org/wiki/Commons:Video2Commons)** | Uploads/converts video | Handles transcoding (e.g., MP4 → WebM) during upload; ideal for migrating video from YouTube or other sources under free licenses |
 | **[Pywikibot](https://www.mediawiki.org/wiki/Manual:Pywikibot)** | Python bot framework for scripted uploads | Programmatic bulk uploads via `Site.upload()` or `pwb.py upload`; `pwb.py imagetransfer` moves files between wikis (e.g. enwiki → Commons) with attribution history. See the **[pywikibot](../pywikibot/SKILL.md)** skill |
 | **[Commonist](https://commons.wikimedia.org/wiki/Commons:Commonist)** | Desktop bulk uploader (Java) | Legacy tool for batch uploads with a GUI; lighter than Pattypan for simple batches |
+
+> 📖 **Mass-upload tooling landscape & gaps:** For analyzing Commons mass-upload tools (which are unmaintained/dead, the ETL-vs-ELT framing, user-rights asymmetries, and the no-code filename/metadata transform gap — plus a reusable fetch technique), see `references/upload-tools-landscape.md`. Compiled from the GLAM CSI report, `Commons:Upload_tools`, and the Flickypedia failure log.
 
 ### **Upload Checklist**
 
