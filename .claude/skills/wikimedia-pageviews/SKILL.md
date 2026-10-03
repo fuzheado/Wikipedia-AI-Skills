@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["pageviews", "traffic", "popularity", "article views", "views per article"]
   - keywords: ["top pages", "pageview API", "daily views", "analytics"]
   - keywords: ["media views", "mediarequests", "file views", "image views", "media requests"]
-last_verified: 2026-09-20
+last_verified: 2026-10-03
 ---
 
 > ⚠️ **User-Agent required:** The REST API examples below require a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -220,7 +220,7 @@ Fetch historical daily pageviews for a specific article with a visual bar chart.
 ### 📚 Pageview API Reference (`references/pageview-api.md`)
 
 Full reference for the Wikimedia Pageviews REST API:
-- All endpoints (top, per-article, top-by-country, top-by-ec)
+- All endpoints (top, per-article, top-by-country, top-per-country)
 - Date format reference (slash vs compact — a common gotcha)
 - Common query patterns with examples
 - Error response guide

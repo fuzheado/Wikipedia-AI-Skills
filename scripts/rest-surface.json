@@ -1,0 +1,272 @@
+{
+ "generated_by": "scripts/refresh-rest-surface.py",
+ "note": "Paths come from the live OpenAPI/REST specs; parameter values are probed live. A value listed under 'invalid' returns 400/404 and must never be presented in a skill as usable.",
+ "paths": [
+  "/metrics/pageviews/legacy/pagecounts/aggregate/{project}/{access-site}/{granularity}/{start}/{end}",
+  "/metrics/pageviews/aggregate/{project}/{access}/{agent}/{granularity}/{start}/{end}",
+  "/metrics/pageviews/per-article/{project}/{access}/{agent}/{article}/{granularity}/{start}/{end}",
+  "/metrics/pageviews/top-by-country/{project}/{access}/{year}/{month}",
+  "/metrics/pageviews/top-per-country/{country}/{access}/{year}/{month}/{day}",
+  "/metrics/pageviews/top/{project}/{access}/{year}/{month}/{day}",
+  "/metrics/pageviews/v3/per_editor/{user_central_id}/{granularity}/{start}/{end}",
+  "/metrics/pageviews/v3/top_pages_per_editor/{user_central_id}/{granularity}/{start}/{end}",
+  "/metrics/mediarequests/aggregate/{referer}/{media-type}/{agent}/{granularity}/{start}/{end}",
+  "/metrics/mediarequests/per-file/{referer}/{agent}/{file-path}/{granularity}/{start}/{end}",
+  "/metrics/mediarequests/top/{referer}/{media-type}/{year}/{month}/{day}",
+  "/metrics/mediarequests/video_plays/v3/aggregate/{referer}/{agent}/{granularity}/{start}/{end}",
+  "/metrics/mediarequests/video_plays/v3/per_file/{referer}/{agent}/{file_path}/{granularity}/{start}/{end}",
+  "/metrics/mediarequests/video_plays/v3/top/{referer}/{year}/{month}/{day}",
+  "/metrics/edits/bytes-difference/absolute/aggregate/{project}/{editor-type}/{page-type}/{granularity}/{start}/{end}",
+  "/metrics/edits/bytes-difference/absolute/per-page/{project}/{page-title}/{editor-type}/{granularity}/{start}/{end}",
+  "/metrics/edits/bytes-difference/net/aggregate/{project}/{editor-type}/{page-type}/{granularity}/{start}/{end}",
+  "/metrics/edits/bytes-difference/net/per-page/{project}/{page-title}/{editor-type}/{granularity}/{start}/{end}",
+  "/metrics/edits/edited-pages/aggregate/{project}/{editor-type}/{page-type}/{activity-level}/{granularity}/{start}/{end}",
+  "/metrics/edits/edited-pages/new/{project}/{editor-type}/{page-type}/{granularity}/{start}/{end}",
+  "/metrics/edits/edited-pages/top-by-absolute-bytes-difference/{project}/{editor-type}/{page-type}/{year}/{month}/{day}",
+  "/metrics/edits/edited-pages/top-by-edits/{project}/{editor-type}/{page-type}/{year}/{month}/{day}",
+  "/metrics/edits/edited-pages/top-by-net-bytes-difference/{project}/{editor-type}/{page-type}/{year}/{month}/{day}",
+  "/metrics/edits/aggregate/{project}/{editor-type}/{page-type}/{granularity}/{start}/{end}",
+  "/metrics/edits/per-page/{project}/{page-title}/{editor-type}/{granularity}/{start}/{end}",
+  "/metrics/edits/v3/per_editor/{user_central_id}/{page_type}/{granularity}/{start}/{end}",
+  "/metrics/commons-analytics/category-metrics-snapshot/{category}/{start}/{end}",
+  "/metrics/commons-analytics/edits-per-category-monthly/{category}/{category-scope}/{edit-type}/{start}/{end}",
+  "/metrics/commons-analytics/edits-per-user-monthly/{user-name}/{edit-type}/{start}/{end}",
+  "/metrics/commons-analytics/media-file-metrics-snapshot/{media-file}/{start}/{end}",
+  "/metrics/commons-analytics/pageviews-per-category-monthly/{category}/{category-scope}/{wiki}/{start}/{end}",
+  "/metrics/commons-analytics/pageviews-per-media-file-monthly/{media-file}/{wiki}/{start}/{end}",
+  "/metrics/commons-analytics/top-edited-categories-monthly/{category-scope}/{edit-type}/{year}/{month}",
+  "/metrics/commons-analytics/top-editors-monthly/{category}/{category-scope}/{edit-type}/{year}/{month}",
+  "/metrics/commons-analytics/top-pages-per-category-monthly/{category}/{category-scope}/{wiki}/{year}/{month}",
+  "/metrics/commons-analytics/top-pages-per-media-file-monthly/{media-file}/{wiki}/{year}/{month}",
+  "/metrics/commons-analytics/top-viewed-categories-monthly/{category-scope}/{wiki}/{year}/{month}",
+  "/metrics/commons-analytics/top-viewed-media-files-monthly/{category}/{category-scope}/{wiki}/{year}/{month}",
+  "/metrics/commons-analytics/top-wikis-per-category-monthly/{category}/{category-scope}/{year}/{month}",
+  "/metrics/commons-analytics/top-wikis-per-media-file-monthly/{media-file}/{year}/{month}",
+  "/data/citation/{format}/{query}",
+  "/data/css/mobile/{type}",
+  "/data/i18n/{type}",
+  "/data/javascript/mobile/{type}",
+  "/data/lists/",
+  "/data/lists/batch",
+  "/data/lists/changes/since/{date}",
+  "/data/lists/pages/{project}/{title}",
+  "/data/lists/setup",
+  "/data/lists/teardown",
+  "/data/lists/{id}",
+  "/data/lists/{id}/entries/",
+  "/data/lists/{id}/entries/batch",
+  "/data/lists/{id}/entries/{entry_id}",
+  "/data/recommendation/article/creation/morelike/{seed_article}",
+  "/data/recommendation/article/creation/translation/{from_lang}",
+  "/data/recommendation/article/creation/translation/{from_lang}/{seed_article}",
+  "/media/math/check/{type}",
+  "/media/math/formula/{hash}",
+  "/media/math/render/{format}/{hash}",
+  "/page/",
+  "/page/html/{title}",
+  "/page/html/{title}/{revision}",
+  "/page/lint/{title}",
+  "/page/lint/{title}/{revision}",
+  "/page/media-list/{title}",
+  "/page/media-list/{title}/{revision}",
+  "/page/mobile-html-offline-resources/{title}",
+  "/page/mobile-html-offline-resources/{title}/{revision}",
+  "/page/mobile-html/{title}",
+  "/page/mobile-html/{title}/{revision}",
+  "/page/summary/{title}",
+  "/page/talk/{title}",
+  "/page/talk/{title}/{revision}",
+  "/page/title/{title}",
+  "/page/title/{title}/{revision}",
+  "/transform/html/to/wikitext",
+  "/transform/html/to/wikitext/{title}",
+  "/transform/html/to/wikitext/{title}/{revision}",
+  "/transform/wikitext/to/html",
+  "/transform/wikitext/to/html/{title}",
+  "/transform/wikitext/to/html/{title}/{revision}",
+  "/transform/wikitext/to/lint",
+  "/transform/wikitext/to/lint/{title}",
+  "/transform/wikitext/to/lint/{title}/{revision}",
+  "/transform/wikitext/to/mobile-html/{title}"
+ ],
+ "modules": {
+  "pageviews": {
+   "spec": "https://wikimedia.org/api/rest_v1/metrics/pageviews/api-spec.json",
+   "path_count": 8,
+   "paths": [
+    "/metrics/pageviews/legacy/pagecounts/aggregate/{project}/{access-site}/{granularity}/{start}/{end}",
+    "/metrics/pageviews/aggregate/{project}/{access}/{agent}/{granularity}/{start}/{end}",
+    "/metrics/pageviews/per-article/{project}/{access}/{agent}/{article}/{granularity}/{start}/{end}",
+    "/metrics/pageviews/top-by-country/{project}/{access}/{year}/{month}",
+    "/metrics/pageviews/top-per-country/{country}/{access}/{year}/{month}/{day}",
+    "/metrics/pageviews/top/{project}/{access}/{year}/{month}/{day}",
+    "/metrics/pageviews/v3/per_editor/{user_central_id}/{granularity}/{start}/{end}",
+    "/metrics/pageviews/v3/top_pages_per_editor/{user_central_id}/{granularity}/{start}/{end}"
+   ]
+  },
+  "mediarequests": {
+   "spec": "https://wikimedia.org/api/rest_v1/metrics/mediarequests/api-spec.json",
+   "path_count": 6,
+   "paths": [
+    "/metrics/mediarequests/aggregate/{referer}/{media-type}/{agent}/{granularity}/{start}/{end}",
+    "/metrics/mediarequests/per-file/{referer}/{agent}/{file-path}/{granularity}/{start}/{end}",
+    "/metrics/mediarequests/top/{referer}/{media-type}/{year}/{month}/{day}",
+    "/metrics/mediarequests/video_plays/v3/aggregate/{referer}/{agent}/{granularity}/{start}/{end}",
+    "/metrics/mediarequests/video_plays/v3/per_file/{referer}/{agent}/{file_path}/{granularity}/{start}/{end}",
+    "/metrics/mediarequests/video_plays/v3/top/{referer}/{year}/{month}/{day}"
+   ]
+  },
+  "edits": {
+   "spec": "https://wikimedia.org/api/rest_v1/metrics/edits/api-spec.json",
+   "path_count": 12,
+   "paths": [
+    "/metrics/edits/bytes-difference/absolute/aggregate/{project}/{editor-type}/{page-type}/{granularity}/{start}/{end}",
+    "/metrics/edits/bytes-difference/absolute/per-page/{project}/{page-title}/{editor-type}/{granularity}/{start}/{end}",
+    "/metrics/edits/bytes-difference/net/aggregate/{project}/{editor-type}/{page-type}/{granularity}/{start}/{end}",
+    "/metrics/edits/bytes-difference/net/per-page/{project}/{page-title}/{editor-type}/{granularity}/{start}/{end}",
+    "/metrics/edits/edited-pages/aggregate/{project}/{editor-type}/{page-type}/{activity-level}/{granularity}/{start}/{end}",
+    "/metrics/edits/edited-pages/new/{project}/{editor-type}/{page-type}/{granularity}/{start}/{end}",
+    "/metrics/edits/edited-pages/top-by-absolute-bytes-difference/{project}/{editor-type}/{page-type}/{year}/{month}/{day}",
+    "/metrics/edits/edited-pages/top-by-edits/{project}/{editor-type}/{page-type}/{year}/{month}/{day}",
+    "/metrics/edits/edited-pages/top-by-net-bytes-difference/{project}/{editor-type}/{page-type}/{year}/{month}/{day}",
+    "/metrics/edits/aggregate/{project}/{editor-type}/{page-type}/{granularity}/{start}/{end}",
+    "/metrics/edits/per-page/{project}/{page-title}/{editor-type}/{granularity}/{start}/{end}",
+    "/metrics/edits/v3/per_editor/{user_central_id}/{page_type}/{granularity}/{start}/{end}"
+   ]
+  },
+  "commons-analytics": {
+   "spec": "https://wikimedia.org/api/rest_v1/metrics/commons-analytics/api-spec.json",
+   "path_count": 14,
+   "paths": [
+    "/metrics/commons-analytics/category-metrics-snapshot/{category}/{start}/{end}",
+    "/metrics/commons-analytics/edits-per-category-monthly/{category}/{category-scope}/{edit-type}/{start}/{end}",
+    "/metrics/commons-analytics/edits-per-user-monthly/{user-name}/{edit-type}/{start}/{end}",
+    "/metrics/commons-analytics/media-file-metrics-snapshot/{media-file}/{start}/{end}",
+    "/metrics/commons-analytics/pageviews-per-category-monthly/{category}/{category-scope}/{wiki}/{start}/{end}",
+    "/metrics/commons-analytics/pageviews-per-media-file-monthly/{media-file}/{wiki}/{start}/{end}",
+    "/metrics/commons-analytics/top-edited-categories-monthly/{category-scope}/{edit-type}/{year}/{month}",
+    "/metrics/commons-analytics/top-editors-monthly/{category}/{category-scope}/{edit-type}/{year}/{month}",
+    "/metrics/commons-analytics/top-pages-per-category-monthly/{category}/{category-scope}/{wiki}/{year}/{month}",
+    "/metrics/commons-analytics/top-pages-per-media-file-monthly/{media-file}/{wiki}/{year}/{month}",
+    "/metrics/commons-analytics/top-viewed-categories-monthly/{category-scope}/{wiki}/{year}/{month}",
+    "/metrics/commons-analytics/top-viewed-media-files-monthly/{category}/{category-scope}/{wiki}/{year}/{month}",
+    "/metrics/commons-analytics/top-wikis-per-category-monthly/{category}/{category-scope}/{year}/{month}",
+    "/metrics/commons-analytics/top-wikis-per-media-file-monthly/{media-file}/{year}/{month}"
+   ]
+  },
+  "core_rest": {
+   "spec": "https://en.wikipedia.org/api/rest_v1/?spec",
+   "path_count": 46,
+   "paths": [
+    "/data/citation/{format}/{query}",
+    "/data/css/mobile/{type}",
+    "/data/i18n/{type}",
+    "/data/javascript/mobile/{type}",
+    "/data/lists/",
+    "/data/lists/batch",
+    "/data/lists/changes/since/{date}",
+    "/data/lists/pages/{project}/{title}",
+    "/data/lists/setup",
+    "/data/lists/teardown",
+    "/data/lists/{id}",
+    "/data/lists/{id}/entries/",
+    "/data/lists/{id}/entries/batch",
+    "/data/lists/{id}/entries/{entry_id}",
+    "/data/recommendation/article/creation/morelike/{seed_article}",
+    "/data/recommendation/article/creation/translation/{from_lang}",
+    "/data/recommendation/article/creation/translation/{from_lang}/{seed_article}",
+    "/media/math/check/{type}",
+    "/media/math/formula/{hash}",
+    "/media/math/render/{format}/{hash}",
+    "/page/",
+    "/page/html/{title}",
+    "/page/html/{title}/{revision}",
+    "/page/lint/{title}",
+    "/page/lint/{title}/{revision}",
+    "/page/media-list/{title}",
+    "/page/media-list/{title}/{revision}",
+    "/page/mobile-html-offline-resources/{title}",
+    "/page/mobile-html-offline-resources/{title}/{revision}",
+    "/page/mobile-html/{title}",
+    "/page/mobile-html/{title}/{revision}",
+    "/page/summary/{title}",
+    "/page/talk/{title}",
+    "/page/talk/{title}/{revision}",
+    "/page/title/{title}",
+    "/page/title/{title}/{revision}",
+    "/transform/html/to/wikitext",
+    "/transform/html/to/wikitext/{title}",
+    "/transform/html/to/wikitext/{title}/{revision}",
+    "/transform/wikitext/to/html",
+    "/transform/wikitext/to/html/{title}",
+    "/transform/wikitext/to/html/{title}/{revision}",
+    "/transform/wikitext/to/lint",
+    "/transform/wikitext/to/lint/{title}",
+    "/transform/wikitext/to/lint/{title}/{revision}",
+    "/transform/wikitext/to/mobile-html/{title}"
+   ]
+  }
+ },
+ "params": {
+  "pageviews:access": {
+   "template": "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/{v}/user/Albert_Einstein/monthly/20260101/20260131",
+   "valid": [
+    "all-access",
+    "desktop",
+    "mobile-web",
+    "mobile-app"
+   ],
+   "invalid": {
+    "all-access-all": 400,
+    "desktop-site": 400
+   }
+  },
+  "pageviews:agent": {
+   "template": "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/{v}/Albert_Einstein/monthly/20260101/20260131",
+   "valid": [
+    "all-agents",
+    "user",
+    "spider",
+    "automated"
+   ],
+   "invalid": {
+    "bot": 400
+   }
+  },
+  "mediarequests:agent_type": {
+   "template": "https://wikimedia.org/api/rest_v1/metrics/mediarequests/aggregate/all-referers/image/{v}/monthly/20260801/20260901",
+   "valid": [
+    "user",
+    "spider",
+    "all-agents"
+   ],
+   "invalid": {
+    "automated": 400
+   }
+  },
+  "mediarequests:referer": {
+   "template": "https://wikimedia.org/api/rest_v1/metrics/mediarequests/aggregate/{v}/image/user/monthly/20260801/20260901",
+   "valid": [
+    "all-referers",
+    "internal",
+    "external",
+    "unknown",
+    "none",
+    "search-engine"
+   ],
+   "invalid": {}
+  },
+  "mediarequests:media_type": {
+   "template": "https://wikimedia.org/api/rest_v1/metrics/mediarequests/aggregate/all-referers/{v}/user/monthly/20260801/20260901",
+   "valid": [
+    "image",
+    "audio",
+    "video",
+    "all-media-types",
+    "other",
+    "document"
+   ],
+   "invalid": {}
+  }
+ }
+}
