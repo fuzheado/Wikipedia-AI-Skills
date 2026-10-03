@@ -67,7 +67,9 @@ There is **no CLI equivalent** — `toolforge tools maintainers ...` does not ex
 > paginated at `/tools/?p=N` (10 tools/page); each tool page `/tools/id/<tool>` (**no
 > trailing slash**) lists maintainers in a `<caption>Maintainers</caption>` table. See
 > `references/maintainer-audit.md` for method + pitfalls, and run
-> `scripts/count-maintainers.py`.
+> `scripts/count-maintainers.py --all`. The crawl is ~4,600 requests to a Wikimedia
+> service, so it is paced to the Robot policy (**1 concurrent, ≥ 1 s between
+> requests** → ~80 minutes) and refuses to start without `--all`.
 
 ## SOP 2: File Deployment
 

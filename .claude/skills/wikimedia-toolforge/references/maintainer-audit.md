@@ -32,8 +32,22 @@ ecosystem. Used when someone asks "how many people maintain Toolforge tools" or
 3. **Extract maintainers** — find `<caption>Maintainers</caption>`, then each
    `<td>...</td>` in that `<tbody>` is one maintainer (strip tags + HTML-unescape).
 
-Run it with `scripts/count-maintainers.py` (stdlib only, threaded, ~4,200 tools in a
-few minutes).
+Run it with `scripts/count-maintainers.py --all` (stdlib only). The full crawl is
+~4,600 requests, so it is deliberate rather than a default: without `--all` (or a
+`--max-page` bound) the script prints its usage and exits instead of starting.
+
+**Pacing.** Striker is Wikimedia infrastructure, a *non-wiki* resource, so the
+[Robot policy](https://wikitech.wikimedia.org/wiki/Robot_policy) applies: at most
+**1 concurrent request** and at least **1 second between requests**. The defaults
+follow that (`--workers 1 --delay 1.0`), which puts a full crawl at roughly **80
+minutes** — budget for it rather than reaching for `--workers`.
+
+`--delay` is enforced *globally across threads*: raising `--workers` does not raise
+the average request rate, it only removes idle time between paced requests. Feeding
+this crawl 12 threads to finish in a couple of minutes is exactly the burst pattern
+that gets a client rate-limited (see the measured 101 × 429 case in the
+`wikimedia-commons-thumbnails` skill) — and a 429 here is not the URL being bad, it
+is the client asking too fast.
 
 ## Pitfalls
 
@@ -48,8 +62,11 @@ few minutes).
 - The high end of the distribution is skewed by **WMF-run infrastructure tools**
   (`admin`, `stewardbots`, `wikibugs`, etc. with 12–18 maintainers). For a "community
   tool" solo rate, exclude those.
-- Use a descriptive User-Agent and polite concurrency (~12 threads). The full crawl is
-  ~4,200 requests; a couple minutes.
+- Use a descriptive User-Agent (`$WIKIMEDIA_USER_AGENT` when set) and the paced
+defaults above. The crawl is ~4,600 requests; at `--delay 1.0` that is ~80 minutes.
+- On **HTTP 429** the script honours `Retry-After` and **stops the run** after 2
+consecutive 429s rather than retrying through the throttle; on repeated **5xx** it
+stops too, because the policy asks for a 15-minute pause after a 5xx.
 
 ## Baseline snapshot (2026-08-16)
 
