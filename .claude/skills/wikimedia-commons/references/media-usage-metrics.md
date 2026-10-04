@@ -48,14 +48,15 @@ Daily TSV, one row per file. Columns: `total`, `original`, `transcoded_image`
 - Source: https://wikitech.wikimedia.org/wiki/Data_Platform/Data_Lake/Traffic/Mediacounts
 
 ### 2. Mediarequests AQS — `metrics/mediarequests/{aggregate,top,per-file}`
-Filters: `referer` (all/internal/external/unknown), `media_type`
-(image/audio/video/all-media-types), `agent_type` (user/spider/all-agents),
-`granularity` (daily/monthly).
+Filters: `referer` (all-referers/internal/external/unknown — `all` is **not** valid and returns
+HTTP 404), `media_type` (image/audio/video/document/other/all-media-types), `agent_type`
+(user/spider/all-agents), `granularity` (daily/monthly). All values probed live 2026-10-04.
 - **GOTCHA (verified 2026-10-04):** `agent_type` has **no `automated` bin** here —
   `agent_type=automated` is invalid and returns HTTP 400. Unlike the pageviews
   AQS `agent` parameter, which *does* accept `automated` (a heuristic split of
   non-human traffic), mediarequests only splits self-identified bots: use
-  `user`, `spider` or `all-agents`. Verified live:
+  `user`, `spider` or `all-agents` — the error body lists the allowed set
+  (`[all-agents, user, spider]`). Verified live:
   `/metrics/mediarequests/aggregate/all-referers/image/{automated→400|user→200}/monthly/…`
 - **GOTCHA (verified):** `per-file` path MUST be URL-encoded **with the leading
   slash**: `%2Fwikipedia%2Fcommons%2F0%2F00%2FCrab_Nebula.jpg`. Omitting the leading
