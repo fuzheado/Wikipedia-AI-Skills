@@ -1,6 +1,6 @@
 # LLM Benchmarks Grounded in Wikipedia / Wikimedia Knowledge & QA
 
-**Research date:** 2026-08-19 · **Researcher:** HermesAgent subagent (verification via live HTTP fetches, User-Agent `HermesAgent/1.0 benchmark research`)
+**Research date:** 2026-08-19 · **Researcher:** research agent (verification via live HTTP fetches carrying a descriptive research User-Agent)
 **Purpose:** Landscape survey for Andrew Lih (Fuzheado) & Lodewijk Gelauff's planned benchmark suite testing LLMs on Wikimedia-relevant tasks (on-wiki editing, MediaWiki APIs, Wikidata SPARQL, Commons, Toolforge, ML services). This file covers topic #1: **benchmarks where Wikipedia is the knowledge source / test material** (knowledge QA, factuality, long-form generation, tables, multi-hop, freshness, RAG, community evaluation).
 **Verification mandate:** every entry below was verified against a primary source (arXiv abs page, arXiv API, GitHub API, HuggingFace API/page, or official site) with the HTTP status recorded. Items that could not be verified live are marked **[UNVERIFIED]**.
 
@@ -163,7 +163,7 @@ Legend — sources: arXiv abs page, GitHub API/repo, HF (HuggingFace API), site 
 
 ---
 
-## 7. Verification log (live fetches, 2026-08-19, UA `HermesAgent/1.0 benchmark research`)
+## 7. Verification log (live fetches, 2026-08-19, descriptive research User-Agent)
 
 **arXiv abs pages — HTTP 200 (title matched):**
 1606.05250 SQuAD · 1705.03551 TriviaQA · 1809.09600 HotpotQA · 1803.05355 FEVER · 1907.09190 ELI5 · 1811.01241 Wizard of Wikipedia · 1508.00305 WikiTableQuestions · 1709.00103 Seq2SQL (introduces WikiSQL) · 1909.02164 TabFact · 2009.02252 KILT · 2305.14251 FActScore · 2310.03214 FreshQA (repo link freshllms/freshqa) · 2411.04368 SimpleQA · 2501.14249 HLE · 2308.14508 LongBench · 2406.04744 CRAG (repo facebookresearch/CRAG) · 2407.11005 RAGBench (found via arXiv API ti:"RAGBench") · 2106.05707 FEVEROUS · 2211.08412 FIB (repo r-three/fib) · 2103.08541 VitaminC · 2402.14147 Wikibench · 2402.18264 WIKIGENBENCH · 2406.13805 WikiContradict · 2510.13598 FreshTab · 2602.01590 Wiki Live Challenge (repo WangShao2000/Wiki_Live_Challenge) · 2602.16902 LLM-WikiRace · 2605.21479 WikiVQABench · 2605.31113 TSM-Bench · 2507.03373 WETBench · 2503.19065 WikiAutoGen · 2009.03300 MMLU · 2109.07958 TruthfulQA · 2410.08918 Wikimedia-data-for-AI review · 2503.02879 Wikipedia-in-Era-of-LLMs · 2504.02107 TiC-LM · 2511.08598 OKBench · 2606.10460 LakeQA · 2510.26160 CRAG-MM · 2406.03428 HelloFresh

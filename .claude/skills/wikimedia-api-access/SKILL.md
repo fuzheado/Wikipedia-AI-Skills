@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["Site Matrix", "sitematrix", "domain mapping", "language code", "language domain", "yue wikipedia", "zh-yue", "interlanguage"]
   - keywords: ["page summary", "page extract", "extintro", "exintro", "page content", "fetch article", "get page"]
   - keywords: ["CORS preflight", "NetworkError", "Load failed", "browser fetch", "Firefox", "Safari", "WebKit", "forbidden header", "OPTIONS 405", "Api-User-Agent"]
-last_verified: 2026-10-03
+last_verified: 2026-10-04
 ---
 
 All requests to Wikimedia APIs **must** include a descriptive `User-Agent` header or they will be blocked (HTTP 403 or 429). This is enforced by the [Wikimedia Foundation User-Agent Policy](https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy).
@@ -200,6 +200,32 @@ Practical consequences (verified 2026-08-10):
   when it is. For per-IP CDN blocks (e.g. live.staticflickr.com) the window
   can be ~60 min — see the [flickr](../flickr/SKILL.md) skill.
 
+#### Sustained rate, not burst size (verified 2026-10-04)
+
+The class table above is a **per-minute budget**, so the number that matters is
+your achieved requests-per-minute — not how large an instantaneous burst looks:
+
+| Pattern | Achieved rate | UA-only class (200/min) |
+|---|---|---|
+| Sequential, ≥1s between requests | ≤60/min | fine |
+| 4 parallel requests, next wave 1s later | ~240/min | **over budget** |
+| 10 parallel requests per wave | ~600/min | well over |
+
+Two traps this creates:
+
+- **A short burst proves nothing.** Six requests fired back-to-back return
+  `200`s with no `Retry-After` and no `x-ratelimit-*` header, because the budget
+  is minute-scale. A burst probe cannot tell you whether a sustained run will be
+  throttled — measure req/min across the whole run instead.
+- **A missing `Retry-After` does not mean "no limit applies".** Back off on the
+  status code (exponential, min 5s), not on the presence of the header.
+
+The class also depends on **where you run**: the same code is exempt inside
+Toolforge/WMCS but a UA-only client on a laptop, so a local loop (e.g. re-running
+an evaluation corpus across thousands of pages) can hit a ceiling the deployed
+service never sees. When that happens the fix is usually the cache — see
+*Cache the entity, not the batch* below.
+
 ### Authoritative sources & per-surface guidance
 
 The two governing documents, both current as of 2026-09:
@@ -285,6 +311,61 @@ def fetch_with_cache(lang, title):
 - Write back to disk after each fetch (appending is fine for ~300 entries)
 - Keep cache files gitignored (they're session artifacts)
 - For large caches (>1000 entries), consider SQLite instead of JSON
+
+#### Cache the entity, not the batch (verified 2026-10-04)
+
+If you cache a **batched** response under a key derived from the request URL,
+the **batch composition is part of the cache key**. Any change to batch size,
+ordering or membership silently invalidates every entry:
+
+```
+GET w/api.php?action=query&titles=A|B|C&prop=templates   → key = hash(full URL)
+GET w/api.php?action=query&titles=A|B|C|D&prop=templates → different key, nothing reused
+```
+
+Observed in a real tool that censuses peer articles in `titles=` batches:
+
+- Changing batches from 50 titles to 25 — a pure performance tweak — turned a
+  warm sub-second evaluation into a **~2,600-request cold crawl**, which then
+  hit a 429 (see *Sustained rate, not burst size* above). A caching regression
+  surfaces as a **rate-limit** error.
+- A cold cache also destroys your baseline: results and timings stop being
+  comparable, so a miss is indistinguishable from a regression.
+
+**Pattern: keep the URL cache, add an entity-keyed layer on top.**
+
+```python
+def read_entity(cache_dir, kind, key):        # kind="templates", key=<page title>
+    path = os.path.join(cache_dir, kind, sha1(key) + ".json")
+    return json.load(open(path)) if os.path.exists(path) else None
+
+def write_entity(cache_dir, kind, key, value):
+    os.makedirs(os.path.join(cache_dir, kind), exist_ok=True)
+    tmp = f"{cache_dir}/{kind}/{sha1(key)}.json.tmp"
+    with open(tmp, "w") as fh:
+        json.dump(value, fh)
+    os.replace(tmp, f"{cache_dir}/{kind}/{sha1(key)}.json")
+```
+
+Fetch batched (that is what the API rewards), then **split each response into
+per-entity entries**. Overlapping workloads gain twice over: two runs sharing
+60% of their inputs fetch only the missing 40%.
+
+**Do not pay for a cache refactor with a crawl — migrate what you already
+have.** The batched responses on disk contain every per-entity answer:
+
+```python
+for body in cached_bodies():                       # existing URL-keyed files
+    for page in body.get("query", {}).get("pages", []):
+        write_entity(CACHE, "templates", page["title"],
+                     {"templates": page.get("templates", []), "page": page})
+```
+
+A one-off harvest turned 8,159 cached batch bodies into 11,670 entity entries
+with **zero network requests**, so the "cold" re-warm never happened. One
+correctness guard: when an old and a new entry both exist, **keep the richer
+one** — a response truncated by a per-request row budget can otherwise overwrite
+a complete entry with a starved one.
 
 ### Structured Error Returns from Fetch Functions
 

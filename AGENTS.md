@@ -23,6 +23,31 @@ Direct pushes to `main` are admin-bypass only, reserved for emergencies
 (e.g. CI outage blocking a hotfix). If you bypass, say so explicitly in the
 commit/PR.
 
+## Remote state — query it, never infer it from local refs (hard rule)
+
+`git log origin/main..HEAD` proves exactly one thing: *not merged into main*. It
+says nothing about whether a branch was pushed, whether a PR exists, or what its
+checks and review state are.
+
+Learned the hard way: asked whether a commit had been pushed, an agent ran
+`git log origin/main..HEAD`, saw the commit absent from `main`, and reported it as
+"exists only on a local branch — awaiting its own PR/push". The branch was pushed
+and had an **open PR with green CI**. A stale local `origin/*` is the usual cause.
+
+- **Fetch first** (`git fetch origin`), or ask `gh` — those queries hit the API and
+  cannot be stale.
+- **Branch pushed?** `git ls-remote --heads origin`.
+- **PR exists / open / merged?** `gh pr list`, `gh pr view <n>`.
+- **Checks / mergeable?** `gh pr checks <n>`,
+  `gh pr view <n> --json mergeable,mergeStateStatus`.
+- **State the method with the claim.** "No PR in `gh pr list`" is checkable; "it
+  isn't pushed" is a guess dressed as a fact. If you have not queried the remote,
+  say so instead of asserting.
+- **Absence is not evidence.** A local branch can exist with no PR; an open PR can
+  exist for a branch you never fetched; and because this repo deletes branches on
+  merge (`--delete-branch`), a missing branch says nothing about whether its PR
+  merged — use `gh pr view <n> --json state,mergedAt`.
+
 ## Skill contributions
 
 For new or changed skills (`.claude/skills/<name>/`):

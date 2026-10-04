@@ -17,13 +17,17 @@ Stdlib only (urllib). Requires a descriptive User-Agent (WMF policy).
 """
 import argparse
 import json
+import os
 import sys
 import time
 import urllib.parse
 import urllib.request
 
-UA = ("HermesAgent/1.0 (https://en.wikipedia.org/wiki/User:WikiButler-bot) "
-      "WikidataReconciliation/1.0")
+UA = os.environ.get(
+    "WIKIMEDIA_USER_AGENT",
+    "wikidata-reconciliation-skill/1.0 "
+    "(https://github.com/fuzheado/Wikipedia-AI-Skills) reconcile.py",
+)
 API = "https://www.wikidata.org/w/api.php"
 DELAY = 0.5  # seconds between API calls (floor; 1.0 recommended for big batches)
 
