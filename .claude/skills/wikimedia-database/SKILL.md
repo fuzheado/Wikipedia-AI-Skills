@@ -7,7 +7,7 @@ depends_on: [wikimedia-toolforge]
 skill_discovery_hints:
   - keywords: ["SQL", "database", "replica", "Toolforge database", "enwiki_p", "MySQL"]
   - keywords: ["SSH tunnel", "pymysql", "query Wikipedia", "schema", "page table", "revision table"]
-last_verified: 2026-09-15
+last_verified: 2026-10-03
 ---
 
 > ⚠️ **User-Agent required:** While this skill primarily uses SQL via SSH tunnel, any direct API calls (e.g., for verification via `curl` or `requests`) must include a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
@@ -137,6 +137,9 @@ back to the `mysql` CLI only if Python dependencies are missing.
 * **Prompt:** "Count revisions by 'ExampleUser' on enwiki."
 * **Action:** Execute `SELECT COUNT(*) FROM revision_userindex JOIN actor ON rev_actor = actor_id WHERE actor_name = 'ExampleUser';`
 
+* **Prompt:** "Search edit summaries mentioning 'revert' by a specific user."
+* **Action:** Execute constrained SQL — the `comment` table has no full-text index, so queries MUST include both `actor_name` and `rev_timestamp` filters to avoid timeouts. See `references/edit-summary-search.md` for the full guide to edit-summary search across all approaches (SQL, Sigma tool, XML dumps, EventStreams).
+
 ---
 
 ## **Tooling**
@@ -177,6 +180,13 @@ Cleanly tear down the SSH tunnel.
 Full reference of Wikimedia replica database tables (page, revision, actor,
 page_props, categorylinks, pagelinks) with column descriptions and common
 queries.
+
+### 📚 Edit Summary Search (`references/edit-summary-search.md`)
+
+Comprehensive guide to searching Wikipedia edit summaries. Covers the `comment`
+table indexing gap, constrained SQL patterns, the Σ (Sigma) Toolforge tool, XML
+dump processing, and EventStreams filtering. Load this when the task involves
+finding edits by their summary text.
 
 ### 📚 Connection Guide (`references/connection-guide.md`)
 

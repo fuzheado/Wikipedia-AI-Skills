@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["Toolforge", "tool hosting", "Kubernetes", "web service", "cron job", "deploy"]
   - keywords: ["toolsadmin", "become", "webservice", "toolforge jobs"]
   - keywords: ["CDN", "cdnjs", "tools-static", "privacy-preserving CDN", "content delivery", "third-party script", "external CDN tracking"]
-last_verified: 2026-09-14
+last_verified: 2026-10-03
 ---
 
 Toolforge (formerly Wikimedia Tool Labs) is a cloud hosting platform for community-developed tools that interact with Wikimedia wikis and data. This skill covers account setup, service management, deployment, and debugging.
@@ -59,6 +59,17 @@ After creation, the tool's home directory is at `/data/project/my-tool-name/`.
 Maintainers are managed via the web UI at <https://toolsadmin.wikimedia.org/tools>
 (open the tool, then "Maintainers"). The tool's creator is a maintainer automatically.
 There is **no CLI equivalent** — `toolforge tools maintainers ...` does not exist.
+
+> 🔎 **Auditing maintainers at ecosystem scale** (e.g. "how many tools have >1
+> maintainer", bus-factor analysis): there is **no public API** — Striker's `/tools/api/`
+> is auth-gated, LDAP is internal-only, and Toolhub's `author` field is self-reported
+> `toolinfo.json` (not authoritative). Instead crawl the Striker web UI: index is
+> paginated at `/tools/?p=N` (10 tools/page); each tool page `/tools/id/<tool>` (**no
+> trailing slash**) lists maintainers in a `<caption>Maintainers</caption>` table. See
+> `references/maintainer-audit.md` for method + pitfalls, and run
+> `scripts/count-maintainers.py --all`. The crawl is ~4,600 requests to a Wikimedia
+> service, so it is paced to the Robot policy (**1 concurrent, ≥ 1 s between
+> requests** → ~80 minutes) and refuses to start without `--all`.
 
 ## SOP 2: File Deployment
 
@@ -796,6 +807,109 @@ The full CDN mirror guide with troubleshooting is at **[references/cdn-mirror-gu
 | [`scripts/list-available.sh`](./scripts/list-available.sh) | Search available libraries |
 | [`assets/load-template.html`](./assets/load-template.html) | HTML page loading jQuery, Bootstrap, Font Awesome from CDN |
 | [`assets/load-template.js`](./assets/load-template.js) | Dynamic JS loader for programmatic use |
+
+---
+
+## SOP 10: Toolforge Components (push-to-deploy) & the Alerting Service
+
+As of 2026-09 the Tools Platform team is standardising deployment on **Toolforge
+Components**: the build + run definition lives in the tool's own Git repo, and a
+`git push` triggers build and deploy. Many movement collaborators (including
+community tools around photo and GLAM work) deploy this way, so this is
+the default to assume for new tools.
+
+### 10.1 Push-to-deploy (beta)
+
+**Status: beta** — upstream docs still warn "we don't recommend using it for
+production services". Only **buildservice-based** components (a public Git URL) are
+supported; pre-built images are not yet accepted.
+
+Four things are needed:
+
+1. Buildservice-based code in a public repo + a `Procfile` at the root
+   (e.g. `web: uwsgi uwsgi.ini`).
+2. A deployment token (as the tool user): `toolforge components deploy-token create`
+3. A tool config at the repo root (`toolforge.yaml` / `config.yaml`):
+
+```yaml
+source_url: https://gitlab.wikimedia.org/toolforge-repos/my-tool/-/raw/main/config.yaml
+components:
+  my-tool:
+    build:
+      repository: https://gitlab.wikimedia.org/toolforge-repos/my-tool
+      ref: main
+    run:
+      command: web
+      publish: /
+      port: 8000
+```
+
+   Register it: `CONFIG="<url to the config>"; curl "$CONFIG" | toolforge components config create`
+4. CI. On gitlab.wikimedia.org, include the shared pipeline:
+
+```yaml
+include:
+  - project: "repos/cloud/cicd/gitlab-ci"
+    file: "toolforge-cd/deploy-to-toolforge.yaml"
+```
+
+   For GitHub/Gerrit, trigger the deployment manually:
+   `curl --fail-with-body -X POST "https://api.svc.toolforge.org/components/v1/tool/$TOOL_NAME/deployment?token=$TOOLS_DEPLOY_TOKEN"`
+
+Supported in beta (upstream-dated): config create/modify/delete, continuous
+components, scheduled components (2025-07-02), multiple components,
+buildservice-only components, CLI deploys, external CI triggering, cancelling a
+deployment (2025-07-03), config-from-URL and latest buildpacks (2025-08-11),
+publishing a component to the web (2026-08-17).
+
+**Not supported yet:** webservice components, one-off components, deployment
+order, **rollback**, queued deployments, per-component deploys.
+
+### 10.2 Alerting service (opt-in from October 2026)
+
+Email alerts for tool maintainers when a web service breaks. **Off by default**;
+opt in per tool in the same config file:
+
+```yaml
+defaults:
+  alerts:
+    notify: true
+```
+
+then `curl "$CONFIG" | toolforge components config create` from the bastion.
+
+v1 alert conditions: web service returns **5xx on >50% of requests for ≥20 min**;
+**fails to respond on >50% for ≥20 min**; **a pod restarting >5×/hour**. Mail goes
+to *all* tool maintainers — at problem start, every 24 h while unresolved, and when
+it clears. v1 is a single per-tool toggle; per-alert granularity comes later
+(planned after that: alerts list in a web UI, per-maintainer opt-out, silencing,
+alert history).
+
+Timeline: opt-in opens **October 2026**; **early access is available per tool on
+request** (talk page / Phabricator / #wikimedia-cloud). Tracker: **T432860**
+"ST5.4.2 Toolforge Alerting System" (Open, In Progress, fnegri, filed 2026-07-22).
+
+### 10.3 Pitfalls for both features
+
+- **Alerting requires Toolforge Components** — "Notifications are only available for
+  tools using Toolforge Components". A tool still running plain `webservice` or
+  `toolforge jobs` cannot receive alerts.
+- **Docs lag the feature.** As of 2026-09-21 `Help:Toolforge/Deploy_your_tool`
+  contains no "alert" text and `insource:"alerts: notify"` returns **0** pages on
+  Wikitech. The `defaults.alerts.notify` key is currently documented only in the
+  September 2026 "What's New on Toolforge" deck (slides 17–21) and the
+  enhancement-proposal page. Verify against the live tool before relying on it.
+- **Push-to-deploy is not a rollback path** — rollback is explicitly unsupported;
+  keep an old ref/image pinned if you may need to revert.
+- **Deck vs docs.** The Sept-2026 deck says push-to-deploy "will be out of beta
+  soon" and advertises public webservices; upstream docs still list *webservice
+  components* as non-supported and carry the beta warning. Treat deck forward-looking
+  slides as roadmap, not shipped behaviour.
+- Sources: <https://wikitech.wikimedia.org/wiki/Help:Toolforge/Deploy_your_tool> ·
+  <https://wikitech.wikimedia.org/wiki/Wikimedia_Cloud_Services_team/EnhancementProposals/Toolforge_Alerting_Service> ·
+  <https://phabricator.wikimedia.org/T432860> (alerting) ·
+  <https://phabricator.wikimedia.org/T194332> (push-to-deploy epic, filed 2018-05-09) ·
+  deck: docs.google.com/presentation/d/1s67k3XIHCeWfbrngNEvX9f3MK9oNJf_d_7dGmgUF52E
 
 ---
 

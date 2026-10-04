@@ -4,7 +4,7 @@ description: Choose the right Wikimedia API or tool for the task — a decision 
 depends_on: [wikimedia-api-access]
 license: MIT
 compatibility: opencode
-last_verified: 2026-08-18
+last_verified: 2026-10-03
 skill_discovery_hints:
   - keywords: ["which API", "best tool", "how to access", "API strategy", "choose between"]
   - keywords: ["REST vs Action", "SPARQL vs API", "Pywikibot vs API", "SQL vs API"]
@@ -222,6 +222,10 @@ Or an even faster alternative using SQL:
 | Fetching full page wikitext just to get the page ID | Wasteful — ridiculously oversized response | Use `prop=info&inprop=url` (much smaller response) |
 | Using the Action API when you need rendered HTML | Returns raw wikitext, requires client-side rendering | Use REST API `/page/html/{title}` for ready-to-render HTML |
 | Implementing your own bot framework | You'll rewrite Pywikibot's throttling, conflict detection, and page generators from scratch | Use Pywikibot — it has 20+ years of battle-testing |
+| Searching edit summaries via any API | No API indexes edit summaries. CirrusSearch indexes page content only. `list=recentchanges`/`list=usercontribs` return summaries but have no filter parameter for summary text. | Use SQL replicas with `actor_name` + date constraints, the Σ Toolforge tool (`sigma/summary.py`), or XML dumps. See **[wikimedia-database](../wikimedia-database/SKILL.md)** `references/edit-summary-search.md`. |
+| Using `rvlimit` in multi-title batch queries | The API rejects `rvlimit` when multiple pages are supplied: *"rvlimit may only be used on a single page"*. The response is a 400 error, not partial data. | Omit `rvlimit` from multi-title queries. The default is 1 revision per page — usually sufficient. Fetch full history per-page individually if you need more. |
+| Fetching many large pages in a single `titles=` query via tools with stdout caps | Terminal-based API clients (curl piped through a tool with a ~50KB output cap) silently truncate large multi-page responses. JSON parsing fails on the truncated output with no clear error. The first 2-3 pages parse fine; the rest are lost. | Fetch pages individually or in batches of 2-3. For talk pages especially (which can be 200K+ chars), one-at-a-time is safest. Use `--data-urlencode` with `-G` for curl to handle pipe chars in `titles=`. |
+| Scraping listing/category pages to find structured discussions (RFCs, AfDs, etc.) | Manually-curated listing pages (e.g. `Wikipedia:Requests for comment/All`) lag behind or miss entries. They're also harder to parse reliably. | Use `list=embeddedin&eititle=Template:Rfc` (or the relevant template) to find ALL pages currently transcluding the template. This is the bot-tracked source of truth — every active RFC has the template. See `references/template-transclusion-discovery.md`. |
 
 ---
 

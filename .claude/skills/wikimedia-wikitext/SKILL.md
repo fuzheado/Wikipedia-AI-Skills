@@ -7,7 +7,7 @@ depends_on: [wikimedia-api-access]
 skill_discovery_hints:
   - keywords: ["wikitext", "wiki markup", "parse", "mwparserfromhell", "wikitext parsing", "template parsing"]
   - keywords: ["wikitext AST", "syntax tree", "section parsing", "link extraction", "template expansion"]
-last_verified: 2026-09-11
+last_verified: 2026-10-03
 ---
 
 > ⚠️ **User-Agent required:** The API examples below use the Action API and REST API. All requests must include a descriptive `User-Agent` header or they will be blocked. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
@@ -201,6 +201,25 @@ for t in code.filter_templates():
 
 ### Unicode and Special Characters
 Wikitext may contain non-ASCII characters, HTML entities (`&amp;`, `&lt;`), and magic words. `mwparserfromhell` handles these correctly; regex approaches will not.
+
+### ⚠️ Gallery images are NOT wikilinks (verified 2026-08-18)
+Inside `{{gallery|File:X.jpg|caption|File:Y.jpg|caption}}` templates, file names
+are **plain-text template parameters**, not `[[File:...]]` wikilinks.
+`mwparserfromhell` correctly reports them as `Text` nodes — so
+`code.filter_wikilinks()` will NOT find gallery images. If you need the set of
+images *actually rendered* in an article, use the Parsoid REST endpoint
+(`GET /w/rest.php/v1/page/<title>/html`) and select semantic elements:
+`<figure>` + `<figcaption>` for standard thumbnails, `<li class="gallerybox">` +
+`<div class="gallerytext">` for `<gallery>` items. This also excludes navbox
+icons and other template chrome that `prop=images` would include. Chapters can
+be assigned in the same walk: each figure/gallerybox belongs to the nearest
+preceding `<h2>` (Parsoid emits plain `<h2>` elements in document order).
+
+### ⚠️ Parsoid hrefs are relative (verified 2026-08-18)
+The Parsoid REST `/html` endpoint emits **relative** file links:
+`<a href="./File:Name.jpg">` (not `/wiki/File:Name.jpg`), and the `<img>`
+`resource` attribute also uses `./File:`. Handle all three forms:
+`re.search(r"(?:\./|/wiki/)?(File|Image):(.*)$", href)`.
 
 ---
 

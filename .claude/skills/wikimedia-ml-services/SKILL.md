@@ -14,7 +14,7 @@ skill_discovery_hints:
   - keywords: ["translation", "content translation", "cross-language", "recommendation"]
   - keywords: ["LLM", "chat completions", "Qwen", "OpenAI-compatible", "text generation", "LiftWing Studio", "large language model"]
   - keywords: ["429", "rate limited", "rate limit", "Toolforge", "high-throughput", "burst", "LLM testing"]
-last_verified: 2026-09-09
+last_verified: 2026-10-04
 ---
 
 > ⚠️ **User-Agent required:** All API calls below need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -195,6 +195,25 @@ Models have fixed training cutoffs: retrieve current facts rather than
 trusting model memory, and verify before any on-wiki use (outputs are
 assistive drafts; bot/editing policies still apply).
 
+### Verified: translation & model choice (tested 2026-08)
+
+- **Translation quality (empirical):** strong for high-resource languages —
+  EN↔FR/DE/ES/ZH/RU and JA→EN tested fluent & accurate; idioms handled
+  natively (EN "proof of the pudding" → ZH 实践出真知); `[[wikitext links]]`
+  preserved and link labels translated (EN→FR). Weak for low-resource
+  languages (EN→SW produced a calque error). ~0.5–1.5 s/call; use
+  `temperature=0` and "output ONLY the translation, no explanation" in the
+  prompt. Not a substitute for dedicated NMT (MinT/Content Translation) at
+  scale, but fine for ad-hoc sentence/paragraph translation.
+- **14b vs 27b (head-to-head, same suite):** 27b is NOT slower (shared-service
+  latency dominates — 14b was slower on most pairs) and is higher quality:
+  14b picked a wrong-meaning Chinese idiom, wrote "Wikipedia is the biggest
+  Wikipedia" in Nepali (confused encyclopedia→Wikipedia), left "AI" in Latin
+  script in Russian. 27b also completed all calls while 14b threw 504
+  timeouts. **For translation (and most text tasks) prefer `llm-qwen36-27b`.**
+- Local notes with model list, rate-limit tiers, and benchmark details:
+  `references/lift-wing-llm.md`.
+
 ---
 
 ## SOP: Making Lift Wing API Calls
@@ -301,23 +320,23 @@ risk = result["output"]["probabilities"]["true"]   # ← float 0-1
 prediction = result["output"]["prediction"]          # ← bool
 ```
 
-**Modern articlequality model (continuous score):**
+**Modern articlequality model (continuous score)** — response is **FLAT**: no `output` wrapper.
+Verified 2026-10-04 against `POST /models/articlequality:predict` with
+`{"rev_id": 1377721095, "lang": "en"}`:
 ```json
 {
+  "score": 0.9847169113407679,          # ← float 0-1, NOT a discrete grade
   "model_name": "articlequality",
   "model_version": "1",
   "wiki_db": "enwiki",
-  "revision_id": 123456789,
-  "output": {
-    "prediction": {"score": 0.72}        # ← float 0-1, NOT a discrete grade
-  }
+  "revision_id": 1377721095
 }
 ```
 
 **Access pattern:**
 ```python
-score = result["output"]["prediction"]["score"]    # ← float 0-1
-# 0.72 is closer to "B" grade (the continuous model is different from the discrete Revscoring model!)
+score = result["score"]          # ← float 0-1, top-level
+# NOT result["output"]["prediction"]["score"] — that key does not exist for this model.
 ```
 
 **Modern models** have per-model response schemas. See the model-specific SOPs below.

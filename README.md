@@ -310,7 +310,7 @@ The extension checks these locations in order (first match wins):
 All shell and Python scripts in this repository follow a **script compliance standard**
 defined in [`.claude/guidelines/script-audit-guidelines.md`](.claude/guidelines/script-audit-guidelines.md):
 
-- ✅ **Zero-argument guard** — every script prints a helpful usage message when invoked with no arguments
+- ✅ **Zero-argument guard** — every script prints a helpful usage message when invoked with no arguments (enforced in CI by `scripts/verify-script-guards.py`, which runs each in-scope script bare; exemptions for scripts whose bare invocation is the intended use are listed with reasons via `--list-exempt`)
 - ✅ **Portable bash** — no bash 4+ features (`declare -A`, `${var,,}`) that break on macOS's default bash 3.2
 - ✅ **Safe piped output** — `curl | python3` patterns use temp files with HTTP status checks instead of silently passing empty/invalid input
 - ✅ **`--help` support** — every script responds to `--help` with full documentation
@@ -336,6 +336,7 @@ live systems, and every skill is verified against them in CI
 | Code snippet syntax (python/bash/json/js) | — (offline) | `scripts/verify-snippets.py` |
 | `last_verified` freshness | — (offline) | `scripts/verify-freshness.py` |
 | `mul` default values (label service, label readers, multi-language requests) | — (offline) | `scripts/verify-mul-labels.py` |
+| Script zero-argument guards (each in-scope script executed bare; network blocked) | — (executed) | `scripts/verify-script-guards.py` |
 | SQL semantics against the live replicas (opt-in; needs Toolforge credentials) | — (local only) | `scripts/verify-sql-live.py` |
 
 Run all checks locally:
@@ -347,7 +348,17 @@ python3 scripts/verify-links.py
 python3 scripts/verify-snippets.py
 python3 scripts/verify-freshness.py
 python3 scripts/verify-mul-labels.py
+python3 scripts/verify-script-guards.py
 ```
+
+The script-guard check is the one that *executes* repository code: it copies the
+skills tree to a temp dir, blocks sockets and points `http_proxy` at an unroutable
+port, then runs each in-scope script with no arguments to see whether it prints
+usage or starts working. In-scope means entry-point scripts under
+`.claude/skills/**`; `scripts/verify-*.py` and `scripts/refresh-*.py` are run bare by
+design and are out of scope. Five scripts whose bare invocation *is* the intended
+use (smoke tests, an idempotent cleanup helper, a sourceable template, a stdin
+filter) carry exemptions with reasons — see `--list-exempt`.
 
 **SQL is the one thing CI cannot check.** The verifiers above validate URLs,
 commands, API names and snippet syntax, but nothing executes a query — which is how
