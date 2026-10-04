@@ -1,8 +1,8 @@
 # Tech News Monitor — Skill Impact Watcher
 
 **Date:** 2026-09-03
-**Author:** Hermes agent spec for Andrew Lih (User:Fuzheado)
-**Status:** Proposed — spec for a persistent (Hermes 24×7) watcher process; not yet implemented
+**Author:** research agent spec for Andrew Lih (User:Fuzheado)
+**Status:** Proposed — spec for a persistent 24×7 watcher process; not yet implemented
 **Related:** PR #26 (thumbnails skill update), T427465 / T402792 / Tech News 2026 week 05 + Issue 36 (motivating incidents)
 
 ---
@@ -80,9 +80,9 @@ and decides whether a skill needs updating (as PR #26 did for thumbnails).
    If only T3 items matched: append to a rolling monthly digest instead of filing
    an issue (keeps noise down).
 
-## 5. Runtime: Hermes 24×7 placement
+## 5. Runtime: 24×7 placement
 
-Designed for a persistent Hermes process, runtime-agnostic requirements:
+Designed for a persistent process, runtime-agnostic requirements:
 
 - **Scheduler:** in-process timer or cron — poll 2–4×/day is sufficient; weekly
   output.
@@ -91,8 +91,8 @@ Designed for a persistent Hermes process, runtime-agnostic requirements:
 - **Git:** **not required** — the watcher reads the catalog via the GitHub API
   (raw file fetch) or a periodic `git pull` of the skills repo into a scratch
   clone. Ledger lives in watcher-local storage (§7), not committed to the repo.
-- **State:** small JSON ledger, durable across restarts (Hermes state dir).
-- **Politeness:** descriptive User-Agent (`tech-news-monitor/0.1 (Hermes; contact:
+- **State:** small JSON ledger, durable across restarts (state dir).
+- **Politeness:** descriptive User-Agent (`tech-news-monitor/0.1 (contact:
   User:Fuzheado)`), honor caching headers, ≤1 fetch/hour per feed.
 
 **CI fallback (optional):** the same matcher runnable as a weekly GitHub Actions
@@ -128,7 +128,7 @@ The watcher is only as good as the inventory. Requirements:
 ## 8. Failure modes & observability
 
 - **Feed format drift** (Diff redesign): item extraction returns 0 items for 2
-  consecutive issues → alarm (Hermes notification / GitHub issue) — silence is
+  consecutive issues → alarm (notification / GitHub issue) — silence is
   the enemy; a dead watcher must be visible.
 - **Heartbeat:** write `lastFeedCheck` on every poll; external alarm if stale
   >72h (misses >2 issues).
@@ -163,7 +163,7 @@ honest as it evolves.
 
 - Matcher + ledger + report: ~150–200 lines Python (reuses
   `api-surface.json` + existing CI patterns).
-- Hermes wiring (scheduler, storage, GitHub issue creation): ~50–100 lines.
+- Wiring (scheduler, storage, GitHub issue creation): ~50–100 lines.
 - Fixtures + golden tests: ~100 lines.
 - **Total ≈ 1–2 sessions.** Highest-leverage part is keeping `api-surface.json`
   current — one existing refresh script already does that.
@@ -173,6 +173,6 @@ honest as it evolves.
 1. GitHub issues vs. a `reports/tech-news/` file in the repo as the report
    surface (issues are more actionable; files are greppable — could do both).
 2. Should the ledger be committed under `reports/tech-news/ledger.json` for
-   auditability (low-churn, ~1 commit/week) or stay Hermes-local?
+   auditability (low-churn, ~1 commit/week) or stay local?
 3. T3 advisory language list — start conservative (`deprecated`, `sunset`,
    `stop working`, `removed`, `breaking`) and grow from observed misses.
