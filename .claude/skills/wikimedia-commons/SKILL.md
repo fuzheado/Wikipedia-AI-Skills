@@ -15,7 +15,7 @@ skill_discovery_hints:
   - keywords: ["Commons namespaces", "gallery", "gallery pages", "{{Gallery page}}", "Creator namespace"]
   - keywords: ["CORS", "cross-origin", "upload.wikimedia.org", "browser app", "Canvas", "WebGL"]
   - keywords: ["Commons Impact Metrics", "CIM", "category analytics", "Views from category", "impact metrics"]
-last_verified: 2026-10-03
+last_verified: 2026-10-04
 ---
 
 > ⚠️ **User-Agent required:** All curl and code examples in this skill access Wikimedia APIs. Requests without a descriptive `User-Agent` header will be blocked with HTTP 403 or 429. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.

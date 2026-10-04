@@ -133,9 +133,9 @@ All pageview data is on `wikimedia.org`, not `en.wikipedia.org`.
 | Endpoint | Description |
 |---|---|
 | `GET /per-article/{project}/{access}/{agent}/{article}/daily/{start}/{end}` | Daily pageviews for one article |
-| `GET /top/{project}/{access}/{date}` | Top articles for a given date |
-| `GET /top-by-country/{country}/{date}` | Top articles by country (CC by ISO 3166) |
-| `GET /top-by-ec/{project}/{access}/{year}/{month}` | Top by editing community |
+| `GET /top/{project}/{access}/{year}/{month}/{day}` | Top articles for one day |
+| `GET /top-by-country/{project}/{access}/{year}/{month}` | Top articles per country, one month |
+| `GET /top-per-country/{country}/{access}/{year}/{month}/{day}` | Top articles in one country, one day |
 
 ### Parameters
 
