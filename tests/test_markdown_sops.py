@@ -152,6 +152,45 @@ class TestApiAccessRateLimitDetails:
         assert 'rvsection' in text or 'section=0' in text
 
 
+class TestApiAccessSustainedRateAndEntityCache:
+    """Verify the sustained-rate and entity-cache guidance added 2026-10-04."""
+
+    def test_sustained_rate_subsection(self):
+        text = read_skill('wikimedia-api-access')
+        assert 'Sustained rate, not burst size' in text
+        assert 'per-minute budget' in text
+
+    def test_burst_probe_is_not_evidence(self):
+        text = read_skill('wikimedia-api-access')
+        assert 'A short burst proves nothing' in text
+        assert 'x-ratelimit' in text
+
+    def test_missing_retry_after_is_not_permission(self):
+        text = read_skill('wikimedia-api-access')
+        assert 'does not mean "no limit applies"' in text
+
+    def test_entity_cache_subsection(self):
+        text = read_skill('wikimedia-api-access')
+        assert 'Cache the entity, not the batch' in text
+        assert 'batch composition is part of the cache key' in text
+
+    def test_migrate_instead_of_recrawl(self):
+        text = read_skill('wikimedia-api-access')
+        assert 'migrate what you already' in text
+        assert 'zero network requests' in text
+        # the truncation guard that makes harvesting safe
+        assert 'keep the richer' in text
+
+    def test_error_handling_cross_references_the_trap(self):
+        text = read_skill('wikipedia-error-handling')
+        assert 'cache-key' in text
+        assert 'Cache the entity, not the batch' in text
+
+    def test_strategy_anti_pattern_row(self):
+        text = read_skill('wikimedia-api-strategy')
+        assert 'Caching batched API responses by URL' in text
+
+
 class TestLiftWingLLMSection:
     """Verify the LiftWing LLM chat-completions section in wikimedia-ml-services."""
 

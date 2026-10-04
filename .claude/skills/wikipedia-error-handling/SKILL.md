@@ -10,7 +10,7 @@ skill_discovery_hints:
   - keywords: ["error", "exception", "retry", "timeout", "connection", "failure", "debug"]
   - keywords: ["422", "parent revision", "model error", "Lift Wing error"]
   - keywords: ["SPARQL timeout", "query timeout", "504", "gateway"]
-last_verified: 2026-08-10
+last_verified: 2026-10-04
 ---
 
 > ⚠️ **User-Agent required:** All API calls below need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -143,6 +143,18 @@ When scraping **many language editions** concurrently (e.g., fetching the same a
 - First 50–100 requests succeed, then a burst of 429s
 - Earlier requests in the batch succeed, later ones fail
 - The rate limit is triggered by *sustained rate*, not total requests
+
+**Quantify the budget before tuning workers.** The gateway limits are
+per minute per client class (10 / 200 / 2000 req/min — see
+[wikimedia-api-access](../wikimedia-api-access/SKILL.md)), so work out the rate
+your concurrency actually produces: 6 unpaced workers sustain ~360/min
+(6 × 60) against a 200/min UA-only budget, while a 1s wave gate admitting 4
+parallel requests is ~240/min. A handful of requests fired back-to-back return
+`200`s, so a burst probe cannot tell you whether the sustained run is safe. And
+if 429s appear right after a caching or batching change, suspect a **cache-key
+invalidation** (batch composition is part of a URL-derived key) rather than a
+real traffic increase — see *Cache the entity, not the batch* in
+[wikimedia-api-access](../wikimedia-api-access/SKILL.md).
 
 **Prevention strategies (in order of effectiveness):**
 
