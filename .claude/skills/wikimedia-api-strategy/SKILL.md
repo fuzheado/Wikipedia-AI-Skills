@@ -4,7 +4,7 @@ description: Choose the right Wikimedia API or tool for the task — a decision 
 depends_on: [wikimedia-api-access]
 license: MIT
 compatibility: opencode
-last_verified: 2026-10-03
+last_verified: 2026-10-04
 skill_discovery_hints:
   - keywords: ["which API", "best tool", "how to access", "API strategy", "choose between"]
   - keywords: ["REST vs Action", "SPARQL vs API", "Pywikibot vs API", "SQL vs API"]
@@ -221,6 +221,7 @@ Or an even faster alternative using SQL:
 | Looping through category members with individual API calls per page | N+1 query problem | Use SQL replicas or batch API calls |
 | Fetching full page wikitext just to get the page ID | Wasteful — ridiculously oversized response | Use `prop=info&inprop=url` (much smaller response) |
 | Using the Action API when you need rendered HTML | Returns raw wikitext, requires client-side rendering | Use REST API `/page/html/{title}` for ready-to-render HTML |
+| Caching batched API responses by URL, then changing the batching | Batch composition is part of the cache key, so a "harmless" refactor invalidates every entry and triggers a full re-crawl — which can trip a rate limit | Cache per **entity** alongside the URL cache, and migrate the existing batch cache instead of re-fetching. See **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** |
 | Implementing your own bot framework | You'll rewrite Pywikibot's throttling, conflict detection, and page generators from scratch | Use Pywikibot — it has 20+ years of battle-testing |
 | Searching edit summaries via any API | No API indexes edit summaries. CirrusSearch indexes page content only. `list=recentchanges`/`list=usercontribs` return summaries but have no filter parameter for summary text. | Use SQL replicas with `actor_name` + date constraints, the Σ Toolforge tool (`sigma/summary.py`), or XML dumps. See **[wikimedia-database](../wikimedia-database/SKILL.md)** `references/edit-summary-search.md`. |
 | Using `rvlimit` in multi-title batch queries | The API rejects `rvlimit` when multiple pages are supplied: *"rvlimit may only be used on a single page"*. The response is a 400 error, not partial data. | Omit `rvlimit` from multi-title queries. The default is 1 revision per page — usually sufficient. Fetch full history per-page individually if you need more. |
