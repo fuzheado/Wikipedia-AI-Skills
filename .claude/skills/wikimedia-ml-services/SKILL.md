@@ -14,7 +14,7 @@ skill_discovery_hints:
   - keywords: ["translation", "content translation", "cross-language", "recommendation"]
   - keywords: ["LLM", "chat completions", "Qwen", "OpenAI-compatible", "text generation", "LiftWing Studio", "large language model"]
   - keywords: ["429", "rate limited", "rate limit", "Toolforge", "high-throughput", "burst", "LLM testing"]
-last_verified: 2026-10-03
+last_verified: 2026-10-04
 ---
 
 > ⚠️ **User-Agent required:** All API calls below need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -320,23 +320,23 @@ risk = result["output"]["probabilities"]["true"]   # ← float 0-1
 prediction = result["output"]["prediction"]          # ← bool
 ```
 
-**Modern articlequality model (continuous score):**
+**Modern articlequality model (continuous score)** — response is **FLAT**: no `output` wrapper.
+Verified 2026-10-04 against `POST /models/articlequality:predict` with
+`{"rev_id": 1377721095, "lang": "en"}`:
 ```json
 {
+  "score": 0.9847169113407679,          # ← float 0-1, NOT a discrete grade
   "model_name": "articlequality",
   "model_version": "1",
   "wiki_db": "enwiki",
-  "revision_id": 123456789,
-  "output": {
-    "prediction": {"score": 0.72}        # ← float 0-1, NOT a discrete grade
-  }
+  "revision_id": 1377721095
 }
 ```
 
 **Access pattern:**
 ```python
-score = result["output"]["prediction"]["score"]    # ← float 0-1
-# 0.72 is closer to "B" grade (the continuous model is different from the discrete Revscoring model!)
+score = result["score"]          # ← float 0-1, top-level
+# NOT result["output"]["prediction"]["score"] — that key does not exist for this model.
 ```
 
 **Modern models** have per-model response schemas. See the model-specific SOPs below.

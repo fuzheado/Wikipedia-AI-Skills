@@ -1,7 +1,7 @@
 # MinT (Machine in Translation) API — Skill Research Memo
 
 **Date:** 2026-08-17
-**Author:** Hermes agent research for Andrew Lih (User:Fuzheado)
+**Author:** research agent for Andrew Lih (User:Fuzheado)
 **Status:** Proposed — add as T2 skill; this memo is the durable rationale + evidence record
 **Related PR:** feat/mint (skill: `.claude/skills/mint/`)
 

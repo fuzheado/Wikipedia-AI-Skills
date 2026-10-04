@@ -119,7 +119,7 @@ The brief describes **QALD-10 as a "CLEF 2024" lab**. Primary sources (DBLP, Ope
 
 ---
 
-## 6. Verification log (2026-08-19, UA "HermesAgent/1.0 benchmark research", curl -sL --max-time 20-25)
+## 6. Verification log (2026-08-19, descriptive research User-Agent, curl -sL --max-time 20-25)
 
 | URL / endpoint | HTTP | Notes |
 |---|---|---|
