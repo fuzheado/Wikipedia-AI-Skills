@@ -48,9 +48,10 @@ Daily TSV, one row per file. Columns: `total`, `original`, `transcoded_image`
 - Source: https://wikitech.wikimedia.org/wiki/Data_Platform/Data_Lake/Traffic/Mediacounts
 
 ### 2. Mediarequests AQS — `metrics/mediarequests/{aggregate,top,per-file}`
-Filters: `referer` (all/internal/external/unknown), `media_type`
-(image/audio/video/all-media-types), `agent_type` (user/spider/automated/all-agents),
-`granularity` (daily/monthly).
+Filters: `referer` (all-referers/internal/external/unknown — `all` is NOT valid and returns HTTP 404),
+`media_type` (image/audio/video/document/other/all-media-types), `agent_type`
+(user/spider/all-agents — there is no `automated` value; requesting it returns HTTP 400 listing the
+allowed set `[all-agents, user, spider]`), `granularity` (daily/monthly). All values probed 2026-10-04.
 - **GOTCHA (verified):** `per-file` path MUST be URL-encoded **with the leading
   slash**: `%2Fwikipedia%2Fcommons%2F0%2F00%2FCrab_Nebula.jpg`. Omitting the leading
   slash → 404. `top` returns `file_path` WITH a leading slash (e.g.
