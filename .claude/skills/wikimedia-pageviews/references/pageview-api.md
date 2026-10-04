@@ -20,7 +20,7 @@ Documentation: https://wikimedia.org/api/rest_v1/
 ### Top Pages
 
 ```
-GET /top/{project}/{access}/{date}
+GET /top/{project}/{access}/{year}/{month}/{day}
 ```
 
 Returns the most viewed pages for a project on a given date.
@@ -122,7 +122,7 @@ GET /top/{referer}/{media-type}/{year}/{month}/{day}
 ### Top by Country
 
 ```
-GET /top-by-country/{country}/{date}
+GET /top-by-country/{project}/{access}/{year}/{month}
 ```
 
 Most viewed articles in a specific country on a given date.
@@ -132,13 +132,16 @@ Most viewed articles in a specific country on a given date.
 | `country` | ISO 3166-1 alpha-2 code | `US`, `DE`, `FR`, `IN`, `JP` |
 | `date` | Date (slash format) | `2026/05/20` |
 
-### Top by Editing Community
+### Top by Country (all projects, one country)
 
 ```
-GET /top-by-ec/{project}/{access}/{year}/{month}
+GET /top-per-country/{country}/{access}/{year}/{month}/{day}
 ```
 
-Most viewed articles by editors of a specific project in a given month.
+Most viewed articles in one country across all projects, for a given day.
+
+There is no `/top-by-ec` endpoint: it was documented here but has never existed
+(verified 2026-10-03 — 404, and absent from the live api-spec).
 
 ---
 
@@ -147,10 +150,10 @@ Most viewed articles by editors of a specific project in a given month.
 | Endpoint | Date Format | Example |
 |---|---|---|
 | `top/{project}/{access}/{date}` | `YYYY/MM/DD` (with slashes) | `2026/05/20` |
-| `top-by-country/{country}/{date}` | `YYYY/MM/DD` (with slashes) | `2026/05/20` |
+| `top-by-country/{project}/{access}/{year}/{month}` | `YYYY` / `MM` | `2026` / `09` |
 | `per-article/.../daily/{start}/{end}` | `YYYYMMDD` (compact, no slashes) | `20260101` |
 | `per-article/.../monthly/{start}/{end}` | `YYYYMM` (compact, no slashes) | `202601` |
-| `top-by-ec/{project}/{access}/{year}/{month}` | `YYYY` / `MM` | `2026` / `05` |
+| `top-per-country/{country}/{access}/{year}/{month}/{day}` | `YYYY/MM/DD` (with slashes) | `2026/09/20` |
 
 **Important:** The Top endpoint uses slashes (`2026/05/20`). The Per-Article
 endpoint uses compact format (`20260101`). Using the wrong format returns 404.

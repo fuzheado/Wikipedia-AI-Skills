@@ -232,7 +232,7 @@ Fetch historical daily pageviews for a specific article with a visual bar chart.
 ### 📚 Pageview API Reference (`references/pageview-api.md`)
 
 Full reference for the Wikimedia Pageviews REST API:
-- All endpoints (top, per-article, top-by-country, top-by-ec)
+- All endpoints (top, per-article, top-by-country, top-per-country)
 - Date format reference (slash vs compact — a common gotcha)
 - Common query patterns with examples
 - Error response guide
