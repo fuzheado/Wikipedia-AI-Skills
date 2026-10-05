@@ -7,14 +7,16 @@ depends_on: [wikimedia-api-access, wikidata]
 skill_discovery_hints:
   - keywords: ["vector search", "semantic search", "embedding", "similarity score", "find QID", "fuzzy match"]
   - keywords: ["wd-vectordb", "concept search", "meaning search", "RRF", "cross-lingual search"]
-last_verified: 2026-06-10
+last_verified: 2026-10-04
 ---
 
 > ⚠️ **User-Agent required:** All calls to the Vector Database API require a descriptive `User-Agent` header. Requests without one are blocked with HTTP 403. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
 
 > ⚠️ **Alpha-quality service:** The Vector Database is in early testing (v0.2.1). Results may be incomplete or inaccurate. Queries are sent to JinaAI for embedding and logged for up to 90 days. The `instanceof` filter is non-functional in the current release.
 
-The **Wikidata Vector Database** ([wd-vectordb.wmcloud.org](https://wd-vectordb.wmcloud.org/)), part of the [Wikidata Embedding Project](https://www.wikidata.org/wiki/Wikidata:Embedding_Project) led by Wikimedia Deutschland, stores semantic embeddings of every Wikidata entity. It enables **context-aware search** — finding items by *what they mean* rather than by exact string matching.
+The **Wikidata Vector Database** ([wd-vectordb.wmcloud.org](https://wd-vectordb.wmcloud.org/)), part of the [Wikidata Embedding Project](https://www.wikidata.org/wiki/Wikidata:Embedding_Project) led by Wikimedia Deutschland, stores semantic embeddings of Wikidata entities — currently **~23 million** entities that have at least one Wikipedia article (the project page says ~30M items; the Hugging Face dataset card reports 23M unique entities and **44M vectors** across the language shards; embeddings are computed from the **September 2024** dump). It enables **context-aware search** — finding items by *what they mean* rather than by exact string matching.
+
+> 🧩 **Two ways in:** the hosted **Wikidata MCP** server (`https://wd-mcp.wmcloud.org/mcp/`) exposes this vector search *plus* SPARQL and statement tools to any MCP client — no API key. And the **raw vectors themselves** are downloadable in bulk (CC0 Hugging Face dataset) or per-entity via `return_vectors=true`. See [The Vectors Themselves](#the-vectors-themselves) and [MCP Access](#mcp-access).
 
 **When to reach for this instead of SPARQL:**
 
@@ -422,6 +424,45 @@ The Vector Database indexes **every** Wikidata entity — categories, journals, 
 
 ---
 
+## The Vectors Themselves
+
+Three routes to actual embeddings rather than just ranked QIDs:
+
+| Route | What you get | Notes |
+|---|---|---|
+| **API `return_vectors=true`** | The 512-dim vector for each returned entity, inline in the JSON | Per-entity; you need a query first. Verified 2026-10-04: `/item/query/?query=Douglas+Adams&lang=en&K=1&return_vectors=true` → `vector` = 512 floats |
+| **Hugging Face dataset (bulk)** | All of them | [`philippesaade/Wikidata_Vectors_0.2`](https://huggingface.co/datasets/philippesaade/Wikidata_Vectors_0.2) — **CC0-1.0**, public, not gated; 540 parquet chunks (~213 MB each) under `data/{en,fr,de,ar}/`; columns `id`, `vector` (base64-encoded float32), `lang`, `wdid`. Card reports 44M vectors / 23M unique entities, 512-dim. Last modified 2026-08-25 |
+| **Recompute locally** | Your own vectors | Pipeline is open source ([WikidataTextEmbedding](https://github.com/philippesaade-wmde/WikidataTextEmbedding)) using [Jina Embeddings v3](https://huggingface.co/jinaai/jina-embeddings-v3) — the *same* model, so your vectors stay comparable to the published ones |
+
+Decoding a vector from the dataset:
+
+```python
+import base64, numpy as np
+vec = np.frombuffer(base64.b64decode(row["vector"]), dtype=np.float32)   # shape (512,)
+```
+
+> ⚠️ **Download history:** vector downloads were temporarily disabled (Nov 2025–Feb 2026) then re-enabled in **March 2026** via the HF dataset above. Older instructions pointing at a removed download endpoint should be replaced by this dataset.
+
+## MCP Access
+
+Wikimedia Deutschland runs a hosted **Wikidata MCP** server wrapping this vector database (plus statements and SPARQL) for agent use — **no API key required**.
+
+- **MCP endpoint:** `https://wd-mcp.wmcloud.org/mcp/` (streamable HTTP)
+- **Interactive docs:** [wd-mcp.wmcloud.org/docs](https://wd-mcp.wmcloud.org/docs) — the same tools as a REST mirror, `POST /tool/<name>`
+- **Source:** [github.com/wmde/WikidataMCP](https://github.com/wmde/WikidataMCP) (AGPL, self-hostable via Docker)
+
+```json
+{
+  "mcpServers": {
+    "wikidata": { "type": "streamable_http", "url": "https://wd-mcp.wmcloud.org/mcp/" }
+  }
+}
+```
+
+**Verified 2026-10-04** by live MCP handshake: server `Wikidata MCP v1.15.0`, protocol `2025-06-18`, capabilities `tools/prompts/resources/experimental`, **6 tools** — `search_items`, `search_properties`, `get_statements`, `get_statement_values`, `get_instance_and_subclass_hierarchy`, `execute_sparql`. `search_items` / `search_properties` are the vector-search entry points (hybrid vector + keyword, keyword fallback when vector search is unavailable).
+
+**Which to use:** the MCP when an agent should explore Wikidata unaided (it chains search → statements → SPARQL for you); the raw API when you need similarity scores, `similarity-score`, or bulk vectors.
+
 ## References
 
 - **Web UI:** [wd-vectordb.wmcloud.org](https://wd-vectordb.wmcloud.org/) — try queries interactively
@@ -429,3 +470,7 @@ The Vector Database indexes **every** Wikidata entity — categories, journals, 
 - **Project Page:** [Wikidata:Vector Database](https://www.wikidata.org/wiki/Wikidata:Vector_Database)
 - **Embedding Project:** [Wikidata:Embedding Project](https://www.wikidata.org/wiki/Wikidata:Embedding_Project)
 - **Feedback Survey:** [wikimedia.sslsurvey.de/Wikidata-Vector-DB-Feedback-Alpha-release](https://wikimedia.sslsurvey.de/Wikidata-Vector-DB-Feedback-Alpha-release)
+- **MCP server:** [wd-mcp.wmcloud.org/mcp/](https://wd-mcp.wmcloud.org/mcp/) — see [Wikidata:MCP](https://www.wikidata.org/wiki/Wikidata:MCP), source [wmde/WikidataMCP](https://github.com/wmde/WikidataMCP)
+- **Vectors in bulk (CC0):** [philippesaade/Wikidata_Vectors_0.2](https://huggingface.co/datasets/philippesaade/Wikidata_Vectors_0.2)
+- **Embedding pipeline (open source):** [philippesaade-wmde/WikidataTextEmbedding](https://github.com/philippesaade-wmde/WikidataTextEmbedding)
+- **Wikidata Textifier** (entity → LLM-friendly text): [wd-textify.wmcloud.org](https://wd-textify.wmcloud.org/)
