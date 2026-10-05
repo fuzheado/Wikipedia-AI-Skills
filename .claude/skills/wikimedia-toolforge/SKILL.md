@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["Toolforge", "tool hosting", "Kubernetes", "web service", "cron job", "deploy"]
   - keywords: ["toolsadmin", "become", "webservice", "toolforge jobs"]
   - keywords: ["CDN", "cdnjs", "tools-static", "privacy-preserving CDN", "content delivery", "third-party script", "external CDN tracking"]
-last_verified: 2026-10-03
+last_verified: 2026-10-05
 ---
 
 Toolforge (formerly Wikimedia Tool Labs) is a cloud hosting platform for community-developed tools that interact with Wikimedia wikis and data. This skill covers account setup, service management, deployment, and debugging.
@@ -70,6 +70,10 @@ There is **no CLI equivalent** — `toolforge tools maintainers ...` does not ex
 > `scripts/count-maintainers.py --all`. The crawl is ~4,600 requests to a Wikimedia
 > service, so it is paced to the Robot policy (**1 concurrent, ≥ 1 s between
 > requests** → ~80 minutes) and refuses to start without `--all`.
+
+> 📇 **Publishing the tool itself** (catalogue metadata, `toolinfo.json`, Toolhub
+> registration, and the traps in the toolinfo schema): see
+> [`references/publishing-to-toolhub.md`](./references/publishing-to-toolhub.md).
 
 ## SOP 2: File Deployment
 
