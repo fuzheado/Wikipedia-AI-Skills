@@ -27,6 +27,31 @@ re-submit.
 > 200 for every client-side route. Render the page (or ask the API) whenever a URL
 > matters — `/api/tools/create/` returns that tool's record.
 
+## Before registering: is it already there?
+
+A Toolforge tool may already be catalogued without anyone registering it. Toolhub
+crawls an **aggregate Toolforge feed** (Toolforge's own `tools/toolinfo/v1.2/`
+endpoint on toolsadmin), so a tool that exists in toolsadmin shows up
+automatically — under the name **`toolforge-<tool>`**, carrying whatever metadata
+toolsadmin holds (title, a one-line description, license, tool type, author name)
+and nothing else. (That endpoint does not answer `HEAD` and is ~1.7 MB over
+`GET`, so do not plan a checker around it.)
+
+Look it up under *that* name before concluding anything:
+
+```bash
+curl -s "https://toolhub.wikimedia.org/api/tools/toolforge-<tool>/"    # 404 = genuinely absent
+```
+
+Querying the name you would have chosen is how you conclude "it isn't there"
+about a record that is. The full source list Toolhub crawls (~125 entries) is
+readable at <https://toolhub.wikimedia.org/api/crawler/urls/>.
+
+If a record already exists, the job is **enrichment, not registration** — and it
+is worth checking which source the crawler reads before editing anything in
+Toolhub, because a crawled record's fields can be replaced on the next pass
+(about every 60 minutes).
+
 ## The schema, and the traps
 
 The canonical schema is `jsonschema/toolinfo/1.2.2.json` in the Toolhub

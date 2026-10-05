@@ -543,6 +543,7 @@
   "https://toolhub.wikimedia.org/add-or-remove-tools?tab=tool-create": "2026-10-05T08:49:32Z",
   "https://toolhub.wikimedia.org/add-or-remove-tools?tab=urls": "2026-10-05T08:49:33Z",
   "https://toolhub.wikimedia.org/api-docs": "2026-10-05T08:49:34Z",
+  "https://toolhub.wikimedia.org/api/crawler/urls/": "2026-10-05T08:54:32Z",
   "https://toolhub.wikimedia.org/tools/create": "2026-10-05T08:49:35Z",
   "https://tools-static.wmflabs.org": "2026-08-10T12:57:50Z",
   "https://tools-static.wmflabs.org/cdnjs/ajax/libs/<library": "2026-08-10T12:57:50Z",
@@ -795,7 +796,7 @@
   "https://your-tool.toolforge.org": "2026-08-10T12:57:50Z",
   "https://\u0440\u0443.wikipedia.org": "2026-09-29T22:23:29Z"
  },
- "generated_at": "2026-10-05T08:49:25Z",
+ "generated_at": "2026-10-05T08:56:17Z",
  "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
@@ -1362,8 +1363,10 @@
   "https://toolhub.wikimedia.org/add-or-remove-tools?tab=tool-create": 200,
   "https://toolhub.wikimedia.org/add-or-remove-tools?tab=urls": 200,
   "https://toolhub.wikimedia.org/api-docs": 200,
+  "https://toolhub.wikimedia.org/api/crawler/urls/": 200,
   "https://toolhub.wikimedia.org/api/tools/<name": -1,
   "https://toolhub.wikimedia.org/api/tools/?name=<name": -1,
+  "https://toolhub.wikimedia.org/api/tools/toolforge-<tool": -1,
   "https://toolhub.wikimedia.org/tools/create": 200,
   "https://tools-static.wmflabs.org": 200,
   "https://tools-static.wmflabs.org/cdnjs/ajax/libs/<library": -1,
