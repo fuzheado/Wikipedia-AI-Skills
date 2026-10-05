@@ -1,12 +1,16 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "https://tools.wmflabs.org/toolhub/schema/1.1.1",
+    "$schema": "/toolinfo/1.2.2",
     "name": "github-fuzheado-wikipedia-ai-skills",
     "title": "Wikipedia AI Skills",
     "description": "A curated collection of SKILL.md files for AI coding agents (Pi, OpenCode, Claude Code and any agent supporting the .claude/skills convention) that give expert guidance on Wikipedia, Wikimedia and Wikidata tasks: biography writing, page anatomy, talk pages, edit history, pageviews, wikitext parsing, diffs, Commons, page assessments, Wikidata/SPARQL, API access, database replicas, Toolforge and CDN assets.",
     "url": "https://github.com/fuzheado/Wikipedia-AI-Skills",
     "keywords": "skills,ai,llm,agents,agent",
-    "author": "Andrew Lih (fuzheado)",
+    "author": [
+        {
+            "name": "Andrew Lih",
+            "wiki_username": "Fuzheado"
+        }
+    ],
     "repository": "https://github.com/fuzheado/Wikipedia-AI-Skills.git",
     "license": "MIT"
 }
