@@ -113,6 +113,46 @@ def test_links_templated_urls_skipped(tmp_path):
     assert problems == []
 
 
+def test_links_url_registry_warns_status_zero(tmp_path, capsys):
+    d = make_skill(tmp_path, "See https://tools-static.test-registry.org/timeout\n")
+    problems = links.scan_file(
+        d / "SKILL.md",
+        SKILLS,
+        {"urls": {"https://tools-static.test-registry.org/timeout": 0}},
+    )
+    captured = capsys.readouterr()
+    assert problems == []
+    assert "URL status 0" in captured.err
+    assert "unverified, not proven live" in captured.err
+
+
+def test_links_url_registry_warns_but_allows_unverifiable_statuses(tmp_path, capsys):
+    for status in (401, 403, 405, 422, 500, 503):
+        url = f"https://tools-static.test-registry.org/status-{status}"
+        d = make_skill(tmp_path / str(status), f"See {url}\n")
+        problems = links.scan_file(d / "SKILL.md", SKILLS, {"urls": {url: status}})
+        assert problems == []
+    captured = capsys.readouterr()
+    assert "URL status 401" in captured.err
+    assert "URL status 503" in captured.err
+
+
+def test_links_main_scans_markdown_assets(tmp_path, capsys):
+    skills_dir = tmp_path / "skills"
+    asset_dir = skills_dir / "test-skill" / "assets"
+    asset_dir.mkdir(parents=True)
+    (skills_dir / "test-skill" / "SKILL.md").write_text("---\nname: test-skill\n---\n")
+    (asset_dir / "example.md").write_text("See https://tools-static.test-registry.org/asset-gap\n")
+    registry = tmp_path / "url-registry.json"
+    registry.write_text(json.dumps({"urls": {}}))
+
+    code = links.main(["--skills-dir", str(skills_dir), "--url-registry", str(registry)])
+    captured = capsys.readouterr()
+    assert code == 1
+    assert "assets/example.md" in captured.out
+    assert "not in url-registry" in captured.out
+
+
 # ---------------------------------------------------------------------------
 # verify-api
 # ---------------------------------------------------------------------------
