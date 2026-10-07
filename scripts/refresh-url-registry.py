@@ -31,6 +31,7 @@ Writes: scripts/url-registry.json
   { generated_at, generator, user_agent,
     urls:       {url: status_code},   # status: -1 example, -2 post-only, 0 error, else HTTP code
     checked_at: {url: ISO8601},       # when each URL was last live-checked
+    exceptions: {url: {classification, allow_reason}},
     skip: {...} }
 """
 
@@ -96,7 +97,7 @@ POST_ONLY_RE = re.compile(
 # Clearly-illustrative example URLs that are not real resources
 EXAMPLE_URL_RE = re.compile(
     r"""(?:
-      example\.com|example\.org|example\.jpg|<[A-Za-z_-]+>|\{[a-z_]+\}|
+      example\.com|example\.org|example\.jpg|doi\.org/10\.0000/example|newspaper\.com/article|<[A-Za-z_-]+>|\{[a-z_]+\}|
       \*\.|your-[a-z-]+|my-[a-z][a-z-]*|123456\d*|wrong-[a-z-]+|\bxxx\b|
       placeholder|\bTBD\b|library/version/file|PageName|Username|Foo\.svg|Doc\.pdf|
       He_Tingbo|/thumb/$|/800px$|/1440px$|\.\.\.|/stream/$|entity/[MQ]$|/entity/$|
@@ -114,6 +115,64 @@ def classify(url: str) -> int | None:
     if POST_ONLY_RE.search(url):
         return -2
     return None
+
+
+def exception_for(url: str, status) -> dict | None:
+    """Return structured allow metadata for URLs that are not normal live GETs.
+
+    These exceptions make verifier passes reviewable: a non-OK URL is allowed
+    only when the registry says why a generic HEAD/GET check is not decisive.
+    """
+    host = urlparse(url).hostname or ""
+    if status == -1:
+        return {"classification": "example",
+                "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify"}
+    if status == -2:
+        return {"classification": "post_or_parameter_required",
+                "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test"}
+    if status == 0:
+        if host in {"localhost", "127.0.0.1"}:
+            return {"classification": "local_dev",
+                    "allow_reason": "Local development URL; not expected to resolve from CI"}
+        if host == "stream.wikimedia.org":
+            return {"classification": "eventstream_sse",
+                    "allow_reason": "Server-sent event stream; generic URL check can time out even when the endpoint exists"}
+        if host in {"xn--h1ayg.wikipedia.org", "ру.wikipedia.org"}:
+            return {"classification": "unicode_domain_example",
+                    "allow_reason": "Used to document Unicode/IDNA pitfalls, not as a normal live-link assertion"}
+        if host == "reconcile.wikidata.org":
+            return {"classification": "documented_legacy_service",
+                    "allow_reason": "Documented legacy/retired reconciliation endpoint; kept as historical context"}
+        if host == "wmf.legal-yes.com":
+            return {"classification": "browser_only",
+                    "allow_reason": "Browser-facing tool can fail generic server-side probes"}
+        return {"classification": "network_unverified",
+                "allow_reason": "Network/DNS/timeout result; retained for review instead of silently accepting"}
+    if status == 401:
+        return {"classification": "auth_required",
+                "allow_reason": "URL exists behind authentication or anti-bot access controls"}
+    if status == 403:
+        return {"classification": "access_restricted",
+                "allow_reason": "URL is access-restricted to generic CI probes but is not a clear dead link"}
+    if status == 405:
+        return {"classification": "method_specific",
+                "allow_reason": "Endpoint rejects generic HEAD/GET; another method or payload is required"}
+    if status == 422:
+        return {"classification": "requires_parameters",
+                "allow_reason": "Endpoint exists but rejects a bare request without required parameters"}
+    if isinstance(status, int) and status >= 500:
+        return {"classification": "transient_server_error",
+                "allow_reason": "Server-side error at probe time; needs scheduled recheck, not an immediate hallucination finding"}
+    return None
+
+
+def rebuild_exceptions(registry: dict) -> None:
+    exceptions = {}
+    for url, status in registry.get("urls", {}).items():
+        exc = exception_for(url, status)
+        if exc is not None:
+            exceptions[url] = exc
+    registry["exceptions"] = exceptions
 
 def check_url(url: str, timeout: float, delay: float) -> int:
     """HEAD (fall back to GET) a URL, returning the final status code.
@@ -227,6 +286,7 @@ def main(argv: list[str] | None = None) -> int:
         "user_agent": USER_AGENT,
         "urls": dict(known),
         "checked_at": dict(checked_at),
+        "exceptions": {},
         "skip": {"post_only": "POST-only or parameter-required endpoints "
                               "(bare HEAD/GET cannot verify)",
                  "example": "illustrative placeholder URLs"},
@@ -243,6 +303,8 @@ def main(argv: list[str] | None = None) -> int:
             registry["urls"][u] = marker          # skip markers never need a fetch
             if u not in checked_at:
                 checked_at[u] = now_iso()          # classify counts as "known"
+            registry["checked_at"] = dict(checked_at)
+            rebuild_exceptions(registry)
             continue
         status = known.get(u)
         if needs_check(u, status, checked_at.get(u), now,
@@ -262,6 +324,7 @@ def main(argv: list[str] | None = None) -> int:
         status = check_url(url, args.timeout, args.delay)
         registry["urls"][url] = status
         registry["checked_at"][url] = now_iso()
+        rebuild_exceptions(registry)
         if status >= 400:
             bad += 1
         print(f" [{i}/{len(plan)}] ({reason}) {status} {url}", file=sys.stderr)
@@ -270,6 +333,7 @@ def main(argv: list[str] | None = None) -> int:
         time.sleep(args.delay)  # pacing (Wikimedia etiquette)
         save()  # incremental save: never lose progress on interruption
 
+    rebuild_exceptions(registry)
     save()  # final save (also covers the no-pending case)
     print(f"\nRegistry written to {OUT}", file=sys.stderr)
     print(f" {len(plan)} URLs checked, {bad} with status >= 400, "

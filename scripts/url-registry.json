@@ -28,11 +28,13 @@
   "https://.../1920px-Example.jpg": "2026-08-10T12:57:50Z",
   "https://.../960px-Example.jpg": "2026-08-10T12:57:50Z",
   "https://...</ref": "2026-08-10T12:57:50Z",
+  "https://YOUR-TOOL.toolforge.org/crop?file=File:Name.jpg&width=300&height=200&gravity=face": "2026-10-07T13:39:03Z",
   "https://admin.toolforge.org/": "2026-08-10T12:57:50Z",
   "https://aegisub.org/": "2026-08-10T12:57:50Z",
   "https://api.cdnjs.com/libraries?search=d3&fields=version,latest": "2026-08-10T12:57:50Z",
   "https://api.flickr.com/services/rest/": "2026-08-10T12:57:50Z",
   "https://api.flickr.com/services/rest/?method=<method": "2026-08-10T12:57:50Z",
+  "https://api.github.com/repos/wikimedia/mediawiki-extensions-<Name": "2026-10-07T13:39:03Z",
   "https://api.github.com/repos/wikimedia/mediawiki-extensions-PersonalDashboard/commits?per_page=1": "2026-10-03T13:51:53Z",
   "https://api.github.com/repos/wikimedia/mediawiki-extensions-PersonalDashboard/commits?per_page=1&page=254": "2026-10-03T13:51:55Z",
   "https://api.svc.toolforge.org/components/v1/tool/$TOOL_NAME/deployment?token=$TOOLS_DEPLOY_TOKEN": "2026-10-03T13:51:56Z",
@@ -45,6 +47,7 @@
   "https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-damaging:predict": "2026-08-10T12:57:50Z",
   "https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-goodfaith:predict": "2026-08-10T12:57:50Z",
   "https://api.wikimedia.org/service/lw/inference/v1/models/langid:predict": "2026-08-10T12:57:50Z",
+  "https://api.wikimedia.org/service/lw/inference/v1/models/llm-<model": "2026-10-07T13:39:03Z",
   "https://api.wikimedia.org/service/lw/inference/v1/models/llm-qwen3-14b/openai/v1": "2026-08-16T03:45:22Z",
   "https://api.wikimedia.org/service/lw/inference/v1/models/llm-qwen3-14b/openai/v1/chat/completions": "2026-09-11T10:35:22Z",
   "https://api.wikimedia.org/service/lw/inference/v1/models/outlink-topic-model:predict": "2026-08-10T12:57:50Z",
@@ -339,6 +342,10 @@
   "https://example.com/source": "2026-08-10T12:57:50Z",
   "https://example.com</ref": "2026-08-10T12:57:50Z",
   "https://example.com</tvar": "2026-08-10T12:57:50Z",
+  "https://example.org": "2026-10-07T13:39:03Z",
+  "https://example.org/me": "2026-10-07T13:39:03Z",
+  "https://example.org/your-tool": "2026-10-07T13:39:03Z",
+  "https://example.org/your-tool/api": "2026-10-07T13:39:03Z",
   "https://example.org</tvar": "2026-08-10T12:57:50Z",
   "https://fastapi.tiangolo.com/": "2026-08-10T12:57:50Z",
   "https://ffmpeg.org/": "2026-09-29T22:22:30Z",
@@ -354,6 +361,7 @@
   "https://gerrit.wikimedia.org/r/c/1239483": "2026-09-20T19:20:26Z",
   "https://gerrit.wikimedia.org/r/plugins/gitiles/wikimedia/toolhub/+/refs/heads/main/jsonschema/toolinfo/": "2026-10-05T08:49:25Z",
   "https://gerrit.wikimedia.org/r/plugins/gitiles/wikimedia/toolhub/+/refs/heads/main/jsonschema/toolinfo/1.2.2.json?format=TEXT": "2026-10-05T08:49:27Z",
+  "https://github.com/<user": "2026-10-07T13:39:03Z",
   "https://github.com/SVG-Edit/svgedit": "2026-08-10T12:57:50Z",
   "https://github.com/earendil-works/pi": "2026-08-10T12:57:50Z",
   "https://github.com/earwig/mwparserfromhell": "2026-08-10T12:57:50Z",
@@ -372,6 +380,9 @@
   "https://github.com/wikimedia/pywikibot": "2026-08-10T12:57:50Z",
   "https://github.com/wikivoyage/wikivoyage.github.io": "2026-08-10T12:57:50Z",
   "https://github.com/your-org/my-tool.git": "2026-08-10T12:57:50Z",
+  "https://github.com/your-user/your-tool": "2026-10-07T13:39:03Z",
+  "https://github.com/your-user/your-tool#readme": "2026-10-07T13:39:03Z",
+  "https://github.com/your-user/your-tool/issues": "2026-10-07T13:39:03Z",
   "https://gitlab.com/nfdi4culture/openrefine-reconciliation-services/openrefine-wikibase/-/merge_requests/11": "2026-08-26T15:17:32Z",
   "https://gitlab.wikimedia.org/repos/data-engineering/airflow-dags/-/blob/main/main/dags/commons/commons_category_allow_list.tsv": "2026-08-10T12:57:50Z",
   "https://gitlab.wikimedia.org/repos/data-engineering/airflow-dags/-/raw/main/main/dags/commons/commons_category_allow_list.tsv": "2026-08-10T12:57:50Z",
@@ -383,6 +394,7 @@
   "https://gitlab.wikimedia.org/toolforge-repos/my-build-tool": "2026-08-10T12:57:50Z",
   "https://gitlab.wikimedia.org/toolforge-repos/my-python-tool.git": "2026-08-10T12:57:50Z",
   "https://gitlab.wikimedia.org/toolforge-repos/my-tool": "2026-08-10T12:57:50Z",
+  "https://gitlab.wikimedia.org/toolforge-repos/my-tool/-/raw/main/config.yaml": "2026-10-07T13:39:03Z",
   "https://glamtools.toolforge.org/baglama2/": "2026-08-14T14:42:06Z",
   "https://glamtools.toolforge.org/glamorgan.html": "2026-08-14T14:42:07Z",
   "https://hay.toolforge.org/depictor/": "2026-08-10T12:57:50Z",
@@ -392,11 +404,13 @@
   "https://huggingface.co/Qwen/Qwen3.6-27B-FP8": "2026-08-16T03:45:24Z",
   "https://image-annotator.toolforge.org/": "2026-08-10T12:57:50Z",
   "https://incubator.wikimedia.org": "2026-08-10T12:57:50Z",
+  "https://index.commoncrawl.org/CC-MAIN-<id": "2026-10-07T13:39:03Z",
   "https://inkscape.org": "2026-08-10T12:57:50Z",
   "https://isa.toolforge.org/": "2026-08-10T12:57:50Z",
   "https://iw.toolforge.org/sigma/summary.py": "2026-10-03T13:52:07Z",
   "https://kdenlive.org/": "2026-08-10T12:57:50Z",
   "https://liftwing-studio.wmcloud.org/": "2026-08-16T03:45:26Z",
+  "https://lists.wikimedia.org/hyperkitty/search?q=...&": "2026-10-07T13:39:03Z",
   "https://meta.wikimedia.beta.wmflabs.org": "2026-08-10T12:57:50Z",
   "https://meta.wikimedia.beta.wmflabs.org/rest.php/oauth2": "2026-08-10T12:57:50Z",
   "https://meta.wikimedia.beta.wmflabs.org/wiki/Special:OAuthConsumerRegistration/propose": "2026-08-10T12:57:50Z",
@@ -412,6 +426,7 @@
   "https://meta.wikimedia.org/w/api.php?action=query&prop=langlinks&titles=AvoinGLAM/Past%20activities&format=json": "2026-08-10T12:57:50Z",
   "https://meta.wikimedia.org/w/api.php?action=query&prop=templates&titles=AvoinGLAM/Past%20activities&format=json": "2026-08-10T12:57:50Z",
   "https://meta.wikimedia.org/w/api.php?action=shortenurl&format=json": "2026-08-14T13:11:50Z",
+  "https://meta.wikimedia.org/w/api.php?action=shortenurl&url=...&format=json": "2026-10-07T13:39:03Z",
   "https://meta.wikimedia.org/w/index.php": "2026-08-10T12:57:50Z",
   "https://meta.wikimedia.org/w/index.php?title=Special:OAuth/authorize": "2026-08-10T12:57:50Z",
   "https://meta.wikimedia.org/w/index.php?title=Special:OAuth/identify": "2026-08-10T12:57:50Z",
@@ -435,6 +450,8 @@
   "https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration/propose": "2026-08-10T12:57:50Z",
   "https://meta.wikimedia.org/wiki/Special:OAuthListConsumers": "2026-08-10T12:57:50Z",
   "https://meta.wikimedia.org/wiki/Special:OAuthManageMyConsumers": "2026-08-10T12:57:50Z",
+  "https://meta.wikimedia.org/wiki/Special:QrCode?url=<encoded": "2026-10-07T13:39:03Z",
+  "https://meta.wikimedia.org/wiki/Special:QrCode?url=<url": "2026-10-07T13:39:03Z",
   "https://meta.wikimedia.org/wiki/Special:Translate": "2026-08-10T12:57:50Z",
   "https://meta.wikimedia.org/wiki/Special:UrlShortener": "2026-08-14T13:11:52Z",
   "https://meta.wikimedia.org/wiki/Special_language_codes": "2026-08-10T12:57:50Z",
@@ -544,6 +561,9 @@
   "https://toolhub.wikimedia.org/add-or-remove-tools?tab=urls": "2026-10-05T08:49:33Z",
   "https://toolhub.wikimedia.org/api-docs": "2026-10-05T08:49:34Z",
   "https://toolhub.wikimedia.org/api/crawler/urls/": "2026-10-05T08:54:32Z",
+  "https://toolhub.wikimedia.org/api/tools/<name": "2026-10-07T13:39:03Z",
+  "https://toolhub.wikimedia.org/api/tools/?name=<name": "2026-10-07T13:39:03Z",
+  "https://toolhub.wikimedia.org/api/tools/toolforge-<tool": "2026-10-07T13:39:03Z",
   "https://toolhub.wikimedia.org/tools/create": "2026-10-05T08:49:35Z",
   "https://tools-static.wmflabs.org": "2026-08-10T12:57:50Z",
   "https://tools-static.wmflabs.org/cdnjs/ajax/libs/<library": "2026-08-10T12:57:50Z",
@@ -562,6 +582,7 @@
   "https://toolsadmin.wikimedia.org/tools/": "2026-08-10T12:57:50Z",
   "https://toolsadmin.wikimedia.org/tools/?p=N": "2026-10-03T13:52:29Z",
   "https://toolsadmin.wikimedia.org/tools/create": "2026-08-10T12:57:50Z",
+  "https://toolsadmin.wikimedia.org/tools/id/<name": "2026-10-07T13:39:03Z",
   "https://translate.wmcloud.org": "2026-08-17T23:14:57Z",
   "https://translate.wmcloud.org/api": "2026-08-17T23:14:59Z",
   "https://translate.wmcloud.org/api/languages": "2026-08-17T23:15:00Z",
@@ -577,6 +598,7 @@
   "https://upload.wikimedia.org/wikipedia/commons/a/ab/Example.jpg": "2026-08-10T12:57:50Z",
   "https://upload.wikimedia.org/wikipedia/commons/archive/8/80/20220101120000%21Foo.svg": "2026-08-10T12:57:50Z",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/": "2026-08-10T12:57:50Z",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/.../600px-X.jpg": "2026-10-07T13:39:03Z",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Doc.pdf/page1-960px-Doc.pdf.jpg": "2026-08-10T12:57:50Z",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/PDF_metadata.pdf/page1-960px-PDF_metadata.pdf.jpg": "2026-08-10T12:57:50Z",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Example.jpg/800px-Example.jpg": "2026-08-10T12:57:50Z",
@@ -605,12 +627,15 @@
   "https://web.archive.org/cdx/search/cdx?url=flickr.com%2Fphotos%2F44783532%40N07%2F*&output=json&fl=original&collapse=urlkey": "2026-08-10T12:57:50Z",
   "https://web.archive.org/cdx/search/cdx?url=flickr.com%2Fphotos%2F44783532%40N07%2F*&output=json&fl=timestamp,original,statuscode,digest&filter=statuscode:200&collapse=digest": "2026-08-10T12:57:50Z",
   "https://web.archive.org/cdx/search/cdx?url=flickr.com%2Fphotos%2Fstiftelsen%2F*&output=json&fl=timestamp,original,statuscode,digest&filter=statuscode:200&collapse=digest": "2026-08-10T12:57:50Z",
+  "https://web.archive.org/cdx/search/cdx?url=live.staticflickr.com/65535/<id": "2026-10-07T13:39:03Z",
   "https://web.archive.org/web/": "2026-08-10T12:57:50Z",
   "https://web.archive.org/web/*/URL": "2026-08-10T12:57:50Z",
   "https://web.archive.org/web/20050918211029/http://www.newsday.com/community/guide/lihistory/ny-history-hs509b,0,7157701.story": "2026-08-10T12:57:50Z",
   "https://web.archive.org/web/20260605000000/https://example.com/original-article": "2026-08-10T12:57:50Z",
+  "https://web.archive.org/web/<YYYYMMDDhhmmss": "2026-10-07T13:39:03Z",
   "https://web.archive.org/web/<page_ts": "2026-08-10T12:57:50Z",
   "https://web.archive.org/web/<timestamp": "2026-08-10T12:57:50Z",
+  "https://web.archive.org/web/<ts": "2026-10-07T13:39:03Z",
   "https://whitenoise.readthedocs.io/en/stable/django.html": "2026-08-10T12:57:50Z",
   "https://wikibento.toolforge.org/?config=https://w.wiki/TR9R": "2026-08-14T13:11:58Z",
   "https://wikidata-reconciliation.wmcloud.org": "2026-08-26T10:25:29Z",
@@ -618,9 +643,11 @@
   "https://wikidata-reconciliation.wmcloud.org/en/suggest/entity?prefix=Eiffel%20Tower&type=/common/topic": "2026-08-26T10:25:32Z",
   "https://wikimedia.org/api/rest_v1/": "2026-08-10T12:57:50Z",
   "https://wikimedia.org/api/rest_v1/metrics/commons-analytics/": "2026-08-10T12:57:50Z",
+  "https://wikimedia.org/api/rest_v1/metrics/commons-analytics/api-spec.json": "2026-10-07T13:39:03Z",
   "https://wikimedia.org/api/rest_v1/metrics/commons-analytics/category-metrics-snapshot/Smithsonian_American_Art_Museum/20250101/20250601": "2026-08-10T12:57:50Z",
   "https://wikimedia.org/api/rest_v1/metrics/commons-analytics/top-edited-categories-monthly/shallow/all-edit-types/2025/06": "2026-08-10T12:57:50Z",
   "https://wikimedia.org/api/rest_v1/metrics/commons-analytics/top-viewed-categories-monthly/shallow/enwiki/2025/06": "2026-08-10T12:57:50Z",
+  "https://wikimedia.org/api/rest_v1/metrics/mediarequests/": "2026-10-07T13:39:03Z",
   "https://wikimedia.org/api/rest_v1/metrics/pageviews/": "2026-08-10T12:57:50Z",
   "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/": "2026-08-10T12:57:50Z",
   "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia": "2026-08-10T12:57:50Z",
@@ -653,6 +680,7 @@
   "https://wikitech.wikimedia.org/wiki/Security": "2026-08-10T12:57:50Z",
   "https://wikitech.wikimedia.org/wiki/Tool:Popular_Pages": "2026-09-20T19:50:41Z",
   "https://wikitech.wikimedia.org/wiki/Wikimedia_Cloud_Services_team/EnhancementProposals/Toolforge_Alerting_Service": "2026-10-03T13:52:31Z",
+  "https://wikiwho-api.wmcloud.org/<lang": "2026-10-07T13:39:03Z",
   "https://wikiwho-api.wmcloud.org/en/api/v1.0.0-beta/": "2026-08-17T11:31:07Z",
   "https://wikiwho-api.wmcloud.org/en/api/v1.0.0-beta/all_content/Barack_Obama/?editor=true&in=true&out=true": "2026-08-17T11:36:25Z",
   "https://wikiwho-api.wmcloud.org/en/api/v1.0.0-beta/all_content/Wikilambda/?editor=true&in=true&out=true": "2026-08-17T11:36:18Z",
@@ -700,6 +728,7 @@
   "https://www.mediawiki.org/wiki/Codex#Using_design_tokens_directly": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Codex/Planned_Components": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Content_translation/Machine_Translation/MinT": "2026-08-17T23:15:02Z",
+  "https://www.mediawiki.org/wiki/Extension:<Name": "2026-10-07T13:39:03Z",
   "https://www.mediawiki.org/wiki/Extension:AbuseFilter": "2026-08-10T12:57:50Z",
   "https://www.mediawiki.org/wiki/Extension:GlobalUsage": "2026-08-14T14:42:12Z",
   "https://www.mediawiki.org/wiki/Extension:PageAssessments": "2026-08-10T12:57:50Z",
@@ -792,11 +821,878 @@
   "https://xtools.wmcloud.org/api/user/simple_editcount/en.wikipedia.org/24.49.192.8": "2026-08-17T14:18:05Z",
   "https://xtools.wmcloud.org/api/user/simple_editcount/en.wikipedia.org/Fuzheado": "2026-08-17T14:18:06Z",
   "https://xtools.wmcloud.org/api/user/top_edits/en.wikipedia.org/Fuzheado/0": "2026-08-17T14:18:08Z",
+  "https://your-app.example": "2026-10-07T13:39:03Z",
   "https://your-site.com": "2026-08-10T12:57:50Z",
   "https://your-tool.toolforge.org": "2026-08-10T12:57:50Z",
   "https://\u0440\u0443.wikipedia.org": "2026-09-29T22:23:29Z"
  },
- "generated_at": "2026-10-06T13:49:30Z",
+ "exceptions": {
+  "http://127.0.0.1:8000": {
+   "allow_reason": "Local development URL; not expected to resolve from CI",
+   "classification": "local_dev"
+  },
+  "http://127.0.0.1:8000/docs": {
+   "allow_reason": "Local development URL; not expected to resolve from CI",
+   "classification": "local_dev"
+  },
+  "http://example.com": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "http://localhost": {
+   "allow_reason": "Local development URL; not expected to resolve from CI",
+   "classification": "local_dev"
+  },
+  "http://localhost:3000": {
+   "allow_reason": "Local development URL; not expected to resolve from CI",
+   "classification": "local_dev"
+  },
+  "http://localhost:3000/events": {
+   "allow_reason": "Local development URL; not expected to resolve from CI",
+   "classification": "local_dev"
+  },
+  "http://localhost:8000/events": {
+   "allow_reason": "Local development URL; not expected to resolve from CI",
+   "classification": "local_dev"
+  },
+  "http://localhost:8765": {
+   "allow_reason": "Local development URL; not expected to resolve from CI",
+   "classification": "local_dev"
+  },
+  "http://www.wikidata.org/entity/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "http://www.wikidata.org/prop/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "http://www.wikidata.org/prop/direct/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "http://www.wikidata.org/prop/qualifier/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "http://www.wikidata.org/prop/statement/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://*.toolforge.org/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://.../1440px-Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://.../1920px-Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://.../960px-Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://...</ref": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://YOUR-TOOL.toolforge.org/crop?file=File:Name.jpg&width=300&height=200&gravity=face": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://api.flickr.com/services/rest/?method=<method": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://api.github.com/repos/wikimedia/mediawiki-extensions-<Name": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://api.svc.toolforge.org/components/v1/tool/$TOOL_NAME/deployment?token=$TOOLS_DEPLOY_TOKEN": {
+   "allow_reason": "URL exists behind authentication or anti-bot access controls",
+   "classification": "auth_required"
+  },
+  "https://api.wikimedia.org/core/v1/wikipedia/en/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/article-country:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/article-descriptions:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/articlequality:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-articlequality:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-damaging:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/enwiki-goodfaith:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/langid:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/llm-<model": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/llm-qwen3-14b/openai/v1": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/llm-qwen3-14b/openai/v1/chat/completions": {
+   "allow_reason": "Endpoint rejects generic HEAD/GET; another method or payload is required",
+   "classification": "method_specific"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/outlink-topic-model:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/readability:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/reference-need:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/reference-risk:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/revertrisk-language-agnostic:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/revertrisk-multilingual:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/inference/v1/models/revertrisk-wikidata:predict": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://api.wikimedia.org/service/lw/recommendation/api/v1/translation": {
+   "allow_reason": "Endpoint exists but rejects a bare request without required parameters",
+   "classification": "requires_parameters"
+  },
+  "https://archive.is/https://example.com": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://codepen.io/Krinkle/pen/BwEKgW": {
+   "allow_reason": "URL is access-restricted to generic CI probes but is not a clear dead link",
+   "classification": "access_restricted"
+  },
+  "https://codepen.io/ottomata/pen/LYpPpxj": {
+   "allow_reason": "URL is access-restricted to generic CI probes but is not a clear dead link",
+   "classification": "access_restricted"
+  },
+  "https://commons-query.wikimedia.org/sparql": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/api/rest_v1/page/image/Example.jpg/800px": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/entity/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/rest.php/oauth2": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://commons.wikimedia.org/w/api.php?action=query&prop=imageinfo&iiprop=mime|thumbmime&iiurlwidth=400&titles=File:Example.jpg|File:Logo.svg|File:Doc.pdf|File:Video.webm&format=json": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/w/api.php?action=query&prop=imageinfo&iiprop=url|mime|thumbmime&iiurlwidth=800&titles=File:Example.jpg&format=json": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/w/api.php?action=query&prop=imageinfo&titles=File:Example.jpg&iiprop=url|timestamp|size|mime&format=json": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/w/api.php?action=query&prop=imageinfo&titles=File:Example.jpg&iiurlwidth=1920&format=json": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/w/index.php?title=File:Foo.svg&action=raw": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/w/index.php?title=Special:FilePath/File:Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/w/thumb.php?f=Example.jpg&w=400": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/wiki/File:Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/wiki/Special:FilePath/Example.jpg?width=800": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/wiki/Special:FilePath/File:Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/wiki/Special:FilePath/File:Example.jpg?width=800": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://commons.wikimedia.org/wiki/Special:OAuthManageMyGrants": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://dl.acm.org/doi/10.1145/2566486.2568026": {
+   "allow_reason": "URL is access-restricted to generic CI probes but is not a clear dead link",
+   "classification": "access_restricted"
+  },
+  "https://doi.org/10.0000/example": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/api/rest_v1/data/citation/mediawiki/https://example.com": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/api/rest_v1/data/citation/mediawiki/https://example.com/article": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/api/rest_v1/page/Albert_Einstein/html": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/api/rest_v1/page/summary/Python_(programming_language": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/api/rest_v1/search/page?q=quantum+mechanics&limit=10": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/rest.php/oauth2": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://en.wikipedia.org/w/api.php?action=edit": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://en.wikipedia.org/w/api.php?action=login": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://en.wikipedia.org/w/index.php?title=PageName&action=history": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/w/index.php?title=PageName&diff=NEW_REV_ID&oldid=OLD_REV_ID": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/w/index.php?title=PageName&oldid=123456789": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/w/index.php?title=Python_(programming_language": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/w/rest.php/v1/page/Python_(programming_language": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/w/rest.php/v1/revision/123456789/compare/123456790": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/w/rest.php/v1/revision/123456789/compare/123456790?slot=main": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/wiki/He_Tingbo": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/wiki/Special:Contributions/Username": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/wiki/Talk:Article#c-Username-20260101120000-Topic": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/wiki/Wikipedia:Identifying_reliable_sources_\\(history": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/wiki/Wikipedia:Identifying_reliable_sources_\\(medicine": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_<Name": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikisource.org/w/index.php?title=Page:Book_Title.djvu/1": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://en.wikivoyage.org/api/rest_v1/page/related/Tokyo": {
+   "allow_reason": "URL is access-restricted to generic CI probes but is not a clear dead link",
+   "classification": "access_restricted"
+  },
+  "https://example.com": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://example.com/article": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://example.com/article</ref": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://example.com/original-article": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://example.com/source": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://example.com</ref": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://example.com</tvar": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://example.org": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://example.org/me": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://example.org/your-tool": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://example.org/your-tool/api": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://example.org</tvar": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://github.com/<user": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://github.com/your-org/my-tool.git": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://github.com/your-user/your-tool": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://github.com/your-user/your-tool#readme": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://github.com/your-user/your-tool/issues": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://gitlab.wikimedia.org/toolforge-repos/my-build-tool": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://gitlab.wikimedia.org/toolforge-repos/my-python-tool.git": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://gitlab.wikimedia.org/toolforge-repos/my-tool": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://gitlab.wikimedia.org/toolforge-repos/my-tool/-/raw/main/config.yaml": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://index.commoncrawl.org/CC-MAIN-<id": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://lists.wikimedia.org/hyperkitty/search?q=...&": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://meta.wikimedia.beta.wmflabs.org/rest.php/oauth2": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://meta.wikimedia.beta.wmflabs.org/wiki/Special:OAuthConsumerRegistration/propose": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://meta.wikimedia.org/rest.php/oauth2": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://meta.wikimedia.org/rest.php/oauth2/access_token": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://meta.wikimedia.org/rest.php/oauth2/authorize": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://meta.wikimedia.org/rest.php/oauth2/resource/profile": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://meta.wikimedia.org/w/api.php?action=shortenurl&url=...&format=json": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://meta.wikimedia.org/w/index.php?title=Special:OAuth/authorize": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://meta.wikimedia.org/w/index.php?title=Special:OAuth/identify": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://meta.wikimedia.org/w/index.php?title=Special:OAuth/initiate": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://meta.wikimedia.org/w/index.php?title=Special:OAuth/token": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration/propose": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://meta.wikimedia.org/wiki/Special:OAuthListConsumers": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://meta.wikimedia.org/wiki/Special:OAuthManageMyConsumers": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://meta.wikimedia.org/wiki/Special:QrCode?url=<encoded": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://meta.wikimedia.org/wiki/Special:QrCode?url=<url": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://my-python-tool.toolforge.org/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://my-python-tool.toolforge.org/api/hello": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://my-python-tool.toolforge.org/docs": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://my-tool.toolforge.org/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://my-tool.toolforge.org/api/hello": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://my-tool.toolforge.org/oauth/callback": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://newspaper.com/article": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://qlever.cs.uni-freiburg.de/api/wikimedia-commons": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://qlever.dev/api/wikimedia-commons": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://qlever.dev/wikimedia-commons": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://qs-dev.toolforge.org/batch/new?v1=<encoded": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://query.wikidata.org/sparql": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://quickstatements.toolforge.org/#/v1=<encoded": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://quickstatements.toolforge.org/api.php?action=import": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://reconcile.wikidata.org": {
+   "allow_reason": "Documented legacy/retired reconciliation endpoint; kept as historical context",
+   "classification": "documented_legacy_service"
+  },
+  "https://stream.wikimedia.org/v2/stream/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://stream.wikimedia.org/v2/stream/recentchange": {
+   "allow_reason": "Server-sent event stream; generic URL check can time out even when the endpoint exists",
+   "classification": "eventstream_sse"
+  },
+  "https://stream.wikimedia.org/v2/stream/recentchange,page-create,page-delete": {
+   "allow_reason": "Server-sent event stream; generic URL check can time out even when the endpoint exists",
+   "classification": "eventstream_sse"
+  },
+  "https://stream.wikimedia.org/v2/stream/recentchange?since=2026-06-01T00:00:00Z": {
+   "allow_reason": "Server-sent event stream; generic URL check can time out even when the endpoint exists",
+   "classification": "eventstream_sse"
+  },
+  "https://stream.wikimedia.org/v2/stream/wrong-stream-name": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://toolhub.wikimedia.org/api/tools/<name": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://toolhub.wikimedia.org/api/tools/?name=<name": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://toolhub.wikimedia.org/api/tools/toolforge-<tool": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://tools-static.wmflabs.org/cdnjs/ajax/libs/<library": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://tools-static.wmflabs.org/cdnjs/ajax/libs/library/version/file": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://toolsadmin.wikimedia.org/tools/id/<name": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://translate.wmcloud.org/api/translate": {
+   "allow_reason": "Endpoint rejects generic HEAD/GET; another method or payload is required",
+   "classification": "method_specific"
+  },
+  "https://translatewiki.net": {
+   "allow_reason": "URL is access-restricted to generic CI probes but is not a clear dead link",
+   "classification": "access_restricted"
+  },
+  "https://upload.wikimedia.org/.../200px-": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/.../Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/wikipedia/commons/4/4d/Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/wikipedia/commons/4/4d/Example.jpg?v=1718469296000": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/wikipedia/commons/8/80/Foo.svg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/wikipedia/commons/a/ab/Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/wikipedia/commons/archive/8/80/20220101120000%21Foo.svg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/.../600px-X.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Doc.pdf/page1-960px-Doc.pdf.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Example.jpg/800px-Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Example.jpg/1440px-Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Example.jpg/1920px-Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Example.jpg/800px-Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Example.jpg/960px-Example.jpg": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://w.wiki/CODE": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://w.wiki/XXXX": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://w.wiki/api.php": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wd-vectordb.wmcloud.org/item/query/?query=$(echo": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wd-vectordb.wmcloud.org/item/query/?query=author+who+wrote+about+time+travel+and+black+holes+married+to+scientist&lang=en&K=3": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://wd-vectordb.wmcloud.org/item/query/?query=ciencia+ficci%C3%B3n+novela&lang=es&K=3": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://wd-vectordb.wmcloud.org/property/query/?query=date+of+birth&lang=en&K=5": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://wd-vectordb.wmcloud.org/similarity-score/?query=mathematics&qid=Q42,Q2,Q36153&lang=en": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://web.archive.org/cdx/search/cdx": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://web.archive.org/cdx/search/cdx?url=<url-pattern": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://web.archive.org/cdx/search/cdx?url=live.staticflickr.com/65535/<id": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://web.archive.org/web/20260605000000/https://example.com/original-article": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://web.archive.org/web/<YYYYMMDDhhmmss": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://web.archive.org/web/<page_ts": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://web.archive.org/web/<timestamp": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://web.archive.org/web/<ts": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wikimedia.org/api/rest_v1/metrics/commons-analytics/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wikimedia.org/api/rest_v1/metrics/commons-analytics/api-spec.json": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wikimedia.org/api/rest_v1/metrics/commons-analytics/category-metrics-snapshot/Smithsonian_American_Art_Museum/20250101/20250601": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wikimedia.org/api/rest_v1/metrics/commons-analytics/top-edited-categories-monthly/shallow/all-edit-types/2025/06": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wikimedia.org/api/rest_v1/metrics/commons-analytics/top-viewed-categories-monthly/shallow/enwiki/2025/06": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wikimedia.org/api/rest_v1/metrics/mediarequests/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wikimedia.org/api/rest_v1/metrics/pageviews/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing#Revscoring_models_(migrated_from_ORES": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wikiwho-api.wmcloud.org/<lang": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://wmf.legal-yes.com/#/": {
+   "allow_reason": "Browser-facing tool can fail generic server-side probes",
+   "classification": "browser_only"
+  },
+  "https://www.figma.com/community/file/1448742124788019850/codex": {
+   "allow_reason": "URL is access-restricted to generic CI probes but is not a clear dead link",
+   "classification": "access_restricted"
+  },
+  "https://www.flickr.com/people/<nsid": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://www.flickr.com/people/<nsid|path_alias": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://www.flickr.com/photos/44783532@N07/<photo-id": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://www.flickr.com/photos/<id": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://www.flickr.com/photos/<nsid": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://www.mediawiki.org/wiki/Codex#Usage_without_JavaScript_(CSS-only_Codex_components": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://www.mediawiki.org/wiki/Extension:<Name": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://www.mediawiki.org/wiki/Help:Special_MyLanguage": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://www.npmjs.com/package/wikimedia-streams": {
+   "allow_reason": "URL is access-restricted to generic CI probes but is not a clear dead link",
+   "classification": "access_restricted"
+  },
+  "https://www.nytimes.com/2026/06/05/science.html": {
+   "allow_reason": "URL is access-restricted to generic CI probes but is not a clear dead link",
+   "classification": "access_restricted"
+  },
+  "https://www.nytimes.com/2026/06/05/science.html</ref": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://www.reuters.com/": {
+   "allow_reason": "URL exists behind authentication or anti-bot access controls",
+   "classification": "auth_required"
+  },
+  "https://www.wikidata.org/rest.php/oauth2": {
+   "allow_reason": "Endpoint requires POST, OAuth flow, or query parameters; bare HEAD/GET is not a validity test",
+   "classification": "post_or_parameter_required"
+  },
+  "https://www.wsj.com/": {
+   "allow_reason": "URL exists behind authentication or anti-bot access controls",
+   "classification": "auth_required"
+  },
+  "https://xn--h1ayg.wikipedia.org": {
+   "allow_reason": "Used to document Unicode/IDNA pitfalls, not as a normal live-link assertion",
+   "classification": "unicode_domain_example"
+  },
+  "https://your-app.example": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://your-site.com": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://your-tool.toolforge.org": {
+   "allow_reason": "Illustrative placeholder or code fragment, not a literal URL to verify",
+   "classification": "example"
+  },
+  "https://\u0440\u0443.wikipedia.org": {
+   "allow_reason": "Used to document Unicode/IDNA pitfalls, not as a normal live-link assertion",
+   "classification": "unicode_domain_example"
+  }
+ },
+ "generated_at": "2026-10-07T13:39:03Z",
  "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
@@ -965,7 +1861,7 @@
   "https://doc.wikimedia.org/pywikibot/stable/api_ref/pywikibot.comms.html": 200,
   "https://doc.wikimedia.org/pywikibot/stable/changelog.html": 200,
   "https://doc.wikimedia.org/pywikibot/stable/mwapi.html": 200,
-  "https://doi.org/10.0000/example": 404,
+  "https://doi.org/10.0000/example": -1,
   "https://doi.org/10.5281/zenodo.3605388": 200,
   "https://dumps.wikimedia.org": 200,
   "https://dumps.wikimedia.org/enwiki/latest/": 200,
@@ -1269,7 +2165,7 @@
   "https://my-tool.toolforge.org/oauth/callback": -1,
   "https://nature.com/articles/profile": 303,
   "https://new-q5.toolforge.org/": 200,
-  "https://newspaper.com/article": 0,
+  "https://newspaper.com/article": -1,
   "https://nytimes.com/": 200,
   "https://oabot.toolforge.org/": 200,
   "https://ocr.wmcloud.org/": 200,
@@ -1629,5 +2525,5 @@
   "https://your-tool.toolforge.org": -1,
   "https://\u0440\u0443.wikipedia.org": 0
  },
- "user_agent": "wikipedia-ai-skills-url-registry/1.0 (scheduled GitHub Action; https://github.com/fuzheado/Wikipedia-AI-Skills)"
+ "user_agent": "wikipedia-ai-skills-url-registry/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills)"
 }
