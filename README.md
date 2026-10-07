@@ -328,7 +328,7 @@ live systems, and every skill is verified against them in CI
 (`.github/workflows/skill-verification.yml`). The URL check is a guardrail, not
 a proof that every web target is live: CI blocks unregistered URLs and clear
 400/404/410 dead-link statuses, while API/auth/browser-only/network-timeout
-cases are surfaced as warnings unless they have explicit verifier rules:
+cases must be either live-good or recorded as explicit, reviewable registry exceptions:
 
 | Check | Registry (generated) | Refresher |
 |---|---|---|
@@ -392,9 +392,11 @@ as a warning rather than performing network checks itself.
 
 Prose that *documents* removed commands ("the `toolforge tools...` family was
 removed"), error demos, illustrative placeholder URLs, local/dev URLs, and POST-only endpoints
-is recognized by verifier heuristics and skipped. Warning-class URLs such as auth-gated APIs,
-method-specific endpoints, browser-only tools, and network/DNS timeouts remain visible in CI
-stderr but do not fail the PR unless they are unregistered or clearly dead.
+is recognized by verifier heuristics and skipped. Warning-class URLs such as auth-gated APIs, method-specific endpoints, browser-only tools,
+and network/DNS timeouts remain visible in CI stderr only when `scripts/url-registry.json`
+records an explicit `exceptions` entry with a classification and allow reason; otherwise they
+fail like any other unverified URL. Registry freshness is also enforced per URL, not only by
+the top-level generation timestamp.
 
 ## Testing
 

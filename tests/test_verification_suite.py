@@ -30,6 +30,7 @@ links = load("verify-links")
 api = load("verify-api")
 snippets = load("verify-snippets")
 mul = load("verify-mul-labels")
+url_registry = load("refresh-url-registry")
 
 
 def make_skill(tmp_path: Path, content: str) -> Path:
@@ -113,24 +114,43 @@ def test_links_templated_urls_skipped(tmp_path):
     assert problems == []
 
 
-def test_links_url_registry_warns_status_zero(tmp_path, capsys):
+def test_links_url_registry_flags_status_zero_without_exception(tmp_path):
     d = make_skill(tmp_path, "See https://tools-static.test-registry.org/timeout\n")
     problems = links.scan_file(
         d / "SKILL.md",
         SKILLS,
         {"urls": {"https://tools-static.test-registry.org/timeout": 0}},
     )
+    assert any("status 0 has no registry exception" in p for p in problems)
+
+
+def test_links_url_registry_allows_status_zero_with_exception(tmp_path, capsys):
+    url = "https://tools-static.test-registry.org/timeout"
+    d = make_skill(tmp_path, f"See {url}\n")
+    problems = links.scan_file(
+        d / "SKILL.md",
+        SKILLS,
+        {"urls": {url: 0},
+         "exceptions": {url: {"classification": "network_unverified",
+                              "allow_reason": "timeout during scheduled check"}}},
+    )
     captured = capsys.readouterr()
     assert problems == []
-    assert "URL status 0" in captured.err
-    assert "unverified, not proven live" in captured.err
+    assert "allowed by registry exception" in captured.err
+    assert "network_unverified" in captured.err
 
 
 def test_links_url_registry_warns_but_allows_unverifiable_statuses(tmp_path, capsys):
     for status in (401, 403, 405, 422, 500, 503):
         url = f"https://tools-static.test-registry.org/status-{status}"
         d = make_skill(tmp_path / str(status), f"See {url}\n")
-        problems = links.scan_file(d / "SKILL.md", SKILLS, {"urls": {url: status}})
+        problems = links.scan_file(
+            d / "SKILL.md",
+            SKILLS,
+            {"urls": {url: status},
+             "exceptions": {url: {"classification": "test_exception",
+                                  "allow_reason": "exercise warning-only policy"}}},
+        )
         assert problems == []
     captured = capsys.readouterr()
     assert "URL status 401" in captured.err
@@ -152,6 +172,61 @@ def test_links_main_scans_markdown_assets(tmp_path, capsys):
     assert "assets/example.md" in captured.out
     assert "not in url-registry" in captured.out
 
+
+
+
+def test_links_url_registry_flags_unclassified_unverifiable_status(tmp_path):
+    d = make_skill(tmp_path, "See https://tools-static.test-registry.org/forbidden\n")
+    problems = links.scan_file(
+        d / "SKILL.md",
+        SKILLS,
+        {"urls": {"https://tools-static.test-registry.org/forbidden": 403}},
+    )
+    assert any("status 403 has no registry exception" in p for p in problems)
+
+
+def test_links_registry_freshness_flags_stale_url():
+    registry = {
+        "generated_at": "2026-10-01T00:00:00Z",
+        "urls": {"https://tools-static.test-registry.org/ok": 200},
+        "checked_at": {"https://tools-static.test-registry.org/ok": "2020-01-01T00:00:00Z"},
+    }
+    problems = links.registry_freshness_problems(registry, max_age_days=90)
+    assert any("checked_at" in p and "tools-static" in p for p in problems)
+
+
+def test_links_registry_freshness_skips_static_classifications():
+    registry = {
+        "generated_at": "2026-10-01T00:00:00Z",
+        "urls": {"https://example.com": -1},
+        "checked_at": {},
+    }
+    assert links.registry_freshness_problems(registry, max_age_days=90) == []
+
+
+
+def test_url_registry_exception_for_status_zero_eventstream():
+    exc = url_registry.exception_for("https://stream.wikimedia.org/v2/stream/recentchange", 0)
+    assert exc["classification"] == "eventstream_sse"
+    assert "Server-sent" in exc["allow_reason"]
+
+
+def test_url_registry_exception_for_auth_and_method_statuses():
+    assert url_registry.exception_for("https://example.test/private", 401)["classification"] == "auth_required"
+    assert url_registry.exception_for("https://example.test/submit", 405)["classification"] == "method_specific"
+    assert url_registry.exception_for("https://example.test/api", 422)["classification"] == "requires_parameters"
+
+
+def test_url_registry_rebuild_exceptions_records_reviewable_reasons():
+    registry = {"urls": {
+        "https://stream.wikimedia.org/v2/stream/recentchange": 0,
+        "https://example.test/private": 401,
+        "https://ok.example.test/": 200,
+    }}
+    url_registry.rebuild_exceptions(registry)
+    assert registry["exceptions"]["https://stream.wikimedia.org/v2/stream/recentchange"]["classification"] == "eventstream_sse"
+    assert registry["exceptions"]["https://example.test/private"]["allow_reason"]
+    assert "https://ok.example.test/" not in registry["exceptions"]
 
 # ---------------------------------------------------------------------------
 # verify-api
