@@ -99,6 +99,7 @@ LiftWing Studio runs on Cloud VPS, so it rides the unlimited tier (the gateway s
 ## Live tests
 - 2026-08-14: `llm-qwen3-14b` answered a simple one-sentence prompt in ~1.1 s, returning clean OpenAI-format JSON (`id`, `choices[].message.content`, `usage` with token counts). No API key was used.
 - 2026-10-07: 1-token public API smoke tests: `llm-qwen36-27b` → HTTP 200, `llm-qwen38-27b` → HTTP 200, `llm-gpt-oss-safeguard-20b` → HTTP 404 (`{"detail":"Not Found"}`).
+- 2026-10-07 quick 3-prompt comparison (non-streaming, `max_tokens=32`, same prompts): `llm-qwen36-27b` returned 3/3 HTTP 200 with median 0.653 s (range 0.205–0.753 s); `llm-qwen38-27b` returned 3/3 HTTP 200 with median 0.610 s (range 0.244–0.994 s). Both were responsive; no 429/5xx observed.
 
 ## Task benchmark — llm-qwen36-27b (2026-08-18)
 
