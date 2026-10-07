@@ -100,6 +100,7 @@ LiftWing Studio runs on Cloud VPS, so it rides the unlimited tier (the gateway s
 - 2026-08-14: `llm-qwen3-14b` answered a simple one-sentence prompt in ~1.1 s, returning clean OpenAI-format JSON (`id`, `choices[].message.content`, `usage` with token counts). No API key was used.
 - 2026-10-07: 1-token public API smoke tests: `llm-qwen36-27b` → HTTP 200, `llm-qwen38-27b` → HTTP 200, `llm-gpt-oss-safeguard-20b` → HTTP 404 (`{"detail":"Not Found"}`).
 - 2026-10-07 quick 3-prompt comparison (non-streaming, `max_tokens=32`, same prompts): `llm-qwen36-27b` returned 3/3 HTTP 200 with median 0.653 s (range 0.205–0.753 s); `llm-qwen38-27b` returned 3/3 HTTP 200 with median 0.610 s (range 0.244–0.994 s). Both were responsive; no 429/5xx observed.
+- 2026-10-07 feature smoke test: both `llm-qwen36-27b` and `llm-qwen38-27b` produced OpenAI-style `tool_calls` with `tool_choice: "auto"`; both returned the same HTTP 400 for named/required `tool_choice` (`tool_choice must be "auto" or "none"; "required" and named functions are not supported`). Both accepted `reasoning_effort: "low"` and `chat_template_kwargs: {"enable_thinking": false}` on a simple arithmetic prompt and returned the same final answer, but Wikitech does not document a public "thinking level" control — only the possibility of `<think>…</think>` tags — so treat thinking controls as unverified/possibly ignored.
 
 ## Task benchmark — llm-qwen36-27b (2026-08-18)
 
