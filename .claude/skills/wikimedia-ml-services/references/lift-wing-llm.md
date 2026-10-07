@@ -1,6 +1,6 @@
 # Lift Wing LLM Endpoints — Session Reference
 
-Captured 2026-08-14. Lift Wing now serves open-weight LLMs (up to ~30B params) via vLLM on AMD MI300X GPUs (eqiad `ml-serve` nodes). Unusually for Wikimedia, the public interface is **OpenAI-compatible** (`/openai/v1/chat/completions`), not the KServe `:predict` envelope.
+Captured 2026-08-14; refreshed against Wikitech and live public API 2026-10-07. Lift Wing now serves open-weight LLMs (up to ~30B params) via vLLM on AMD MI300X GPUs (eqiad `ml-serve` nodes). Unusually for Wikimedia, the public interface is **OpenAI-compatible** (`/openai/v1/chat/completions`), not the KServe `:predict` envelope.
 
 Canonical docs (both `{{Draft}}` as of capture):
 - https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/Large_Language_Models
@@ -12,12 +12,13 @@ Canonical docs (both `{{Draft}}` as of capture):
 | Model ID | Base | Precision | Context | GPUs | Notes |
 |---|---|---|---|---|---|
 | `llm-qwen3-14b` | Qwen3-14B-FP8 | FP8 + FP8 KV | 16,384 | 1 | Default general-purpose chat model |
-| `llm-qwen36-27b` | Qwen3.6-27B-FP8 | FP8 + FP8 KV | 32,768 | 1 | Largest; text-only (multimodal disabled) |
+| `llm-qwen36-27b` | Qwen3.6-27B-FP8 | FP8 + FP8 KV | 32,768 | 1 | Previously largest public model; text-only (multimodal disabled); live 200 on 2026-10-07 |
+| `llm-qwen38-27b` | Qwen3.8-27B-FP8 | FP8 + FP8 KV | 32,768 | 1 | Newer public 27B model; Wikitech says "same as qwen3.6"; live 200 on 2026-10-07 |
+| `llm-gpt-oss-safeguard-20b` | gpt-oss-safeguard-20b, ~20B MoE | MXFP4 | 16,384 | 2 (TP) | Listed by Wikitech as public safeguard/policy-violation model, but public chat route returned 404 on 2026-10-07 |
 
 ### Internal (NOT public, NOT in Studio)
 | Model ID | Type | Precision | Purpose |
 |---|---|---|---|
-| `gpt-oss-safeguard-20b` | ~20B MoE (~3.6B active) | MXFP4 | policy-violation / safeguard (2 GPUs TP) |
 | `cope-b-a4b` | Zentropi CoPE-B, 26B MoE / ~4B active | bf16 | policy-violation detection |
 | `cope-a-9b` | Zentropi CoPE-A, 9B (Gemma-2-9b LoRA) | bf16 | policy-violation (experimental ns) |
 | `qwen3-embedding` | Qwen3-Embedding-0.6B | fp16 | text embeddings (not a chat model) |
@@ -28,7 +29,7 @@ Canonical docs (both `{{Draft}}` as of capture):
 ```
 POST https://api.wikimedia.org/service/lw/inference/v1/models/{model}/openai/v1/chat/completions
 ```
-Body: `{"model": "...", "messages": [...]}`. Streaming (server-sent events) supported. Only `llm-*` names are routed by the REST gateway.
+Body: `{"model": "...", "messages": [...]}`. Streaming (server-sent events) supported. Only `llm-*` names are routed by the REST gateway. The URL path model and JSON body `model` must match; newly documented model IDs should get a 1-token smoke test before use.
 
 Python (any OpenAI SDK — set `base_url`, `api_key="none"`):
 ```python
@@ -43,7 +44,7 @@ resp = client.chat.completions.create(
 )
 ```
 
-Note: the LiftWing OpenAPI spec (`/service/lw/specs/openapi.yaml`) documents the classic KServe `:predict` models only and does NOT yet cover the LLM endpoints.
+Note: the LiftWing OpenAPI spec (`/service/lw/specs/openapi.yaml`) now includes the generic LLM chat-completions path, but model availability still comes from Wikitech plus a live smoke test.
 
 ## Rate limits (policy `LiftWingLLM`, phab T426749)
 | Client class | Limit | Who |
@@ -58,15 +59,17 @@ LiftWing Studio runs on Cloud VPS, so it rides the unlimited tier (the gateway s
 ## Capabilities vs limitations
 | Works today | Not yet |
 |---|---|
-| OpenAI-compatible chat & text completions | tool / function calling |
-| streaming (SSE) | web search / browsing |
-| up to 32K context (public models) | RAG (server-side) — but DIY by stuffing context into prompt |
-| multilingual input | vision / multimodal |
-| horizontal scaling of single-GPU models | multi-GPU (tensor parallel) for public models |
+| OpenAI-compatible chat & text completions | web search / browsing |
+| streaming (SSE) | RAG (server-side) — but DIY by stuffing context into prompt |
+| up to 32K context (public models) | vision / multimodal |
+| tool / function calling for general-purpose public models | |
+| multilingual input | |
+| horizontal scaling of single-GPU models | multi-GPU (tensor parallel) for public Qwen models |
 
 - `<think>…</think>` may wrap chain-of-thought at the start of a Qwen response — strip it if you only want the final answer.
 - Experimental, **no availability SLA**; FP8 quantized → small differences vs full precision; model set / endpoints may change without notice.
-- Fixed training cutoff, no live data → do NOT trust for time-sensitive facts; retrieve current content yourself and include it as context.
+- Fixed training cutoff, no live data unless you wire tools → do NOT trust for time-sensitive facts; retrieve current content yourself, include it as context, or run a tool-calling loop.
+- Wikitech documents hosted tools (`current_date`, `wikipedia_semantic_search`) and an MCP/tool-calling loop example; the model alone will not fetch current data.
 
 ## Benchmarks (llm-qwen36-27b FP8, internal endpoint, single replica, 2026-07-17)
 | Concurrency | Req/s | Output tok/s | TTFT p50 (ms) | TTFT p99 (ms) | E2EL p50 (ms) | E2EL p99 (ms) |
@@ -93,8 +96,9 @@ LiftWing Studio runs on Cloud VPS, so it rides the unlimited tier (the gateway s
 - Studio source: https://gitlab.wikimedia.org/repos/machine-learning/liftwing-studio
 - Related phab: T426749 (rate limits), T431136 (vLLM metrics), T431554/T431851 (benchmarking/load-testing), T421461 (safeguard model pinning).
 
-## Live test (2026-08-14)
-`llm-qwen3-14b` answered a simple one-sentence prompt in ~1.1 s, returning clean OpenAI-format JSON (`id`, `choices[].message.content`, `usage` with token counts). No API key was used.
+## Live tests
+- 2026-08-14: `llm-qwen3-14b` answered a simple one-sentence prompt in ~1.1 s, returning clean OpenAI-format JSON (`id`, `choices[].message.content`, `usage` with token counts). No API key was used.
+- 2026-10-07: 1-token public API smoke tests: `llm-qwen36-27b` → HTTP 200, `llm-qwen38-27b` → HTTP 200, `llm-gpt-oss-safeguard-20b` → HTTP 404 (`{"detail":"Not Found"}`).
 
 ## Task benchmark — llm-qwen36-27b (2026-08-18)
 
@@ -114,7 +118,7 @@ Run with `python3 benchmark-llm.py` (full, ~12 LLM calls) or `--quick` (smoke te
 
 **Recommended uses (benchmark-backed):** prose→Wikidata statements (SDC, infobox data, property suggestions); short-description generation (millions of articles lack them); CS1 citation construction; RfC/noticeboard consensus summarization; cross-wiki gap analysis (two language versions in one 32K prompt → list missing sections/claims).
 
-**Avoid:** article-quality grading (statistical model strictly better); NPOV as final call; live-data tasks without pre-fetching context (no tool calling — DIY RAG). Long structured outputs are where latency lives (531 completion tokens ≈ 14s).
+**Avoid:** article-quality grading (statistical model strictly better); NPOV as final call; live-data tasks without pre-fetching context or a tool-calling loop. Long structured outputs are where latency lives (531 completion tokens ≈ 14s).
 
 **Latency profile:** short tasks 0.2–0.4s; medium (verdict+rationale, citation, talk summary) 1.7–5s; long (14K-char digest) 11s; heavy structured JSON 14s.
 

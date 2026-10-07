@@ -390,6 +390,7 @@
   "https://hubblesite.org/": "2026-08-10T13:06:16Z",
   "https://huggingface.co/Qwen/Qwen3-14B-FP8": "2026-08-16T03:45:23Z",
   "https://huggingface.co/Qwen/Qwen3.6-27B-FP8": "2026-08-16T03:45:24Z",
+  "https://huggingface.co/Qwen/Qwen3.8-27B-FP8": "2026-10-07T13:54:44Z",
   "https://image-annotator.toolforge.org/": "2026-08-10T12:57:50Z",
   "https://incubator.wikimedia.org": "2026-08-10T12:57:50Z",
   "https://inkscape.org": "2026-08-10T12:57:50Z",
@@ -796,7 +797,7 @@
   "https://your-tool.toolforge.org": "2026-08-10T12:57:50Z",
   "https://\u0440\u0443.wikipedia.org": "2026-09-29T22:23:29Z"
  },
- "generated_at": "2026-10-06T13:49:30Z",
+ "generated_at": "2026-10-07T13:54:44Z",
  "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
@@ -1205,6 +1206,7 @@
   "https://hubblesite.org/": 200,
   "https://huggingface.co/Qwen/Qwen3-14B-FP8": 200,
   "https://huggingface.co/Qwen/Qwen3.6-27B-FP8": 200,
+  "https://huggingface.co/Qwen/Qwen3.8-27B-FP8": 200,
   "https://image-annotator.toolforge.org/": 200,
   "https://incubator.wikimedia.org": 200,
   "https://index.commoncrawl.org/CC-MAIN-<id": -1,
@@ -1629,5 +1631,5 @@
   "https://your-tool.toolforge.org": -1,
   "https://\u0440\u0443.wikipedia.org": 0
  },
- "user_agent": "wikipedia-ai-skills-url-registry/1.0 (scheduled GitHub Action; https://github.com/fuzheado/Wikipedia-AI-Skills)"
+ "user_agent": "wikipedia-ai-skills-url-registry/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills)"
 }
