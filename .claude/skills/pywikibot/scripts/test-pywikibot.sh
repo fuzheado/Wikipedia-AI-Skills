@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # test-pywikibot.sh — Verify Pywikibot installation and basic functionality
-# Usage: bash test-pywikibot.sh
+# Usage: bash test-pywikibot.sh --check | --live
 
 set -euo pipefail
 
@@ -8,6 +8,35 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
+
+usage() {
+    cat <<'USAGE'
+Usage: test-pywikibot.sh --check | --live
+
+  --check   offline checks: Python version, pywikibot import, user-config.py, bot classes
+  --live    everything in --check, plus live reads from en.wikipedia and Wikidata
+
+Examples:
+  bash scripts/test-pywikibot.sh --check
+  bash scripts/test-pywikibot.sh --live
+USAGE
+}
+
+# Zero-argument guard: bare invocation used to run a live API test against
+# en.wikipedia and Wikidata, i.e. it made network requests without being asked.
+MODE="${1:-}"
+case "$MODE" in
+    -h|--help)
+        usage
+        exit 0
+        ;;
+    --check|--live)
+        ;;
+    *)
+        usage >&2
+        exit 2
+        ;;
+esac
 
 echo "=========================================="
 echo "  Pywikibot Installation Test"
@@ -55,9 +84,10 @@ else
     echo "   Create one or run: python -m pywikibot generate_user_files"
 fi
 
-# Step 4: Test read-only API access
-echo -n "4. Read-only API access "
-API_TEST=$("$PYTHON" -c "
+# Step 4: Test read-only API access (network — --live only)
+if [ "$MODE" = "--live" ]; then
+    echo -n "4. Read-only API access "
+    API_TEST=$("$PYTHON" -c "
 import pywikibot
 try:
     site = pywikibot.Site('en', 'wikipedia')
@@ -67,10 +97,13 @@ except Exception as e:
     print(f'✗ ({e})')
 " 2>&1)
 
-if echo "$API_TEST" | grep -q '✓'; then
-    echo -e "   ${GREEN}$API_TEST${NC}"
+    if echo "$API_TEST" | grep -q '✓'; then
+        echo -e "   ${GREEN}$API_TEST${NC}"
+    else
+        echo -e "   ${RED}$API_TEST${NC}"
+    fi
 else
-    echo -e "   ${RED}$API_TEST${NC}"
+    echo -e "4. Read-only API access      ${YELLOW}skipped${NC} (offline — re-run with --live)"
 fi
 
 # Step 5: Bot framework
@@ -84,9 +117,10 @@ else
     echo -e "${RED}✗${NC}"
 fi
 
-# Step 6: Wikidata support
-echo -n "6. Wikidata support "
-WD_TEST=$("$PYTHON" -c "
+# Step 6: Wikidata support (network — --live only)
+if [ "$MODE" = "--live" ]; then
+    echo -n "6. Wikidata support "
+    WD_TEST=$("$PYTHON" -c "
 import pywikibot
 try:
     repo = pywikibot.Site('wikidata', 'wikidata')
@@ -97,10 +131,13 @@ except Exception as e:
     print(f'✗ ({e})')
 " 2>&1)
 
-if echo "$WD_TEST" | grep -q '✓'; then
-    echo -e "   ${GREEN}$WD_TEST${NC}"
+    if echo "$WD_TEST" | grep -q '✓'; then
+        echo -e "   ${GREEN}$WD_TEST${NC}"
+    else
+        echo -e "   ${RED}$WD_TEST${NC}"
+    fi
 else
-    echo -e "   ${RED}$WD_TEST${NC}"
+    echo -e "6. Wikidata support          ${YELLOW}skipped${NC} (offline — re-run with --live)"
 fi
 
 echo ""
