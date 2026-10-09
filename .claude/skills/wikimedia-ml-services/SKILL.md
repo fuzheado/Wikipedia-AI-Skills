@@ -106,6 +106,23 @@ https://api.wikimedia.org/service/lw/inference/v1/models/llm-<model>/openai/v1/c
   if you only want the final answer.
 - `stream=True` is supported (token-by-token output).
 
+#### Operational lessons from long structured-output runs (verified 2026-10-07)
+
+- **Use `stream=True` for any generation above ~1K output tokens.** Non-streaming
+  requests with `max_tokens=3000` and a ~5K-token prompt returned **HTTP 504** from the
+  gateway and burned all retries (a 2-article run exceeded 7 minutes without producing a
+  result). The identical prompt with `stream=True` returned HTTP 200 in ~60 s. Streaming
+  keeps bytes flowing so the proxy does not time the request out; parse the SSE frames
+  (`data: {...}`, terminated by `data: [DONE]`) and accumulate `choices[0].delta.content`.
+- **Long JSON output is fragile: budget for parse repair.** Asking one model call to emit
+  a structured object covering 5 languages (~2K completion tokens) produced **strict
+  `json.loads` success on only 1/10 responses** — the model drops closing braces or
+  escapes inside repetitive arrays. Tolerant repair (`json_repair`, pip) recovered
+  **10/10**. Never design a pipeline that requires strict JSON validity from LiftWing
+  output; parse tolerantly, and record the strict rate as a tracked metric.
+- **Right-size the request.** Prompt ~4.7K tokens + completion ~1.8–2.1K tokens is a
+  comfortable 27B-class call on this platform (~60 s wall clock, shared service).
+
 ```python
 from openai import OpenAI
 client = OpenAI(
