@@ -392,6 +392,7 @@
   "https://hubblesite.org/": "2026-08-10T13:06:16Z",
   "https://huggingface.co/Qwen/Qwen3-14B-FP8": "2026-08-16T03:45:23Z",
   "https://huggingface.co/Qwen/Qwen3.6-27B-FP8": "2026-08-16T03:45:24Z",
+  "https://huggingface.co/Qwen/Qwen3.8-27B-FP8": "2026-10-09T10:07:14Z",
   "https://huggingface.co/datasets/philippesaade/Wikidata_Vectors_0.2": "2026-10-05T19:30:42Z",
   "https://huggingface.co/jinaai/jina-embeddings-v3": "2026-10-05T19:30:43Z",
   "https://image-annotator.toolforge.org/": "2026-08-10T12:57:50Z",
@@ -804,7 +805,7 @@
   "https://your-tool.toolforge.org": "2026-08-10T12:57:50Z",
   "https://\u0440\u0443.wikipedia.org": "2026-09-29T22:23:29Z"
  },
- "generated_at": "2026-10-07T13:54:44Z",
+ "generated_at": "2026-10-09T10:07:13Z",
  "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
@@ -1215,6 +1216,7 @@
   "https://hubblesite.org/": 200,
   "https://huggingface.co/Qwen/Qwen3-14B-FP8": 200,
   "https://huggingface.co/Qwen/Qwen3.6-27B-FP8": 200,
+  "https://huggingface.co/Qwen/Qwen3.8-27B-FP8": 200,
   "https://huggingface.co/datasets/philippesaade/Wikidata_Vectors_0.2": 200,
   "https://huggingface.co/jinaai/jina-embeddings-v3": 200,
   "https://image-annotator.toolforge.org/": 200,
