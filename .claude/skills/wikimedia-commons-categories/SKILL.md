@@ -162,6 +162,16 @@ GET commons.wikimedia.org/w/api.php?action=query&prop=info|pageprops&titles=Cate
 Read per page: `exists` (not missing), `redirect`, `pageprops.wikibase_item`.
 Track `normalized` titles back to input casing. Then:
 
+**⚠️ A category's item is not its subject's item — resolve in two steps (verified 2026-10-09).**
+`pageprops.wikibase_item` on `Category:X` is the *category's own* item when it exists at all, which is not the
+subject you are describing. Reach the subject with **P301 (category's main topic)** on that item:
+`Category:X` → `pageprops.wikibase_item` → `P301` → the subject item.
+
+Do **not** resolve a category by name through `haswbstatement:P373=<category name>`: a name-addressed search returns
+whatever item merely carries the string, and on an annotated-artwork corpus it produced a wrong resolution that
+returned the *painting itself* as a depicts candidate for a link that pointed at a category. Treat a missing P301 as
+**unresolved**, not as "no item exists" — and never fall back to the name route silently.
+
 | Probe result | What to do |
 |---|---|
 | exists, `wikibase_item` = the subject's item | done - the category already exists for this person |
