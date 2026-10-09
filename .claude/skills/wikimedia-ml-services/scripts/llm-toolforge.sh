@@ -12,7 +12,7 @@
 #   ./llm-toolforge.sh <prompt> [model] [max_tokens] [count]
 #
 #   prompt       The user message
-#   model        llm-qwen3-14b (default) | llm-qwen36-27b
+#   model        llm-qwen3-14b (default) | llm-qwen36-27b | llm-qwen38-27b
 #   max_tokens   Completion cap (default 256)
 #   count        Burst: run the request this many times back-to-back
 #                (default 1) and report an ok/429/other summary.
@@ -24,7 +24,7 @@
 #
 # Examples:
 #   ./llm-toolforge.sh "Explain vLLM in one sentence."
-#   ./llm-toolforge.sh "Translate to Spanish: The quick brown fox" llm-qwen36-27b
+#   ./llm-toolforge.sh "Translate to Spanish: The quick brown fox" llm-qwen38-27b
 #   ./llm-toolforge.sh "Reply with exactly: OK" llm-qwen3-14b 8 50   # 50-request burst
 #
 # Verified 2026-09-09: 100-request burst from dev.toolforge.org → 0x429 in ~14s.

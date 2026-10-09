@@ -14,7 +14,7 @@ skill_discovery_hints:
   - keywords: ["translation", "content translation", "cross-language", "recommendation"]
   - keywords: ["LLM", "chat completions", "Qwen", "OpenAI-compatible", "text generation", "LiftWing Studio", "large language model"]
   - keywords: ["429", "rate limited", "rate limit", "Toolforge", "high-throughput", "burst", "LLM testing"]
-last_verified: 2026-10-04
+last_verified: 2026-10-07
 ---
 
 > ⚠️ **User-Agent required:** All API calls below need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -84,9 +84,12 @@ full platform reference: the [main LLM docs](https://wikitech.wikimedia.org/wiki
 | Model | Card | Context | Notes |
 |---|---|---|---|
 | `llm-qwen3-14b` | [Qwen3-14B-FP8](https://huggingface.co/Qwen/Qwen3-14B-FP8) | 16K tokens | 14B general-purpose chat model; good default |
-| `llm-qwen36-27b` | [Qwen3.6-27B-FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) | 32K tokens | 27B chat model; largest available |
+| `llm-qwen36-27b` | [Qwen3.6-27B-FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) | 32K tokens | 27B chat model; previously largest public model; still works |
+| `llm-qwen38-27b` | [Qwen3.8-27B-FP8](https://huggingface.co/Qwen/Qwen3.8-27B-FP8) | 32K tokens | Newer 27B public model; Wikitech says "same as qwen3.6" |
 
-Both multilingual and instruction-tuned; responses stream token-by-token.
+The public Wikitech table also lists `llm-gpt-oss-safeguard-20b` (OpenAI gpt-oss-safeguard, ~20B MoE, 16K context, 2 GPUs TP) as a public safeguard/policy-violation model. **Caveat verified 2026-10-07:** the public chat-completions route for `llm-gpt-oss-safeguard-20b` returned HTTP 404 while `llm-qwen36-27b` and `llm-qwen38-27b` returned HTTP 200, so do not depend on the safeguard model until the public API route works.
+
+The Qwen models are multilingual and instruction-tuned; responses stream token-by-token.
 
 ### Endpoint (OpenAI-compatible, no API key)
 
@@ -188,8 +191,11 @@ logging, retention, or training.
 ### Capabilities
 
 Works today: chat & text completions (OpenAI-compatible), streaming,
-multilingual input, context up to 32K tokens. **Not available yet:** tool /
-function calling, web search / browsing, server-side RAG, vision / multimodal.
+multilingual input, context up to 32K tokens, and tool/function calling for
+public general-purpose models. Wikitech documents hosted tools including
+`current_date` and `wikipedia_semantic_search`; clients still need to run the
+tool-calling loop. **Not available yet:** web search / browsing, server-side
+RAG, vision / multimodal.
 DIY RAG works — fetch the context yourself and include it in the prompt.
 Models have fixed training cutoffs: retrieve current facts rather than
 trusting model memory, and verify before any on-wiki use (outputs are
@@ -210,7 +216,7 @@ assistive drafts; bot/editing policies still apply).
   14b picked a wrong-meaning Chinese idiom, wrote "Wikipedia is the biggest
   Wikipedia" in Nepali (confused encyclopedia→Wikipedia), left "AI" in Latin
   script in Russian. 27b also completed all calls while 14b threw 504
-  timeouts. **For translation (and most text tasks) prefer `llm-qwen36-27b`.**
+  timeouts. **For translation (and most text tasks) prefer a 27B Qwen model; `llm-qwen36-27b` is benchmark-backed here, and `llm-qwen38-27b` is the newer public 27B model but has not yet been re-benchmarked in this skill.**
 - Local notes with model list, rate-limit tiers, and benchmark details:
   `references/lift-wing-llm.md`.
 
