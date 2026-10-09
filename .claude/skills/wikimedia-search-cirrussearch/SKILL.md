@@ -175,6 +175,12 @@ Use a namespace prefix (followed by `:`) as the **first** term in the query:
 | `all:` | All namespaces |
 | `:` (single colon) | Main (article) namespace only |
 
+**⚠️ With no prefix and no `srnamespace`, you are searching namespace 0 only (verified 2026-10-09).** On Commons,
+`srsearch=hastemplate:"ImageNote"` returned **0 hits**; the identical query with `srnamespace=*` returned **363,459**.
+Every file, template, category and help page was invisible to the first query, and the API reported no error — so
+"the corpus is empty" is the most common false conclusion in this kind of audit. Pass `srnamespace=*` (or `6` for
+File, `14` for Category) explicitly, and state the namespace in any number you publish.
+
 ### Negation Examples
 
 ```cirrus
@@ -363,6 +369,14 @@ haswbstatement:P180=Q146|P180=Q144
 # Any statement existence
 haswbstatement:*
 ```
+
+> **⚠️ A qualifier is not a main statement — ask SPARQL, not search (verified 2026-10-09).** `haswbstatement:P2677`
+> asks for *statements whose property is P2677*, not for files that carry a P2677 **qualifier** (the
+> position-within-image rectangles on `depicts`). Measured on Commons: `haswbstatement:P2677` → **1 file**, while
+> SPARQL found **7,926 files / 23,561 statements**. Worse, the single file the index returned
+> (`File:Jesus Fabian Moreno.jpg`, M89045763) carries **no P2677 qualifier at all** when read back — so the index can
+> stale-positive as well as under-count. The bracket form above (`P180=Q…[P462=Q…]`) filters on a qualifier's
+> *value*, which is a different question from existence.
 
 **When to use `haswbstatement:` instead of SPARQL:**
 

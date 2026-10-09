@@ -154,6 +154,12 @@ fetch('https://en.wikipedia.org/w/api.php?action=query&format=json', {
 5. **User-Agent per project** — Parameterize the contact info so users can swap in their own details. Never hardcode someone else's email.
 6. **SPARQL queries** — For Wikidata Query Service, always set the UA and use `&format=json`. Consider using `SPARQLWrapper` with the `agent` parameter.
 
+**⚠️ `maxlag` is not the same signal on every wiki (verified 2026-10-09).** On Wikipedia and Commons it reflects
+edit-cluster load. On **`wikidata.org` it blocks on WDQS replication lag**, so a bulk job passing `maxlag=5` there is
+refused whenever the query service falls behind — an event with nothing to do with editing load — and an immediate
+retry loop then amplifies the backlog it is reacting to. Scope `maxlag` to the wiki you are actually *writing* to,
+and treat a `maxlag` error on wikidata.org as "come back later" rather than "back off and retry".
+
 ### 429 Retry-After Handling
 
 When a 429 (Too Many Requests) response is received, Wikimedia includes a

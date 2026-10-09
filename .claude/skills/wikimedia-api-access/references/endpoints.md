@@ -36,13 +36,22 @@ The original workhorse API. Parameter-driven, supports read, write, and search o
 | `format=json` | **Always** specify JSON output (also: `xml`, `php`, `jsonfm`) | — |
 | `formatversion=2` | Modern format — numeric IDs as integers, cleaner structure | — |
 | `origin=*` | CORS header — required for browser-based requests from other origins | — |
-| `maxlag=<seconds>` | Respect server load (use `maxlag=5` for bulk operations) | — |
+| `maxlag=<seconds>` | Respect server load (use `maxlag=5` for bulk operations; on **wikidata.org it reflects WDQS lag**, not edit load — verified 2026-10-09) | — |
 | `continue` | Required for paginated results — always check for `continue` in the response | — |
 | `srlimit` | Search result limit | 50 |
 | `cmlimit` | Category member limit | 500 |
 | `rvlimit` | Revision history limit (5,000 for bots with `apihighlimits`) | 500 |
 | `uclimit` | User contributions limit (5,000 for bots) | 500 |
 | `exlimit` | Extract limit | 20 |
+
+### Revision content moves between `formatversion`s
+
+`prop=revisions&rvprop=content` returns the wikitext under a **different key per formatversion** — `*` on
+`formatversion=1`, `content` on `formatversion=2` (verified 2026-10-09; see the report's defect list in
+`wikimedia-wikitext`). Code written for v1 and switched to v2 (or the reverse) gets `None` for every page with no
+error at all, which reads downstream as "these pages have no content". If you must handle both, read
+`rev.get("slots", {}).get("main", {}).get("content") or rev.get("*")` — and prefer `formatversion=2` plus
+`rvslots=main` for new code.
 | `tllimit` | Transcluded templates limit | 500 |
 | `cllimit` | Category list limit (categories on a page) | 500 |
 | `bllimit` | Backlinks limit | 500 |

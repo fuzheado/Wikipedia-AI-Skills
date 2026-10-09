@@ -78,6 +78,16 @@ plain_text = code.strip_code()  # Removes templates, comments, wikilinks, etc.
 - Plain text content
 - External URLs
 
+**⚠️ Template *payloads* are the trap (verified 2026-10-09).** Text wrapped for language or formatting —
+`{{en|1=Text}}`, `{{Langswitch|en=…}}`, `{{nowrap|…}}` — is not "plain content" to a stripper: a pass that drops
+everything between `{{` and `}}` blanks the text entirely and leaves an empty string, which then reads like a page
+with nothing to say rather than a parser failure. Resolve the payload of language/formatting templates
+(`{{en|1=X}}` → `X`), and fall back to the labels of any wikilinks when a payload cannot be read.
+
+Measured on a 30,032-note corpus: fixing this moved an agreement rate from 4.1% → 4.2% and resolved links from
+2,879 → 2,990. Small corrections to an aggregate — but the same bug emptied *individual* notes, and an empty note
+counts as "no evidence" in every downstream number, so the error is silent by construction.
+
 Use `str(code)` when you need the raw wikitext with all markup intact.
 
 ### Filtering Specific Node Types
@@ -179,6 +189,7 @@ for section in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"]):
 | `r'\[\[(.*?)\]\]'` for wikilinks | Misses piped links, interwiki links, category links, file links | `mwparserfromhell.filter_wikilinks()` |
 | `r'<ref>(.*?)</ref>'` for references | Misses self-closing `<ref name="x" />`, multi-line refs, nested refs | `mwparserfromhell.filter_tags()` |
 | Manually stripping HTML from Parsoid output | Fragile — Parsoid's HTML structure may change across MediaWiki versions | BeautifulSoup/lxml with semantic selectors |
+| Dropping every `{{…}}` to "remove templates" | Blanks `{{en|1=Text}}`, `{{Langswitch|en=…}}`, `{{nowrap|…}}` — the text *is* the payload | Resolve language/formatting template payloads; strip only structural templates |
 
 ---
 

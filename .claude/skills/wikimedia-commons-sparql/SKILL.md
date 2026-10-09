@@ -367,6 +367,37 @@ SELECT ?file ?fileLabel WHERE {
 
 Note: The `wikibase:label` SERVICE works the same way as in WDQS but returns the **file caption** as the label for M IDs. Captions can live in the `mul` default value instead of per-language entries — that is why `mul` is in the language list above: without it, those files come back labelled `M…`.
 
+**⚠️ `SERVICE wikibase:label` is a WDQS feature — QLever rejects it (verified 2026-10-09).** Against the
+`qlever.dev/api/wikimedia-commons` endpoint the same query returns **HTTP 400**, not an empty result. Use
+`rdfs:label` with an explicit language filter there and read `mul` last:
+
+```sparql
+?file rdfs:label ?fileLabel . FILTER(LANG(?fileLabel) IN ("en", "mul"))
+```
+
+Labels **are** in QLever's Commons graph (37,458,840 `rdfs:label` triples on 2026-10-09), so a query that
+"has no labels" is a query using the wrong service.
+
+### Pattern 3b: Region-level depicts — qualifiers live only in SPARQL
+
+The rectangles that say *where* in a file something is depicted are qualifiers (`pq:P2677`), and search cannot
+answer for them: `haswbstatement:P2677` reported **1 file** where SPARQL found **7,926 files / 23,561 statements**
+(2026-10-09). The value is a geometry string — `pct:x,y,width,height`, in percent of the image, e.g.
+`pct:11.271224,16.205793,19.055633,43.002592`:
+
+```sparql
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+SELECT ?file ?pos ?depicted WHERE {
+  ?file p:P180 ?st . ?st pq:P2677 ?pos . ?st ps:P180 ?depicted .
+}
+```
+
+(For what these regions are used for — clickable zones and labelled overlays — see
+`wikimedia-commons-sdc`, and note that ImageNote boxes on file pages are a *separate, unsynchronised* layer: only
+4.2% of notes agree with the file's structured data.)
+
 ### Pattern 4: Media Metadata — Files by Dimensions
 
 ```sparql

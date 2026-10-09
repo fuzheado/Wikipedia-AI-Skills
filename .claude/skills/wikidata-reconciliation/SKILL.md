@@ -242,6 +242,40 @@ def verify(qids):
     return ok  # caller decides: exists? right label? right type?
 ```
 
+## The publish gate: turning a score into a governance decision
+
+A matcher score is not a decision. Measure the score against a **hand-adjudicated gold set stratified by evidence
+type**, sweep the threshold, and choose the operating point from measured precision and coverage. From 100 Commons
+notes (hand-adjudicated gold set, measured 2026-10-09): precision **63.8% at ≥0.50 · 72.3% at ≥0.60 · 91.7% at ≥0.70 · 95.8% at ≥0.80**, against coverage of
+bindable records of 87.9% / 71.2% / 54.5% / 36.4%.
+
+The policy that table buys is one a reviewer can approve — **auto-publish ≥0.80 (≈96% precision), human review
+0.50–0.80, discard below 0.50** — which is a very different proposal from "we will import a million statements".
+Stratify the gold set by evidence type, or the estimate flatters itself.
+
+Top-1 precision by the evidence *in the record itself*:
+
+| evidence in the record | notes | bindable | correct top-1 |
+|---|---|---|---|
+| explicit `:wikidata:Q…` link | 2 | 2 | **100%** |
+| wiki article link (any language) | 30 | 29 | **97%** |
+| category link | 12 | 9 | **22%** |
+| no link at all | 56 | 26 | **19%** |
+
+Two consequences worth carrying into any reconciliation:
+
+- **Stage by evidence type, not by corpus size.** Link-bearing records are an easy, high-precision first tranche
+  (97–100%); the review queue is the link-free majority (73% of that corpus). Ship the easy tranche first, and let
+  the review capacity be sized from the measured miss rate rather than a guess.
+- **Name the ceiling.** A micro-gold set drawn from link-rich files scored ~83% top-1 — the shape a demo shows.
+  Publish the stratified number as the estimate and label the flattering one as the ceiling.
+
+**Category links are the weak evidence, and they are usually mis-resolved.** Resolve them through
+`pageprops.wikibase_item` → **P301**, never by name search (see
+[wikimedia-commons-categories](../wikimedia-commons-categories/SKILL.md)); and give Wikimedia-internal candidates
+(categories, list articles, disambiguation pages) an explicit penalty, or the matcher will "succeed" by binding to
+housekeeping.
+
 ## Constraint & Guardrails
 
 1. **Never write an unverified QID.** Verify via `wbgetentities` in the same session as the write (see `wikimedia-commons-sdc` / `quickstatements` for the write side).

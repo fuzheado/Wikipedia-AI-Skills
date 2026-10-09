@@ -111,7 +111,7 @@ A MediaInfo entity in JSON looks like this:
     },
     "descriptions": {},
     "aliases": {},
-    "claims": {
+    "statements": {
       "P180": [
         {
           "mainsnak": {
@@ -159,6 +159,31 @@ A MediaInfo entity in JSON looks like this:
 | Descriptions | Usually absent or minimal on Commons | Typically empty |
 | Sitelinks | Links to Wikipedia articles | Not used (the file page IS the entity) |
 | API endpoint | `https://www.wikidata.org/w/api.php` | `https://commons.wikimedia.org/w/api.php` |
+
+### ⚠️ The statement container is named differently, and it depends on HOW you ask (verified 2026-10-09)
+
+There is no `claims` key on a MediaInfo entity from `wbgetentities` — and no error either, so a script that reads
+`entity["claims"]` concludes **"this file has no structured data"** about a file with 18 properties. Measured against
+`M46083797` and `Q177773`:
+
+| how you ask | Wikidata item (Q ID) | Commons file (M ID) |
+|---|---|---|
+| `wbgetentities&props=claims` (fv1 **or** fv2) | answers under **`claims`** | answers under **`statements`** |
+| `wbgetentities&props=statements` | `Unrecognized value for parameter "props": statements` — nothing returned | same |
+| `action=wbgetclaims&entity=M…` | — | answers under **`claims`** |
+| `Special:EntityData/M…json` | — | **`statements`** |
+
+`formatversion` does **not** change either name — 1 and 2 behave identically here, which is why the report that
+first hit this mistook it for a `formatversion=2` bug.
+
+Rules that hold in practice:
+
+- **Reading a file's statements:** `wbgetentities&props=claims`, then read `entity["statements"]` — or use
+  `action=wbgetclaims`, which answers under `claims` and takes a `property=` filter (one property, no parsing).
+- `props=statements` is not a valid parameter value. The API only *warns*, so batch runs that ignore `warnings`
+  see an unexplained silence.
+- Write defensively when the entity type is not known ahead of time:
+  `stmts = ent.get("statements") or ent.get("claims") or {}`.
 
 ---
 
@@ -287,7 +312,7 @@ caption = (labels.get("en") or labels.get("mul") or {}).get("value", "")
 print(f"English caption: {caption}")
 
 # Depicts statements
-depicts_claims = entity.get("claims", {}).get("P180", [])
+depicts_claims = entity.get("statements", {}).get("P180", [])
 for claim in depicts_claims:
     q_id = claim["mainsnak"]["datavalue"]["value"]["id"]
     print(f"Depicts: {q_id} (rank: {claim['rank']})")
