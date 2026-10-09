@@ -36,5 +36,13 @@ jobs:
         run: python3 scripts/verify-freshness.py
       - name: mul default values requested wherever labels are read
         run: python3 scripts/verify-mul-labels.py
+      - name: Install skill-asset dependencies
+        # The guard step below executes every skill script with no arguments.
+        # Without these deps (same set the tests job installs) 22 of 142 scripts
+        # die on `import requests`/`mwparserfromhell` and are reported as "not
+        # exercised" instead of actually being checked. pywikibot is not in
+        # requirements.txt (it belongs to the pywikibot skill) but one guarded
+        # script imports it.
+        run: python3 -m pip install -r requirements.txt pywikibot
       - name: Skill scripts refuse to do work when invoked with no arguments
         run: python3 scripts/verify-script-guards.py

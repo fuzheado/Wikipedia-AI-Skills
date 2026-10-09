@@ -37,6 +37,22 @@ Pass criterion, per script invoked with no arguments:
 Two ways to fail: it hangs (starts work with no end in sight), or it exits zero
 without printing anything usage-looking (silently performs its default action).
 
+A third outcome: NOT EXERCISED (missing optional dependency)
+------------------------------------------------------------
+A nonzero exit only counts as a guard if the script actually got to make that
+decision. A Python script that dies on `import requests` exits nonzero with a
+message and therefore *passes* — without its guard ever running. That made the
+verdict depend on the interpreter used: the same tree reported 0 violations
+under a bare `python3` (no `requests`) and 2 violations under an interpreter
+that has `requests` installed, because there the scripts got past the import
+and ran their default action (language_explorer.py, api_client.py — both were
+fixed, not exempted). So an uncaught `ModuleNotFoundError`/`ImportError`
+traceback is now counted and reported as "not exercised" instead of being
+silently read as a pass. It is *not* a violation (CI runs an interpreter
+without those extras and must stay green), but it is no longer invisible
+either: the summary names the missing module(s) so a green run cannot be
+mistaken for proof that every guard was executed.
+
 Usage:
     python3 scripts/verify-script-guards.py
     python3 scripts/verify-script-guards.py --json
@@ -160,6 +176,30 @@ def looks_usageish(out: str) -> bool:
     return bool(out.strip()) and any(m in low for m in USAGEISH)
 
 
+# An *uncaught* import failure means the bare run never reached the script's own
+# argument handling, so the pass/nonzero verdict says nothing about its guard.
+TRACEBACK_MARKER = "Traceback (most recent call last):"
+MISSING_DEP_RE = re.compile(
+    r"^(?:ModuleNotFoundError|ImportError): No module named ['\"]([A-Za-z0-9_.]+)['\"]",
+    re.M,
+)
+
+
+def missing_dependency(rc: int | str, out: str, hung: bool) -> str | None:
+    """Return the missing module name if the bare run died on an import.
+
+    Requires BOTH a real traceback and an uncaught ModuleNotFoundError/ImportError
+    line, so a script that *catches* the error and prints a helpful refusal
+    ("install X: pip install foo") keeps counting as guarded.
+    """
+    if hung or rc in ("EXC", "TIMEOUT") or rc == 0:
+        return None
+    if TRACEBACK_MARKER not in out:
+        return None
+    m = MISSING_DEP_RE.search(out)
+    return m.group(1) if m else None
+
+
 def verdict(rc: int | str, out: str, hung: bool, timeout: float) -> str | None:
     """Return a violation reason, or None if the script is guarded."""
     if hung:
@@ -174,7 +214,7 @@ def verdict(rc: int | str, out: str, hung: bool, timeout: float) -> str | None:
     return None                            # nonzero + a message, or zero + usage text
 
 
-def scan(skills_dir: Path, args) -> tuple[list[dict], int, bool]:
+def scan(skills_dir: Path, args) -> tuple[list[dict], int, bool, list[dict]]:
     work, harness = build_sandbox(skills_dir)
     try:
         env = sandbox_env(harness)
@@ -194,6 +234,7 @@ def scan(skills_dir: Path, args) -> tuple[list[dict], int, bool]:
             targets = [(p, p.relative_to(root)) for p in sorted(root.rglob("*"))]
 
         violations: list[dict] = []
+        unexercised: list[dict] = []
         examined = 0
         stopped = False
         for path, rel in targets:
@@ -207,6 +248,12 @@ def scan(skills_dir: Path, args) -> tuple[list[dict], int, bool]:
             examined += 1
             cmd = [sys.executable, str(path)] if path.suffix == ".py" else ["bash", str(path)]
             rc, out, hung = run_bare(cmd, work, env, args.timeout)
+            dep = missing_dependency(rc, out, hung) if path.suffix == ".py" else None
+            if dep:
+                # Died on `import X`: the verdict would be an artefact of this
+                # interpreter, not a statement about the script's guard.
+                unexercised.append({"file": str(rel), "module": dep, "exit_code": rc})
+                continue
             reason = verdict(rc, out, hung, args.timeout)
             if reason:
                 violations.append({"file": str(rel), "reason": reason,
@@ -214,7 +261,7 @@ def scan(skills_dir: Path, args) -> tuple[list[dict], int, bool]:
                 if len(violations) >= args.max_hangs:
                     stopped = True
                     break
-        return violations, examined, stopped
+        return violations, examined, stopped, unexercised
     finally:
         shutil.rmtree(work, ignore_errors=True)
 
@@ -244,23 +291,34 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: skills dir not found: {args.skills_dir}", file=sys.stderr)
         return 1
 
-    violations, examined, stopped = scan(args.skills_dir, args)
+    violations, examined, stopped, unexercised = scan(args.skills_dir, args)
 
     if args.json:
         print(json.dumps({"violations": violations, "examined": examined,
-                          "stopped_early": stopped,
+                          "stopped_early": stopped, "unexercised": unexercised,
                           "exempt": sorted(EXEMPT)}, indent=2))
         return 1 if violations else 0
 
     for v in violations:
         print(f"{v['file']}: {v['reason']}", file=sys.stderr)
+    if unexercised:
+        modules = sorted({u["module"] for u in unexercised})
+        print(f"\nnote: {len(unexercised)} script(s) not exercised — they exit nonzero on "
+              f"an uncaught import error, so their guard was never run. "
+              f"Missing module(s): {', '.join(modules)}. Install the dependency to check "
+              f"them, or run this verifier with an interpreter that has it.", file=sys.stderr)
+        for u in unexercised:
+            print(f"  ? {u['file']} (import {u['module']})", file=sys.stderr)
     if violations:
         print(f"\n{len(violations)} script guard violation(s).", file=sys.stderr)
         if stopped:
             print("stopped early: enough violations to fail the check.", file=sys.stderr)
         return 1
+    tail = (f"; {len(unexercised)} not exercised (missing: "
+            f"{', '.join(sorted({u['module'] for u in unexercised}))})"
+            if unexercised else "")
     print(f"{examined} script(s) run with no arguments, "
-          f"0 zero-argument guard violation(s).")
+          f"0 zero-argument guard violation(s){tail}.")
     return 0
 
 

@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # Inspect wikitext: parse and report what mwparserfromhell sees
 # Usage:
-#   ./test-mwparser.sh              — run installation smoke test
-#   ./test-mwparser.sh page.wikitext — inspect a wikitext file
-#   ./test-mwparser.sh -             — read wikitext from stdin (pipe)
+#   ./test-mwparser.sh --smoke        — run installation smoke test
+#   ./test-mwparser.sh page.wikitext  — inspect a wikitext file
+#   ./test-mwparser.sh -              — read wikitext from stdin (pipe)
 #
 # Examples:
+#   ./test-mwparser.sh --smoke
+#
 #   curl -s "https://en.wikipedia.org/w/index.php?title=Python_(programming_language)&action=raw" \
 #     | ./test-mwparser.sh -
 #
@@ -19,7 +21,41 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-INSPECT_FILE="${1:-}"
+usage() {
+    cat <<'USAGE'
+Usage: test-mwparser.sh --smoke | <file.wikitext> | -
+
+  --smoke        run the built-in installation smoke test
+  <file.wikitext>  parse the file and report its structure
+  -              read wikitext from stdin (pipe mode)
+
+Examples:
+  ./test-mwparser.sh --smoke
+  ./test-mwparser.sh article.wikitext
+  curl -s "https://en.wikipedia.org/w/index.php?title=Python_(programming_language)&action=raw" \
+    | ./test-mwparser.sh -
+USAGE
+}
+
+# Zero-argument guard: a bare invocation used to print a banner and run the
+# smoke test, i.e. it did work without being asked to.
+if [ $# -eq 0 ]; then
+    usage >&2
+    exit 2
+fi
+
+case "${1:-}" in
+    -h|--help)
+        usage
+        exit 0
+        ;;
+    --smoke)
+        INSPECT_FILE=""
+        ;;
+    *)
+        INSPECT_FILE="$1"
+        ;;
+esac
 
 # ── Prerequisite checks ──────────────────────────────────────
 

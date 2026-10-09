@@ -325,7 +325,10 @@ against **hallucinated content** — plausible-looking commands/modules/URLs tha
 do not exist (e.g. `toolforge tools create`, `action=templatestyles`,
 `prop=translationinfo`) — this repo keeps ground-truth registries captured from
 live systems, and every skill is verified against them in CI
-(`.github/workflows/skill-verification.yml`):
+(`.github/workflows/skill-verification.yml`). The URL check is a guardrail, not
+a proof that every web target is live: CI blocks unregistered URLs and clear
+400/404/410 dead-link statuses, while API/auth/browser-only/network-timeout
+cases are surfaced as warnings unless they have explicit verifier rules:
 
 | Check | Registry (generated) | Refresher |
 |---|---|---|
@@ -383,12 +386,15 @@ URL refresh is incremental by default: a URL is only live-checked if it is new, 
 ~3-month freshness window (`--max-age-days`), or a known-broken URL due for a retry
 (`--retry-after-days`). Known-good URLs are skipped, so normal runs check only the handful
 that rotated in — no more multi-minute sweeps on every change. CI's `verify-links.py` is fully
-offline; a scheduled workflow (`.github/workflows/url-registry-refresh.yml`, weekly) keeps the
-registry fresh automatically.
+offline; a scheduled workflow (`.github/workflows/url-registry-refresh.yml`, weekly) opens
+registry refresh PRs. If that refresh loop stalls, feature-PR CI still reports registry staleness
+as a warning rather than performing network checks itself.
 
 Prose that *documents* removed commands ("the `toolforge tools...` family was
-removed"), error demos, illustrative placeholder URLs, and POST-only endpoints
-is automatically recognized and skipped.
+removed"), error demos, illustrative placeholder URLs, local/dev URLs, and POST-only endpoints
+is recognized by verifier heuristics and skipped. Warning-class URLs such as auth-gated APIs,
+method-specific endpoints, browser-only tools, and network/DNS timeouts remain visible in CI
+stderr but do not fail the PR unless they are unregistered or clearly dead.
 
 ## Testing
 

@@ -7,7 +7,7 @@ depends_on: [wikimedia-api-access]
 skill_discovery_hints:
   - keywords: ["wikitext", "wiki markup", "parse", "mwparserfromhell", "wikitext parsing", "template parsing"]
   - keywords: ["wikitext AST", "syntax tree", "section parsing", "link extraction", "template expansion"]
-last_verified: 2026-10-03
+last_verified: 2026-10-09
 ---
 
 > ⚠️ **User-Agent required:** The API examples below use the Action API and REST API. All requests must include a descriptive `User-Agent` header or they will be blocked. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
@@ -241,12 +241,12 @@ This skill includes helper scripts, reference docs, and templates:
 ### 🔧 Wikitext Inspector (`scripts/test-mwparser.sh`)
 
 Inspect any wikitext file and get a structured overview of what's in it — templates,
-wikilinks, tags, headings, sections, and potential issues. Also doubles as an
-installation smoke test when called with no arguments.
+wikilinks, tags, headings, sections, and potential issues. It also doubles as an
+installation smoke test when called with `--smoke`.
 
 ```bash
-# Smoke test (no args) — verify installation
-./scripts/test-mwparser.sh
+# Smoke test (--smoke) — verify installation
+./scripts/test-mwparser.sh --smoke
 
 # Inspect a wikitext file
 ./scripts/test-mwparser.sh page.wikitext
@@ -255,10 +255,11 @@ installation smoke test when called with no arguments.
 curl -s "https://en.wikipedia.org/w/index.php?title=Python_(programming_language)&action=raw" \
   | ./test-mwparser.sh -
 
-# Usage: ./test-mwparser.sh [file.wikitext | -]
-#   (no args)  — run installation smoke test
-#   file.wikitext — parse file and report structure
-#   -          — read wikitext from stdin (pipe mode)
+# Usage: ./test-mwparser.sh [--smoke | file.wikitext | -]
+#   --smoke        — run installation smoke test
+#   file.wikitext  — parse file and report structure
+#   -              — read wikitext from stdin (pipe mode)
+#   (no args)      — print usage and exit 2
 ```
 
 Reports: total AST nodes, templates with parameter previews, wikilinks with display
