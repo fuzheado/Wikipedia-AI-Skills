@@ -318,9 +318,13 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Test Wikimedia API connectivity")
-    parser.add_argument("--endpoint", default="enwiki",
+    # required on purpose: with a default, bare invocation fired a live
+    # connectivity test (and its retries) against enwiki — the exact
+    # "unrequested network work on no arguments" bug class that
+    # scripts/verify-script-guards.py exists to catch.
+    parser.add_argument("--endpoint", required=True,
                         choices=["enwiki", "wikidata", "commons", "sparql", "liftwing", "pageviews"],
-                        help="API endpoint to test")
+                        help="API endpoint to test (required: this script makes live requests)")
     parser.add_argument("--verbose", "-v", action="store_true", help="Enable debug logging")
     args = parser.parse_args()
 
