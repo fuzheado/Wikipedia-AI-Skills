@@ -123,20 +123,6 @@ https://api.wikimedia.org/service/lw/inference/v1/models/llm-<model>/openai/v1/c
 - **Right-size the request.** Prompt ~4.7K tokens + completion ~1.8–2.1K tokens is a
   comfortable 27B-class call on this platform (~60 s wall clock, shared service).
 
-```python
-from openai import OpenAI
-client = OpenAI(
-    base_url="https://api.wikimedia.org/service/lw/inference/v1/models/llm-qwen3-14b/openai/v1",
-    api_key="none",  # public endpoint; no key required
-)
-resp = client.chat.completions.create(
-    model="llm-qwen3-14b",
-    messages=[{"role": "user", "content": "Explain vLLM in one sentence."}],
-    stream=True,
-)
-for chunk in resp:
-    print(chunk.choices[0].delta.content or "", end="")
-```
 
 ```python
 from openai import OpenAI
