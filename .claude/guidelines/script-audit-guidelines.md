@@ -37,7 +37,16 @@ if len(sys.argv) == 1:
     sys.exit(1)
 ```
 
-**Exception:** Interactive scripts that prompt the user when no CLI args are given (e.g., `citation_generator.py`). For those, document the interactive mode clearly.
+**Exception:** Interactive scripts that prompt the user when no CLI args are given (e.g., `citation_generator.py`). For those, document the interactive mode clearly — and still refuse when there is no terminal to prompt on:
+
+```python
+if len(sys.argv) == 1 and not sys.stdin.isatty():
+    parser.print_usage(sys.stderr)
+    print("error: no TEXT given and stdin is not a terminal", file=sys.stderr)
+    sys.exit(2)
+```
+
+`scripts/verify-script-guards.py` runs every script with stdin on `/dev/null`, so a script that only prompts reads EOF, prints its banner and exits 0 — which is its *default action* as far as the verifier can tell (`language_explorer.py`, fixed 2026-10-09). Related trap: a script that dies on an uncaught `import requests` also exits nonzero with a traceback, which looks guarded — so the verdict used to depend on whether the dependency happened to be installed. The verifier now reports those as "not exercised" instead of counting them as a pass; a real guard is still required.
 
 ### Current audit status
 

@@ -77,6 +77,42 @@ class TestVerdict:
         assert vsg.verdict("EXC", "ValueError: bad shebang", False, 5.0) is None
 
 
+class TestMissingDependency:
+    """An uncaught import error means the guard never ran — not a pass, not a failure.
+
+    Regression for the environment-sensitive verdict: with `requests` installed,
+    language_explorer.py and api_client.py reached their default action under
+    what CI (no `requests`) saw as a clean tree.
+    """
+
+    TRACEBACK = (
+        "Traceback (most recent call last):\n"
+        '  File "/tmp/x/lang.py", line 28, in <module>\n'
+        "    import requests\n"
+        "ModuleNotFoundError: No module named 'requests'\n"
+    )
+
+    def test_uncaught_import_error_reports_the_module(self):
+        assert vsg.missing_dependency(1, self.TRACEBACK, False) == "requests"
+
+    def test_import_error_without_a_traceback_is_not_unexercised(self):
+        """A deliberate refusal may mention ImportError; that is still a guard."""
+        assert vsg.missing_dependency(1, "ModuleNotFoundError: No module named 'requests'",
+                                      False) is None
+
+    def test_caught_dependency_is_guarded_not_unexercised(self):
+        out = ("Traceback (most recent call last):\n"
+               "ImportError: cannot import name 'session' from 'requests'\n"
+               "missing optional dep: pip install requests\n")
+        assert vsg.missing_dependency(1, out, False) is None
+
+    def test_successful_run_is_not_unexercised(self):
+        assert vsg.missing_dependency(0, self.TRACEBACK, False) is None
+
+    def test_hang_is_not_unexercised(self):
+        assert vsg.missing_dependency("TIMEOUT", self.TRACEBACK, True) is None
+
+
 # --- fixtures with known behaviour -------------------------------------------
 
 GUARDED_REFUSAL = '''#!/usr/bin/env python3
@@ -187,6 +223,58 @@ if __name__ == "__main__":
     main()
 '''
 
+DIES_ON_IMPORT = '''#!/usr/bin/env python3
+import argparse
+import this_module_does_not_exist_anywhere
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--x", default=None)
+    ap.parse_args()
+    print("did work")
+
+if __name__ == "__main__":
+    main()
+'''
+
+CATCHES_MISSING_DEP = '''#!/usr/bin/env python3
+import argparse
+
+try:
+    import this_module_does_not_exist_anywhere as dep
+except ImportError:
+    dep = None
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--x", default=None)
+    ap.parse_args()
+    if dep is None:
+        raise SystemExit("missing optional dep: pip install this-module")
+    print("did work")
+
+if __name__ == "__main__":
+    main()
+'''
+
+# A REPL-style default action: exits 0 having printed a banner, exactly what
+# language_explorer.py used to do when invoked bare with no TTY (the banner is
+# not usage-looking, so it must be flagged).
+BANNER_THEN_EXIT = '''#!/usr/bin/env python3
+import argparse
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("text", nargs="?")
+    ap.parse_args()
+    print("=" * 20)
+    print("Interactive mode — type text to identify its language")
+    print("=" * 20)
+
+if __name__ == "__main__":
+    main()
+'''
+
 
 def write_skill_scripts(tmp_path: Path, scripts: dict[str, str]) -> Path:
     """Create a fake skills tree with one script per {relpath: source}."""
@@ -210,7 +298,7 @@ class TestScanCriterion:
             "demo-skill/scripts/silent.sh": SILENT_SH,
             "demo-skill/scripts/hangs.py": HANGS,
         })
-        violations, examined, _ = vsg.scan(root, Args(timeout=1.5))
+        violations, examined, _, _ = vsg.scan(root, Args(timeout=1.5))
         flagged = {v["file"] for v in violations}
         assert flagged == {"demo-skill/scripts/silent_work.py",
                            "demo-skill/scripts/silent.sh",
@@ -222,7 +310,7 @@ class TestScanCriterion:
         root = write_skill_scripts(tmp_path, {
             "demo-skill/assets/helper.py": NOT_AN_ENTRY_POINT,
         })
-        violations, examined, _ = vsg.scan(root, Args())
+        violations, examined, _, _ = vsg.scan(root, Args())
         assert violations == [] and examined == 0
 
     def test_exempt_scripts_are_not_run(self, tmp_path):
@@ -231,7 +319,7 @@ class TestScanCriterion:
         })
         vsg.EXEMPT["demo-skill/scripts/silent_work.py"] = "test fixture"
         try:
-            violations, examined, _ = vsg.scan(root, Args())
+            violations, examined, _, _ = vsg.scan(root, Args())
         finally:
             del vsg.EXEMPT["demo-skill/scripts/silent_work.py"]
         assert violations == [] and examined == 0
@@ -242,8 +330,31 @@ class TestScanCriterion:
             "demo-skill/scripts/silent_b.py": SILENT_WORK,
             "demo-skill/scripts/silent_c.py": SILENT_WORK,
         })
-        violations, examined, stopped = vsg.scan(root, Args(max_hangs=2))
+        violations, examined, stopped, _ = vsg.scan(root, Args(max_hangs=2))
         assert len(violations) == 2 and stopped and examined == 2
+
+    def test_scan_counts_unexercised_separately_from_violations(self, tmp_path):
+        """A dependency crash is reported, never silently read as a pass."""
+        root = write_skill_scripts(tmp_path, {
+            "demo-skill/scripts/dies_on_import.py": DIES_ON_IMPORT,
+            "demo-skill/scripts/catches_dep.py": CATCHES_MISSING_DEP,
+            "demo-skill/scripts/silent_work.py": SILENT_WORK,
+        })
+        violations, examined, _, unexercised = vsg.scan(root, Args(timeout=5.0))
+        assert examined == 3
+        assert {v["file"] for v in violations} == {"demo-skill/scripts/silent_work.py"}
+        assert [(u["file"], u["module"]) for u in unexercised] == [
+            ("demo-skill/scripts/dies_on_import.py",
+             "this_module_does_not_exist_anywhere")]
+
+    def test_banner_then_exit_is_still_a_violation(self, tmp_path):
+        """The fix must not turn language_explorer.py's old bare behaviour into a pass."""
+        root = write_skill_scripts(tmp_path, {
+            "demo-skill/scripts/banner.py": BANNER_THEN_EXIT,
+        })
+        violations, _, _, unexercised = vsg.scan(root, Args(timeout=5.0))
+        assert unexercised == []
+        assert {v["file"] for v in violations} == {"demo-skill/scripts/banner.py"}
 
 
 class TestSandbox:
@@ -309,6 +420,22 @@ class TestRealTree:
     def test_count_maintainers_is_guarded(self):
         """The regression that motivated this verifier: it must stay refused."""
         script = SKILLS_DIR / "wikimedia-toolforge" / "scripts" / "count-maintainers.py"
-        violations, examined, _ = vsg.scan(SKILLS_DIR, Args(files=[script], timeout=10))
+        violations, examined, _, _ = vsg.scan(SKILLS_DIR, Args(files=[script], timeout=10))
         assert examined == 1
         assert violations == [], "count-maintainers.py lost its zero-argument guard"
+
+    def test_language_explorer_never_silently_succeeds_when_bare(self):
+        """Fixed 2026-10-09: bare + no TTY used to print a banner and exit 0."""
+        script = (SKILLS_DIR / "wikimedia-ml-services" / "assets" / "language_explorer.py")
+        violations, examined, _, _ = vsg.scan(SKILLS_DIR, Args(files=[script], timeout=10))
+        assert examined == 1
+        assert violations == [], (
+            "language_explorer.py must refuse a bare, non-interactive invocation "
+            "(it may also be 'not exercised' when requests is absent)")
+
+    def test_api_client_never_fires_a_live_probe_when_bare(self):
+        """Fixed 2026-10-09: --endpoint defaulted to enwiki, so bare = live request."""
+        script = (SKILLS_DIR / "wikipedia-error-handling" / "assets" / "api_client.py")
+        violations, examined, _, _ = vsg.scan(SKILLS_DIR, Args(files=[script], timeout=10))
+        assert examined == 1
+        assert violations == [], "api_client.py must require --endpoint"

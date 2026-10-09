@@ -168,6 +168,16 @@ def main():
             print(format_result(args.text, result))
         return
 
+    # Bare invocation is the documented interactive REPL, but only when there is
+    # actually a terminal to type into. With no TTY (a pipe, cron, the guard
+    # harness) the REPL used to print a banner and exit 0 — work "done" with no
+    # input. Refuse with the usage text instead.
+    if not sys.stdin.isatty():
+        parser.print_usage(sys.stderr)
+        print("error: no TEXT given and stdin is not a terminal — pass TEXT or "
+              "--samples, or run it interactively in a terminal.", file=sys.stderr)
+        sys.exit(2)
+
     interactive_mode()
 
 
