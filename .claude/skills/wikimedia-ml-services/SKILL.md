@@ -1,6 +1,6 @@
 ---
 name: wikimedia-ml-services
-description: LiftWing/ORES endpoints: quality, revert risk, topics, references, langid, LLM chat (Qwen) and DECISION models (clef-flash via :predict). Read before probing any LiftWing route.
+description: LiftWing/ORES endpoints incl. quality, revert risk, topics, references, langid, LLM chat (Qwen) and DECISION models (clef-flash via :predict). Read before probing any LiftWing route.
 depends_on: [wikimedia-api-access]
 license: MIT
 compatibility: opencode
