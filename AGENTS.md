@@ -48,6 +48,26 @@ and had an **open PR with green CI**. A stale local `origin/*` is the usual caus
   merge (`--delete-branch`), a missing branch says nothing about whether its PR
   merged — use `gh pr view <n> --json state,mergedAt`.
 
+## Consult the library before probing (hard rule)
+
+This repo **is** the knowledge base for Wikimedia-adjacent work. Before writing a probe, a request,
+or any claim about a Wikimedia-hosted endpoint, route, model or schema:
+
+1. `grep -r "<model-or-endpoint>" .claude/skills/` and read the matching `references/` file.
+2. Probe live only when the library does not answer, or to re-verify a `last_verified` date.
+
+Learned the hard way (2026-10-21): the merged reference
+`.claude/skills/wikimedia-ml-services/references/clef-flash-decision-models.md` (PR #100, merged
+2026-10-16) documents that decision models 404 on the chat route and answer on `:predict`. Five days
+later an adjacent task probed the chat route, got the documented 404, and reported a live model as
+"not exposed — unexplained, worth asking the ML team". **A contradiction between a live probe and
+this repo is a signal to re-read the repo, not a finding to publish.**
+
+**Harness note for contributors:** `skill_discovery_hints` is a pi/opencode convention and is not
+read by every harness — the Hermes harness selects skills on `description` alone. Trigger words
+therefore belong in the `description`. A useful CI check would assert that each skill's hint
+keywords appear in its description; until then, keep the description load-bearing.
+
 ## Skill contributions
 
 For new or changed skills (`.claude/skills/<name>/`):
