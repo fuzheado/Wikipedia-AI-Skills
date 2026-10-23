@@ -9,7 +9,7 @@ skill_discovery_hints:
   - keywords: ["#if", "#switch", "#invoke", "TemplateData", "infobox template"]
   - keywords: ["limitreport", "ResourceLoader", "Scribunto", "Module namespace", "ns 828"]
   - keywords: ["Related Changes", "RecentChangesLinked", "WhatLinksHere", "link table", "Prefixindex"]
-last_verified: 2026-09-29
+last_verified: 2026-10-17
 ---
 
 > ⚠️ **User-Agent required:** The API examples below hit Wikimedia endpoints. All requests must include a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
@@ -465,10 +465,48 @@ Returns all templates transcluded on the page, with namespace (ns=10 for templat
 }
 ```
 
-> ⚠️ **Response shape differs by API.** With `action=query&prop=templates`
-> (above), each entry has `ns` + `title`. With `action=parse&prop=templates`,
-> entries use `ns` + `exists` + `*` — the template title is under the `*` key,
-> **not** `title`. Don't read `.title` off a `parse` response.
+> ⚠️ **Response shape differs by API and `formatversion`.**
+> - With `action=query&prop=templates` (above), each entry has `ns` + `title` (and only lists templates on already-saved pages).
+> - With `action=parse&prop=templates` and default **`formatversion=1`**, entries use `ns` + `*` (and `"exists": ""` only if the template exists) — the template title is under the `*` key, **not** `title`.
+> - With `action=parse&prop=templates` and **`formatversion=2`**, entries use `ns` + `title` + boolean `exists` (`true` or `false`).
+
+### Detect Non-Existent or Deleted Templates in Unsaved Wikitext (`action=parse`)
+
+```
+POST /w/api.php
+action=parse&title=Sandbox&text={{UnsavedWikitext}}&prop=templates|text&contentmodel=wikitext&formatversion=2&format=json
+```
+
+When previewing or validating unsaved wikitext before publishing, include `templates` in `action=parse`'s `prop` list (`prop=templates` reports both `Template:` ns 10 and Scribunto `Module:` ns 828 transclusions; do not confuse with `prop=modules`, which returns ResourceLoader web bundles). Any transcluded template or Lua module that does not exist on the target wiki (such as a hallucinated shorthand like `{{i|...}}` on a wiki without `Template:I`, a typo, or a recently deleted template) is flagged in two places:
+
+1. **Structured `parse.templates` array (`formatversion=2`)**:
+   ```json
+   {
+     "ns": 10,
+     "title": "Template:NonExistentTemplate",
+     "exists": false
+   }
+   ```
+   *(In `formatversion=1`, non-existent templates omit the `"exists"` key entirely, whereas existing templates have `"exists": ""`.)*
+2. **Rendered HTML (`parse.text`)**: MediaWiki emits red links (`class="new"`, `action=edit&redlink=1`) for missing templates, whereas missing Lua modules invoked via `{{#invoke:...}}` render inline Scribunto error spans:
+   ```html
+   <!-- Missing template (ns 10) -->
+   <a href="/w/index.php?title=Template:NonExistentTemplate&amp;action=edit&amp;redlink=1"
+      class="new"
+      title="Template:NonExistentTemplate (page does not exist)">Template:NonExistentTemplate</a>
+
+   <!-- Missing Lua module (ns 828) -->
+   <strong class="error"><span class="scribunto-error mw-scribunto-error-...">Script error: No such module &quot;MissingModule&quot;.</span></strong>
+   ```
+
+Filtering `parse.templates` for `entry.get("exists") is False` (with `formatversion=2`) gives a unified, zero-extra-request pre-save gate that reliably catches missing direct and nested template/module transclusions before modifying the wiki:
+
+```python
+missing = [
+    t["title"] for t in parse_data.get("templates", [])
+    if t.get("exists") is False  # Requires formatversion=2
+]
+```
 
 ### Find All Pages Using a Template
 

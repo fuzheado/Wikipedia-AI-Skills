@@ -227,6 +227,16 @@ Privacy differs from the API: **Studio saves your chats** by default (use a
 temporary chat to avoid persistence); the API itself persists nothing — no
 logging, retention, or training.
 
+Measured 2026-10-18, it self-reports as **Open WebUI 0.9.6**
+(`GET https://liftwing-studio.wmcloud.org/api/config` →
+`{"name": "Open WebUI", "version": "0.9.6"}`, with `enable_signup: true`). That
+version is the right frame for reasoning about what is possible there: Workspace
+→ Models presets, **Tools** as Python executed by the Studio server, and
+Knowledge/RAG. One consequence worth knowing before designing around it: a
+Studio tool's requests leave from the **Studio server**, not your machine — so the
+anonymous 100 req/h figure is a property of *your* egress, not of the tool, and
+should be re-checked rather than assumed either way.
+
 ### Capabilities
 
 Works today: chat & text completions (OpenAI-compatible), streaming,
@@ -237,7 +247,12 @@ public general-purpose models. Wikitech documents hosted tools including
 (`tool-server.discovery.wmnet:31443`), so from outside the production network
 you supply your own tools and run the loop yourself. `tool_choice` accepts only
 `"auto"` or `"none"`: `"required"` and named functions return HTTP 400, so you
-cannot force a tool call. **Not available yet:** web search / browsing, server-side
+cannot force a tool call. **A `tool_calls` message arriving does not mean the
+arguments are usable** (measured 2026-10-18, `llm-qwen38-27b`): the arguments are
+schema-violating in two ways — arrays come back serialised as JSON *strings*, and
+free-form enums get **invented** (a `project` argument returned `"commons"` where
+the schema enumerated `"wikimedia"`). Coerce and validate every argument
+server-side; never pass the emitted types straight into your tool. **Not available yet:** web search / browsing, server-side
 RAG, vision / multimodal (the task-specific decision model accepts images, but the
 chat models are text-only).
 DIY RAG works — fetch the context yourself and include it in the prompt.
@@ -264,6 +279,16 @@ assistive drafts; bot/editing policies still apply).
 - Local notes with model list, rate-limit tiers, and benchmark details:
   `references/lift-wing-llm.md`; decision models (`:predict`-only typed questions,
   caps, timings): `references/clef-flash-decision-models.md`.
+
+### Verified: structured output with a closed schema (tested 2026-10-18)
+
+- **With the schema in the prompt, a 27B Qwen model is a reliable structured translator:**
+  6/6 strict-JSON responses with exact-value matches on a 6-query benchmark, checked against
+  independently computed ground truth — 2.3–3.6 s/call at `temperature=0` with a ~1,300-token spec.
+- **Without a schema it invents a grammar.** The same questions, same model, no JSON schema in the
+  prompt: a plausible but entirely fabricated parameter vocabulary. The schema — not the model's prior
+  knowledge of the API — is what makes the output usable, so send the schema with the request instead
+  of relying on the model to know the endpoint.
 
 ---
 

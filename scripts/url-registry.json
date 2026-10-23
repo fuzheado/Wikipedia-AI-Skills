@@ -313,7 +313,7 @@
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Olympics/Popular_pages": "2026-08-10T12:57:50Z",
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Parapsychology/Resources": "2026-08-10T12:57:50Z",
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Physics": "2026-08-10T12:57:50Z",
-  "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Physics/Assessment": "2026-08-10T13:06:01Z",
+  "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Physics/Assessment": "2026-10-22T22:40:44Z",
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Physics/Popular_pages": "2026-08-10T12:57:50Z",
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Politics/Assessment": "2026-08-10T12:57:50Z",
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Politics/Popular_pages": "2026-08-10T12:57:50Z",
@@ -372,6 +372,7 @@
   "https://github.com/epfl-dlab/WikiHist.html": "2026-09-14T21:06:35Z",
   "https://github.com/epfl-dlab/enwiki_history_to_html": "2026-09-14T21:06:36Z",
   "https://github.com/flickr/flickr-api-swagger": "2026-08-10T12:57:50Z",
+  "https://github.com/fuzheado/wikibento/blob/main/docs/research/TOOLFORGE-INCIDENT-2026-10-22.md": "2026-10-22T22:40:45Z",
   "https://github.com/jentic/jentic-public-apis": "2026-08-10T12:57:50Z",
   "https://github.com/philippesaade-wmde/WikidataTextEmbedding": "2026-10-05T19:30:39Z",
   "https://github.com/scour-project/scour": "2026-08-10T12:57:50Z",
@@ -421,6 +422,7 @@
   "https://iw.toolforge.org/sigma/summary.py": "2026-10-03T13:52:07Z",
   "https://kdenlive.org/": "2026-08-10T12:57:50Z",
   "https://liftwing-studio.wmcloud.org/": "2026-08-16T03:45:26Z",
+  "https://liftwing-studio.wmcloud.org/api/config": "2026-10-19T14:25:04Z",
   "https://lists.wikimedia.org/hyperkitty/search?q=...&": "2026-10-14T14:26:54Z",
   "https://meta.wikimedia.beta.wmflabs.org": "2026-08-10T12:57:50Z",
   "https://meta.wikimedia.beta.wmflabs.org/rest.php/oauth2": "2026-08-10T12:57:50Z",
@@ -678,6 +680,7 @@
   "https://wikitech.wikimedia.org/wiki/Help:Toolforge/Building_container_images/My_first_Buildpack_Django_tool": "2026-08-10T12:57:50Z",
   "https://wikitech.wikimedia.org/wiki/Help:Toolforge/Building_container_images/My_first_Buildpack_Python_tool": "2026-08-10T12:57:50Z",
   "https://wikitech.wikimedia.org/wiki/Help:Toolforge/Deploy_your_tool": "2026-10-03T13:52:30Z",
+  "https://wikitech.wikimedia.org/wiki/Help:Toolforge/Kubernetes": "2026-10-19T20:50:19Z",
   "https://wikitech.wikimedia.org/wiki/Help:Toolforge/My_first_Flask_OAuth_tool": "2026-08-10T12:57:50Z",
   "https://wikitech.wikimedia.org/wiki/Help:Toolforge/My_first_Python_ASGI_tool": "2026-08-10T12:57:50Z",
   "https://wikitech.wikimedia.org/wiki/Help:Toolforge/Python": "2026-08-10T12:57:50Z",
@@ -1733,7 +1736,7 @@
    "classification": "unicode_domain_example"
   }
  },
- "generated_at": "2026-10-20T12:27:29Z",
+ "generated_at": "2026-10-22T22:40:43Z",
  "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
@@ -2112,6 +2115,7 @@
   "https://github.com/epfl-dlab/WikiHist.html": 200,
   "https://github.com/epfl-dlab/enwiki_history_to_html": 200,
   "https://github.com/flickr/flickr-api-swagger": 200,
+  "https://github.com/fuzheado/wikibento/blob/main/docs/research/TOOLFORGE-INCIDENT-2026-10-22.md": 200,
   "https://github.com/jentic/jentic-public-apis": 200,
   "https://github.com/philippesaade-wmde/WikidataTextEmbedding": 200,
   "https://github.com/scour-project/scour": 200,
@@ -2161,6 +2165,7 @@
   "https://iw.toolforge.org/sigma/summary.py": 200,
   "https://kdenlive.org/": 200,
   "https://liftwing-studio.wmcloud.org/": 200,
+  "https://liftwing-studio.wmcloud.org/api/config": 200,
   "https://lists.wikimedia.org/hyperkitty/search?q=...&": -1,
   "https://meta.wikimedia.beta.wmflabs.org": 200,
   "https://meta.wikimedia.beta.wmflabs.org/rest.php/oauth2": -2,
@@ -2418,6 +2423,7 @@
   "https://wikitech.wikimedia.org/wiki/Help:Toolforge/Building_container_images/My_first_Buildpack_Django_tool": 200,
   "https://wikitech.wikimedia.org/wiki/Help:Toolforge/Building_container_images/My_first_Buildpack_Python_tool": 200,
   "https://wikitech.wikimedia.org/wiki/Help:Toolforge/Deploy_your_tool": 200,
+  "https://wikitech.wikimedia.org/wiki/Help:Toolforge/Kubernetes": 200,
   "https://wikitech.wikimedia.org/wiki/Help:Toolforge/My_first_Flask_OAuth_tool": 200,
   "https://wikitech.wikimedia.org/wiki/Help:Toolforge/My_first_Python_ASGI_tool": 200,
   "https://wikitech.wikimedia.org/wiki/Help:Toolforge/Python": 200,
@@ -2583,5 +2589,5 @@
   "https://your-tool.toolforge.org": -1,
   "https://\u0440\u0443.wikipedia.org": 0
  },
- "user_agent": "wikipedia-ai-skills-url-registry/1.0 (scheduled GitHub Action; https://github.com/fuzheado/Wikipedia-AI-Skills)"
+ "user_agent": "WikipediaSkill/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills; andrew.lih@gmail.com) ContentGapResearch"
 }

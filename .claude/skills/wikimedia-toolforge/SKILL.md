@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["Toolforge", "tool hosting", "Kubernetes", "web service", "cron job", "deploy"]
   - keywords: ["toolsadmin", "become", "webservice", "toolforge jobs"]
   - keywords: ["CDN", "cdnjs", "tools-static", "privacy-preserving CDN", "content delivery", "third-party script", "external CDN tracking"]
-last_verified: 2026-10-14
+last_verified: 2026-10-19
 ---
 
 Toolforge (formerly Wikimedia Tool Labs) is a cloud hosting platform for community-developed tools that interact with Wikimedia wikis and data. This skill covers account setup, service management, deployment, and debugging.
@@ -469,7 +469,7 @@ toolforge webservice buildservice shell
 - **`runtime.txt` is dead** — heroku/python buildpacks ≥ 6.x fail the build
   with `Error: The runtime.txt file isn't supported`; use `.python-version`
   containing just the major.minor (e.g. `3.11`).
-- **Default pod memory limit is 512 Mi** — each gunicorn sync worker is a
+- **Build Service default pod memory limit is 512 Mi** (a Build Service default, not a platform-wide constant; see Guardrail 4) — each gunicorn sync worker is a
   separate process (~100–150 MB RSS with OpenCV/numpy/ML libraries), so
   `--workers=4` under 512 Mi = OOMKilled container. Raise with `-m 1Gi` at
   start; budget workers × per-process RSS against the limit.
@@ -633,6 +633,10 @@ https://packages.ubuntu.com/noble/.
 3. **NFS latency** — `/data/project/` is on NFS. File operations can be slow. Avoid frequent small writes. Use local `/tmp/` for temporary files and move results to NFS only when needed.
 
 4. **Resource limits** — Kubernetes pods have 1 CPU and 1Gi RAM by default. Use toolforge jobs with `--mem` and `--cpu` flags for larger tasks. Do not run resource-intensive tasks on bastion or login nodes.
+
+   **Verified against [Help:Toolforge/Kubernetes](https://wikitech.wikimedia.org/wiki/Help:Toolforge/Kubernetes) (2026-10-19):** the platform page states **container storage is 10 GB including the image** (≈9 GB free in `/tmp`, wiped when the container ends) and that worker nodes have **16 GB RAM**; it gives no per-container memory default. Per-tool limits are namespace-wide quotas — read the real numbers with `kubectl describe resourcequotas`, and request increases via the Phabricator *Toolforge (Quota requests)* project. The **512 Mi** figure in §8.5 is a *Build Service* default, not a platform constant; `toolforge jobs --mem` defaults to 1Gi (max 4Gi).
+
+   **Consequence for data-heavy tools:** the platform explicitly recommends a file-based database (SQLite, dbm, CSV) in `/tmp` when the data is larger than memory — 9 GB is enough for a several-hundred-MB catalogue, so SQLite-in-`/tmp` is a supported pattern, not a hack. Copy the release from NFS at container start, verify its hash, and fail fast rather than serve a partial file.
 
 5. **Do not run long processes on login** — The login shell is for administration only. Long-running processes should be jobs or web services. Processes running for more than 30 minutes on login may be killed without warning.
 

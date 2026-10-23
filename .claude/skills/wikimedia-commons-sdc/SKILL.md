@@ -9,7 +9,7 @@ skill_discovery_hints:
   - keywords: ["AC/DC", "ISA Tool", "OpenRefine Commons", "QuickStatements Commons", "Pattypan"]
   - keywords: ["wbcreateclaim", "wbeditentity", "wbsetclaim", "wbsetlabel", "GLAM Commons"]
   - keywords: ["Structured data editing", "batch SDC", "Commons API editing", "copyright statement", "license statement"]
-last_verified: 2026-09-15
+last_verified: 2026-10-21
 ---
 
 > ⚠️ **User-Agent and authentication required:** All write operations to Wikimedia Commons require authentication. You need a Commons account and either a bot password or OAuth authorization. See the **[wikimedia-auth-oauth](../wikimedia-auth-oauth/SKILL.md)** skill for setup. All HTTP requests need a descriptive `User-Agent` header — see the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill.
@@ -415,24 +415,31 @@ else:
     print(f"Created claim: {claim_id}")
 ```
 
-**Adding multiple depicts values** — call `wbcreateclaim` once per depicts statement. Each call adds a separate statement:
+**Adding multiple depicts values** — every `wbcreateclaim` call saves a separate revision, so do not loop it over one file. Send all the statements in one `wbeditentity` call instead, after checking which ones the file already has (see §14, *Atomic Statement Management*):
 
 ```python
 depicts_qids = ["Q42", "Q5", "Q30"]   # Douglas Adams, human, United States
-for qid in depicts_qids:
-    resp = SESSION.post(
-        "https://commons.wikimedia.org/w/api.php",
-        data={
-            "action": "wbcreateclaim",
-            "entity": "M12345",
+claims = [
+    {
+        "type": "statement",
+        "mainsnak": {
+            "snaktype": "value",
             "property": "P180",
-            "value": json.dumps({"id": qid}),
-            "token": csrf_token,
-            "format": "json",
+            "datavalue": {"type": "wikibase-entityid", "value": {"id": qid}},
         },
-    )
-    # Optional: respect rate limits
-    import time; time.sleep(0.5)
+    }
+    for qid in depicts_qids
+]
+resp = SESSION.post(
+    "https://commons.wikimedia.org/w/api.php",
+    data={
+        "action": "wbeditentity",
+        "id": "M12345",
+        "data": json.dumps({"claims": claims}),
+        "token": csrf_token,
+        "format": "json",
+    },
+)
 ```
 
 ### 4. Adding Copyright Status (`wbcreateclaim` with item value)
@@ -723,6 +730,100 @@ resp = SESSION.post(
 - `P248` — stated in (Wikidata item representing the source)
 - `P4656` — Wikipedia article (as source)
 
+### 14. Atomic Statement Management & Revision History Hygiene (`wbeditentity`)
+
+> ⚠️ **CRITICAL: Avoid Flooding Commons Revision History**
+> On Wikimedia Commons, **every call to a single-purpose write module (`wbcreateclaim`, `wbsetclaim`, `wbsetclaimvalue`, `wbremoveclaims`, `wbsetlabel`, `wbsetqualifier`, `wbsetreference`) saves its own revision** of the File page, with an automatic edit summary such as `/* wbcreateclaim-create:... */`, `/* wbsetclaim-create:... */` or `/* wbremoveclaims-remove:... */`.
+> - ❌ **NEVER loop over these modules on the same file** to add or remove several statements. Ten calls make ten revisions in rapid succession, flooding the file history and recent changes.
+> - ✅ **ALWAYS bundle all statement additions, updates, removals, and caption changes for one file into a single `action=wbeditentity` call.** For removals only, `wbremoveclaims` also takes up to 50 GUIDs joined with `|` in one call (one revision).
+
+**How this typically goes wrong:** a script re-sends a file's full statement set *without* `id`s, so every property ends up duplicated. The cleanup then removes the duplicates with one `wbremoveclaims` call per GUID and re-adds the originals in yet another edit — a change that needed one or two revisions leaves a dozen or more in the file history. Reconciling first (below) prevents the duplicates; a single `wbeditentity` with one `remove` entry per duplicate cleans them up in one revision.
+
+#### Single-Edit Statement Removals, Updates, and Additions
+
+To remove, update, and add statements — and change captions — in a single revision:
+
+```python
+# To remove a statement, pass its GUID with "remove": ""
+# To update a statement, pass its GUID and the COMPLETE new statement (see warning below)
+# To add a statement, omit the "id" field
+claims_payload = [
+    # 1. REMOVE existing statement by GUID
+    {"id": "M12345$7B9C34A1-4D2A-4F3E-9B1C-1234567890AB", "remove": ""},
+    # 2. UPDATE existing statement by GUID
+    {
+        "id": "M12345$8C1D45E2-5E3B-5A4F-0C2D-2345678901BC",
+        "type": "statement",
+        "rank": "normal",
+        "mainsnak": {
+            "snaktype": "value",
+            "property": "P180",
+            "datavalue": {"type": "wikibase-entityid", "value": {"id": "Q104526"}},  # pipe
+        },
+        # plus any "qualifiers"/"references" the statement already had
+    },
+    # 3. ADD new statement (no "id" field)
+    {
+        "type": "statement",
+        "mainsnak": {
+            "snaktype": "value",
+            "property": "P180",
+            "datavalue": {"type": "wikibase-entityid", "value": {"id": "Q487"}},  # smile
+        },
+    },
+]
+
+resp = SESSION.post(
+    "https://commons.wikimedia.org/w/api.php",
+    data={
+        "action": "wbeditentity",
+        "id": "M12345",
+        # MediaInfo's wbeditentity reads only "labels", "descriptions" and "claims";
+        # a payload keyed "statements" (the name wbgetentities answers with) is not applied
+        "data": json.dumps({
+            "labels": {"en": {"language": "en", "value": "Man smiling with a pipe"}},
+            "claims": claims_payload,
+        }),
+        "baserevid": base_revid,   # lastrevid from the reconciliation read below
+        "token": csrf_token,
+        "summary": "Update captions and depicts statements",
+        "format": "json",
+    },
+)
+```
+
+> ⚠️ **Updating by GUID replaces the whole statement.** Whatever you send under that `id` becomes the statement:
+> omitted `qualifiers` and `references` are deleted, and an omitted `rank` resets to `normal`. To change only the value,
+> start from the statement exactly as `wbgetentities` returned it and modify its `mainsnak`.
+
+#### Pre-Edit Reconciliation & Duplicate Statement Prevention
+
+Before editing an entity's statements:
+1. Read the file once with `action=wbgetentities&props=claims|info`. For MediaInfo the statements come back under
+   **`statements`**, not `claims` (see *"The statement container is named differently"* above) — a script that reads `entity["claims"]` sees an empty file and re-adds everything as duplicates.
+2. Skip any statement whose property and value already exist. A statement sent to `wbeditentity` without an `id` is always appended, even when an identical one is present.
+3. To correct an existing statement, take its GUID from the read and send it as `id` (update in place), or send `{"id": ..., "remove": ""}` for duplicates.
+4. Pass the read's `lastrevid` as `baserevid`, so the edit fails instead of overwriting a change made in between.
+5. Resolve every QID at runtime — never from memory — with the **[wikidata-reconciliation](../wikidata-reconciliation/SKILL.md)** skill.
+
+```python
+ent = SESSION.get(
+    "https://commons.wikimedia.org/w/api.php",
+    params={"action": "wbgetentities", "ids": "M12345", "props": "claims|info", "format": "json"},
+    timeout=30,
+).json()["entities"]["M12345"]
+existing = ent.get("statements") or ent.get("claims") or {}
+base_revid = ent["lastrevid"]
+
+def has_item_value(prop, qid):
+    """True if the file already has a `prop` statement pointing at `qid`."""
+    for s in existing.get(prop, []):
+        value = s["mainsnak"].get("datavalue", {}).get("value")
+        if isinstance(value, dict) and value.get("id") == qid:
+            return True
+    return False
+```
+
 ---
 
 ## Batch and Workflow Patterns
@@ -821,18 +922,19 @@ with open("captions.csv") as f:
         for page_id, info in pages.items():
             m_id = f"M{page_id}"
 
-        # Set caption for each language
-        for lang in ["en", "de", "fr"]:
-            caption = row.get(f"caption_{lang}", "").strip()
-            if not caption:
-                continue
+        # Set all languages in one revision (wbsetlabel would save one per language)
+        labels = {
+            lang: {"language": lang, "value": row[f"caption_{lang}"].strip()}
+            for lang in ["en", "de", "fr"]
+            if row.get(f"caption_{lang}", "").strip()
+        }
+        if labels:
             resp = SESSION.post(
                 "https://commons.wikimedia.org/w/api.php",
                 data={
-                    "action": "wbsetlabel",
+                    "action": "wbeditentity",
                     "id": m_id,
-                    "language": lang,
-                    "value": caption,
+                    "data": json.dumps({"labels": labels}),
                     "token": csrf_token,
                     "format": "json",
                 },
@@ -854,23 +956,28 @@ resp = SESSION.get(
 )
 claims = resp.json()["claims"]
 
-# Copy each claim to the target file (simplified — skips qualifiers/references)
+# Copy the claims to the target file in ONE revision (simplified — skips qualifiers/references).
+# Drop any the target already has first (see §14), or they become duplicates.
+new_claims = []
 for prop, claim_list in claims.items():
     for claim in claim_list:
         snak = claim.get("mainsnak", {})
         if snak.get("snaktype") == "value" and "datavalue" in snak:
-            resp = SESSION.post(
-                "https://commons.wikimedia.org/w/api.php",
-                data={
-                    "action": "wbcreateclaim",
-                    "entity": "M67890",          # target file
-                    "property": prop,
-                    "value": json.dumps(snak["datavalue"]["value"]),
-                    "token": csrf_token,
-                    "format": "json",
-                },
-            )
-        time.sleep(0.3)
+            new_claims.append({
+                "type": "statement",
+                "mainsnak": {"snaktype": "value", "property": prop, "datavalue": snak["datavalue"]},
+            })
+
+resp = SESSION.post(
+    "https://commons.wikimedia.org/w/api.php",
+    data={
+        "action": "wbeditentity",
+        "id": "M67890",          # target file
+        "data": json.dumps({"claims": new_claims}),
+        "token": csrf_token,
+        "format": "json",
+    },
+)
 ```
 
 ### Pattern D: Update a Claim Value

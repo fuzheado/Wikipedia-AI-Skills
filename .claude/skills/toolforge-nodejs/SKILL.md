@@ -5,7 +5,7 @@ license: MIT
 compatibility: opencode
 depends_on: [wikimedia-toolforge, wikimedia-api-access]
 skill_discovery_hints:
-  - keywords: ["Toolforge Node", "Node.js", "Node webservice", "node22", "node18", "node20", "npm", "package.json", "deploy to toolforge", "launch on toolforge", "serve static files", "static site"]
+  - keywords: ["Toolforge Node", "Node.js", "Node webservice", "node20", "node18", "node20", "npm", "package.json", "deploy to toolforge", "launch on toolforge", "serve static files", "static site"]
   - keywords: ["Toolforge port", "PORT env", "webservice port", "Toolforge Kubernetes", "web service"]
   - keywords: ["Toolforge static files", "express", "http server", "zero dependency", "built-in http"]
   - keywords: ["Cache-Control", "Varnish", "Toolforge proxy", "immutable cache", "static asset"]
@@ -48,13 +48,13 @@ last_verified: 2026-10-14
 | Goal | Command / Pattern |
 |------|-------------------|
 | Deploy a new Node.js service | See SOP 1 |
-| Choose a runtime | `node22` (default), `node18` (legacy) — see SOP 1.1 |
-| Start/restart a webservice | `become <tool> webservice --backend=kubernetes node22 start` |
+| Choose a runtime | `node20` (default), `node18` (legacy) — see SOP 1.1 |
+| Start/restart a webservice | `become <tool> webservice --backend=kubernetes node20 start` |
 | See logs | `become <tool> kubectl logs -f deployment/<tool>` |
 | Set environment variables | `become <tool> toolforge envvars create NAME value` |
 | Serve static files | Use `readFile()` with correct MIME types — see SOP 3 |
 | Add npm dependencies | Use a `package.json` and `npm install` on the tool's NFS — see SOP 5 |
-| Run a cron job | `become <tool> job schedule node22 --command 'node script.mjs' "0 * * * *"` |
+| Run a cron job | `become <tool> job schedule node20 --command 'node script.mjs' "0 * * * *"` |
 
 ---
 
@@ -68,8 +68,14 @@ Toolforge offers these Node.js runtime versions:
 
 | Runtime | Kubernetes Image | Status |
 |---------|-----------------|--------|
-| `node22` | `docker-registry.tools.wmflabs.org/toolforge-node22-sssd-web:latest` | ✅ Current default (Node 22.x) |
-| `node18` | `docker-registry.tools.wmflabs.org/toolforge-node18-sssd-web:latest` | ⚠️ Legacy (Node 18.x, available but not recommended for new tools) |
+| `node20` | `docker-registry.tools.wmflabs.org/toolforge-node20-sssd-web:latest` | ✅ Newest Node type this cluster offers (measured 2026-10-22) |
+| `node18` | `docker-registry.tools.wmflabs.org/toolforge-node18-sssd-web:latest` | ⚠️ Legacy (available; not for new tools) |
+
+**Ask the CLI; do not trust a version number in any document, including this one.** `toolforge webservice --help` lists the
+types the cluster actually offers. On 2026-10-22 that list was `node18`, `node20` — plus `bookworm`, `buildservice`,
+`jdk21`, `perl5.36`, `perl5.40`, `php8.2`, `php8.4`, `python3.11`, `python3.13`, `ruby3.1`, `ruby3.3`, `tcl8.6`,
+`trixie` — and **`node22` was not among them**, although this page had called it the default. A type that does not exist
+fails late and confusingly: `ImagePullBackOff`, or a bare `400` with the reason hidden.
 
 The runtime image includes the operating system, Node.js binary, and basic tools. Your code lives on NFS at `/data/project/<tool>/`.
 
@@ -166,14 +172,14 @@ ssh <user>@login.toolforge.org "mkdir -p /data/project/my-tool/public"
 scp index.html style.css <user>@login.toolforge.org:/data/project/my-tool/public/
 
 # Start the webservice
-ssh <user>@login.toolforge.org "become my-tool webservice --backend=kubernetes node22 start"
+ssh <user>@login.toolforge.org "become my-tool webservice --backend=kubernetes node20 start"
 ```
 
 ### 1.5 Verify
 
 ```bash
 # Check status
-ssh <user>@login.toolforge.org "become my-tool webservice --backend=kubernetes node22 status"
+ssh <user>@login.toolforge.org "become my-tool webservice --backend=kubernetes node20 status"
 
 # View logs
 ssh <user>@login.toolforge.org "become my-tool kubectl logs -f deployment/my-tool"
@@ -421,7 +427,7 @@ if (!apiKey) {
 - **Variables are set per-tool**, not per-webservice-instance. All pods for the same tool share the same environment.
 - **Restart the webservice after changing env vars** — they're loaded at process start, not dynamically:
   ```bash
-  become my-tool webservice --backend=kubernetes node22 restart
+  become my-tool webservice --backend=kubernetes node20 restart
   ```
 - **Never hardcode secrets** in source files committed to version control. Always use `toolforge envvars create`.
 
@@ -470,7 +476,8 @@ log('error', 'Failed to resolve file', { file: filename, error: e.message });
 |---------|-------------|-----|
 | `Connection refused` | Server not listening on `PORT` | Check `process.env.PORT` in code |
 | `CrashLoopBackOff` in status | Server crashes on startup | Run `kubectl logs` to see the error |
-| `ImagePullBackOff` | Runtime image not found | Check runtime name (`node22` not `nodejs22`) |
+| Crashloop whose log is `cd: //www/js: No such file or directory` | The pod was created with `HOME=/` instead of the tool home, so **any** app that builds a path from `$HOME` dies instantly. A platform-side environment injection failed; nothing in your code or on NFS is wrong | Retrying never helps: a container restart reuses the pod's frozen environment. `become <tool> webservice --backend=kubernetes node20 restart` creates a **new** pod, which is the fix. In your own start path prefer `$PWD` over `$HOME` — the pod's `workingDir` is already the tool home. Full write-up: <https://github.com/fuzheado/wikibento/blob/main/docs/research/TOOLFORGE-INCIDENT-2026-10-22.md> |
+| `ImagePullBackOff` | Runtime image not found | Check runtime name (`node20` not `nodejs22`) |
 | Slow first request | Cold start + NFS metadata | Use a keepalive or health check endpoint |
 | `ERR_FAILED 200 (OK)` | Streamed response to Pannellum | Use `readFile()` instead of streaming |
 | 404 for existing files | Path resolution wrong | Log `filePath` and check directory traversal |
@@ -494,13 +501,13 @@ For batch processing, periodic syncs, or scheduled maintenance:
 
 ```bash
 # Run a script every hour
-become my-tool job schedule node22 \
+become my-tool job schedule node20 \
     --command 'node /data/project/my-tool/cron/cleanup.mjs' \
     --no-filelog \
     "0 * * * *"
 
 # Run once
-become my-tool job submit node22 \
+become my-tool job submit node20 \
     --command 'node /data/project/my-tool/cron/backfill.mjs'
 ```
 
@@ -545,7 +552,7 @@ cleanup().catch(err => {
 ### Restart (zero-downtime)
 
 ```bash
-become my-tool webservice --backend=kubernetes node22 restart
+become my-tool webservice --backend=kubernetes node20 restart
 ```
 
 The Kubernetes deployment performs a rolling restart — no downtime as long as your server starts quickly.
@@ -557,13 +564,13 @@ The Kubernetes deployment performs a rolling restart — no downtime as long as 
 scp server.mjs <user>@login.toolforge.org:/data/project/my-tool/
 
 # Restart to pick up changes
-ssh <user>@login.toolforge.org "become my-tool webservice --backend=kubernetes node22 restart"
+ssh <user>@login.toolforge.org "become my-tool webservice --backend=kubernetes node20 restart"
 ```
 
 ### Stop
 
 ```bash
-become my-tool webservice --backend=kubernetes node22 stop
+become my-tool webservice --backend=kubernetes node20 stop
 ```
 
 ---
@@ -572,10 +579,10 @@ become my-tool webservice --backend=kubernetes node22 stop
 
 ```bash
 # === Lifecycle ===
-become my-tool webservice --backend=kubernetes node22 start
-become my-tool webservice --backend=kubernetes node22 stop
-become my-tool webservice --backend=kubernetes node22 restart
-become my-tool webservice --backend=kubernetes node22 status
+become my-tool webservice --backend=kubernetes node20 start
+become my-tool webservice --backend=kubernetes node20 stop
+become my-tool webservice --backend=kubernetes node20 restart
+become my-tool webservice --backend=kubernetes node20 status
 
 # === Logs ===
 become my-tool kubectl logs -f deployment/my-tool
@@ -591,8 +598,8 @@ become my-tool toolforge envvars list
 become my-tool toolforge envvars delete KEY
 
 # === Scheduled Jobs ===
-become my-tool job schedule node22 --command 'node script.mjs' "0 * * * *"
-become my-tool job submit node22 --command 'node script.mjs'
+become my-tool job schedule node20 --command 'node script.mjs' "0 * * * *"
+become my-tool job submit node20 --command 'node script.mjs'
 
 # === Direct Shell ===
 become my-tool
