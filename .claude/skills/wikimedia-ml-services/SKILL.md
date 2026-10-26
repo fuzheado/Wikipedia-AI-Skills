@@ -1,6 +1,6 @@
 ---
 name: wikimedia-ml-services
-description: Score article quality, revert risk, edit quality, readability, topics, references, language ID, and article country via Wikimedia ML inference APIs (Lift Wing + legacy ORES), plus LiftWing LLM chat completions (Qwen3, OpenAI-compatible)
+description: LiftWing/ORES API endpoints incl. quality, revert risk, topics, references, langid, LLM chat (Qwen) and DECISION models (clef-flash via :predict). Read before probing any LiftWing route.
 depends_on: [wikimedia-api-access]
 license: MIT
 compatibility: opencode
@@ -14,8 +14,22 @@ skill_discovery_hints:
   - keywords: ["translation", "content translation", "cross-language", "recommendation"]
   - keywords: ["LLM", "chat completions", "Qwen", "OpenAI-compatible", "text generation", "LiftWing Studio", "large language model"]
   - keywords: ["429", "rate limited", "rate limit", "Toolforge", "high-throughput", "burst", "LLM testing"]
-last_verified: 2026-10-19
+last_verified: 2026-10-21
 ---
+
+> 🛑 **Read this BEFORE writing a probe or a request.** The endpoint contracts are in
+> **[references/](references/)** and are verified live:
+>
+> - `references/lift-wing-llm.md` — the OpenAI-compatible **chat** route (Qwen models)
+> - `references/clef-flash-decision-models.md` — **decision models: `:predict` only.** The chat
+>   route returns `404 {"detail":"Not Found"}` **by design**, and the model is absent from the
+>   OpenAPI spec, so a spec check will not find it either
+> - `references/model-schemas.md` — per-model payload shapes
+>
+> **A 400/422 from a model route means the service is UP and rejecting your payload** — that is
+> proof of deployment, not absence. Only 404 on every candidate route means "not exposed", and a
+> 5xx/timeout must be retried before it is read as anything. Probing before reading here already
+> produced a false "model is retired / unexplained" report on 2026-10-21.
 
 > ⚠️ **User-Agent required:** All API calls below need a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
 
