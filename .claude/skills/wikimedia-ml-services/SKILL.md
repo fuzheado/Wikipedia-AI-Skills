@@ -14,7 +14,7 @@ skill_discovery_hints:
   - keywords: ["translation", "content translation", "cross-language", "recommendation"]
   - keywords: ["LLM", "chat completions", "Qwen", "OpenAI-compatible", "text generation", "LiftWing Studio", "large language model"]
   - keywords: ["429", "rate limited", "rate limit", "Toolforge", "high-throughput", "burst", "LLM testing"]
-last_verified: 2026-10-21
+last_verified: 2026-11-02
 ---
 
 > 🛑 **Read this BEFORE writing a probe or a request.** The endpoint contracts are in

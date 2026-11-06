@@ -89,9 +89,30 @@ is the 400 above.
   base64 per image — sending larger files costs upload bandwidth for no gain.
 - **Token cost is set by aspect ratio, not file size:** every 3:2 file billed 905 input tokens
   whether the original was 5472×3648 or 12000×8000; every 2:3 file 1245 (2026-10-12).
-- **No `x-wmf-ratelimit-class` header on `:predict`** (the chat route sends `unauthed-bot`).
-  Whether the decision route counts against the anonymous 100 req/hour budget is **unverified** —
-  pace batches and expect a 429 to be possible.
+- **Rate limiting on `:predict` is real, and `Retry-After` is authoritative.** There is no
+  `x-wmf-ratelimit-class` header (the chat route sends `unauthed-bot`), but an exhausted budget
+  answers **HTTP 429** with `x-envoy-ratelimited: true` and a `retry-after` in **seconds**. Observed
+  values: **1347** (2026-11-02) and **~800** (2026-10-20, after ~200 calls in ~80 min). Treat it as a
+  budget reset, not a transient hiccup.
+
+### Observed rate-limit behaviour (2026-10-20, 2026-11-02)
+
+| observation | value |
+|---|---|
+| 429 after ~200 calls in ~80 min | `retry-after: ~800` s |
+| 429 on the first call of a session, budget already spent by earlier runs | `retry-after: 1347` s |
+| headers present on 429 | `x-envoy-ratelimited: true`, `retry-after`, `x-client-ip`, `x-request-id` |
+| body | `You are making too many requests to the API … contact bot-traffic@wikimedia.org` |
+
+Both observations came from shared egress IPs on modest runs (~200 and 1 call respectively), so the
+budget is per-IP and can be spent by anything else behind the same address. Planning figure:
+**~2.5 calls/min sustained**. Size a job against that before promising a runtime — 122,000 calls
+(one deployment's 2,000 hours of video at 50 calls per hour) is weeks of wall clock, not hours.
+
+**The trap this cost us.** A client that honoured `Retry-After` but capped it at 1200 s retried
+**147 s early** on the 1347 s header and re-entered the wall; the retry looked like intermittent
+flakiness, and the cap converted a correct wait into a guaranteed failure. If a runaway ceiling is
+needed, **refuse the call and report the wait** — never shorten it silently.
 
 ## Why it looks like this (serving internals)
 
@@ -118,7 +139,9 @@ supports `:predict` endpoint for now." Deployment trail: Phabricator T440223 (20
 
 ## Known unknowns
 
-- Rate-limit tier and whether the 100 req/hour anonymous budget applies to `:predict`.
+- The exact window the 429 budget resets on, and whether `:predict` shares the anonymous
+  100 req/hour budget with the chat route. Observed waits (~800 s, 1347 s) are consistent with an
+  hourly per-IP budget but do not prove it.
 - No published task-quality numbers for this model (vendor Decision Index covers text/structured
   usage only) — validate on your own examples.
 - Whether more task-specific models will follow this pattern; check the Wikitech "Public — Task
