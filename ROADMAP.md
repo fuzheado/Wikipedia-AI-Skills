@@ -3,6 +3,10 @@
 ## What's done
 
 ### Published skills
+- **citoid-publisher-diagnostics** — Production-first access diagnosis, cache/Wayback controls, controlled UA/method/network probes, cautious blocklist attribution, dated corrections, and reporting/outreach references.
+
+- **zotero-translator-development** — Reusable web-translator implementation and review workflow with current async APIs, EM delegation, byline/date/language semantics, embedded fixtures, lint and real sandbox verification. Includes five focused references; excludes personal paths and stale PR/environment snapshots.
+
 - **wikimedia-codex** — Complete. Covers the Codex design system for building Wikimedia-consistent web interfaces — the three npm packages (@wikimedia/codex with Vue 3 and CSS-only components, @wikimedia/codex-icons, @wikimedia/codex-design-tokens), design token categories and usage, dark mode, bidirectionality, composables, and CDN loading (including the stale-cdnjs caveat with jsDelivr/unpkg alternatives for current versions). Ships with references for developing with Codex, components, design tokens, icons, and composables, plus scripts/list-codex-checkout.ps1 (lists components/demos/tokens from a local design-codex checkout).
 
 - **wikimedia-api-access** — Complete. Covers Wikimedia API entry points (REST, Action, SPARQL), User-Agent policy compliance, rate limiting with Retry-After backoff, connection reuse via `requests.Session()`, 403/429 error handling, and browser-based `Api-User-Agent` workaround.
