@@ -4,7 +4,7 @@ description: Use PetScan for multi-source Wikimedia queries — category interse
 license: MIT
 compatibility: opencode
 depends_on: [wikimedia-api-access]
-last_verified: 2026-09-14
+last_verified: 2026-11-16
 skill_discovery_hints:
   - keywords: ["PetScan", "petscan", "category intersection", "category union", "category difference", "category overlap"]
   - keywords: ["multi-source query", "combine categories", "combine SPARQL", "combine PagePile", "combine templates"]
@@ -12,7 +12,9 @@ skill_discovery_hints:
   - keywords: ["find items without statements", "Wikidata quality", "missing Wikidata item", "redlink finder"]
 ---
 
-> ℹ️ **User-Agent required:** All API examples in this skill access PetScan (`petscan.wmcloud.org`). Include a descriptive `User-Agent` header as described in the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill.
+> ℹ️ **User-Agent required:** All API examples in this skill access PetScan (`petscan.toolforge.org`). Include a descriptive `User-Agent` header as described in the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill.
+
+> ⚠️ **Use `petscan.toolforge.org` — the canonical host.** The older names are permanent 301 redirects (`petscan.wmflabs.org` → `petscan.wmcloud.org` → `petscan.toolforge.org`). A `curl` **without `-L`** therefore returns a 301 HTML page instead of JSON, so the legacy hosts silently break scripted use even though the tool is alive. Verified 2026-11-16.
 
 > 💡 **Related skills for complementary query approaches:**
 > - **[wikipedia-categories](../wikipedia-categories/SKILL.md)** — Category tree navigation, `incategory:` policy, and the `category-intersect.py` asset
@@ -24,7 +26,7 @@ skill_discovery_hints:
 
 ## SOP: What PetScan Is
 
-**[PetScan](https://petscan.wmcloud.org/)** is a powerful multi-source querying tool for Wikimedia, created by Magnus Manske as the successor to CatScan2. Winner of the **Coolest Tool Award 2022**.
+**[PetScan](https://petscan.toolforge.org/)** is a powerful multi-source querying tool for Wikimedia, created by Magnus Manske as the successor to CatScan2. Winner of the **Coolest Tool Award 2022**.
 
 It generates lists of pages or Wikidata items matching criteria across up to **6 source tabs** simultaneously:
 
@@ -43,7 +45,7 @@ The key insight: **PetScan combines these sources into one result** using config
 
 | Method | When | How |
 |--------|------|-----|
-| **Web UI** | One-off queries, exploration | `https://petscan.wmcloud.org/` — fill forms, tabs, click "Do it!" |
+| **Web UI** | One-off queries, exploration | `https://petscan.toolforge.org/` — fill forms, tabs, click "Do it!" |
 | **URL API** | Automation, scripts | Append URL parameters to the base URL, get JSON/CSV/XML/... |
 | **PSID** | Share, rerun, tool integration | Every query gets a stable ID; `?psid=12345` re-runs it |
 
@@ -53,7 +55,7 @@ The key insight: **PetScan combines these sources into one result** using config
 
 Since 2016, every submitted PetScan query is assigned a unique, stable numeric **PSID** (displayed in the result page). This enables:
 
-- **Short URLs:** `https://petscan.wmcloud.org/?psid=552`
+- **Short URLs:** `https://petscan.toolforge.org/?psid=552`
 - **Re-running queries** without re-entering all parameters
 - **Tool integration:** Many tools (WD-FIST, PagePile, Massviews) accept PSID as input
 - **Caching:** PSID results are cached server-side for faster repeat access
@@ -151,7 +153,7 @@ All examples use `curl`. Replace `language`/`project` as needed.
 Pages in ALL categories — equivalent to `category-intersect.py` in the **[wikipedia-categories](../wikipedia-categories/SKILL.md)** skill:
 
 ```bash
-curl -s 'https://petscan.wmcloud.org/\
+curl -s 'https://petscan.toolforge.org/\
   ?language=en\
   &project=wikipedia\
   &categories=Physicists%7CGerman%20scientists\
@@ -166,7 +168,7 @@ curl -s 'https://petscan.wmcloud.org/\
 Pages in `Category:Physics` that have `{{WikiProject Physics}}`:
 
 ```bash
-curl -s 'https://petscan.wmcloud.org/\
+curl -s 'https://petscan.toolforge.org/\
   ?language=en\
   &project=wikipedia\
   &categories=Physics\
@@ -181,7 +183,7 @@ curl -s 'https://petscan.wmcloud.org/\
 FA-class articles in a category:
 
 ```bash
-curl -s 'https://petscan.wmcloud.org/\
+curl -s 'https://petscan.toolforge.org/\
   ?language=en\
   &project=wikipedia\
   &categories=Physics\
@@ -199,7 +201,7 @@ Get all items from a SPARQL query that are also in a category:
 SPARQL_ENC=$(python3 -c "import urllib.parse; print(urllib.parse.quote(\"\"\"\
 SELECT ?item WHERE { ?item wdt:P31 wd:Q5 ; wdt:P106 wd:Q2519376 }
 \"\"\"))")
-curl -s "https://petscan.wmcloud.org/\
+curl -s "https://petscan.toolforge.org/\
   ?language=en\
   &project=wikipedia\
   &categories=American%20jewellers\
@@ -219,7 +221,7 @@ MANUAL_ENC=$(python3 -c "import urllib.parse; print(urllib.parse.quote('''$MANUA
 SPARQL_EXCLUDE=$(python3 -c "import urllib.parse; print(urllib.parse.quote(\"\"\"\
 SELECT ?item WHERE { ?item wdt:P31 wd:Q5 ; wdt:P106 wd:Q2519376 }\
 \"\"\"))")
-curl -s "https://petscan.wmcloud.org/\
+curl -s "https://petscan.toolforge.org/\
   ?manual_list=$MANUAL_ENC\
   &manual_list_wiki=wikidatawiki\
   &sparql=$SPARQL_EXCLUDE\
@@ -233,7 +235,7 @@ curl -s "https://petscan.wmcloud.org/\
 Find English Wikipedia articles in a category that have a Wikidata item but no statements:
 
 ```bash
-curl -s 'https://petscan.wmcloud.org/\
+curl -s 'https://petscan.toolforge.org/\
   ?language=en\
   &project=wikipedia\
   &categories=United%20States%20geography%20stubs\
@@ -247,7 +249,7 @@ curl -s 'https://petscan.wmcloud.org/\
 ### Commons: Find Uncategorized Files with a Language Template
 
 ```bash
-curl -s 'https://petscan.wmcloud.org/\
+curl -s 'https://petscan.toolforge.org/\
   ?language=commons\
   &project=wikimedia\
   &categories=Uncategorized%20files\
@@ -263,7 +265,7 @@ curl -s 'https://petscan.wmcloud.org/\
 Re-run a previously saved query:
 
 ```bash
-curl -s 'https://petscan.wmcloud.org/?psid=552&format=json' \
+curl -s 'https://petscan.toolforge.org/?psid=552&format=json' \
   -H 'User-Agent: ...'
 ```
 
@@ -272,7 +274,7 @@ curl -s 'https://petscan.wmcloud.org/?psid=552&format=json' \
 Any format parameter changes the output:
 
 ```bash
-curl -s 'https://petscan.wmcloud.org/\
+curl -s 'https://petscan.toolforge.org/\
   ?language=en&project=wikipedia&categories=Physics\
   &ns%5B0%5D=1&format=wiki' \
   -H 'User-Agent: ...'
