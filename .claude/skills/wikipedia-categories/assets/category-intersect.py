@@ -36,7 +36,7 @@ EXAMPLES:
   python3 category-intersect.py "1879 births" --no-petscan
 
 HOW IT WORKS:
-  Primary path: Uses PetScan (https://petscan.wmflabs.org/), an external tool
+  Primary path: Uses PetScan (https://petscan.toolforge.org/), an external tool
   that can query Wikipedia categories with intersection, template filters,
   and namespace constraints. PetScan handles all the API work server-side.
 
@@ -78,7 +78,7 @@ USER_AGENT = (
     "(https://github.com/fuzheado/Wikipedia-AI-Skills) "
     "CategoryIntersect"
 )
-PETSCAN_URL = "https://petscan.wmflabs.org/"
+PETSCAN_URL = "https://petscan.toolforge.org/"
 
 
 class RawFormatter(argparse.HelpFormatter):

@@ -614,7 +614,7 @@ class TestScripts:
     def test_checker_script_help(self):
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "notability_checker.py"), "--help"],
+            [sys.executable, str(ASSETS_DIR / "notability_checker.py"), "--help"],
             capture_output=True, text=True, timeout=10,
         )
         assert result.returncode == 0
@@ -623,7 +623,7 @@ class TestScripts:
     def test_checker_script_json(self):
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "notability_checker.py"),
+            [sys.executable, str(ASSETS_DIR / "notability_checker.py"),
              "Jane Smith",
              "--description", "Professor at MIT, Nobel Prize winner",
              "--type", "academic",
@@ -638,7 +638,7 @@ class TestScripts:
         """Test --afd flag produces AfD-ready output."""
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "notability_checker.py"),
+            [sys.executable, str(ASSETS_DIR / "notability_checker.py"),
              "Jane Smith",
              "--description", "Professor at MIT, Nobel Prize winner",
              "--type", "academic",
@@ -651,7 +651,7 @@ class TestScripts:
     def test_evaluator_script_help(self):
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "source_evaluator.py"), "--help"],
+            [sys.executable, str(ASSETS_DIR / "source_evaluator.py"), "--help"],
             capture_output=True, text=True, timeout=10,
         )
         assert result.returncode == 0
@@ -659,7 +659,7 @@ class TestScripts:
     def test_evaluator_script_basic(self):
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "source_evaluator.py"),
+            [sys.executable, str(ASSETS_DIR / "source_evaluator.py"),
              "--title", "Nature article",
              "--type", "academic_journal",
              "--url", "https://nature.com/article"],
@@ -672,7 +672,7 @@ class TestScripts:
     def test_templates_script_help(self):
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "notability_templates.py"), "--help"],
+            [sys.executable, str(ASSETS_DIR / "notability_templates.py"), "--help"],
             capture_output=True, text=True, timeout=10,
         )
         assert result.returncode == 0

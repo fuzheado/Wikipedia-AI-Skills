@@ -494,7 +494,7 @@ class TestScripts:
         """Test search_client.py --help via python3."""
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "search_client.py"), "--help"],
+            [sys.executable, str(ASSETS_DIR / "search_client.py"), "--help"],
             capture_output=True, text=True, timeout=10,
         )
         assert result.returncode == 0
@@ -504,7 +504,7 @@ class TestScripts:
         """Test maintenance_queries.py with 'list'."""
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "maintenance_queries.py"), "list"],
+            [sys.executable, str(ASSETS_DIR / "maintenance_queries.py"), "list"],
             capture_output=True, text=True, timeout=10,
         )
         assert result.returncode == 0

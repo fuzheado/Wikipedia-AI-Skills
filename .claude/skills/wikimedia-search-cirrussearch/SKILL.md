@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["maintenance query", "search API", "prefix search", "full-text search", "title search"]
   - keywords: ["PetScan", "search results", "ranking", "search filter", "cross-wiki search"]
   - keywords: ["escape quotes", "quoting", "special characters in search", "zero results", "empty search results", "search returns nothing"]
-last_verified: 2026-10-03
+last_verified: 2026-11-16
 depends_on: [wikimedia-api-access, wikipedia-categories]
 ---
 
@@ -523,7 +523,7 @@ See `assets/maintenance_queries.py` for a Python module with pre-built maintenan
 
 ### Search + PetScan
 
-PetScan (`https://petscan.wmflabs.org/`) is an external tool for complex category intersections and data extraction. It complements CirrusSearch by handling:
+PetScan (`https://petscan.toolforge.org/`) is an external tool for complex category intersections and data extraction. It complements CirrusSearch by handling:
 
 - **Category intersections** — Find pages in multiple categories simultaneously
 - **Template filtering** — Only pages with/without certain templates
@@ -545,7 +545,7 @@ PetScan (`https://petscan.wmflabs.org/`) is an external tool for complex categor
 
 ```bash
 # PetScan API example — find intersection of two categories
-curl -s 'https://petscan.wmflabs.org/?language=en&project=wikipedia&categories=Physicists%0AGerman%20scientists&ns%5B0%5D=1&interface_language=en&format=json' \
+curl -s 'https://petscan.toolforge.org/?language=en&project=wikipedia&categories=Physicists%0AGerman%20scientists&ns%5B0%5D=1&interface_language=en&format=json' \
   -H 'User-Agent: MyBot/1.0 (contact) ContentGapResearch' \
   | python3 -c "import json,sys; data=json.load(sys.stdin); print('\n'.join(p['a']['title'] for p in data.get('*',[])))"
 ```

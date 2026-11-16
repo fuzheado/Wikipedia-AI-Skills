@@ -7,7 +7,7 @@ depends_on: [wikimedia-api-access, wikipedia-page-anatomy]
 skill_discovery_hints:
   - keywords: ["category", "categorization", "category tree", "WP:CATDEF", "WP:CATV"]
   - keywords: ["sort key", "DEFAULTSORT", "hidden category", "category redirect", "PetScan"]
-last_verified: 2026-09-15
+last_verified: 2026-11-16
 ---
 
 > ⚠️ **User-Agent required:** The API examples below hit Wikimedia endpoints. All requests must include a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
@@ -360,7 +360,7 @@ This returns all articles in EITHER category. Note: does **not** include subcate
 
 ### External Tools
 
-**PetScan** (`https://petscan.wmflabs.org/`) — category intersection and data extraction tool. Useful for:
+**PetScan** (`https://petscan.toolforge.org/`) — category intersection and data extraction tool. Useful for:
 
 | Use case | How |
 |---|---|
@@ -370,7 +370,7 @@ This returns all articles in EITHER category. Note: does **not** include subcate
 | Filter by namespace, page size, redirect status | Built-in filters |
 | Export as CSV, JSON, or Wiki table | Output format selector |
 
-Web UI: `https://petscan.wmflabs.org/`
+Web UI: `https://petscan.toolforge.org/`
 
 ### Special Pages
 
@@ -574,7 +574,7 @@ for member in cat.members(recurse=True):
 
 | Tool | Best for | How |
 |---|---|---|
-| **PetScan** | Category intersection + filtering | Web UI at `https://petscan.wmflabs.org/` or URL API |
+| **PetScan** | Category intersection + filtering | Web UI at `https://petscan.toolforge.org/` or URL API |
 | **WDQS (SPARQL)** | Cross-wiki recursive category queries | `https://query.wikidata.org/sparql` |
 | **Special:CategoryTree** | Interactive manual browsing | Browser-based, expand/collapse |
 | **Special:Categories** | Discover all categories on a wiki | Alphabetical with member counts |
@@ -582,7 +582,7 @@ for member in cat.members(recurse=True):
 **PetScan example URL** — find FA-class articles in Category:Physics:
 
 ```
-https://petscan.wmflabs.org/?language=en&project=wikipedia&categories=Physics
+https://petscan.toolforge.org/?language=en&project=wikipedia&categories=Physics
   &ns[0]=1&interface_language=en&wikidata_item=yes&templates_yes=WikiProject_Physics
 ```
 
