@@ -7,7 +7,7 @@ compatibility: opencode
 skill_discovery_hints:
   - keywords: ["citation", "reference", "cite web", "cite book", "CS1", "Wayback Machine"]
   - keywords: ["dead link", "archive URL", "bare URL", "Citoid", "DOI", "ISBN"]
-last_verified: 2026-08-10
+last_verified: 2026-11-16
 ---
 
 > ⚠️ **User-Agent required:** API calls below need a descriptive `User-Agent` header.
@@ -279,17 +279,17 @@ WP:BAREURL. Convert them to proper citations:
 
 ```wikitext
 <!-- Bare URL -->
-<ref>https://www.nytimes.com/2026/06/05/science.html</ref>
+<ref>https://www.nytimes.com/2026/11/16/science/leonids-meteor-shower-peak.html</ref>
 
-<!-- Converted -->
+<!-- Converted (byline/date are illustrative; the URL is a live article) -->
 <ref>{{cite news
- |url=https://www.nytimes.com/2026/06/05/science.html
- |title=New Scientific Discovery
+ |url=https://www.nytimes.com/2026/11/16/science/leonids-meteor-shower-peak.html
+ |title=Leonids Meteor Shower Peaks
  |last=Johnson
  |first=Mark
- |date=5 June 2026
+ |date=16 November 2026
  |work=The New York Times
- |access-date=5 June 2026
+ |access-date=16 November 2026
 }}</ref>
 ```
 

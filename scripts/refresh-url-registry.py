@@ -17,11 +17,17 @@ run (manual or scheduled) only checks the handful of URLs that rotated in.
 There is no need for an unbounded full sweep on every commit — CI's
 verify-links.py is fully offline and only cross-checks against this registry.
 
+Registry entries whose URL no longer appears in any doc are pruned on write
+(--keep-orphans disables this). Nothing collects those URLs, so nothing would
+ever re-probe them: their checked_at would age past the freshness window into a
+staleness failure that no refresh can repair.
+
 Useful invocations:
     python3 scripts/refresh-url-registry.py                 # incremental (new + stale + broken)
     python3 scripts/refresh-url-registry.py --new-only      # only URLs never checked (pre-push, fastest)
     python3 scripts/refresh-url-registry.py --full          # re-check everything (rare full audit)
     python3 scripts/refresh-url-registry.py --max-age-days 30   # tighter freshness window
+    python3 scripts/refresh-url-registry.py --keep-orphans      # keep entries no doc references
 
 Wikimedia API etiquette is enforced: a descriptive User-Agent on every request
 ($WIKIMEDIA_USER_AGENT when set), pacing between requests (--delay, default 1s),
@@ -103,9 +109,16 @@ EXAMPLE_URL_RE = re.compile(
       He_Tingbo|/thumb/$|/800px$|/1440px$|\.\.\.|/stream/$|entity/[MQ]$|/entity/$|
       /prop/(direct/|qualifier/|statement/)?$|
       rest_v1/metrics/|rest_v1/page/.*/html$|service/lw/inference/v1/models/$|core/v1/wikipedia/en/$|
-      [\\<>]|\([^)]*$|Special_MyLanguage|Special:OAuth|Book_Title|rest_v1/search/page|qlever\.(cs\.uni-freiburg\.de|dev)|/sparql$
+      [\\<>]|\([^)]*$|Special_MyLanguage|Special:OAuth|Book_Title|rest_v1/search/page|qlever\.(cs\.uni-freiburg\.de|dev)|/sparql$|
+      w\.wiki/(?:CODE|api\.php)
     )"""
 , re.I | re.X)
+
+# SDK base URLs are prefixes, not endpoints. The OpenAI-compatible clients take
+# ".../models/<model>/openai/v1" as base_url and append "/chat/completions"
+# themselves, so a bare HEAD/GET of the prefix 404s even when the model is
+# healthy (its child route answers — typically 405 to a bare GET).
+BASE_URL_RE = re.compile(r"service/lw/inference/v1/models/[^/]+/openai/v1/?$", re.I)
 
 def classify(url: str) -> int | None:
     """Return the skip marker (-1 example, -2 post-only) or None if the URL
@@ -163,6 +176,9 @@ def exception_for(url: str, status) -> dict | None:
     if status == 422:
         return {"classification": "requires_parameters",
                 "allow_reason": "Endpoint exists but rejects a bare request without required parameters"}
+    if status == 404 and BASE_URL_RE.search(url):
+        return {"classification": "base_url",
+                "allow_reason": "SDK base URL, not an endpoint; the client appends its own path, so only the child route is probeable"}
     if isinstance(status, int) and status >= 500:
         return {"classification": "transient_server_error",
                 "allow_reason": "Server-side error at probe time; needs scheduled recheck, not an immediate hallucination finding"}
@@ -176,6 +192,28 @@ def rebuild_exceptions(registry: dict) -> None:
         if exc is not None:
             exceptions[url] = exc
     registry["exceptions"] = exceptions
+
+
+def prune_uncollected(registry: dict, collected: set[str]) -> int:
+    """Drop registry entries whose URL no longer appears in any doc.
+
+    Those URLs are never collected again, so needs_check never sees them and
+    check_url never refreshes their checked_at. Left in place they can only age
+    past the freshness window and fail verify-links, with no way to repair them.
+    Returns the number of URL entries dropped.
+    """
+    dropped = 0
+    for bucket in ("urls", "checked_at"):
+        entries = registry.get(bucket)
+        if not isinstance(entries, dict):
+            continue
+        for url in [u for u in entries if u not in collected]:
+            del entries[url]
+            if bucket == "urls":
+                dropped += 1
+    if dropped:
+        rebuild_exceptions(registry)
+    return dropped
 
 def check_url(url: str, timeout: float, delay: float) -> int:
     """HEAD (fall back to GET) a URL, returning the final status code.
@@ -271,6 +309,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--resume", action="store_true",
                     help="kept for backwards compatibility — incremental freshness "
                          "mode is now the default, so this flag is a no-op")
+    ap.add_argument("--keep-orphans", action="store_true",
+                    help="keep registry entries whose URL no longer appears in any "
+                         "doc (default: prune them, since nothing would ever re-probe "
+                         "them and they only age into a staleness failure)")
     args = ap.parse_args(argv)
 
     urls = collect_urls(args.skills_dir)
@@ -298,15 +340,21 @@ def main(argv: list[str] | None = None) -> int:
     def save():
         OUT.write_text(json.dumps(registry, indent=1, sort_keys=True) + "\n")
 
+    if not args.keep_orphans:
+        dropped = prune_uncollected(registry, set(urls))
+        if dropped:
+            print(f" pruned {dropped} registry entr{'y' if dropped == 1 else 'ies'} "
+                  f"no longer referenced by any doc", file=sys.stderr)
+
     # Decide what to check this run (before mutating anything)
     plan = []  # (url, reason)
     for u in urls:
         marker = classify(u)
         if marker is not None:
             registry["urls"][u] = marker          # skip markers never need a fetch
-            if u not in checked_at:
-                checked_at[u] = now_iso()          # classify counts as "known"
-            registry["checked_at"] = dict(checked_at)
+            # Write straight into the saved registry: re-copying the local
+            # `checked_at` dict would resurrect entries prune_uncollected dropped.
+            registry["checked_at"].setdefault(u, now_iso())  # classify counts as "known"
             rebuild_exceptions(registry)
             continue
         status = known.get(u)
