@@ -237,6 +237,48 @@ def test_url_registry_exception_for_accept_header_status():
 def test_url_registry_exception_for_dead_links_is_none():
     """404/410 must stay unexcepted: a dead link is fixed, not classified away."""
     assert url_registry.exception_for("https://example.test/gone", 404) is None
+
+
+def test_url_registry_classifies_wiki_shortener_placeholders():
+    """`w.wiki/CODE` is a literal "put a code here" placeholder and
+    `w.wiki/api.php` is a hypothetical in the "there is no API" note — both 404 by
+    construction. Real shortlinks must still be probed."""
+    assert url_registry.classify("https://w.wiki/CODE") == -1
+    assert url_registry.classify("https://w.wiki/api.php?action=query") == -1
+    assert url_registry.classify("https://w.wiki/TR9R") is None
+
+
+def test_url_registry_exception_for_sdk_base_url_404():
+    """An OpenAI-compatible base_url is a prefix, not an endpoint: the client
+    appends /chat/completions, so the bare prefix 404s while the model is healthy."""
+    base = "https://api.wikimedia.org/service/lw/inference/v1/models/llm-qwen3-14b/openai/v1"
+    exc = url_registry.exception_for(base, 404)
+    assert exc is not None and exc["classification"] == "base_url"
+    # anything past the prefix is a real path, so a 404 there stays a dead link
+    assert url_registry.exception_for(base + "/chat/completions/x", 404) is None
+
+
+def test_url_registry_prunes_uncollected_urls():
+    """A URL dropped from the docs can never be re-probed, so it would only age
+    into a freshness failure that no refresh can repair; the refresh prunes it."""
+    registry = {
+        "urls": {"https://kept.test/": 200, "https://dropped.test/": 404},
+        "checked_at": {"https://kept.test/": "2026-01-01T00:00:00Z",
+                       "https://dropped.test/": "2026-01-01T00:00:00Z"},
+        "exceptions": {},
+    }
+    dropped = url_registry.prune_uncollected(registry, {"https://kept.test/"})
+    assert dropped == 1
+    assert set(registry["urls"]) == {"https://kept.test/"}
+    assert set(registry["checked_at"]) == {"https://kept.test/"}
+
+
+def test_url_registry_has_no_orphan_checked_at():
+    """`urls` and `checked_at` must track each other exactly. An entry in only one
+    of them is either a URL that can never be re-probed or a pruned entry that got
+    resurrected from a stale copy — both age into an unrepairable freshness failure."""
+    registry = json.loads((REPO_ROOT / "scripts" / "url-registry.json").read_text())
+    assert set(registry["urls"]) == set(registry["checked_at"])
     assert url_registry.exception_for("https://example.test/gone", 410) is None
 
 
