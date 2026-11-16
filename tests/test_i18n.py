@@ -758,7 +758,7 @@ class TestScripts:
         """Test i18n_utils.py --help."""
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "i18n_utils.py"), "--help"],
+            [sys.executable, str(ASSETS_DIR / "i18n_utils.py"), "--help"],
             capture_output=True, text=True, timeout=10,
         )
         assert result.returncode == 0
@@ -768,7 +768,7 @@ class TestScripts:
         """Test i18n_utils.py fallback fr."""
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "i18n_utils.py"), "fallback", "fr"],
+            [sys.executable, str(ASSETS_DIR / "i18n_utils.py"), "fallback", "fr"],
             capture_output=True, text=True, timeout=10,
         )
         assert result.returncode == 0
@@ -778,7 +778,7 @@ class TestScripts:
         """Test i18n_utils.py domain fr."""
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "i18n_utils.py"), "domain", "fr"],
+            [sys.executable, str(ASSETS_DIR / "i18n_utils.py"), "domain", "fr"],
             capture_output=True, text=True, timeout=10,
         )
         assert result.returncode == 0
@@ -788,7 +788,7 @@ class TestScripts:
         """Test i18n_utils.py rtl ar."""
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "i18n_utils.py"), "rtl", "ar"],
+            [sys.executable, str(ASSETS_DIR / "i18n_utils.py"), "rtl", "ar"],
             capture_output=True, text=True, timeout=10,
         )
         assert result.returncode == 0
@@ -798,7 +798,7 @@ class TestScripts:
         """Test i18n_utils.py rtl en returns no."""
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "i18n_utils.py"), "rtl", "en"],
+            [sys.executable, str(ASSETS_DIR / "i18n_utils.py"), "rtl", "en"],
             capture_output=True, text=True, timeout=10,
         )
         assert result.returncode == 0
@@ -808,7 +808,7 @@ class TestScripts:
         """Test message_loader.py runs without error."""
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "message_loader.py")],
+            [sys.executable, str(ASSETS_DIR / "message_loader.py")],
             capture_output=True, text=True, timeout=10,
         )
         assert result.returncode == 0
@@ -817,7 +817,7 @@ class TestScripts:
         """Test wikidata_labels.py --help."""
         import subprocess
         result = subprocess.run(
-            ["python3", str(ASSETS_DIR / "wikidata_labels.py"), "--help"],
+            [sys.executable, str(ASSETS_DIR / "wikidata_labels.py"), "--help"],
             capture_output=True, text=True, timeout=10,
         )
         assert result.returncode == 0
