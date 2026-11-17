@@ -4,6 +4,103 @@
       "subcommands": [],
       "version": "become: no such tool '--version'"
     },
+    "mw": {
+      "sub": {
+        "analytics": [
+          "devices",
+          "editors",
+          "edits",
+          "mediarequests",
+          "new-pages",
+          "pageviews",
+          "top-edited",
+          "top-pages"
+        ],
+        "codesearch": [
+          "search"
+        ],
+        "config": [
+          "get",
+          "profiles",
+          "secrets",
+          "set",
+          "show",
+          "where"
+        ],
+        "dev": [
+          "compose",
+          "destroy",
+          "env",
+          "restart",
+          "start",
+          "stop",
+          "update"
+        ],
+        "enterprise": [
+          "api",
+          "articles",
+          "auth",
+          "batches",
+          "codes",
+          "languages",
+          "namespaces",
+          "projects"
+        ],
+        "events": [
+          "info",
+          "list",
+          "tail"
+        ],
+        "toolforge": [
+          "build",
+          "components",
+          "cp",
+          "create",
+          "envvar",
+          "job",
+          "kubernetes",
+          "replicas",
+          "shell",
+          "toolsdb"
+        ],
+        "tools": [
+          "quip",
+          "toolcounter",
+          "toolviews"
+        ],
+        "wiki": [
+          "api",
+          "auth",
+          "bulk",
+          "ext",
+          "file",
+          "page",
+          "realm",
+          "rest"
+        ]
+      },
+      "subcommands": [
+        "analytics",
+        "api",
+        "cloudvps",
+        "codesearch",
+        "completion",
+        "config",
+        "dev",
+        "enterprise",
+        "events",
+        "gerrit",
+        "gitlab",
+        "help",
+        "phabricator",
+        "toolforge",
+        "tools",
+        "update",
+        "version",
+        "wiki"
+      ],
+      "version": "0.36.0 (published manual, not introspected)"
+    },
     "pwb.py": {
       "sub": {},
       "subcommands": [
@@ -134,7 +231,7 @@
   },
   "generated_at": "2026-08-08T14:02:16Z",
   "generator": "scripts/refresh-command-registry.py",
-  "note": "Ground-truth command surface. Do not edit by hand; regenerate with scripts/refresh-command-registry.py.",
+  "note": "Ground-truth command surface. Do not edit by hand; regenerate with scripts/refresh-command-registry.py. The `mw` entry comes from its published manual (MANUAL_BINARIES), not introspection.",
   "schema_version": 1,
   "source": "ssh alih@login.toolforge.org + https://doc.wikimedia.org/pywikibot/stable/scripts/index.html"
 }

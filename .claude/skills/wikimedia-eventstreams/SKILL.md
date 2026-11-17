@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["real-time", "stream", "SSE", "EventStreams", "live", "recent change", "recentchange"]
   - keywords: ["new page", "page creation", "patrol", "monitor", "watch", "live feed"]
   - keywords: ["edit event", "revision create", "log event", "streaming"]
-last_verified: 2026-06-10
+last_verified: 2026-11-17
 ---
 
 > ⚠️ **User-Agent required:** All examples in this skill connect to `stream.wikimedia.org`. Requests without a descriptive `User-Agent` header may be throttled. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns. Before writing code, load that skill for the required User-Agent boilerplate.
@@ -96,6 +96,12 @@ EventStreams occupies a unique position — it's the **only push-based, real-tim
 | [`wikipedia-edit-history`](../wikipedia-edit-history/SKILL.md) | History is retrospective (looking at past edits). EventStreams is prospective (watching edits happen in real-time). |
 | [`pywikibot`](../pywikibot/SKILL.md) | Pywikibot's `comms.eventstreams.EventStreams` is the most Pythonic way to consume EventStreams. See the [Python Clients](#python-clients-in-depth) section. |
 | [`wikimedia-api-access`](../wikimedia-api-access/SKILL.md) | Sets the User-Agent and rate-limiting patterns for all HTTP-based access, including EventStreams. |
+
+> **Optional alternative — the official [Wikimedia CLI](https://a-wikimedia-cli.toolforge.org/) (`mw`).**
+> If it is installed, `mw events tail recentchange` follows a stream with no SSE client code, and
+> `mw events list` / `mw events info` dump the stream index and schema. Reach for this skill's
+> client patterns when you need filters, reconnect handling or canary logic. Surface verified
+> against CLI v0.36.0, 2026-11-17.
 
 ---
 

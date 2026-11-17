@@ -7,7 +7,7 @@ depends_on: [wikimedia-toolforge]
 skill_discovery_hints:
   - keywords: ["SQL", "database", "replica", "Toolforge database", "enwiki_p", "MySQL"]
   - keywords: ["SSH tunnel", "pymysql", "query Wikipedia", "schema", "page table", "revision table"]
-last_verified: 2026-10-14
+last_verified: 2026-11-17
 ---
 
 > ⚠️ **User-Agent required:** While this skill primarily uses SQL via SSH tunnel, any direct API calls (e.g., for verification via `curl` or `requests`) must include a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format.
@@ -53,6 +53,12 @@ Before executing any SQL, the agent must ensure the tunnel is active.
   `apt install autossh` (Linux), then use:
   `autossh -M 0 -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" -L ${TOOLFORGE_DB_PORT:-3307}:enwiki.analytics.db.svc.wikimedia.cloud:3306 ${TOOLFORGE_USER}@login.toolforge.org -N -v`
 * **Escalation:** If the tunnel fails to open, provide the user with the command above to run manually.
+
+> **Optional alternative — the official [Wikimedia CLI](https://a-wikimedia-cli.toolforge.org/) (`mw`).**
+> If it is installed, `mw toolforge replicas tunnel enwiki dewiki` forwards the replica ports
+> over one SSH connection, and `mw toolforge replicas username` prints the replica DB username,
+> so you can skip `scripts/setup-tunnel.sh` entirely. The script stays the no-extra-install
+> path. Surface verified against CLI v0.36.0, 2026-11-17.
 
 ### **2. Implementation Pattern (Python)**
 
