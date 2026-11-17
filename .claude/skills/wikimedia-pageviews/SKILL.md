@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["pageviews", "traffic", "popularity", "article views", "views per article"]
   - keywords: ["top pages", "pageview API", "daily views", "analytics"]
   - keywords: ["media views", "mediarequests", "file views", "image views", "media requests"]
-last_verified: 2026-10-03
+last_verified: 2026-11-17
 ---
 
 > ⚠️ **User-Agent required:** The REST API examples below require a descriptive `User-Agent` header. See the **[wikimedia-api-access](../wikimedia-api-access/SKILL.md)** skill for the correct format and rate-limiting patterns.
@@ -62,6 +62,12 @@ If the task requires specific dates, trends, or "total views last month," the ag
 > days) for a *known set* of articles, skip the per-article loop — the Action
 > API `prop=pageviews` returns up to **50 titles per call**. See
 > `references/pageview-api.md` → "Batch: Action API prop=pageviews".
+
+> **Optional alternative — the official [Wikimedia CLI](https://a-wikimedia-cli.toolforge.org/) (`mw`).**
+> If it is installed, `mw analytics pageviews 'Albert Einstein' --project en.wikipedia.org --start 20261101 --end 20261108 --output json`
+> returns the same AQS rows (`article`, `project`, `timestamp`, `views`); `--output csv` and
+> `--output graph` give other shapes, and `--agent user` restricts to human traffic. This skill
+> stays the no-extra-install path. Surface verified against CLI v0.36.0, 2026-11-17.
 
 * **Endpoint:** `[https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/](https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/)`
 * **Access Pattern:** `project / access / agent / article / granularity / start / end`

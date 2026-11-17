@@ -29,6 +29,7 @@
   "https://.../960px-Example.jpg": "2026-08-10T12:57:50Z",
   "https://...</ref": "2026-08-10T12:57:50Z",
   "https://YOUR-TOOL.toolforge.org/crop?file=File:Name.jpg&width=300&height=200&gravity=face": "2026-10-14T14:26:53Z",
+  "https://a-wikimedia-cli.toolforge.org/": "2026-11-17T22:05:23Z",
   "https://admin.toolforge.org/": "2026-11-10T15:20:41Z",
   "https://aegisub.org/": "2026-11-10T15:20:42Z",
   "https://api.cdnjs.com/libraries?search=d3&fields=version,latest": "2026-11-10T15:20:44Z",
@@ -203,6 +204,7 @@
   "https://en.wikipedia.org/w/api.php?action=query&meta=tokens&type=login": "2026-11-10T15:22:45Z",
   "https://en.wikipedia.org/w/api.php?action=query&prop=categories&titles=Albert_Einstein&format=json": "2026-11-10T15:22:46Z",
   "https://en.wikipedia.org/w/api.php?action=query&titles=$TITLE&redirects=1&format=json": "2026-11-10T15:22:47Z",
+  "https://en.wikipedia.org/w/api.php?action=query&titles=Wikipedia:WikiProject_Physics/Assessment&format=json&prop=info": "2026-11-17T22:05:24Z",
   "https://en.wikipedia.org/w/api.php?action=sitematrix": "2026-11-10T15:22:48Z",
   "https://en.wikipedia.org/w/index.php?title=Albert_Einstein&action=raw": "2026-11-10T15:22:49Z",
   "https://en.wikipedia.org/w/index.php?title=Chess&mobileformat=1": "2026-11-10T15:22:51Z",
@@ -310,6 +312,7 @@
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Olympics/Popular_pages": "2026-11-10T15:24:43Z",
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Parapsychology/Resources": "2026-11-10T15:24:44Z",
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Physics": "2026-11-10T15:24:45Z",
+  "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Physics/Assessment": "2026-11-17T22:05:25Z",
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Physics/Popular_pages": "2026-11-10T15:24:47Z",
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Politics/Assessment": "2026-11-10T15:24:48Z",
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Politics/Popular_pages": "2026-11-10T15:24:49Z",
@@ -1758,7 +1761,7 @@
    "classification": "unicode_domain_example"
   }
  },
- "generated_at": "2026-11-17T16:36:45Z",
+ "generated_at": "2026-11-17T22:05:22Z",
  "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
@@ -1794,6 +1797,7 @@
   "https://.../960px-Example.jpg": -1,
   "https://...</ref": -1,
   "https://YOUR-TOOL.toolforge.org/crop?file=File:Name.jpg&width=300&height=200&gravity=face": -1,
+  "https://a-wikimedia-cli.toolforge.org/": 200,
   "https://admin.toolforge.org/": 200,
   "https://aegisub.org/": 200,
   "https://api.cdnjs.com/libraries?search=d3&fields=version,latest": 200,
@@ -1968,6 +1972,7 @@
   "https://en.wikipedia.org/w/api.php?action=query&meta=tokens&type=login": 200,
   "https://en.wikipedia.org/w/api.php?action=query&prop=categories&titles=Albert_Einstein&format=json": 200,
   "https://en.wikipedia.org/w/api.php?action=query&titles=$TITLE&redirects=1&format=json": 200,
+  "https://en.wikipedia.org/w/api.php?action=query&titles=Wikipedia:WikiProject_Physics/Assessment&format=json&prop=info": 200,
   "https://en.wikipedia.org/w/api.php?action=sitematrix": 200,
   "https://en.wikipedia.org/w/index.php?title=Albert_Einstein&action=raw": 200,
   "https://en.wikipedia.org/w/index.php?title=Chess&mobileformat=1": 200,
@@ -2075,6 +2080,7 @@
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Olympics/Popular_pages": 200,
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Parapsychology/Resources": 200,
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Physics": 200,
+  "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Physics/Assessment": 404,
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Physics/Popular_pages": 200,
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Politics/Assessment": 200,
   "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Politics/Popular_pages": 200,
@@ -2621,5 +2627,5 @@
   "https://your-tool.toolforge.org": -1,
   "https://\u0440\u0443.wikipedia.org": 0
  },
- "user_agent": "wikipedia-ai-skills-url-registry/1.0 (scheduled GitHub Action; https://github.com/fuzheado/Wikipedia-AI-Skills)"
+ "user_agent": "WikipediaSkill/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills; andrew.lih@gmail.com) ContentGapResearch"
 }

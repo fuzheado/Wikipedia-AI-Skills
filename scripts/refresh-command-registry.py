@@ -37,6 +37,44 @@ bastion = os.environ.get("TOOLFORGE_BASTION") or (
 # Included for existence verification only.
 STANDALONE_BINARIES = ("webservice", "sql", "become")
 
+# Binaries documented from their published manual rather than introspected.
+# `mw` (the official Wikimedia CLI, https://a-wikimedia-cli.toolforge.org/) is a
+# ~136 MB per-machine download, so it is not installed or introspected here. This
+# tree is the documented surface at the pinned version: extend it in the same PR
+# that starts documenting a new `mw` path, otherwise verify-commands.py rejects
+# that path as an unknown subcommand (which is the point — it catches typos and
+# invented verbs). Empty child lists mean "children not enumerated; do not check".
+MANUAL_BINARIES = {
+    "mw": {
+        "version": "0.36.0 (published manual, not introspected)",
+        "subcommands": [
+            "analytics", "api", "cloudvps", "codesearch", "completion", "config",
+            "dev", "enterprise", "events", "gerrit", "gitlab", "help",
+            "phabricator", "toolforge", "tools", "update", "version", "wiki",
+        ],
+        "sub": {
+            "analytics": [
+                "devices", "editors", "edits", "mediarequests", "new-pages",
+                "pageviews", "top-edited", "top-pages",
+            ],
+            "config": ["get", "profiles", "secrets", "set", "show", "where"],
+            "codesearch": ["search"],
+            "dev": ["compose", "destroy", "env", "restart", "start", "stop", "update"],
+            "enterprise": [
+                "api", "articles", "auth", "batches", "codes", "languages",
+                "namespaces", "projects",
+            ],
+            "events": ["info", "list", "tail"],
+            "toolforge": [
+                "build", "components", "cp", "create", "envvar", "job",
+                "kubernetes", "replicas", "shell", "toolsdb",
+            ],
+            "tools": ["quip", "toolcounter", "toolviews"],
+            "wiki": ["api", "auth", "bulk", "ext", "file", "page", "realm", "rest"],
+        },
+    }
+}
+
 # pwb.py is not on the bastion; its script list comes from the pywikibot
 # source repo (authoritative filenames) with the docs index as fallback.
 PYWIKIBOT_DOCS = "https://doc.wikimedia.org/pywikibot/stable/scripts/index.html"
@@ -139,7 +177,8 @@ def main() -> int:
         "generated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": f"ssh {bastion} + {PYWIKIBOT_DOCS}",
         "note": ("Ground-truth command surface. Do not edit by hand; regenerate "
-                 "with scripts/refresh-command-registry.py."),
+                 "with scripts/refresh-command-registry.py. The `mw` entry comes "
+                 "from its published manual (MANUAL_BINARIES), not introspection."),
         "binaries": {
             "toolforge": {
                 "version": tf_version,
@@ -155,6 +194,8 @@ def main() -> int:
     }
     for name in STANDALONE_BINARIES:
         registry["binaries"][name] = {"version": get_version(name), "subcommands": []}
+
+    registry["binaries"].update(MANUAL_BINARIES)
 
     OUT.write_text(json.dumps(registry, indent=2, sort_keys=True) + "\n")
 

@@ -35,7 +35,10 @@ DEFAULT_SKILLS_DIR = REPO_ROOT / ".claude" / "skills"
 
 # Binaries the verifier knows about; invocations of anything else are ignored.
 # Extend here + in the registry when new tooling is documented.
-BINARIES = ("toolforge", "webservice", "sql", "become", "pwb.py")
+# `mw` is the official Wikimedia CLI; its registry entry is curated from the
+# published manual rather than introspected (see MANUAL_BINARIES in
+# refresh-command-registry.py), so a documented `mw <verb>` is still checked.
+BINARIES = ("mw", "toolforge", "webservice", "sql", "become", "pwb.py")
 
 BIN_RE = re.compile(r"\b(" + "|".join(BINARIES) + r")\s+([a-z][a-z0-9_-]*)")
 

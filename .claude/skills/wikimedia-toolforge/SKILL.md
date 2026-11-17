@@ -8,7 +8,7 @@ skill_discovery_hints:
   - keywords: ["Toolforge", "tool hosting", "Kubernetes", "web service", "cron job", "deploy"]
   - keywords: ["toolsadmin", "become", "webservice", "toolforge jobs"]
   - keywords: ["CDN", "cdnjs", "tools-static", "privacy-preserving CDN", "content delivery", "third-party script", "external CDN tracking"]
-last_verified: 2026-10-19
+last_verified: 2026-11-17
 ---
 
 Toolforge (formerly Wikimedia Tool Labs) is a cloud hosting platform for community-developed tools that interact with Wikimedia wikis and data. This skill covers account setup, service management, deployment, and debugging.
@@ -20,6 +20,14 @@ Toolforge (formerly Wikimedia Tool Labs) is a cloud hosting platform for communi
 - `ssh-agent` running locally with your private key loaded (`ssh-add ~/.ssh/id_ed25519`)
 - The following environment variable set (optional but recommended):
   - `TOOLFORGE_USER` — Your Toolforge shell/LDAP username
+
+> **Optional alternative — the official [Wikimedia CLI](https://a-wikimedia-cli.toolforge.org/) (`mw`).**
+> If it is installed, `mw toolforge shell --tool=my-tool -- <command>` runs a command as the
+> tool account through the upstream Toolforge CLI, so it cannot hit the
+> `become`-then-semicolon trap in pitfall #1. Plain SSH with `sudo -niu` stays the
+> no-extra-install path. `mw` is a ~136 MB per-machine binary; add `--no-interaction` to
+> every call (a first run otherwise blocks on a telemetry prompt, and `mw config set telemetry no`
+> only silences future runs). Surface verified against CLI v0.36.0, 2026-11-17.
 
 ## SOP 1: Account & Project Setup
 
