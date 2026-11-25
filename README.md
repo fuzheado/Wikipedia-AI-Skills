@@ -20,7 +20,7 @@ These skills are designed to **help you research, understand, and prepare conten
 
 ## Skills
 
-This repository contains **63 skills** organized into two groups.
+This repository contains **64 skills** organized into two groups.
 
 > 💡 **[Explore the skills directory →](https://fuzheado.github.io/Wikipedia-AI-Skills/skills-explorer.html)** — search and filter by
 > task, domain, role, dependencies, and related skills. The full
