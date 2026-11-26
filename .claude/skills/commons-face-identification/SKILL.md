@@ -38,6 +38,12 @@ bbox width ≥ 90 px, detector score ≥ 0.70, |yaw| ≤ 0.20 (nose offset / int
 Laplacian variance ≥ 40 — passed **108 of 671 faces (16%)**. Of the 17 proposals the matcher
 made in that population across 0.40–1.00, **2 survived**: one person in one photo.
 
+References must also match the corpus **era**, not just the person: a modern-portrait gallery
+scored 0.25-0.29 against 1950s-80s press photographs, while refs taken from the same decades
+reached 0.81-0.97 on the same faces. Select the cohort on a real attribute (e.g. birth year
+covering the corpus period) — `ORDER BY ?p LIMIT n` on Wikidata sorts QID strings, so it
+returns arbitrary high-numbered items and can make a working method look broken.
+
 So before promising a labelling project, compute the same gate on a sample and report *usable
 faces per photo*. Crowd and ceremony photography (wide shots, profiles, motion blur) loses
 ~84%; portrait-style corpora (WikiPortraits, GLAM studio shoots, press portraits) keep most of

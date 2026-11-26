@@ -134,6 +134,33 @@ distance from the 5-point landmarks), Laplacian variance of the crop ≥ 40.
 - Consequence: on crowd/ceremony photography the binding constraint is photo quality. Measure
   usable faces per photo on a sample before scoping any labelling work.
 
+## Corpus-matched gallery: the writer pilot (public data, 2026-11-25)
+
+Cohort: 663 Dutch people with a writing occupation, born 1890-1935, holding both a Wikidata
+portrait (P18) and a Commons category. Gallery refs preferred from files dated 1945-1990.
+
+- Build: 623 people with refs, **488 with at least one era-matched ref**, 46.9 min on 4 CPU cores.
+- Target corpus: `Category:Boekenbal` tree, 113 files, 1947-1985 press photography. 944 faces,
+  **83 usable (9%)** in 51 photos.
+- Matches with an era-matched gallery: 14 faces / 11 distinct people at 0.55-0.60, 17 at 0.45,
+  best 0.97 (Ed Hoornik, whose name is in the file title), 0.97 and 0.81 for two other
+  writers. The same gallery built from P18 alone produced **zero** matches (max 0.29).
+- Precision by eye: the ≥0.73 hits look right; the 0.60-0.67 band contained clear false
+  positives (three Kosiński photographs named as Adriaan Morriën). Treat 0.70 as the
+  auto-suggest floor for historical corpora and review down to 0.55.
+- A title-derived ground truth is not usable as a recall denominator here: 82 `(file, person)`
+  pairs fall out of name-matching in titles, but most of those people are not visible in a
+  usable face, so "2% recall" measures the titles, not the matcher.
+
+### Cohort sampling trap (cost two builds)
+
+`ORDER BY ?p LIMIT 500` on Wikidata sorts the QID **IRI as a string**, so `Q1000123` sorts
+before `Q927`. A 500-person "sample" selected that way was 500 arbitrary high-numbered items,
+mostly 17th-18th-century figures, and the corpus names (Mulisch, Q927) were absent — which
+produced a false "the method does not work" result. Select on a real attribute (birth year
+window matching the corpus era), dedupe in code, and assert that a known in-corpus person is
+in the cohort before spending an hour on the build.
+
 ## Cost, measured on CPU
 
 | step | images | time |
