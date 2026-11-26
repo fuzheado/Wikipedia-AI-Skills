@@ -220,6 +220,13 @@ existing metadata), DepictAssist, and `wd-image-positions` for inspecting `P2677
    interiors, the award object. Exclude them from the face denominator and say why.
 8. **Never tune a threshold on the set you report.** Sweep on one category, report on another,
    or hold out photos.
+9. **A person's Commons category contains other people.** Joint photos (a partner, a colleague,
+   a co-author) are filed under both names — two people's categories shared 7 of 7 and 9 files
+   in the calibration corpus, and a gallery built "largest face first" then locks onto whichever
+   face is biggest. Their centroid cosine was **0.94**: the two "identities" were one face.
+   Build gallery references from single-face images only, prefer P18, and print the
+   most-similar gallery pairs before reporting counts. Contamination inflates "missed
+   appearances" by double-naming the same face.
 
 ## Example use cases
 

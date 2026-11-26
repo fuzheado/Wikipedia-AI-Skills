@@ -85,9 +85,18 @@ missing labels, so ~94% precision is a lower bound.
 - Identity clustering at cosine 0.60: 140 clusters with ≥2 faces, 79 with ≥3 → roughly
   **100–140 recurring people**, i.e. about half the recurring people in the category are
   anonymous in Commons metadata. Clustering over-splits; treat the count as an upper bound.
-- **Missed appearances of already-named people: 69 `(person, photo)` pairs** (top individuals
-  +10, +10, +10, +9). This is the concrete backlog a suggestion tool would clear, and it is
-  much easier to justify than "label the unknown guests".
+- **Missed appearances of already-named people: 39 `(photo, person)` attributions at 0.60**
+  that collapse into **22 distinct faces**. Of those 22, about a dozen are self-consistent
+  (one name per face, best similarity 0.63–0.83). The rest are a contaminated-gallery
+  artefact: two people's Commons categories shared 7 of 7 and 9 files, their centroid cosine
+  was 0.94, and one face collected three different names (Max Sparreboom / Erik Borra /
+  Jimmy Wales). A pre-collapse count of the same set (counting every `(person, photo)` pair
+  without requiring the face's top-1 name) gives 69 — that figure double-counts the
+  contaminated face and should not be quoted as a backlog. Report the collapsed face count,
+  and print the most-similar gallery pairs first.
+- The measurement worth acting on is therefore per-face, not per-pair: **22 faces in photos
+  that do not credit the person the pipeline names.** Fix the contaminated categories
+  upstream before turning any of them into `depicts`. 
 
 ## Cost, measured on CPU
 
