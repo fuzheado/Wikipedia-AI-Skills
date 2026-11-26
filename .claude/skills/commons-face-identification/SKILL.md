@@ -220,7 +220,18 @@ existing metadata), DepictAssist, and `wd-image-positions` for inspecting `P2677
    interiors, the award object. Exclude them from the face denominator and say why.
 8. **Never tune a threshold on the set you report.** Sweep on one category, report on another,
    or hold out photos.
-9. **A person's Commons category contains other people.** Joint photos (a partner, a colleague,
+9. **Decide the population before you measure — community members are a privacy boundary.**
+   If the deliverable is about the outsiders in the frame (an award, a GLAM event, a
+   conference), exclude Wikipedians/Wikimedians: their categories sit under
+   `Wikipedians …`/`Wikimedians …`/`Wikimedia movement …` trees, so walk category ancestry
+   and drop every photo that names one. If the ask is privacy-driven, also drop photos where
+   the matcher puts a community member in frame even though nothing is labelled. Measured on
+   the calibration corpus: 47 of 71 people were community members, 100 photos were dropped on
+   the label rule and 7 more on the match rule, leaving 173 photos and 671 of 1,537 faces.
+   The numbers change with the population — recall on the remaining 116 pairs was 42% at 0.60,
+   not the pooled 51%, because ceremonial wide shots dominate what is left. Never mix the two
+   populations in one accuracy claim.
+10. **A person's Commons category contains other people.** Joint photos (a partner, a colleague,
    a co-author) are filed under both names — two people's categories shared 7 of 7 and 9 files
    in the calibration corpus, and a gallery built "largest face first" then locks onto whichever
    face is biggest. Their centroid cosine was **0.94**: the two "identities" were one face.

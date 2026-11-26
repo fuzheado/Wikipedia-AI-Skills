@@ -98,6 +98,25 @@ missing labels, so ~94% precision is a lower bound.
   that do not credit the person the pipeline names.** Fix the contaminated categories
   upstream before turning any of them into `depicts`. 
 
+## Population filters change the numbers (community members excluded)
+
+47 of 71 classified people were Wikipedians/Wikimedians by category ancestry. Dropping every
+photo that names one removed 100 photos; a stricter pass that also drops photos where the
+matcher places a community member in frame (unlabelled) removed 7 more. 173 photos and 671 of
+the 1,537 faces remained, with 24 non-community people holding gallery references.
+
+| threshold | recall on the 116 non-community pairs | people matched at least once |
+|---|---|---|
+| 0.50 | 69% | 21/24 |
+| 0.55 | 55% | 21/24 |
+| 0.60 | 42% | 18/24 |
+| 0.65 | 31% | 14/24 |
+
+Lower than the pooled figures because the surviving photos are the ceremonial wide shots
+(small faces) and the stale-reference case is a larger share. New attributions on that
+population: 2 at 0.60, 11 at 0.50. Identity clustering over the 671 faces gave 40 clusters of
+≥3 faces, 31 of them nameless at 0.50 — the anonymous recurring people, counted but not shown.
+
 ## Cost, measured on CPU
 
 | step | images | time |
