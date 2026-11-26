@@ -94,6 +94,7 @@
   "https://citations.toolforge.org/": "2026-11-10T15:21:19Z",
   "https://codepen.io/Krinkle/pen/BwEKgW": "2026-11-16T17:44:09Z",
   "https://codepen.io/ottomata/pen/LYpPpxj": "2026-11-16T17:44:10Z",
+  "https://commons-metadata-suggester.toolforge.org": "2026-11-25T22:17:12Z",
   "https://commons-query.wikimedia.org": "2026-11-10T15:21:21Z",
   "https://commons-query.wikimedia.org/": "2026-11-10T15:21:23Z",
   "https://commons-query.wikimedia.org/sparql": "2026-08-10T12:57:50Z",
@@ -103,6 +104,7 @@
   "https://commons.wikimedia.org/entity/": "2026-08-10T12:57:50Z",
   "https://commons.wikimedia.org/rest.php/oauth2": "2026-08-10T12:57:50Z",
   "https://commons.wikimedia.org/w/api.php": "2026-11-10T15:21:27Z",
+  "https://commons.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Erasmus_Prize_2015&cmlimit=50&format=json": "2026-11-25T22:17:13Z",
   "https://commons.wikimedia.org/w/api.php?action=query&list=search": "2026-09-20T19:06:48Z",
   "https://commons.wikimedia.org/w/api.php?action=query&prop=imageinfo&iiprop=mime|thumbmime&iiurlwidth=400&titles=File:Example.jpg|File:Logo.svg|File:Doc.pdf|File:Video.webm&format=json": "2026-08-10T12:57:50Z",
   "https://commons.wikimedia.org/w/api.php?action=query&prop=imageinfo&iiprop=url|mime|thumbmime&iiurlwidth=800&titles=File:Example.jpg&format=json": "2026-08-10T12:57:50Z",
@@ -561,6 +563,7 @@
   "https://refill.toolforge.org/": "2026-11-10T15:27:31Z",
   "https://refill.toolforge.org/ng/api/en.wikipedia.org/Article": "2026-11-10T15:27:32Z",
   "https://refill.toolforge.org/ng/api/en.wikipedia.org/Article_Title": "2026-11-10T15:27:33Z",
+  "https://reframe.toolforge.org": "2026-11-25T22:17:14Z",
   "https://ru.wikipedia.org": "2026-11-10T15:27:34Z",
   "https://sangkalak.toolforge.org/": "2026-09-11T19:57:08Z",
   "https://schema.wikimedia.org": "2026-11-10T15:27:35Z",
@@ -709,6 +712,7 @@
   "https://wikitech.wikimedia.org/wiki/Security": "2026-11-10T15:29:28Z",
   "https://wikitech.wikimedia.org/wiki/Tool:Popular_Pages": "2026-09-20T19:50:41Z",
   "https://wikitech.wikimedia.org/wiki/Wikimedia_Cloud_Services_team/EnhancementProposals/Toolforge_Alerting_Service": "2026-10-03T13:52:31Z",
+  "https://wikivisage.toolforge.org": "2026-11-25T22:17:15Z",
   "https://wikiwho-api.wmcloud.org/<lang": "2026-10-14T14:26:54Z",
   "https://wikiwho-api.wmcloud.org/en/api/v1.0.0-beta/": "2026-11-16T17:46:12Z",
   "https://wikiwho-api.wmcloud.org/en/api/v1.0.0-beta/all_content/Wikilambda/?editor=true&in=true&out=true": "2026-11-16T17:46:13Z",
@@ -1759,7 +1763,7 @@
    "classification": "unicode_domain_example"
   }
  },
- "generated_at": "2026-11-24T18:31:27Z",
+ "generated_at": "2026-11-25T22:17:11Z",
  "generator": "scripts/refresh-url-registry.py",
  "skip": {
   "example": "illustrative placeholder URLs",
@@ -1860,6 +1864,7 @@
   "https://citations.toolforge.org/": 200,
   "https://codepen.io/Krinkle/pen/BwEKgW": 403,
   "https://codepen.io/ottomata/pen/LYpPpxj": 403,
+  "https://commons-metadata-suggester.toolforge.org": 200,
   "https://commons-query.wikimedia.org": 200,
   "https://commons-query.wikimedia.org/": 200,
   "https://commons-query.wikimedia.org/sparql": -1,
@@ -1869,6 +1874,7 @@
   "https://commons.wikimedia.org/entity/": -1,
   "https://commons.wikimedia.org/rest.php/oauth2": -2,
   "https://commons.wikimedia.org/w/api.php": 200,
+  "https://commons.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Erasmus_Prize_2015&cmlimit=50&format=json": 200,
   "https://commons.wikimedia.org/w/api.php?action=query&list=search": 200,
   "https://commons.wikimedia.org/w/api.php?action=query&prop=imageinfo&iiprop=mime|thumbmime&iiurlwidth=400&titles=File:Example.jpg|File:Logo.svg|File:Doc.pdf|File:Video.webm&format=json": -1,
   "https://commons.wikimedia.org/w/api.php?action=query&prop=imageinfo&iiprop=url|mime|thumbmime&iiurlwidth=800&titles=File:Example.jpg&format=json": -1,
@@ -2327,6 +2333,7 @@
   "https://refill.toolforge.org/": 200,
   "https://refill.toolforge.org/ng/api/en.wikipedia.org/Article": 200,
   "https://refill.toolforge.org/ng/api/en.wikipedia.org/Article_Title": 200,
+  "https://reframe.toolforge.org": 200,
   "https://ru.wikipedia.org": 200,
   "https://sangkalak.toolforge.org/": 200,
   "https://schema.wikimedia.org": 200,
@@ -2475,6 +2482,7 @@
   "https://wikitech.wikimedia.org/wiki/Security": 200,
   "https://wikitech.wikimedia.org/wiki/Tool:Popular_Pages": 200,
   "https://wikitech.wikimedia.org/wiki/Wikimedia_Cloud_Services_team/EnhancementProposals/Toolforge_Alerting_Service": 200,
+  "https://wikivisage.toolforge.org": 200,
   "https://wikiwho-api.wmcloud.org/<lang": -1,
   "https://wikiwho-api.wmcloud.org/en/api/v1.0.0-beta/": 200,
   "https://wikiwho-api.wmcloud.org/en/api/v1.0.0-beta/all_content/Wikilambda/?editor=true&in=true&out=true": 200,
@@ -2623,5 +2631,5 @@
   "https://your-tool.toolforge.org": -1,
   "https://\u0440\u0443.wikipedia.org": 0
  },
- "user_agent": "wikipedia-ai-skills-url-registry/1.0 (scheduled GitHub Action; https://github.com/fuzheado/Wikipedia-AI-Skills)"
+ "user_agent": "wikipedia-ai-skills-url-registry/1.0 (https://github.com/fuzheado/Wikipedia-AI-Skills)"
 }
