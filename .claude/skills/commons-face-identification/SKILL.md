@@ -152,8 +152,12 @@ category.
 **Never report a threshold without a visual audit.** Build side-by-side tiles (gallery
 reference | event crop, similarity in the label), judge same/different/unclear yourself in the
 high band and the near-threshold band separately, and quote the audit next to the number.
-Calibration on 282 photos, 1,537 faces: with ArcFace-R50 cosine, the usable band is
-**0.55–0.60**; ≈75% of ≥0.60 matches were correct, only 20–40% in 0.42–0.50. Recall falls off
+Calibration on 282 photos, 1,537 faces: with ArcFace-R50 cosine, ≈75% of ≥0.60 matches were
+correct and only 20–40% in 0.42–0.50 — but that audit ran on the *mixed* population with
+contaminated references. On the cleaned non-community set (47 community members excluded,
+references from single-face images) a domain expert confirmed **11 of 11** proposals at ≥0.50.
+The band is not a constant: gallery quality moves it. Re-audit per population, and quote whose
+judgement the audit used. Recall falls off
 fast above 0.65 and precision collapses below 0.50.
 
 Measured operating points, per-person variance and the population shape:

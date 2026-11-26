@@ -37,7 +37,13 @@ corpus are background guests, and group shots dominate the face count.
 - 0.42–0.50 band, 36 sampled: ~7 clear matches, ~20 clearly different, the rest unclear →
   **20–40%**. Below 0.50 the output is not usable without a human decision on every tile.
 
-Quote the audit next to the threshold. A bare "80% recall" at 0.45 is a misleading claim when
+Population matters more than the threshold: on the cleaned non-community set (community
+members excluded, references restricted to single-face images) a domain expert reviewed every
+proposal at ≥0.50 and confirmed **11 of 11** (n=11, one reviewer — small, so treat it as a
+direction, not a rate). The 20–40% figure above came from a gallery containing joint photos of
+two people, which is what actually destroys precision at that band.
+
+Quote the audit next to the threshold, and say whose judgement it was. A bare "80% recall" at 0.45 is a misleading claim when
 most of those fires are the wrong face in the right photo.
 
 ## Per-person variance at a fixed 0.60 threshold
