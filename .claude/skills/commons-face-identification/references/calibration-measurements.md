@@ -123,6 +123,17 @@ Lower than the pooled figures because the surviving photos are the ceremonial wi
 population: 2 at 0.60, 11 at 0.50. Identity clustering over the 671 faces gave 40 clusters of
 ≥3 faces, 31 of them nameless at 0.50 — the anonymous recurring people, counted but not shown.
 
+## Usability gate (what a reviewer can actually act on)
+
+Gate: bbox width ≥ 90 px, detector score ≥ 0.70, |yaw| ≤ 0.20 (nose x-offset / inter-ocular
+distance from the 5-point landmarks), Laplacian variance of the crop ≥ 40.
+
+- 108 of 671 faces (16%) pass on the non-community set.
+- Proposals by band: 0.60+ → 2 proposals, 1 usable; 0.50–0.60 → 9 proposals, 0 usable;
+  0.40–0.50 → 6 proposals, 1 usable. **2 usable proposals in total**, both in one photo.
+- Consequence: on crowd/ceremony photography the binding constraint is photo quality. Measure
+  usable faces per photo on a sample before scoping any labelling work.
+
 ## Cost, measured on CPU
 
 | step | images | time |

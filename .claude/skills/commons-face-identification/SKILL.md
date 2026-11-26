@@ -30,6 +30,20 @@ Two questions get confused, and the answer to each is different:
 State which one you are measuring before you write code, and never report a single pooled
 accuracy for both.
 
+## Check whether it pays off first
+
+Face recognition on an event corpus produces far less than its recall suggests, and the reason
+is the photography, not the model. On the calibration corpus a minimal usability gate —
+bbox width ≥ 90 px, detector score ≥ 0.70, |yaw| ≤ 0.20 (nose offset / inter-ocular distance),
+Laplacian variance ≥ 40 — passed **108 of 671 faces (16%)**. Of the 17 proposals the matcher
+made in that population across 0.40–1.00, **2 survived**: one person in one photo.
+
+So before promising a labelling project, compute the same gate on a sample and report *usable
+faces per photo*. Crowd and ceremony photography (wide shots, profiles, motion blur) loses
+~84%; portrait-style corpora (WikiPortraits, GLAM studio shoots, press portraits) keep most of
+it. The value is also rarely "add labels for one event" — it is fixing misfiled person
+categories and triaging archives where nobody can label thousands of faces.
+
 ## When to use
 
 - Someone asks how good face recognition is on Commons, or how many people in a category
@@ -235,7 +249,11 @@ existing metadata), DepictAssist, and `wd-image-positions` for inspecting `P2677
    The numbers change with the population — recall on the remaining 116 pairs was 42% at 0.60,
    not the pooled 51%, because ceremonial wide shots dominate what is left. Never mix the two
    populations in one accuracy claim.
-10. **A person's Commons category contains other people.** Joint photos (a partner, a colleague,
+10. **Filter for usable faces before scoring, not after.** Occluded, profile and soft crops
+   pass a cosine threshold and add nothing a reviewer can act on — 84% of detected faces in the
+   calibration corpus failed a minimal gate, and only 2 of 17 proposals survived it. Report
+   usable faces per photo as the yield metric.
+11. **A person's Commons category contains other people.** Joint photos (a partner, a colleague,
    a co-author) are filed under both names — two people's categories shared 7 of 7 and 9 files
    in the calibration corpus, and a gallery built "largest face first" then locks onto whichever
    face is biggest. Their centroid cosine was **0.94**: the two "identities" were one face.
